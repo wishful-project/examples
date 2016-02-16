@@ -1,0 +1,22 @@
+## WiSHFUL Agent config file
+
+agent_info:
+  name: 'wishful_simple_agent_123'
+  info: 'wishful_simple_agent_info'
+
+
+inproc_modules:
+  ath9k_module_inproc:
+      type : python
+      import : wishful_ath9k_driver
+      class_name : Ath9kDriver
+      args : ['-i wlan0,wlan1']
+      function: process_msgs
+      message_type : [radio, all]
+
+modules:
+  discovery_module:
+      type : python
+      path : ../../agent_modules/discovery/bin/simple_discovery
+      args : ['-d tcp://127.0.0.1:8989', '-u tcp://127.0.0.1:8990']
+      message_type : [DiscoverySuccessMsg, DiscoveryRestartMsg]

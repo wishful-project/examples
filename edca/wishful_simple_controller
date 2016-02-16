@@ -1,0 +1,115 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+wishful_controller_simple.py: First implementation of WiSHFUL controller
+
+Usage:
+   wishful_controller_simple.py [options] [-q | -v]
+
+Options:
+   -f                  foo
+   --config configFile config file path
+
+Example:
+   ./wishful_simple_local_controller -v --config ./config.yaml 
+
+Other options:
+   -h, --help          show this help message and exit
+   -q, --quiet         print less text
+   -v, --verbose       print more text
+   --version           show version and exit
+"""
+
+import sys
+import datetime
+import logging
+import wishful_controller
+import gevent
+import wishful_upis as upis
+import wishful_ath9k_driver as edca
+
+__author__ = "Piotr Gawlowicz, Mikolaj Chwalisz"
+__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__version__ = "0.1.0"
+__email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
+
+
+log = logging.getLogger('wishful_agent.main')
+controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+nodes = []
+
+#TODO: allways return call_id to identify response in callback?
+
+@controller.new_node_callback()
+def printNodeName(group, nodeId, name, info):
+    nodes.append(nodeId)
+    print "New Node : Group : {} NodeID : {} Name : {}  Info : {}".format(group, nodeId, name, info)
+
+
+@controller.node_exit_callback()
+def printNodeName(group, nodeId, reason):
+    if nodeId in nodes:
+        nodes.remove(nodeId);
+    print "NodeExit : Group : {} NodeID : {} Reason : {}".format(group, nodeId, reason)
+
+
+@controller.set_default_callback()
+def default_callback(group, nodeId, data):
+    print "DEFAULT CALLBACK : Group:{}, NodeId:{}, msg:{}".format(group, nodeId, data)
+
+
+def main(args):
+    log.debug(args)
+
+    config_file_path = args['--config']
+    controller.load_modules(controller.read_config_file(path=config_file_path))
+    controller.start()
+
+
+    edcaParams = edca.EdcaQueueParameters(aifs=123, cwmin=127, cwmax=511, txop=0)
+    #control loop
+    while True:
+        gevent.sleep(10)
+        print "\n"
+        print "Connected nodes", nodes
+        if nodes:
+            controller.nodes(nodes[0]).radio.setEdcaParameters(queueId=0, qParam=edcaParams)
+
+
+
+if __name__ == "__main__":
+    try:
+        from docopt import docopt
+    except:
+        print("""
+        Please install docopt using:
+            pip install docopt==0.6.1
+        For more refer to:
+        https://github.com/docopt/docopt
+        """)
+        raise
+
+    args = docopt(__doc__, version=__version__)
+
+    log_level = logging.INFO  # default
+    if args['--verbose']:
+        log_level = logging.DEBUG
+    elif args['--quiet']:
+        log_level = logging.ERROR
+
+    logging.basicConfig(level=log_level,
+        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    if logging.getLogger().isEnabledFor(logging.DEBUG):
+        main(args)
+    else:
+        try:
+            main(args)
+        except KeyboardInterrupt:
+            log.debug("Controller exits")
+        except:
+            log.debug("Unexpected error:".format(sys.exc_info()[0]))
+        finally:
+            log.debug("Exit")
+            controller.kill()
