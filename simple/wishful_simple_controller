@@ -34,7 +34,6 @@ __version__ = "0.1.0"
 __email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
 
 
-
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
 nodes = []
@@ -69,9 +68,9 @@ def set_channel_reponse(group, nodeId, data):
 def get_channel_reponse(group, nodeId, data):
     print "get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, nodeId, data)
 
+
 def print_response(group, nodeId, data):
     print "Print response : Group:{}, NodeId:{}, Result:{}".format(group, nodeId, data) 
-
 
 
 def main(args):
@@ -88,11 +87,11 @@ def main(args):
         print "Connected nodes", nodes
         if nodes:
             #execute non-blocking function immediately
-            controller.nodes(nodes[0]).net.start_iperf_server(port=1234)
             controller.nodes(nodes[0]).radio.set_power(12)
+            controller.nodes(nodes[0]).net.start_iperf_server(port=1234)
 
             #execute non-blocking function immediately, with specific callback
-            controller.nodes(nodes[0]).callback(print_response).radio.set_power(12)
+            controller.nodes(nodes[0]).callback(print_response).radio.get_power()
 
             #schedule non-blocking function 
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
@@ -126,7 +125,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
-    if 0:
+    if logging.getLogger().isEnabledFor(logging.DEBUG):
         main(args)
     else:
         try:
