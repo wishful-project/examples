@@ -1,0 +1,103 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+wifi_handover_controller.py: First implementation of WiSHFUL controller
+
+Usage:
+   wifi_handover_controller.py [options] [-q | -v]
+
+Options:
+   -f                  foo
+   --config configFile config file path
+
+Example:
+   ./wifi_handover_controller -v --config ./handover_config.yaml 
+
+Other options:
+   -h, --help          show this help message and exit
+   -q, --quiet         print less text
+   -v, --verbose       print more text
+   --version           show version and exit
+"""
+
+import gevent
+import logging
+import wishful_controller
+import wishful_upis as upis
+
+__author__ = "Piotr Gawlowicz, Anatolij Zubow"
+__copyright__ = "Copyright (c) 2015, Technische Universitat Berlin"
+__version__ = "0.1.0"
+__email__ = "{gawlowicz, zubow}@tkn.tu-berlin.de"
+
+
+log = logging.getLogger('wishful_agent.main')
+controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+nodes = []
+
+@controller.new_node_callback()
+def printNodeName(group, nodeId, name, info):
+    nodes.append(nodeId)
+    print "New Node : Group : {} NodeID : {} Name : {}  Info : {}".format(group, nodeId, name, info)
+
+
+@controller.node_exit_callback()
+def printNodeName(group, nodeId, reason):
+    if nodeId in nodes:
+        del nodes[nodeId]
+    print "NodeExit : Group : {} NodeID : {} Reason : {}".format(group, nodeId, reason)
+
+
+def main(args):
+    log.debug(args)
+
+    config_file_path = args['--config']
+    controller.load_modules(controller.read_config_file(path=config_file_path))
+    controller.start()
+   
+    #control loop
+    staMac = "68:f7:23:72:de:af"
+    while True:
+        gevent.sleep(10)
+        print "Connected nodes", nodes
+        if len(nodes) == 2:
+            controller.handover.perform_hard_handover(nodes[0], nodes[1], staMac)
+            gevent.sleep(10)
+            controller.handover.perform_soft_handover(nodes[1], nodes[0], staMac)
+            
+
+
+
+if __name__ == "__main__":
+    try:
+        from docopt import docopt
+    except:
+        print("""
+        Please install docopt using:
+            pip install docopt==0.6.1
+        For more refer to:
+        https://github.com/docopt/docopt
+        """)
+        raise
+
+    args = docopt(__doc__, version=__version__)
+
+    log_level = logging.INFO  # default
+    if args['--verbose']:
+        log_level = logging.DEBUG
+    elif args['--quiet']:
+        log_level = logging.ERROR
+
+    logging.basicConfig(level=log_level,
+        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    try:
+        main(args)
+    except KeyboardInterrupt:
+        log.debug("Controller exits")
+    except:
+        log.debug("Unexpected error:".format(sys.exc_info()[0]))
+    finally:
+        log.debug("Exit")
+        controller.kill()
