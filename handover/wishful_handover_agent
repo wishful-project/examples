@@ -8,11 +8,10 @@ Usage:
    wishful_agent_simple.py [options] [-q | -v]
 
 Options:
-   -f                  foo
    --config configFile config file path
 
 Example:
-   ./wishful_agent_simple -v --config ./config.yaml
+   ./wishful_agent_simple -v --config ./agent_config.yaml
 
 Other options:
    -h, --help          show this help message and exit

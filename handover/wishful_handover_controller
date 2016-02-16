@@ -17,6 +17,7 @@ Other options:
    --version           show version and exit
 """
 
+import sys
 import gevent
 import logging
 import wishful_controller
@@ -60,9 +61,9 @@ def main(args):
 
         #TO BE REMOVED:        
         if nodes:
-            controller.handover.perform_hard_handover("AP1", "AP2", staMac)
+            controller.handover.perform_hard_handover(nodes[0], "AP2", staMac)
             gevent.sleep(10)
-            controller.handover.perform_soft_handover("AP2", "AP1", staMac)
+            controller.handover.perform_soft_handover("AP2", nodes[0], staMac)
 
         #TO BE ADDED:
         #if len(nodes) == 2:
