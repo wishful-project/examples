@@ -5,14 +5,10 @@
 wifi_handover_controller.py: First implementation of WiSHFUL controller
 
 Usage:
-   wifi_handover_controller.py [options] [-q | -v]
-
-Options:
-   -f                  foo
-   --config configFile config file path
+   wifi_handover_controller.py [-q | -v]
 
 Example:
-   ./wifi_handover_controller -v --config ./handover_config.yaml 
+   ./wifi_handover_controller -v
 
 Other options:
    -h, --help          show this help message and exit
@@ -45,26 +41,34 @@ def printNodeName(group, nodeId, name, info):
 @controller.node_exit_callback()
 def printNodeName(group, nodeId, reason):
     if nodeId in nodes:
-        del nodes[nodeId]
+        nodes.remove(nodeId);
     print "NodeExit : Group : {} NodeID : {} Reason : {}".format(group, nodeId, reason)
 
 
 def main(args):
     log.debug(args)
-
-    config_file_path = args['--config']
-    controller.load_modules(controller.read_config_file(path=config_file_path))
+    controller.add_upi_module(upi="global", moduleName="wishful_module_handover", 
+                          className="HandoverModule", importAs="handover")
     controller.start()
-   
+
+
     #control loop
     staMac = "68:f7:23:72:de:af"
     while True:
         gevent.sleep(10)
         print "Connected nodes", nodes
-        if len(nodes) == 2:
-            controller.handover.perform_hard_handover(nodes[0], nodes[1], staMac)
+
+        #TO BE REMOVED:        
+        if nodes:
+            controller.handover.perform_hard_handover("AP1", "AP2", staMac)
             gevent.sleep(10)
-            controller.handover.perform_soft_handover(nodes[1], nodes[0], staMac)
+            controller.handover.perform_soft_handover("AP2", "AP1", staMac)
+
+        #TO BE ADDED:
+        #if len(nodes) == 2:
+        #    controller.handover.perform_hard_handover(nodes[0], nodes[1], staMac)
+        #    gevent.sleep(10)
+        #    controller.handover.perform_soft_handover(nodes[1], nodes[0], staMac)
             
 
 

@@ -49,7 +49,7 @@ def printNodeName(group, nodeId, name, info):
 @controller.node_exit_callback()
 def printNodeName(group, nodeId, reason):
     if nodeId in nodes:
-        del nodes[nodeId]
+        nodes.remove(nodeId);
     print "NodeExit : Group : {} NodeID : {} Reason : {}".format(group, nodeId, reason)
 
 
