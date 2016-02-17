@@ -82,10 +82,13 @@ def main(args):
         if nodes:
             break
 
-    controller.nodes(nodes[0]).rule(match=(upis.radio.get_noise, "FILTER(MOV_AVG, 10)", ">", -90), 
-                                            action=(upis.radio.set_channel, 7),
-                                            permanence="TRANSIENT",
-                                            callback=rule_matched)
+    controller.nodes(nodes[0]).rule(event=(upis.radio.get_noise, 2),
+                                    filter=("FILTER(MOV_AVG, 10)"),
+                                    match=(">", -90), 
+                                    action=(upis.radio.set_channel, 7),
+                                    permanence="TRANSIENT",
+                                    callback=rule_matched)
+
     while True:
         gevent.sleep(5)
         print "Connected nodes", nodes
