@@ -121,7 +121,11 @@ if __name__ == "__main__":
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
     if logging.getLogger().isEnabledFor(logging.DEBUG):
-        main(args)
+        try:
+            main(args)
+        finally:
+            log.debug("Exit")
+            controller.kill()
     else:
         try:
             main(args)
