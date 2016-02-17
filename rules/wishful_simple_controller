@@ -27,6 +27,7 @@ import logging
 import wishful_controller
 import gevent
 import wishful_upis as upis
+import wishful_framework as fw
 
 __author__ = "Piotr Gawlowicz, Mikolaj Chwalisz"
 __copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
@@ -61,15 +62,9 @@ def default_callback(group, nodeId, cmd, data):
 @controller.add_callback("routers", upis.radio.set_channel)
 def set_channel_reponse(group, nodeId, data):
     print "set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, nodeId, data)
-    controller.nodes(nodeId).delay(3).net.start_iperf_server(port=1234)
 
 
-@controller.add_callback("routers", upis.radio.get_channel)
-def get_channel_reponse(group, nodeId, data):
-    print "get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, nodeId, data)
-
-
-def print_response(group, nodeId, data):
+def rule_matched(group, nodeId, data):
     print "Print response : Group:{}, NodeId:{}, Result:{}".format(group, nodeId, data) 
 
 
@@ -82,19 +77,20 @@ def main(args):
    
     #control loop
     while True:
-        gevent.sleep(2)
+        gevent.sleep(5)
         print "Connected nodes", nodes
         if nodes:
-            #controller.nodes(nodes[0]).rule(match=(radio.get_noise(), FILTER(MOV_AVG, 10), ">", -90), 
-            #                                action=radio.set_channel(7),
-            #                                callback=print_response,
-            #                                permanence="TRANSIENT")
+            break
 
-            #controller.nodes(nodes[0]).rule(match=(radio.get_airtime_utilzation(), FILTER(MOV_AVG, 100), ">", 0.9), 
-            #                                action=radio.set_channel(random()), 
-            #                                callback=print_response,
-            #                                permanence="PERSISTENT")
-            controller.nodes(nodes[0]).radio.get_rssi()
+    controller.nodes(nodes[0]).rule(match=(upis.radio.get_noise, "FILTER(MOV_AVG, 10)", ">", -90), 
+                                            action=(upis.radio.set_channel, 7),
+                                            permanence="TRANSIENT",
+                                            callback=rule_matched)
+    while True:
+        gevent.sleep(5)
+        print "Connected nodes", nodes
+
+
 
 if __name__ == "__main__":
     try:
