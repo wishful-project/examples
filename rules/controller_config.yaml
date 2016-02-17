@@ -1,0 +1,11 @@
+## WiSHFUL Controllers config file
+
+discovery_module:
+    type : python
+    path : ../../agent_modules/discovery/bin/discovery_pyre_controller
+    args : ['']
+
+synchronization_module:
+    type : python
+    path : ../../agent_modules/ptp/bin/ptp_server.py
+    args : ['-i eth0']
