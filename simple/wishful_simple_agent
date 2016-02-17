@@ -31,9 +31,9 @@ __copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
 
+log = logging.getLogger('wishful_agent.main')
 
 def main(args):
-    log = logging.getLogger('wishful_agent.main')
     log.debug(args)
 
     config_file_path = args['--config']
@@ -66,4 +66,14 @@ if __name__ == "__main__":
     logging.basicConfig(level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
-    main(args)
+    if logging.getLogger().isEnabledFor(logging.DEBUG):
+        main(args)
+    else:
+        try:
+            main(args)
+        except KeyboardInterrupt:
+            log.debug("Agent exits")
+        except:
+            log.debug("Unexpected error:".format(sys.exc_info()[0]))
+        finally:
+            log.debug("Exit")
