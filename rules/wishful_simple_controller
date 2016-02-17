@@ -29,10 +29,10 @@ import gevent
 import wishful_upis as upis
 import wishful_framework as fw
 
-__author__ = "Piotr Gawlowicz, Mikolaj Chwalisz"
-__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__author__ = "Piotr Gawlowicz, Anatolij Zubow"
+__copyright__ = "Copyright (c) 2015, Technische Universitat Berlin"
 __version__ = "0.1.0"
-__email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
+__email__ = "{gawlowicz, zubow}@tkn.tu-berlin.de"
 
 
 log = logging.getLogger('wishful_agent.main')
@@ -82,8 +82,10 @@ def main(args):
         if nodes:
             break
 
+    #TODO: add args and repeat number to event definition
+    #TODO: return some ruleId so we can remove it later
     controller.nodes(nodes[0]).rule(event=(upis.radio.get_noise, 2),
-                                    filter=("FILTER(MOV_AVG, 10)"),
+                                    filters=("FILTER(MOV_AVG, 10)"),
                                     match=(">", -90), 
                                     action=(upis.radio.set_channel, 7),
                                     permanence="TRANSIENT",
