@@ -27,7 +27,7 @@ import logging
 import wishful_controller
 import gevent
 import wishful_upis as upis
-import wishful_ath9k_driver as edca
+import wishful_framework.upi_arg_classes.edca as edca
 
 __author__ = "Piotr Gawlowicz, Mikolaj Chwalisz"
 __copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
