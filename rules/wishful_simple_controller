@@ -91,6 +91,24 @@ def main(args):
                                     permanence="TRANSIENT",
                                     callback=rule_matched)
 
+
+    '''
+    controller.nodes(nodes[0]).add_rule(event=TimeEvent(func=upis.radio.get_noise, args=(), interval=2, iface="wlan0"),
+                                    filters=[Filter(MOV_AVG, 10), Filter(PeakDetector, 50)],
+                                    match=Match(">", -90),
+                                    action=Action(upis.radio.set_channel, args=(7)),
+                                    permanence=Permanance.TRANSIENT,
+                                    ctrl_callback=rule_matched)
+
+    controller.nodes(nodes[0]).add_rule(event=PktEvent(iface="wlan0"),
+                                    pmatch=PMatch("icmp", "ether.dst 00:11:00:11:00:11"),
+                                    selector=FieldSelector("Radiotap.rssi"),
+                                    filters=[Filter(MOV_AVG, 10), Filter(PeakDetector, 50)],
+                                    match=Match(">", -90),
+                                    action=Action(upis.radio.set_channel, args=(7)),
+                                    permanence=Permanance.TRANSIENT,
+                                    ctrl_callback=rule_matched)
+    '''
     while True:
         gevent.sleep(5)
         print "Connected nodes", nodes
