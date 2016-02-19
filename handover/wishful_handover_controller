@@ -52,7 +52,6 @@ def main(args):
                           className="HandoverModule", importAs="handover")
     controller.start()
 
-
     #control loop
     staMac = "68:f7:23:72:de:af"
     while True:
@@ -70,9 +69,6 @@ def main(args):
         #    controller.handover.perform_hard_handover(nodes[0], nodes[1], staMac)
         #    gevent.sleep(10)
         #    controller.handover.perform_soft_handover(nodes[1], nodes[0], staMac)
-            
-
-
 
 if __name__ == "__main__":
     try:
