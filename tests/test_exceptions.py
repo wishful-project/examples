@@ -17,7 +17,7 @@ log = logging.getLogger('wishful_test.main')
 
 def main():
 
-    log.info('Starting test')
+    log.info('Starting testing excpetions')
     log.info('%s' % str(dir()))
     try:
         raise exceptions.AgentNotAvailable(id='123')
