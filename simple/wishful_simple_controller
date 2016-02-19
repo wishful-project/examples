@@ -93,7 +93,7 @@ def main(args):
             #execute non-blocking function immediately, with specific callback
             controller.nodes(nodes[0]).callback(print_response).radio.get_power()
 
-            #schedule non-blocking function 
+            #schedule non-blocking function
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
             controller.nodes(nodes[0]).exec_time(exec_time).radio.set_channel(4)
 
