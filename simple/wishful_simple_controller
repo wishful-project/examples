@@ -61,7 +61,7 @@ def default_callback(group, nodeId, cmd, data):
 @controller.add_callback("routers", upis.radio.set_channel)
 def set_channel_reponse(group, nodeId, data):
     print "set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, nodeId, data)
-    controller.nodes(nodeId).delay(3).net.start_iperf_server(port=1234)
+    controller.delay(3).node(nodeId).net.start_iperf_server(port=1234)
 
 
 @controller.add_callback("routers", upis.radio.get_channel)
@@ -87,18 +87,18 @@ def main(args):
         print "Connected nodes", nodes
         if nodes:
             #execute non-blocking function immediately
-            controller.nodes(nodes[0]).radio.set_power(12)
-            controller.nodes(nodes[0]).net.start_iperf_server(port=1234)
+            controller.node(nodes[0]).iface("wlan0").radio.set_power(12)
+            controller.node(nodes[0]).net.start_iperf_server(port=1234)
 
             #execute non-blocking function immediately, with specific callback
-            controller.nodes(nodes[0]).callback(print_response).radio.get_power()
+            controller.callback(print_response).node(nodes[0]).iface("wlan0").radio.get_power()
 
             #schedule non-blocking function
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            controller.nodes(nodes[0]).exec_time(exec_time).radio.set_channel(4)
+            controller.exec_time(exec_time).node(nodes[0]).iface("wlan0").radio.set_channel(4)
 
             #execute blocking function immediately
-            result = controller.nodes(nodes[0]).blocking(True).radio.get_channel()
+            result = controller.blocking(True).node(nodes[0]).iface("wlan0").radio.get_channel()
             print "Channel is:", result
 
 
