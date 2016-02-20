@@ -8,8 +8,8 @@ agent_info:
 inproc_modules:
   ath9k_module_inproc:
       type : python
-      import : wishful_ath9k_driver
-      class_name : Ath9kDriver
+      import : wishful_module_simple
+      class_name : SimpleModule
       args : ['-i wlan0,wlan1']
       function: process_msgs
       message_type : [radio, all]
