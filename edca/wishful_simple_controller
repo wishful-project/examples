@@ -74,7 +74,7 @@ def main(args):
         print "\n"
         print "Connected nodes", nodes
         if nodes:
-            controller.nodes(nodes[0]).radio.setEdcaParameters(queueId=0, qParam=edcaParams)
+            controller.nodes(nodes[0]).radio.set_edca_parameters(queueId=0, qParam=edcaParams)
 
 
 

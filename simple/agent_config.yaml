@@ -7,7 +7,7 @@ agent_info:
 inproc_modules:
   ath9k_module_inproc:
       module : wishful_module_simple
-      class_name : SimpleModule
+      class_name : SimpleModule2
       message_type : [radio, all]
 
   iperf_module_inproc:
