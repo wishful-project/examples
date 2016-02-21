@@ -5,15 +5,17 @@ agent_info:
   info: 'wishful_simple_agent_info'
 
 
-inproc_modules:
-  ath9k_module_inproc:
-      module : wishful_module_simple
-      class_name : SimpleModule
-      message_type : [radio, all]
-
-modules:
-  discovery_module:
-      type : python
+system_modules:
+  discovery:
       path : ../../agent_modules/discovery/bin/simple_discovery
       args : ['-d tcp://127.0.0.1:8989', '-u tcp://127.0.0.1:8990']
-      message_type : [DiscoverySuccessMsg, DiscoveryRestartMsg]
+
+  synchronization:
+      path : ../../agent_modules/ptp/bin/ptp_client.py
+      args : ['-i eth0']
+
+upi_modules:
+  simple:
+      module : wishful_module_simple
+      class_name : SimpleModule2
+      interfaces : [wlan0]
