@@ -22,6 +22,7 @@ import gevent
 import logging
 import wishful_controller
 import wishful_upis as upis
+import time
 
 __author__ = "Piotr Gawlowicz, Anatolij Zubow"
 __copyright__ = "Copyright (c) 2015, Technische Universitat Berlin"
@@ -33,19 +34,134 @@ log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
 nodes = []
 
+node0_name = "nuc4"
+node1_name = "nuc2"
+gateway_name = "nuc1"
+
+node0_ip = "192.168.103.136"
+node1_ip = "192.168.103.125"
+gateway_ip = "192.168.103.115"
+
+node0_ch = 44
+node1_ch = 48
+
 @controller.new_node_callback()
 def printNodeName(node):
     nodes.append(node.id)
-    print "New node appeared:"
-    print node
+    log.debug("New node appeared:")
+    log.debug(node)
 
 
 @controller.node_exit_callback()
 def printNodeName(node, reason):
     if node.id in nodes:
-        nodes.remove(node.id);
-    print "NodeExit : NodeID : {} Reason : {}".format(node.id, reason)
+        nodes.remove(node.id)
+    log.debug("NodeExit : NodeID : %s Reason : %s" % (node.id, reason))
 
+
+def runDualPeriodicSwitching(switchingInterval):
+    """
+     Soft and hard scheme at the same time for two client STAs
+    """
+
+    sta1_mac_addr = "ec:1f:72:82:09:56"
+    sta1_ip = "192.168.5.222"
+    ho1_type = 0 #HandoverTypes.Soft_CSA
+
+    sta2_mac_addr = 'd0:22:be:b7:76:8c'
+    sta2_ip = "192.168.5.200"
+    ho2_type = 1 #HandoverTypes.Hard_BL
+
+    # main control loop
+    while True:
+        if sta2_mac_addr is None or sta2_ip is None or ho2_type is None:
+            numSTAs = 1
+        else:
+            numSTAs = 2
+
+        # for each STA
+        for sta_ii in range(numSTAs):
+            if sta_ii == 0:
+                sta_mac_addr = sta1_mac_addr
+                sta_ip = sta1_ip
+                ho_type = ho1_type
+            else:
+                sta_mac_addr = sta2_mac_addr
+                sta_ip = sta2_ip
+                ho_type = ho2_type
+
+            log.warn("Performing Handover OP ...")
+            performHO(sta_mac_addr, sta_ip, ho_type)
+
+        # reschedule handover
+        log.warn("Handover successful")
+        time.sleep(switchingInterval)  # wait
+
+
+def runSinglePeriodicSwitching(ho_scheme, switchingInterval = 30):
+
+    sta_mac_addr = 'd0:22:be:b7:76:8c'
+    sta_ip = "192.168.5.200"
+
+    while True:
+        performHO(sta_mac_addr, sta_ip, ho_scheme)
+        time.sleep(switchingInterval)
+
+
+def performHO(controller, sta_mac_addr, sta_ip, ho_scheme):
+
+    try:
+        log.debug('********* testPerformHardHO **********')
+
+        # iface to use
+        wlan_iface = 'ap1'
+        wlan_inject_iface = 'inject1'
+
+        # BSSID of our Network
+        network_bssid = "D0:0E:A4:09:11:A3"
+
+        # find out who is currently controlling this client STA
+        servingAP = controller.wireless_topology.is_associated_with(nodes, wlan_iface, sta_mac_addr)
+
+        if str(servingAP) == str(nodes[0]):
+            targetAP = nodes[1]
+            targetChannel = node1_ch
+            servingChannel = node0_ch
+            servingAP_ip = node0_ip
+            targetAP_ip = node1_ip
+            servingAP_name = node0_name
+            targetAP_name = node1_name
+        elif str(servingAP) == str(nodes[1]):
+            targetAP = nodes[0]
+            targetChannel = node0_ch
+            servingChannel = node1_ch
+            servingAP_ip = node1_ip
+            targetAP_ip = node0_ip
+            servingAP_name = node1_name
+            targetAP_name = node0_name
+        else:
+            log.debug('STA is served by an unknown AP; backoff')
+            return
+
+        log.debug('Serving AP of %s is %s' % (str(sta_mac_addr), str(servingAP_name)))
+
+        log.debug('Move STA %s from %s to %s' % (str(sta_mac_addr), str(servingAP_name), str(targetAP_name)))
+
+        retVal = controller.handover.perform_handover(wlan_iface, servingAP, targetAP, sta_mac_addr, \
+                                                      wlan_inject_iface = wlan_inject_iface, sta_ip = sta_ip, \
+                                                      servingAP_ip = servingAP_ip, servingChannel = servingChannel, \
+                                                      network_bssid = network_bssid, targetAP_ip = targetAP_ip, \
+                                                      targetChannel = targetChannel, gateway = self.gateway, \
+                                                      ho_type = ho_scheme)
+
+        log.debug('HO result %s' % (str(retVal)))
+
+    except Exception as e:
+        log.fatal("... An error occurred : %s" % e)
+        raise e
+
+class HOScenarios:
+    SINGLE_HARD, SINGLE_SOFT, DOUBLE_HARD_SOFT = range(2)
 
 def main(args):
     log.debug(args)
@@ -53,23 +169,32 @@ def main(args):
                           className="HandoverModule", importAs="handover")
     controller.start()
 
-    #control loop
-    staMac = "68:f7:23:72:de:af"
     while True:
-        gevent.sleep(10)
-        print "Connected nodes", nodes
+        gevent.sleep(1)
 
-        #TO BE REMOVED:        
-        if nodes:
-            controller.handover.perform_handover(nodes[0], "AP2", staMac, 1)
-            gevent.sleep(10)
-            controller.handover.perform_handover("AP2", nodes[0], staMac, 2)
+        if len(nodes) == 3:
+            # we need two APs and a GW node
+            break
 
-        #TO BE ADDED:
-        #if len(nodes) == 2:
-        #    controller.handover.perform_hard_handover(nodes[0], nodes[1], staMac)
-        #    gevent.sleep(10)
-        #    controller.handover.perform_soft_handover(nodes[1], nodes[0], staMac)
+    log.debug("waiting for nodes: %s" % str(nodes))
+
+    mode = HOScenarios.SINGLE_SOFT
+
+    # in seconds
+    switchingInterval = 30
+
+    if mode == HOScenarios.DOUBLE_HARD_SOFT:
+        runDualPeriodicSwitching(switchingInterval)
+    elif mode == HOScenarios.SINGLE_SOFT:
+        runSinglePeriodicSwitching(0, switchingInterval)
+    elif mode == HOScenarios.SINGLE_HARD:
+        runSinglePeriodicSwitching(1, switchingInterval)
+    else:
+        log.fatal('Unknown scenario; stopping')
+        raise Exception("Unknown scenario")
+
+    log.info('Global controller stopped')
+
 
 if __name__ == "__main__":
     try:
@@ -93,7 +218,6 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
-
 
     if logging.getLogger().isEnabledFor(logging.DEBUG):
         try:
