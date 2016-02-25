@@ -45,12 +45,15 @@ gateway_ip = "192.168.103.115"
 node0_ch = 44
 node1_ch = 48
 
+gateway = None
+
 @controller.new_node_callback()
 def printNodeName(node):
     nodes.append(node.id)
     log.debug("New node appeared:")
     log.debug(node)
-
+    if node.ip == gateway_ip:
+        gateway = node
 
 @controller.node_exit_callback()
 def printNodeName(node, reason):
@@ -90,11 +93,11 @@ def runDualPeriodicSwitching(switchingInterval):
                 sta_ip = sta2_ip
                 ho_type = ho2_type
 
-            log.warn("Performing Handover OP ...")
+            log.info("Performing Handover OP ...")
             performHO(sta_mac_addr, sta_ip, ho_type)
 
         # reschedule handover
-        log.warn("Handover successful")
+        log.info("Handover successful")
         time.sleep(switchingInterval)  # wait
 
 
@@ -109,6 +112,9 @@ def runSinglePeriodicSwitching(ho_scheme, switchingInterval = 30):
 
 
 def performHO(controller, sta_mac_addr, sta_ip, ho_scheme):
+    '''
+        perform handover
+    '''
 
     try:
         log.debug('********* testPerformHardHO **********')
@@ -151,7 +157,7 @@ def performHO(controller, sta_mac_addr, sta_ip, ho_scheme):
                                                       wlan_inject_iface = wlan_inject_iface, sta_ip = sta_ip, \
                                                       servingAP_ip = servingAP_ip, servingChannel = servingChannel, \
                                                       network_bssid = network_bssid, targetAP_ip = targetAP_ip, \
-                                                      targetChannel = targetChannel, gateway = self.gateway, \
+                                                      targetChannel = targetChannel, gateway = gateway, \
                                                       ho_type = ho_scheme)
 
         log.debug('HO result %s' % (str(retVal)))
@@ -184,10 +190,13 @@ def main(args):
     switchingInterval = 30
 
     if mode == HOScenarios.DOUBLE_HARD_SOFT:
+        # two nodes are periodically switched
         runDualPeriodicSwitching(switchingInterval)
     elif mode == HOScenarios.SINGLE_SOFT:
+        # single node HO via soft
         runSinglePeriodicSwitching(0, switchingInterval)
     elif mode == HOScenarios.SINGLE_HARD:
+        # single node HO via hard
         runSinglePeriodicSwitching(1, switchingInterval)
     else:
         log.fatal('Unknown scenario; stopping')
