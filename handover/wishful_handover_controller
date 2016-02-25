@@ -61,9 +61,9 @@ def main(args):
 
         #TO BE REMOVED:        
         if nodes:
-            controller.handover.perform_hard_handover(nodes[0], "AP2", staMac)
+            controller.handover.perform_handover(nodes[0], "AP2", staMac, 1)
             gevent.sleep(10)
-            controller.handover.perform_soft_handover("AP2", nodes[0], staMac)
+            controller.handover.perform_handover("AP2", nodes[0], staMac, 2)
 
         #TO BE ADDED:
         #if len(nodes) == 2:

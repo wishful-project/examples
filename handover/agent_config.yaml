@@ -1,8 +1,8 @@
 ## WiSHFUL Agent config file
 
 agent_info:
-  name: 'wishful_simple_agent_123'
-  info: 'wishful_simple_agent_info'
+  name: 'wishful_handover_agent'
+  info: 'Soft/Hard HO for IEEE 802.11 infrastructure-initiated HO'
 
 system_modules:
   discovery:
