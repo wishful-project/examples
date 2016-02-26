@@ -56,8 +56,8 @@ def printNodeName(node, reason):
 
 
 @controller.set_default_callback()
-def default_callback(group, nodeId, cmd, data):
-    print "DEFAULT CALLBACK : Group: {}, NodeId: {}, Cmd: {}, Returns: {}".format(group, nodeId, cmd, data)
+def default_callback(group, node, cmd, data):
+    print "DEFAULT CALLBACK : Group: {}, NodeId: {}, Cmd: {}, Returns: {}".format(group, node.id, cmd, data)
 
 
 def main(args):

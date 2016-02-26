@@ -55,23 +55,23 @@ def printNodeName(node, reason):
 
 
 @controller.set_default_callback()
-def default_callback(group, nodeId, cmd, data):
-    print "DEFAULT CALLBACK : Group: {}, NodeId: {}, Cmd: {}, Returns: {}".format(group, nodeId, cmd, data)
+def default_callback(group, node, cmd, data):
+    print "DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)
 
 
-@controller.add_callback("routers", upis.radio.set_channel)
-def set_channel_reponse(group, nodeId, data):
-    print "set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, nodeId, data)
-    controller.delay(3).node(nodeId).net.start_iperf_server(port=1234)
+@controller.add_callback(upis.radio.set_channel)
+def set_channel_reponse(group, node, data):
+    print "set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, node.id, data)
+    controller.delay(3).node(node.id).net.start_iperf_server(port=1234)
 
 
-@controller.add_callback("routers", upis.radio.get_channel)
-def get_channel_reponse(group, nodeId, data):
-    print "get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, nodeId, data)
+@controller.add_callback(upis.radio.get_channel)
+def get_channel_reponse(group, node, data):
+    print "get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, node.id, data)
 
 
-def print_response(group, nodeId, data):
-    print "Print response : Group:{}, NodeId:{}, Result:{}".format(group, nodeId, data) 
+def print_response(group, node, data):
+    print "Print response : Group:{}, NodeIP:{}, Result:{}".format(group, node.ip, data) 
 
 
 def main(args):
