@@ -3,7 +3,6 @@
 agent_info:
   name: 'wishful_handover_agent'
   info: 'Soft/Hard HO for IEEE 802.11 infrastructure-initiated HO'
-  ip: '192.168.10.10'
   iface: 'eth0'
 
 system_modules:
@@ -19,7 +18,7 @@ upi_modules:
   simple:
       module : wishful_ath9k_driver
       class_name : Ath9kDriver
-      interfaces : [wlan0, wlan1]
+      interfaces : ['ap1' 'inject1']
 
   iperf:
       module : wishful_iperf_driver

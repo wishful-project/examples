@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """
-wishful_agent_simple.py: First implementation of WiSHFUL agent
+wifi_handover_agent.py: The Wishful agent which supports handover operation, i.e. IEEE 802.11 Linux.
 
 Usage:
-   wishful_agent_simple.py [options] [-q | -v]
+   wifi_handover_agent.py [options] [-q | -v]
 
 Options:
    --config configFile config file path
 
 Example:
-   ./wishful_agent_simple -v --config ./agent_config.yaml
+   ./wifi_handover_agent -v --config ./agent_config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -25,10 +25,10 @@ import signal
 import sys, os
 import wishful_agent
 
-__author__ = "Piotr Gawlowicz, Mikolaj Chwalisz"
+__author__ = "Piotr Gawlowicz, Zubow"
 __copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
 __version__ = "0.1.0"
-__email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
+__email__ = "{gawlowicz, zubow}@tkn.tu-berlin.de"
 
 log = logging.getLogger('wishful_agent.main')
 

@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-wifi_handover_controller.py: A simple client load-balancing (handover) demo.
+wifi_handover_controller.py: A simple client load-balancing (handover) demo. Here 1-2 client STAs are
+periodically handovered from one AP to another.
 
 Req.:
 - 2 APs,
@@ -39,6 +40,10 @@ log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
 nodes = []
 
+#
+# Topology: 2x AP, 1x GW and 1-2 STAs
+#
+
 # AP0
 node0_name = "nuc4"
 node0_ip = "192.168.103.136"
@@ -47,25 +52,31 @@ node0_ch = 44
 # AP1
 node1_name = "nuc2"
 node1_ip = "192.168.103.125"
+node1_ch = 48
 
 # Gateway node
 gateway_name = "nuc1"
 gateway_ip = "192.168.103.115"
 
-node1_ch = 48
+# iface to use
+wlan_iface = 'ap1'
+wlan_inject_iface = 'inject1'
+
+# BSSID of our Network
+network_bssid = "D0:0E:A4:09:11:A3"
+
 
 gateway = None
 
 @controller.new_node_callback()
-def printNodeName(node):
+def new_node_cb(node):
     nodes.append(node.id)
-    log.debug("New node appeared:")
-    log.debug(node)
+    log.debug('NodeEnter: NodeID: ' % node)
     if node.ip == gateway_ip:
         gateway = node
 
 @controller.node_exit_callback()
-def printNodeName(node, reason):
+def exit_node_cb(node, reason):
     if node.id in nodes:
         nodes.remove(node.id)
     log.debug("NodeExit : NodeID : %s Reason : %s" % (node.id, reason))
@@ -73,7 +84,7 @@ def printNodeName(node, reason):
 
 def runDualPeriodicSwitching(switchingInterval):
     """
-     Soft and hard scheme at the same time for two client STAs
+     Periodic handover of two client STAs
     """
 
     sta1_mac_addr = "ec:1f:72:82:09:56"
@@ -84,12 +95,9 @@ def runDualPeriodicSwitching(switchingInterval):
     sta2_ip = "192.168.5.200"
     ho2_type = 1 #HandoverTypes.Hard_BL
 
-    # main control loop
+    numSTAs = 2
+
     while True:
-        if sta2_mac_addr is None or sta2_ip is None or ho2_type is None:
-            numSTAs = 1
-        else:
-            numSTAs = 2
 
         # for each STA
         for sta_ii in range(numSTAs):
@@ -110,63 +118,60 @@ def runDualPeriodicSwitching(switchingInterval):
         time.sleep(switchingInterval)  # wait
 
 
-def runSinglePeriodicSwitching(ho_scheme, switchingInterval = 30):
+def runSinglePeriodicSwitching(ho_scheme, switching_interval = 30):
+
+    """
+     Periodic handover of singe client STA
+    """
 
     sta_mac_addr = 'd0:22:be:b7:76:8c'
     sta_ip = "192.168.5.200"
 
     while True:
         performHO(sta_mac_addr, sta_ip, ho_scheme)
-        time.sleep(switchingInterval)
+        time.sleep(switching_interval)
 
 
-def performHO(controller, sta_mac_addr, sta_ip, ho_scheme):
-    '''
+def performHO(sta_mac_addr, sta_ip, ho_scheme):
+
+    """
         perform handover
-    '''
+    """
 
     try:
         log.debug('********* testPerformHardHO **********')
 
-        # iface to use
-        wlan_iface = 'ap1'
-        wlan_inject_iface = 'inject1'
+        # find out which AP is currently controlling this client STA
+        serving_AP = controller.wireless_topology.is_associated_with(nodes, wlan_iface, sta_mac_addr)
 
-        # BSSID of our Network
-        network_bssid = "D0:0E:A4:09:11:A3"
-
-        # find out who is currently controlling this client STA
-        servingAP = controller.wireless_topology.is_associated_with(nodes, wlan_iface, sta_mac_addr)
-
-        if str(servingAP) == str(nodes[0]):
-            targetAP = nodes[1]
-            targetChannel = node1_ch
-            servingChannel = node0_ch
-            servingAP_ip = node0_ip
-            targetAP_ip = node1_ip
-            servingAP_name = node0_name
-            targetAP_name = node1_name
-        elif str(servingAP) == str(nodes[1]):
-            targetAP = nodes[0]
-            targetChannel = node0_ch
-            servingChannel = node1_ch
-            servingAP_ip = node1_ip
-            targetAP_ip = node0_ip
-            servingAP_name = node1_name
-            targetAP_name = node0_name
+        if str(serving_AP) == str(nodes[0]):
+            target_AP = nodes[1]
+            target_channel = node1_ch
+            serving_channel = node0_ch
+            serving_AP_ip = node0_ip
+            target_AP_ip = node1_ip
+            serving_AP_name = node0_name
+            target_AP_name = node1_name
+        elif str(serving_AP) == str(nodes[1]):
+            target_AP = nodes[0]
+            target_channel = node0_ch
+            serving_channel = node1_ch
+            serving_AP_ip = node1_ip
+            target_AP_ip = node0_ip
+            serving_AP_name = node1_name
+            target_AP_name = node0_name
         else:
             log.debug('STA is served by an unknown AP; backoff')
             return
 
-        log.debug('Serving AP of %s is %s' % (str(sta_mac_addr), str(servingAP_name)))
+        log.debug('Serving AP of %s is %s' % (str(sta_mac_addr), str(serving_AP_name)))
+        log.debug('Move STA %s from %s to %s' % (str(sta_mac_addr), str(serving_AP_name), str(target_AP_name)))
 
-        log.debug('Move STA %s from %s to %s' % (str(sta_mac_addr), str(servingAP_name), str(targetAP_name)))
-
-        retVal = controller.handover.perform_handover(wlan_iface, servingAP, targetAP, sta_mac_addr, \
-                                                      wlan_inject_iface = wlan_inject_iface, sta_ip = sta_ip, \
-                                                      servingAP_ip = servingAP_ip, servingChannel = servingChannel, \
-                                                      network_bssid = network_bssid, targetAP_ip = targetAP_ip, \
-                                                      targetChannel = targetChannel, gateway = gateway, \
+        retVal = controller.handover.perform_handover(wlan_iface, serving_AP, target_AP, sta_mac_addr,
+                                                      wlan_inject_iface = wlan_inject_iface, sta_ip = sta_ip,
+                                                      servingAP_ip = serving_AP_ip, servingChannel = serving_channel,
+                                                      network_bssid = network_bssid, targetAP_ip = target_AP_ip,
+                                                      targetChannel = target_channel, gateway = gateway,
                                                       ho_type = ho_scheme)
 
         log.debug('HO result %s' % (str(retVal)))
@@ -175,6 +180,7 @@ def performHO(controller, sta_mac_addr, sta_ip, ho_scheme):
         log.fatal("... An error occurred : %s" % e)
         raise e
 
+# possible scenarios
 class HOScenarios:
     SINGLE_HARD, SINGLE_SOFT, DOUBLE_HARD_SOFT = range(2)
 
@@ -184,6 +190,9 @@ def main(args):
                           className="HandoverModule", importAs="handover")
     controller.start()
 
+    log.debug("waiting for nodes ...")
+
+    # wait until all nodes become available
     while True:
         gevent.sleep(1)
 
@@ -191,7 +200,7 @@ def main(args):
             # we need two APs and a GW node
             break
 
-    log.debug("waiting for nodes: %s" % str(nodes))
+    log.debug(" ... done: %s" % str(nodes))
 
     mode = HOScenarios.SINGLE_SOFT
 
