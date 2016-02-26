@@ -2,7 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """
-wifi_handover_controller.py: First implementation of WiSHFUL controller
+wifi_handover_controller.py: A simple client load-balancing (handover) demo.
+
+Req.:
+- 2 APs,
+- 1 GW node,
+- 1-2 client STAs
 
 Usage:
    wifi_handover_controller.py [-q | -v]
@@ -34,15 +39,19 @@ log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
 nodes = []
 
+# AP0
 node0_name = "nuc4"
-node1_name = "nuc2"
-gateway_name = "nuc1"
-
 node0_ip = "192.168.103.136"
+node0_ch = 44
+
+# AP1
+node1_name = "nuc2"
 node1_ip = "192.168.103.125"
+
+# Gateway node
+gateway_name = "nuc1"
 gateway_ip = "192.168.103.115"
 
-node0_ch = 44
 node1_ch = 48
 
 gateway = None
