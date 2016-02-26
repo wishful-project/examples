@@ -3,6 +3,8 @@
 agent_info:
   name: 'wishful_simple_agent_123'
   info: 'wishful_simple_agent_info'
+  ip: '192.168.10.10'
+  iface: 'eth0'
 
 system_modules:
   discovery:
