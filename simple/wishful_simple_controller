@@ -62,7 +62,7 @@ def default_callback(group, node, cmd, data):
 @controller.add_callback(upis.radio.set_channel)
 def set_channel_reponse(group, node, data):
     print "set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, node.id, data)
-    controller.delay(3).node(node.id).net.start_iperf_server(port=1234)
+    controller.delay(3).node(node.id).net.create_packetflow_sink(port=1234)
 
 
 @controller.add_callback(upis.radio.get_channel)
@@ -89,7 +89,7 @@ def main(args):
         if nodes:
             #execute non-blocking function immediately
             controller.node(nodes[0]).iface("wlan0").radio.set_power(12)
-            controller.node(nodes[0]).net.start_iperf_server(port=1234)
+            controller.node(nodes[0]).net.create_packetflow_sink(port=1234)
 
             #execute non-blocking function immediately, with specific callback
             controller.callback(print_response).node(nodes[0]).iface("wlan0").radio.get_power()
