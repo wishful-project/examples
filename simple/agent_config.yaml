@@ -3,8 +3,7 @@
 agent_info:
   name: 'agent_123'
   info: 'agent_info'
-  ip: '192.168.10.10'
-  iface: 'eth0'
+  iface: 'lo'
 
 system_modules:
   discovery:
@@ -19,7 +18,7 @@ upi_modules:
   simple:
       module : wishful_module_simple
       class_name : SimpleModule2
-      interfaces : [wlan0, wlan1]
+      interfaces : ['wlan0', 'wlan1']
 
   iperf:
       module : wishful_iperf_driver
