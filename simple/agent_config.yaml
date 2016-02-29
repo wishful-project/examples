@@ -5,16 +5,11 @@ agent_info:
   info: 'agent_info'
   iface: 'lo'
 
-system_modules:
+modules:
   discovery:
-      path : ../../agent_modules/discovery/bin/simple_discovery
-      args : ['-d tcp://127.0.0.1:8989', '-u tcp://127.0.0.1:8990']
+      module : wishful_module_static_discovery
+      class_name : StaticDiscoveryModule
 
-  synchronization:
-      path : ../../agent_modules/ptp/bin/ptp_client.py
-      args : ['-i eth0']
-
-upi_modules:
   simple:
       module : wishful_module_simple
       class_name : SimpleModule2
