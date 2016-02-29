@@ -36,8 +36,13 @@ def main(args):
     log.debug(args)
 
     config_file_path = args['--config']
+
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+
     agent = wishful_agent.Agent()
-    agent.load_config(path=config_file_path)
+    agent.load_config(config)
 
     agent.run()
 
