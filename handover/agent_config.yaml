@@ -11,10 +11,10 @@ modules:
       class_name : StaticDiscoveryModule
 
   simple:
-      module : wishful_ath9k_driver
-      class_name : Ath9kDriver
+      module : wishful_module_wifi_ath9k
+      class_name : Ath9kModule
       interfaces : ['ap1' 'inject1']
 
   iperf:
-      module : wishful_iperf_driver
+      module : wishful_module_iperf
       class_name : IperfModule

@@ -16,5 +16,5 @@ modules:
       interfaces : ['wlan0', 'wlan1']
 
   iperf:
-      module : wishful_iperf_driver
+      module : wishful_module_iperf
       class_name : IperfModule
