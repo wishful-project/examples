@@ -1,11 +1,10 @@
-## WiSHFUL Controllers config file
+## WiSHFUL Controller's config file
 
-discovery_module:
-    type : python
-    path : ../../agent_modules/discovery/bin/discovery_pyre_controller
-    args : ['']
+modules:
+    discovery:
+        module : wishful_module_static_discovery
+        class_name : StaticDiscoveryControllerModule
 
-synchronization_module:
-    type : python
-    path : ../../agent_modules/ptp/bin/ptp_server.py
-    args : ['-i eth0']
+    #synchronization:
+    #    module : wishful_module_static_discovery
+    #    class_name : StaticDiscoveryControllerModule
