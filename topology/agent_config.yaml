@@ -14,7 +14,7 @@ modules:
   wifi:
       module : wishful_module_wifi_ath9k
       class_name : Ath9kModule
-      interfaces : ['wifi0' 'mon0']
+      interfaces : ['wifi0', 'mon0']
 
   iperf:
       module : wishful_module_iperf
