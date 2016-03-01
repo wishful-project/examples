@@ -252,5 +252,6 @@ if __name__ == "__main__":
         log.debug("Controller exits")
     finally:
         log.debug("Exit")
+        controller.stop()
         controller.kill()
 
