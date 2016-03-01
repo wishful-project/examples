@@ -71,17 +71,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
-    if logging.getLogger().isEnabledFor(logging.DEBUG):
-        try:
-            main(args)
-        finally:
-            log.debug("Exit")
-    else:
-        try:
-            main(args)
-        except KeyboardInterrupt:
-            log.debug("Agent exits")
-        except:
-            log.debug("Unexpected error:".format(sys.exc_info()[0]))
-        finally:
-            log.debug("Exit")
+    try:
+        main(args)
+    except KeyboardInterrupt:
+        log.debug("Agent exits")
+    finally:
+        log.debug("Exit")
