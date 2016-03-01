@@ -3,7 +3,7 @@
 agent_info:
   name: 'wishful_simple_agent_123'
   info: 'wishful_simple_agent_info'
-  iface: 'eth0'
+  iface: 'lo'
 
 modules:
   discovery:
