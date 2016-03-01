@@ -2,8 +2,9 @@
 
 modules:
     discovery:
-        module : wishful_module_static_discovery
-        class_name : StaticDiscoveryControllerModule
+        module : wishful_module_discovery_pyre
+        class_name : PyreDiscoveryControllerModule
+        kwargs: {"downlink":"tcp://127.0.0.1:8989", "uplink":"tcp://127.0.0.1:8990" ,"groupName":"wishful_1234"}
 
     #synchronization:
     #    module : wishful_module_static_discovery
