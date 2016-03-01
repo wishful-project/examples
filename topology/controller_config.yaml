@@ -1,0 +1,10 @@
+## WiSHFUL Controller's config file
+
+modules:
+    discovery:
+        module : wishful_module_static_discovery
+        class_name : StaticDiscoveryControllerModule
+
+    #synchronization:
+    #    module : wishful_module_static_discovery
+    #    class_name : StaticDiscoveryControllerModule
