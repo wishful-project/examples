@@ -46,12 +46,12 @@ wlan_inject_iface = 'mon0'
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
 nodes = []
-
+gateway_ip = "192.168.103.123"
 
 @controller.new_node_callback()
 def new_node_cb(node):
     nodes.append(node.id)
-    log.debug('NodeEnter: NodeID: ' % node)
+    log.debug('NodeEnter: NodeID: %s' % node.id)
     if node.ip == gateway_ip:
         gateway = node
 
