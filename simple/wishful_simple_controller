@@ -138,4 +138,3 @@ if __name__ == "__main__":
     finally:
         log.debug("Exit")
         controller.stop()
-        controller.kill()
