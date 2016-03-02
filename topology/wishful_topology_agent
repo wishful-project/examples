@@ -33,6 +33,7 @@ __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
 log = logging.getLogger('wishful_agent.main')
+agent = wishful_agent.Agent()
 
 def main(args):
     log.debug(args)
@@ -43,9 +44,7 @@ def main(args):
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
 
-    agent = wishful_agent.Agent()
     agent.load_config(config)
-
     agent.run()
 
 
@@ -78,3 +77,4 @@ if __name__ == "__main__":
         log.debug("Agent exits")
     finally:
         log.debug("Exit")
+        agent.stop()
