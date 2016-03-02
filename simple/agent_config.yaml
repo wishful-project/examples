@@ -9,7 +9,7 @@ modules:
   discovery:
       module : wishful_module_discovery_pyre
       class_name : PyreDiscoveryAgentModule
-      kwargs: {"groupName":"wishful_1234"}
+      kwargs: {"iface":"lo", "groupName":"wishful_1234"}
 
   simple:
       module : wishful_module_simple
