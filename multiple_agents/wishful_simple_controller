@@ -38,23 +38,34 @@ __email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
 nodes = []
+node0 = None
 node1 = None
-node2 = None
-
 #TODO: allways return call_id to identify response in callback?
 
 @controller.new_node_callback()
 def new_node_cb(node):
+    global node0, node1, nodes
     nodes.append(node)
-    print "New node appeared:"
-    print node
 
+    if node.name == "agent_1":
+        node0 = node
+    elif node.name == "agent_2":
+        node1 = node
+
+    print "New node appeared: {}".format(node.name)
 
 @controller.node_exit_callback()
 def node_exit_cb(node, reason):
+    global node0, node1, nodes
     if node in nodes:
         nodes.remove(node);
-    print "NodeExit : NodeID : {} Reason : {}".format(node.id, reason)
+
+    if node.name == "agent_1":
+        node0 = None
+    elif node.name == "agent_2":
+        node1 = None
+
+    print "NodeExit : NodeName : {} Reason : {}".format(node.name, reason)
 
 
 @controller.set_default_callback()
@@ -88,20 +99,17 @@ def main(args):
     controller.load_config(config)
     controller.start()
    
+
     #wait for 2 nodes
-    while len(nodes) < 2:
+    while True:
         print "Waiting for 2 nodes"
         gevent.sleep(2)
 
+        #control loop
+        while node0 and node1:
+            print ""
+            print "Connected nodes", [str(node.name) for node in nodes]
 
-    node0 = nodes[0]
-    node1 = nodes[1]
-
-    #control loop
-    while True:
-        print "\n"
-        print "Connected nodes", [str(node.name) for node in nodes]
-        if nodes:
             #execute non-blocking function immediately
             controller.node(node0).iface("wlan0").radio.set_power(12)
             controller.node(node1).net.create_packetflow_sink(port=1234)
@@ -117,7 +125,7 @@ def main(args):
             result = controller.blocking(True).node(node1).iface("wlan1").radio.get_channel()
             print "Channel is:", result
 
-        gevent.sleep(10)
+            gevent.sleep(10)
 
 
 if __name__ == "__main__":
