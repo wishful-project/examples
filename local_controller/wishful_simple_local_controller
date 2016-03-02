@@ -43,9 +43,9 @@ def set_channel_reponse(data):
     print "set_channel_reponse : {}".format(data)
     controller.delay(3).net.create_packetflow_sink(port=1234)
 
-@controller.add_callback(upis.radio.get_channel)
-def get_channel_reponse(data):
-    print "get_channel_reponse : {}".format(data)
+@controller.add_callback(upis.radio.get_power)
+def get_power_reponse(data):
+    print "get_power_reponse : {}".format(data)
 
 @controller.set_default_callback()
 def default_callback(cmd, data):
@@ -68,7 +68,7 @@ def main(args):
    
     #control loop
     while True:
-        print "Next iteration"
+        print "\nNext iteration:"
         #execute non-blocking function immediately
         controller.iface("wlan0").radio.set_power(12)
 
