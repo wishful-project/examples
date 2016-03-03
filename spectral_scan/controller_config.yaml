@@ -1,0 +1,7 @@
+## WiSHFUL Controller's config file
+
+modules:
+    discovery:
+        module : wishful_module_discovery_pyre
+        class_name : PyreDiscoveryControllerModule
+        kwargs: {"iface":"lo", "groupName":"wishful_1234", "downlink":"tcp://127.0.0.1:8989", "uplink":"tcp://127.0.0.1:8990"}
