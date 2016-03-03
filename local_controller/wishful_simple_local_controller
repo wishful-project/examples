@@ -70,20 +70,20 @@ def main(args):
     while True:
         print "\nNext iteration:"
         #execute non-blocking function immediately
-        controller.iface("wlan0").radio.set_power(12)
+        controller.radio.iface("wlan0").set_power(12)
 
         #execute non-blocking function immediately, with specific callback
-        controller.iface("wlan0").radio.get_power()
+        controller.radio.iface("wlan0").get_power()
 
         #schedule non-blocking function delay
         controller.delay(3).net.create_packetflow_sink(port=1234)
         
         #schedule non-blocking function delay
         exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-        controller.exec_time(exec_time).iface("wlan1").radio.set_channel(4)
+        controller.exec_time(exec_time).radio.iface("wlan1").set_channel(4)
 
         #execute blocking function immediately
-        result = controller.blocking(True).iface("wlan1").radio.get_channel()
+        result = controller.blocking(True).radio.iface("wlan1").get_channel()
         print "Channel is:", result
 
         time.sleep(10)

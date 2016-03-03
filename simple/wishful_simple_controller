@@ -93,18 +93,18 @@ def main(args):
         print "Connected nodes", nodes
         if nodes:
             #execute non-blocking function immediately
-            controller.node(nodes[0]).iface("wlan0").radio.set_power(12)
+            controller.node(nodes[0]).radio.iface("wlan0").set_power(12)
             controller.node(nodes[0]).net.create_packetflow_sink(port=1234)
 
             #execute non-blocking function immediately, with specific callback
-            controller.callback(print_response).node(nodes[0]).iface("wlan0").radio.get_power()
+            controller.callback(print_response).node(nodes[0]).radio.iface("wlan0").get_power()
 
             #schedule non-blocking function
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            controller.exec_time(exec_time).node(nodes[0]).iface("wlan1").radio.set_channel(4)
+            controller.exec_time(exec_time).node(nodes[0]).radio.iface("wlan1").set_channel(4)
 
             #execute blocking function immediately
-            result = controller.blocking(True).node(nodes[0]).iface("wlan1").radio.get_channel()
+            result = controller.blocking(True).node(nodes[0]).radio.iface("wlan1").get_channel()
             print "Channel is:", result
 
 
