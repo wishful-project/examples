@@ -39,7 +39,6 @@ log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
 nodes = []
 
-#TODO: allways return call_id to identify response in callback?
 
 @controller.new_node_callback()
 def printNodeName(node):
@@ -84,6 +83,9 @@ def main(args):
         config = yaml.load(f)
 
     controller.load_config(config)
+    controller.add_upi_module(upi="global", moduleName="wishful_module_hierarchical_control ", 
+                          className="HierarchicalControlModule", importAs="hc")
+
     controller.start()
    
     #control loop
@@ -92,20 +94,10 @@ def main(args):
         print "\n"
         print "Connected nodes", nodes
         if nodes:
-            #execute non-blocking function immediately
-            controller.node(nodes[0]).radio.iface("wlan0").set_power(12)
-            controller.node(nodes[0]).net.create_packetflow_sink(port=1234)
-
-            #execute non-blocking function immediately, with specific callback
-            controller.callback(print_response).node(nodes[0]).radio.iface("wlan0").get_power()
-
-            #schedule non-blocking function
-            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            controller.exec_time(exec_time).node(nodes[0]).radio.iface("wlan1").set_channel(4)
-
-            #execute blocking function immediately
-            result = controller.blocking(True).node(nodes[0]).radio.iface("wlan1").get_channel()
-            print "Channel is:", result
+            controller.hc.add_rule()
+            controller.hc.delete_rule()
+            controller.hc.start_local_control_program()
+            controller.hc.stop_local_control_program()
 
 
 if __name__ == "__main__":
