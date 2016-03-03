@@ -186,7 +186,7 @@ class HOScenarios:
 
 def main(args):
     log.debug(args)
-    controller.add_upi_module(upi="global", moduleName="wishful_module_handover", 
+    controller.add_upi_module(upi="global", pyModuleName="wishful_module_handover", 
                           className="HandoverModule", importAs="handover")
     controller.start()
 
