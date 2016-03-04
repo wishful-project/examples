@@ -79,7 +79,7 @@ def my_local_control_program(controller):
     import time
     import random
 
-    while self.is_stop():
+    while True:
         print "\nNext iteration:"
         result = controller.blocking(True).radio.iface("wlan0").get_channel()
         print "Channel is:", result
