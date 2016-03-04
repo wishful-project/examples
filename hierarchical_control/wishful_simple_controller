@@ -79,6 +79,11 @@ def my_local_control_program(controller):
     import time
     import random
 
+    @controller.set_default_callback()
+    def default_callback(cmd, data):
+        print "DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(cmd, data)
+
+    #control loop
     while not controller.is_stopped():
         print "\nNext iteration:"
         result = controller.blocking(True).radio.iface("wlan0").get_channel()
@@ -87,8 +92,8 @@ def my_local_control_program(controller):
 
         newChannel = random.randint(0, 30)
         print "Setting channel:", newChannel
-        controller.blocking(False).radio.iface("wlan0").set_channel(newChannel)
-        time.sleep(1)
+        controller.delay(2).radio.iface("wlan0").set_channel(newChannel)
+        time.sleep(3)
 
 
 def main(args):
