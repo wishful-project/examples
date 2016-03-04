@@ -79,7 +79,7 @@ def my_local_control_program(controller):
     import time
     import random
 
-    while True:
+    while not controller.is_stopped():
         print "\nNext iteration:"
         result = controller.blocking(True).radio.iface("wlan0").get_channel()
         print "Channel is:", result
@@ -112,10 +112,11 @@ def main(args):
         print "Connected nodes", nodes
         if nodes:
             fid = controller.node(nodes[0]).hc.start_local_control_program(program=my_local_control_program)
+            print "Local Control Progam ID: {}".format(fid)
+            gevent.sleep(10)
 
-            gevent.sleep(20)
-
-            controller.node(nodes[0]).hc.stop_local_control_program(fid)
+            retVal = controller.node(nodes[0]).hc.stop_local_control_program(fid)
+            print "Local Control Progam ID: {} was {}".format(fid, retVal)
 
 
 if __name__ == "__main__":
