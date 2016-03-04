@@ -75,12 +75,19 @@ def print_response(group, node, data):
 
 
 def my_local_control_program(controller):
+    #do all needed imports here!!!
     import time
-    while True:
-        print "\nNext iteration:",controller
-        #result = controller.blocking(True).radio.iface("wlan1").get_channel()
-        #print "Channel is:", result
-        #controller.send_upstream(result)
+    import random
+
+    while self.is_stop():
+        print "\nNext iteration:"
+        result = controller.blocking(True).radio.iface("wlan0").get_channel()
+        print "Channel is:", result
+        controller.send_upstream({"myChannel":result})
+
+        newChannel = random.randint(0, 30)
+        print "Setting channel:", newChannel
+        controller.blocking(False).radio.iface("wlan0").set_channel(newChannel)
         time.sleep(1)
 
 
