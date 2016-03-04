@@ -74,6 +74,15 @@ def print_response(group, node, data):
     print "Print response : Group:{}, NodeIP:{}, Result:{}".format(group, node.ip, data) 
 
 
+def my_local_control_program(controller):
+    while True:
+        print "\nNext iteration:"
+        result = controller.blocking(True).radio.iface("wlan1").get_channel()
+        print "Channel is:", result
+        controller.send_upstream(result)
+        time.sleep(1)
+
+
 def main(args):
     log.debug(args)
 
@@ -94,10 +103,11 @@ def main(args):
         print "\n"
         print "Connected nodes", nodes
         if nodes:
-            controller.hc.add_rule()
-            controller.hc.delete_rule()
-            controller.hc.start_local_control_program()
-            controller.hc.stop_local_control_program()
+            fid = controller.node(nodes[0]).hc.start_local_control_program(program=my_local_control_program)
+
+            gevent.sleep(20)
+
+            controller.node(nodes[0]).hc.stop_local_control_program(fid)
 
 
 if __name__ == "__main__":
