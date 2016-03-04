@@ -12,7 +12,7 @@ modules:
       kwargs: {"downlink":"tcp://127.0.0.1:8989", "uplink":"tcp://127.0.0.1:8990"}
 
   simple:
-      module : wishful_module_wifi_ath9k
+      module : wishful_module_wifi_ath
       class_name : Ath9kModule
       interfaces : ['ap1' 'inject1']
 
