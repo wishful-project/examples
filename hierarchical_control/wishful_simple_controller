@@ -75,11 +75,12 @@ def print_response(group, node, data):
 
 
 def my_local_control_program(controller):
+    import time
     while True:
-        print "\nNext iteration:"
-        result = controller.blocking(True).radio.iface("wlan1").get_channel()
-        print "Channel is:", result
-        controller.send_upstream(result)
+        print "\nNext iteration:",controller
+        #result = controller.blocking(True).radio.iface("wlan1").get_channel()
+        #print "Channel is:", result
+        #controller.send_upstream(result)
         time.sleep(1)
 
 

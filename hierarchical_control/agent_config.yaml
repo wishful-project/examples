@@ -11,6 +11,10 @@ modules:
       class_name : PyreDiscoveryAgentModule
       kwargs: {"iface":"lo", "groupName":"wishful_1234"}
 
+  localControl:
+      module : wishful_module_local_control
+      class_name : LocalControlModule
+
   simple:
       module : wishful_module_simple
       class_name : SimpleModule2
