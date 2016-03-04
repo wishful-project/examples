@@ -39,7 +39,6 @@ log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
 nodes = []
 
-
 @controller.new_node_callback()
 def printNodeName(node):
     nodes.append(node)
@@ -59,21 +58,7 @@ def default_callback(group, node, cmd, data):
     print "DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)
 
 
-@controller.add_callback(upis.radio.set_channel)
-def set_channel_reponse(group, node, data):
-    print "set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, node.id, data)
-    controller.delay(3).node(node.id).net.create_packetflow_sink(port=1234)
-
-
-@controller.add_callback(upis.radio.get_channel)
-def get_channel_reponse(group, node, data):
-    print "get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, node.id, data)
-
-
-def print_response(group, node, data):
-    print "Print response : Group:{}, NodeIP:{}, Result:{}".format(group, node.ip, data) 
-
-
+#Definition of Local Control Program
 def my_local_control_program(controller):
     #do all needed imports here!!!
     import time
@@ -88,6 +73,7 @@ def my_local_control_program(controller):
         print "\nNext iteration:"
         result = controller.blocking(True).radio.iface("wlan0").get_channel()
         print "Channel is:", result
+        
         controller.send_upstream({"myChannel":result})
 
         newChannel = random.randint(0, 30)
