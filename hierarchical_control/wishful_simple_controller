@@ -42,15 +42,15 @@ nodes = []
 
 @controller.new_node_callback()
 def printNodeName(node):
-    nodes.append(node.id)
+    nodes.append(node)
     print "New node appeared:"
     print node
 
 
 @controller.node_exit_callback()
 def printNodeName(node, reason):
-    if node.id in nodes:
-        nodes.remove(node.id);
+    if node in nodes:
+        nodes.remove(node);
     print "NodeExit : NodeID : {} Reason : {}".format(node.id, reason)
 
 
@@ -87,7 +87,7 @@ def my_local_control_program(controller):
 
         newChannel = random.randint(0, 30)
         print "Setting channel:", newChannel
-        controller.blocking(False).radio.iface("wlan0").set_channel(newChannel)
+        controller.blocking(True).radio.iface("wlan0").set_channel(newChannel)
         time.sleep(1)
 
 
@@ -107,16 +107,16 @@ def main(args):
    
     #control loop
     while True:
-        gevent.sleep(10)
         print "\n"
-        print "Connected nodes", nodes
+        print "Connected nodes", [str(node.name) for node in nodes]
         if nodes:
             fid = controller.node(nodes[0]).hc.start_local_control_program(program=my_local_control_program)
-            print "Local Control Progam ID: {}".format(fid)
+            print "Local Control Progam Started, ID: {}".format(fid)
             gevent.sleep(10)
 
             retVal = controller.node(nodes[0]).hc.stop_local_control_program(fid)
             print "Local Control Progam ID: {} was {}".format(fid, retVal)
+        gevent.sleep(10)
 
 
 if __name__ == "__main__":
