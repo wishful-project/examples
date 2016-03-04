@@ -87,7 +87,7 @@ def my_local_control_program(controller):
 
         newChannel = random.randint(0, 30)
         print "Setting channel:", newChannel
-        controller.blocking(True).radio.iface("wlan0").set_channel(newChannel)
+        controller.blocking(False).radio.iface("wlan0").set_channel(newChannel)
         time.sleep(1)
 
 
