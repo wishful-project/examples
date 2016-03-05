@@ -78,7 +78,7 @@ def main(args):
         #schedule non-blocking function delay
         controller.delay(3).net.create_packetflow_sink(port=1234)
         
-        #schedule non-blocking function delay
+        #schedule non-blocking function exec time
         exec_time = datetime.datetime.now() + datetime.timedelta(seconds=6)
         aa = controller.exec_time(exec_time).radio.iface("wlan1").set_channel(4)
 
