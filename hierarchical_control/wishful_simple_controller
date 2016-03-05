@@ -62,24 +62,26 @@ def default_callback(group, node, cmd, data):
 def my_local_control_program(controller):
     #do all needed imports here!!!
     import time
+    import datetime
     import random
 
     @controller.set_default_callback()
     def default_callback(cmd, data):
-        print "DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(cmd, data)
+        print "{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)
 
     #control loop
     while not controller.is_stopped():
-        print "\nNext iteration:"
-        result = controller.blocking(True).radio.iface("wlan0").get_channel()
-        print "Channel is:", result
+        print "\nLocal Control Program - Name: {}, Id: {}".format(controller.name, controller.ctrProgId)
+        print "Next iteration:"
+        result = controller.radio.iface("wlan0").get_channel()
+        print "{} Channel is: {}".format(datetime.datetime.now(), result)
         
         controller.send_upstream({"myChannel":result})
 
         newChannel = random.randint(0, 30)
-        print "Setting channel:", newChannel
+        print "{} Scheduling set channel call with arg: {} in 2 seconds:".format(datetime.datetime.now(), newChannel)
         controller.delay(2).radio.iface("wlan0").set_channel(newChannel)
-        time.sleep(3)
+        time.sleep(5)
 
 
 def main(args):
@@ -103,7 +105,7 @@ def main(args):
         if nodes:
             fid = controller.node(nodes[0]).hc.start_local_control_program(program=my_local_control_program)
             print "Local Control Progam Started, ID: {}".format(fid)
-            gevent.sleep(10)
+            gevent.sleep(15)
 
             retVal = controller.node(nodes[0]).hc.stop_local_control_program(fid)
             print "Local Control Progam ID: {} was {}".format(fid, retVal)

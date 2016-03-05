@@ -84,7 +84,7 @@ def main(args):
 
         #execute blocking function immediately
         result = controller.radio.iface("wlan1").get_channel()
-        print "{} Channel is:".format(datetime.datetime.now(), result)
+        print "{} Channel is: {}".format(datetime.datetime.now(), result)
 
         time.sleep(15)
 
