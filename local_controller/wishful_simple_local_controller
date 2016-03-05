@@ -40,19 +40,19 @@ controller = agent.get_local_controller()
 
 @controller.add_callback(upis.radio.set_channel)
 def set_channel_reponse(data):
-    print "set_channel_reponse : {}".format(data)
-    controller.delay(3).net.create_packetflow_sink(port=1234)
+    print "{} set_channel_reponse : {}".format(datetime.datetime.now(),data)
+    controller.delay(4).net.create_packetflow_sink(port=1234)
 
 @controller.add_callback(upis.radio.get_power)
 def get_power_reponse(data):
-    print "get_power_reponse : {}".format(data)
+    print "{} get_power_reponse : {}".format(datetime.datetime.now(),data)
 
 @controller.set_default_callback()
 def default_callback(cmd, data):
-    print "DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(cmd, data)
+    print "{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)
 
 def print_response(data):
-    print "Print response : {}".format(data) 
+    print "{} Specific callback for function call; Print response : {}".format(datetime.datetime.now(),data) 
 
 
 def main(args):
@@ -70,23 +70,23 @@ def main(args):
     while True:
         print "\nNext iteration:"
         #execute non-blocking function immediately
-        controller.radio.iface("wlan0").set_power(12)
+        controller.blocking(False).radio.iface("wlan0").set_power(12)
 
         #execute non-blocking function immediately, with specific callback
-        controller.radio.iface("wlan0").get_power()
+        controller.callback(print_response).radio.iface("wlan0").get_power()
 
         #schedule non-blocking function delay
         controller.delay(3).net.create_packetflow_sink(port=1234)
         
         #schedule non-blocking function delay
-        exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-        controller.exec_time(exec_time).radio.iface("wlan1").set_channel(4)
+        exec_time = datetime.datetime.now() + datetime.timedelta(seconds=6)
+        aa = controller.exec_time(exec_time).radio.iface("wlan1").set_channel(4)
 
         #execute blocking function immediately
-        result = controller.blocking(True).radio.iface("wlan1").get_channel()
-        print "Channel is:", result
+        result = controller.radio.iface("wlan1").get_channel()
+        print "{} Channel is:".format(datetime.datetime.now(), result)
 
-        time.sleep(10)
+        time.sleep(15)
 
 
 if __name__ == "__main__":
