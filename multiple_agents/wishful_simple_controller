@@ -111,18 +111,20 @@ def main(args):
             print "Connected nodes", [str(node.name) for node in nodes]
 
             #execute non-blocking function immediately
-            controller.nodes(nodes).radio.iface("wlan0").set_power(12)
-            controller.nodes([node0, node1]).net.create_packetflow_sink(port=1234)
+            controller.blocking(False).nodes(nodes).radio.iface("wlan0").set_power(12)
 
             #execute non-blocking function immediately, with specific callback
             controller.callback(print_response).nodes(nodes).radio.iface("wlan0").get_power()
 
-            #schedule non-blocking function
+            #schedule non-blocking function with delay
+            controller.delay(3).nodes([node0, node1]).net.create_packetflow_sink(port=1234)
+
+            #schedule non-blocking function with exec time
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
             controller.exec_time(exec_time).nodes(nodes).radio.iface("wlan1").set_channel(4)
 
             #execute blocking function immediately
-            result = controller.blocking(True).nodes([node0, node1]).radio.iface("wlan1").get_channel()
+            result = controller.nodes([node0, node1]).radio.iface("wlan1").get_channel()
             print "Channel in nodes:"
             for node, value in result.iteritems():
                 print "\tNodeName: {}, Channel: {}".format(node.name, value)

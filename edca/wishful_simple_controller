@@ -44,15 +44,15 @@ nodes = []
 
 @controller.new_node_callback()
 def printNodeName(node):
-    nodes.append(node.id)
+    nodes.append(node)
     print "New node appeared:"
     print node
 
 
 @controller.node_exit_callback()
 def printNodeName(node, reason):
-    if node.id in nodes:
-        nodes.remove(node.id);
+    if node in nodes:
+        nodes.remove(node);
     print "NodeExit : NodeID : {} Reason : {}".format(node.id, reason)
 
 
@@ -78,9 +78,9 @@ def main(args):
     while True:
         gevent.sleep(10)
         print "\n"
-        print "Connected nodes", nodes
+        print "Connected nodes", [str(node.name) for node in nodes]
         if nodes:
-            controller.nodes(nodes[0]).radio.iface("wlan0").set_mac_access_parameters(queueId=0, qParam=edcaParams)
+            controller.blocking(False).nodes(nodes[0]).radio.iface("wlan0").set_mac_access_parameters(queueId=0, qParam=edcaParams)
 
 
 
