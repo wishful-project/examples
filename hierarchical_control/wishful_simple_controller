@@ -70,8 +70,8 @@ def my_local_control_program(controller):
         print "{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)
 
     #control loop
+    print "\nLocal Control Program - Name: {}, Id: {} - STARTED".format(controller.name, controller.ctrProgId)
     while not controller.is_stopped():
-        print "\nLocal Control Program - Name: {}, Id: {}".format(controller.name, controller.ctrProgId)
         print "Next iteration:"
 
         msg = controller.recv()
@@ -86,6 +86,8 @@ def my_local_control_program(controller):
         
         controller.send_upstream({"myChannel":result})        
         time.sleep(5)
+
+    print "Local Control Program - Name: {}, Id: {} - STOPPED".format(controller.name, controller.ctrProgId)
 
 
 def main(args):
