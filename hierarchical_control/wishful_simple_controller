@@ -85,7 +85,6 @@ def my_local_control_program(controller):
         print "{} Channel is: {}".format(datetime.datetime.now(), result)
         
         controller.send_upstream({"myChannel":result})        
-        time.sleep(5)
 
     print "Local Control Program - Name: {}, Id: {} - STOPPED".format(controller.name, controller.ctrProgId)
 
@@ -110,21 +109,21 @@ def main(args):
         print "Connected nodes", [str(node.name) for node in nodes]
         if nodes:
             lcpDescriptor = controller.node(nodes[0]).hc.start_local_control_program(program=my_local_control_program)
-            print "Local Control Progam Started, ID: {}".format(lcpDescriptor.id)
+            print "{} Local Control Progam Started, ID: {}".format(datetime.datetime.now(), lcpDescriptor.id)
 
             msgNum = 5
             while msgNum:
                 newChannel = random.randint(1, 30)
-                print "Sending new channel to set: {}".format(newChannel)
+                print "{} Sending new channel to set: {}".format(datetime.datetime.now(), newChannel)
                 lcpDescriptor.send({"new_channel":newChannel})
 
                 msg = lcpDescriptor.recv()
-                print "Message from Local Control Program: {}".format(msg)
+                print "{} Message from Local Control Program: {}".format(datetime.datetime.now(), msg)
                 msgNum = msgNum - 1
-                gevent.sleep(2)
+                gevent.sleep(5)
 
             retVal = lcpDescriptor.close()
-            print "Local Control Progam ID: {} was {}".format(lcpDescriptor.id, retVal)
+            print "{} Local Control Progam ID: {} was {}".format(datetime.datetime.now(), lcpDescriptor.id, retVal)
 
         gevent.sleep(10)
 
