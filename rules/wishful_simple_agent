@@ -23,6 +23,7 @@ Other options:
 
 import logging
 import signal
+import yaml
 import sys, os
 import wishful_agent
 

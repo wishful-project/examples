@@ -28,7 +28,7 @@ import wishful_controller
 import gevent
 import yaml
 import wishful_upis as upis
-import wishful_framework as fw
+from wishful_framework import TimeEvent, PktEvent, MovAvgFilter, PeakDetector, Match, Action, Permanance
 
 __author__ = "Piotr Gawlowicz, Anatolij Zubow"
 __copyright__ = "Copyright (c) 2015, Technische Universitat Berlin"
@@ -40,34 +40,28 @@ log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
 nodes = []
 
-#TODO: allways return call_id to identify response in callback?
 
 @controller.new_node_callback()
-def printNodeName(node):
-    nodes.append(node.id)
+def newNode(node):
+    nodes.append(node)
     print "New node appeared:"
     print node
 
 
 @controller.node_exit_callback()
-def printNodeName(node, reason):
-    if node.id in nodes:
-        nodes.remove(node.id);
-    print "NodeExit : NodeID : {} Reason : {}".format(node.id, reason)
+def nodeExit(node, reason):
+    if node in nodes:
+        nodes.remove(node);
+    print "NodeExit : NodeName : {} Reason : {}".format(node.name, reason)
 
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
-    print "DEFAULT CALLBACK : Group: {}, NodeId: {}, Cmd: {}, Returns: {}".format(group, node.id, cmd, data)
-
-
-@controller.add_callback(upis.radio.set_channel)
-def set_channel_reponse(group, node, data):
-    print "set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(group, node.id, data)
+    print "DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)
 
 
 def rule_matched(group, node, data):
-    print "Print response : Group:{}, NodeId:{}, Result:{}".format(group, node.id, data) 
+    print "Print response : Group:{}, NodeName:{}, Result:{}".format(group, node.name, data) 
 
 
 def main(args):
@@ -83,13 +77,26 @@ def main(args):
    
     #control loop
     while True:
-        gevent.sleep(5)
-        print "Connected nodes", nodes
+        print "Connected nodes", [str(node.name) for node in nodes]
         if nodes:
-            break
+            ruleDesc = controller.nodes(nodes[0]).rule.add(
+                                        event=TimeEvent(func=upis.radio.get_noise, args=(), interval=2, iface="wlan0"),
+                                        filters=[MovAvgFilter(10), PeakDetector(50)],
+                                        match=Match(">", -90),
+                                        action=Action(upis.radio.set_channel, args=(7)),
+                                        permanence=Permanance.TRANSIENT,
+                                        ctrl_callback=rule_matched)
 
-    #TODO: add args and repeat number to event definition
-    #TODO: return some ruleId so we can remove it later
+            print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
+            gevent.sleep(10)
+
+            retVal = ruleDesc.remove()
+            print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
+
+        gevent.sleep(10)
+
+
+    '''
     controller.nodes(nodes[0]).rule(event=(upis.radio.get_noise, 2),
                                     filters=("FILTER(MOV_AVG, 10)"),
                                     match=(">", -90), 
@@ -98,7 +105,6 @@ def main(args):
                                     callback=rule_matched)
 
 
-    '''
     controller.nodes(nodes[0]).add_rule(event=TimeEvent(func=upis.radio.get_noise, args=(), interval=2, iface="wlan0"),
                                     filters=[Filter(MOV_AVG, 10), Filter(PeakDetector, 50)],
                                     match=Match(">", -90),
