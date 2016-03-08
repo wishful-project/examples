@@ -80,9 +80,9 @@ def main(args):
         print "Connected nodes", [str(node.name) for node in nodes]
         if nodes:
             ruleDesc = controller.nodes(nodes[0]).rule.add(
-                                        event=TimeEvent(func=upis.radio.get_noise, kwargs={}, interval=1, iface="wlan0"),
-                                        filters=[MovAvgFilter(10), PeakDetector(50)],
-                                        match=Match("<", -80),
+                                        event=TimeEvent(func=upis.radio.get_noise, kwargs={}, interval=0.2, iface="wlan0"),
+                                        filters=[MovAvgFilter(10), PeakDetector(-90)],
+                                        match=Match(">", -70),
                                         action=Action(upis.radio.set_channel, iface="wlan0", kwargs={"channel":8}),
                                         permanence=Permanance.PERSISTENT,
                                         ctrl_callback=upi_based_rule_matched)
