@@ -3,6 +3,7 @@
 
 """
 wishful_agent_simple.py: First implementation of WiSHFUL agent
+sudo su REQUIRED !! see readme.txt
 
 Usage:
    wishful_agent_simple.py [options] [-q | -v]
