@@ -60,8 +60,8 @@ def default_callback(group, node, cmd, data):
     print "DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)
 
 
-def rule_matched(group, node, data):
-    print "Print response : Group:{}, NodeName:{}, Result:{}".format(group, node.name, data) 
+def rule_matched(group, node, ruleId, data):
+    print "Rule in node: {} with id: {} was matched; Data:{}".format(ruleId, node.name, data) 
 
 
 def main(args):
