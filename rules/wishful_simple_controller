@@ -61,7 +61,7 @@ def default_callback(group, node, cmd, data):
 
 
 def rule_matched(group, node, ruleId, data):
-    print "Rule in node: {} with id: {} was matched; Data:{}".format(ruleId, node.name, data) 
+    print "{} Rule in node: {} with id: {} was matched; Data:{}".format(datetime.datetime.now(), ruleId, node.name, data) 
 
 
 def main(args):
@@ -82,8 +82,8 @@ def main(args):
             ruleDesc = controller.nodes(nodes[0]).rule.add(
                                         event=TimeEvent(func=upis.radio.get_noise, kwargs={}, interval=1, iface="wlan0"),
                                         filters=[MovAvgFilter(10), PeakDetector(50)],
-                                        match=Match(">", -90),
-                                        action=Action(upis.radio.set_channel, args=(7)),
+                                        match=Match(">", -80),
+                                        action=Action(upis.radio.set_channel, iface="wlan0", args=(7,)),
                                         permanence=Permanance.PERSISTENT,
                                         ctrl_callback=rule_matched)
 
@@ -97,21 +97,6 @@ def main(args):
 
 
     '''
-    controller.nodes(nodes[0]).rule(event=(upis.radio.get_noise, 2),
-                                    filters=("FILTER(MOV_AVG, 10)"),
-                                    match=(">", -90), 
-                                    action=(upis.radio.set_channel, 7),
-                                    permanence="TRANSIENT",
-                                    callback=rule_matched)
-
-
-    controller.nodes(nodes[0]).add_rule(event=TimeEvent(func=upis.radio.get_noise, args=(), interval=2, iface="wlan0"),
-                                    filters=[Filter(MOV_AVG, 10), Filter(PeakDetector, 50)],
-                                    match=Match(">", -90),
-                                    action=Action(upis.radio.set_channel, args=(7)),
-                                    permanence=Permanance.TRANSIENT,
-                                    ctrl_callback=rule_matched)
-
     controller.nodes(nodes[0]).add_rule(event=PktEvent(iface="wlan0"),
                                     pmatch=PMatch("icmp", "ether.dst 00:11:00:11:00:11"),
                                     selector=FieldSelector("Radiotap.rssi"),
