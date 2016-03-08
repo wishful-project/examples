@@ -77,6 +77,10 @@ def main(args):
     controller.load_config(config)
     controller.start()
    
+    #wait for at leas one node
+    while len(nodes) < 1:
+        gevent.sleep(1)
+
     #control loop
     while True:
         print "Connected nodes", [str(node.name) for node in nodes]
