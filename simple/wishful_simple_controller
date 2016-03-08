@@ -102,7 +102,7 @@ def main(args):
 
             #schedule non-blocking function exec time
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            controller.exec_time(exec_time).node(nodes[0]).radio.iface("wlan1").set_channel(4)
+            controller.exec_time(exec_time).node(nodes[0]).radio.iface("wlan1").set_channel(channel=4)
 
             #execute blocking function immediately
             result = controller.node(nodes[0]).radio.iface("wlan1").get_channel()

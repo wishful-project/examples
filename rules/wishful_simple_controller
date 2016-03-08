@@ -60,7 +60,7 @@ def default_callback(group, node, cmd, data):
     print "DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)
 
 
-def rule_matched(group, node, ruleId, data):
+def upi_based_rule_matched(group, node, ruleId, data):
     print "{} Rule in node: {} with id: {} was matched; Data:{}".format(datetime.datetime.now(), ruleId, node.name, data) 
 
 
@@ -82,10 +82,10 @@ def main(args):
             ruleDesc = controller.nodes(nodes[0]).rule.add(
                                         event=TimeEvent(func=upis.radio.get_noise, kwargs={}, interval=1, iface="wlan0"),
                                         filters=[MovAvgFilter(10), PeakDetector(50)],
-                                        match=Match(">", -80),
-                                        action=Action(upis.radio.set_channel, iface="wlan0", args=(7,)),
+                                        match=Match("<", -80),
+                                        action=Action(upis.radio.set_channel, iface="wlan0", kwargs={"channel":8}),
                                         permanence=Permanance.PERSISTENT,
-                                        ctrl_callback=rule_matched)
+                                        ctrl_callback=upi_based_rule_matched)
 
             print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
             gevent.sleep(10)
@@ -94,6 +94,8 @@ def main(args):
             print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
 
         gevent.sleep(10)
+
+
 
 
     '''
