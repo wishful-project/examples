@@ -3,18 +3,18 @@
 agent_info:
   name: 'agent_1'
   info: 'agent_info'
-  iface: 'lo'
+  iface: 'ap1-eth1'
 
 modules:
   discovery:
       module : wishful_module_discovery_pyre
       class_name : PyreDiscoveryAgentModule
-      kwargs: {"iface":"lo", "groupName":"wishful_1234"}
+      kwargs: {"iface":"ap1-eth1", "groupName":"wishful_1234"}
 
   wlan:
       module : wishful_module_wifi
       class_name : WifiModule
-      interfaces : ['ap2-wlan0', 'wlan0', 'wlan1']
+      interfaces : ['ap1-wlan0', 'wlan0', 'wlan1']
 
   iperf:
       module : wishful_module_iperf

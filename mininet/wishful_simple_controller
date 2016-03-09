@@ -8,7 +8,7 @@ Usage:
    wishful_controller_simple.py [options] [-q | -v]
 
 Options:
-   --logfile	Name of the logfile
+   --logfile    Name of the logfile
    --config configFile config file path
 
 Example:
@@ -27,6 +27,7 @@ import logging
 import wishful_controller
 import gevent
 import yaml
+import pprint
 import wishful_upis as upis
 
 __author__ = "Piotr Gawlowicz, Mikolaj Chwalisz, Zubow"
@@ -36,17 +37,17 @@ __email__ = "{gawlowicz, chwalisz, zubow}@tkn.tu-berlin.de"
 
 
 log = logging.getLogger('wishful_agent.main')
-controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+controller = wishful_controller.Controller(dl="tcp://20.0.0.2:8990", ul="tcp://20.0.0.2:8989")
 nodes = []
 node0 = None
 node1 = None
 node0_iface = None
 node1_iface = None
-#TODO: allways return call_id to identify response in callback?
+
 
 @controller.new_node_callback()
 def new_node_cb(node):
-    global node0, node1, nodes
+    global node0, node1, nodes, node0_iface, node1_iface
     nodes.append(node)
 
     if node.name == "agent_1":
@@ -74,16 +75,14 @@ def node_exit_cb(node, reason):
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
+    global log
     log.info("DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data))
 
 
 @controller.add_callback(upis.net.get_info_of_connected_devices)
 def get_info_of_connected_devices_reponse(group, node, data):
+    global log
     log.info("get_info_of_connected_devices_reponse : Group:{}, NodeName:{}, msg:{}".format(group, node.name, data))
-
-
-#def print_response(group, node, data):
-#    log.info("Print response : Group:{}, NodeName:{}, Result:{}".format(group, node.name, data))
 
 
 def main(args):
@@ -100,38 +99,23 @@ def main(args):
     # wait for 2 nodes
     while True:
         log.info("Waiting for %d(2) nodes; 1=%s, 2=%s" % (len(nodes), str(node0), str(node1)))
-	if node0 and node1:
-	    break
+        if node0 and node1:
+            break
         gevent.sleep(1)
-
     log.info("Found 2 nodes")
+
     #control loop
     while node0 and node1:
         log.info("")
         log.info("Connected nodes ... %s" % str([str(node.name) for node in nodes]))
+        log.info("Connected nodes ... %s" % str([str(node.ip) for node in nodes]))
 
-        controller.callback(get_info_of_connected_devices_reponse).nodes(node0).net.iface(node0_iface).get_info_of_connected_devices()
-        controller.callback(get_info_of_connected_devices_reponse).nodes(node1).net.iface(node1_iface).get_info_of_connected_devices()
+        ap1_sta = controller.node(node0).net.iface(node0_iface).get_info_of_connected_devices()
+        ap2_sta = controller.node(node1).net.iface(node1_iface).get_info_of_connected_devices()
 
-        #execute non-blocking function immediately
-        #controller.blocking(False).nodes(nodes).radio.iface("wlan0").set_power(12)
+        log.info('STAs of AP1:\n{}'.format(pprint.pformat(ap1_sta)))
+        log.info('STAs of AP2:\n{}'.format(pprint.pformat(ap2_sta)))
 
-        #execute non-blocking function immediately, with specific callback
-        #controller.callback(print_response).nodes(nodes).radio.iface("wlan0").get_power()
-
-        #schedule non-blocking function with delay
-        #controller.delay(3).nodes([node0, node1]).net.create_packetflow_sink(port=1234)
-
-        #schedule non-blocking function with exec time
-        #exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-        #controller.exec_time(exec_time).nodes(nodes).radio.iface("wlan1").set_channel(4)
-
-        #execute blocking function immediately
-        #result = controller.nodes([node0, node1]).radio.iface("wlan1").get_channel()
-        #print "Channel in nodes:"
-        #for node, value in result.iteritems():
-        #    print "\tNodeName: {}, Channel: {}".format(node.name, value)
-    
         gevent.sleep(2)
 
 
@@ -155,6 +139,7 @@ if __name__ == "__main__":
     elif args['--quiet']:
         log_level = logging.ERROR
 
+    logfile = None
     if args['--logfile']:
         logfile = args['--logfile']
 

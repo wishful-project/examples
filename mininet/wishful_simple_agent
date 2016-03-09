@@ -69,6 +69,7 @@ if __name__ == "__main__":
     elif args['--quiet']:
         log_level = logging.ERROR
 
+    logfile = None
     if args['--logfile']:
         logfile = args['--logfile']
 
