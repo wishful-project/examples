@@ -11,10 +11,10 @@ modules:
       class_name : PyreDiscoveryAgentModule
       kwargs: {"iface":"lo", "groupName":"wishful_1234"}
 
-  wlan:
-      module : wishful_module_wifi
-      class_name : WifiModule
-      interfaces : ['ap2-wlan0', 'wlan0', 'wlan1']
+  simple:
+      module : wishful_module_simple
+      class_name : SimpleModule2
+      interfaces : ['wlan0', 'wlan1']
 
   iperf:
       module : wishful_module_iperf
