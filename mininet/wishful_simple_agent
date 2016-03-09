@@ -8,8 +8,8 @@ Usage:
    wishful_agent_simple.py [options] [-q | -v]
 
 Options:
-   --logfile	Name of the logfile
-   --config configFile config file path
+   --logfile name      Name of the logfile
+   --config configFile Config file path
 
 Example:
    ./wishful_agent_simple -v --config ./config.yaml
