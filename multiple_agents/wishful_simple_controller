@@ -36,7 +36,7 @@ __email__ = "{gawlowicz, chwalisz, zubow}@tkn.tu-berlin.de"
 
 
 log = logging.getLogger('wishful_agent.main')
-controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+controller = wishful_controller.Controller(dl="tcp://20.0.0.2:8990", ul="tcp://20.0.0.2:8989")
 nodes = []
 node0 = None
 node1 = None
@@ -74,11 +74,13 @@ def node_exit_cb(node, reason):
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
+    global log
     log.info("DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data))
 
 
 @controller.add_callback(upis.net.get_info_of_connected_devices)
 def get_info_of_connected_devices_reponse(group, node, data):
+    global log
     log.info("get_info_of_connected_devices_reponse : Group:{}, NodeName:{}, msg:{}".format(group, node.name, data))
 
 
@@ -110,8 +112,11 @@ def main(args):
         log.info("")
         log.info("Connected nodes ... %s" % str([str(node.name) for node in nodes]))
 
-        controller.callback(get_info_of_connected_devices_reponse).nodes(node0).net.iface(node0_iface).get_info_of_connected_devices()
-        controller.callback(get_info_of_connected_devices_reponse).nodes(node1).net.iface(node1_iface).get_info_of_connected_devices()
+        x = controller.nodes(node0).net.iface(node0_iface).get_info_of_connected_devices()
+        y = controller.nodes(node1).net.iface(node1_iface).get_info_of_connected_devices()
+
+        log.info('x = %s' % str(x))
+        log.info('y = %s' % str(y))
 
         #execute non-blocking function immediately
         #controller.blocking(False).nodes(nodes).radio.iface("wlan0").set_power(12)
