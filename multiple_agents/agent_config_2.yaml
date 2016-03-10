@@ -3,13 +3,13 @@
 agent_info:
   name: 'agent_2'
   info: 'agent_info'
-  iface: 'ap2-eth1'
+  iface: 'lo'
 
 modules:
   discovery:
       module : wishful_module_discovery_pyre
       class_name : PyreDiscoveryAgentModule
-      kwargs: {"iface":"ap2-eth1", "groupName":"wishful_1234"}
+      kwargs: {"iface":"lo", "groupName":"wishful_1234"}
 
   simple:
       module : wishful_module_simple
