@@ -8,8 +8,8 @@ Usage:
    wishful_controller_simple.py [options] [-q | -v]
 
 Options:
-   -f                  foo
-   --config configFile config file path
+   --logfile name      Name of the logfile
+   --config configFile Config file path
 
 Example:
    ./wishful_simple_local_controller -v --config ./config.yaml 
@@ -65,26 +65,24 @@ def my_local_control_program(controller):
     import time
     import datetime
 
+
     @controller.set_default_callback()
     def default_callback(cmd, data):
         print "{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)
+        result = controller.radio.iface("wlan0").get_channel()
+        print "{} Channel is: {}".format(datetime.datetime.now(), result)
+        controller.send_upstream({"myChannel":result})        
+
 
     #control loop
     print "\nLocal Control Program - Name: {}, Id: {} - STARTED".format(controller.name, controller.ctrProgId)
     while not controller.is_stopped():
-        print "Next iteration:"
-
         msg = controller.recv()
         newChannel = msg["new_channel"]
+        print "Next iteration:"
 
-        print "{} Scheduling set channel call with arg: {} in 2 seconds:".format(datetime.datetime.now(), newChannel)
-        controller.delay(2).radio.iface("wlan0").set_channel(newChannel)
-
-        time.sleep(3)
-        result = controller.radio.iface("wlan0").get_channel()
-        print "{} Channel is: {}".format(datetime.datetime.now(), result)
-        
-        controller.send_upstream({"myChannel":result})        
+        print "{} Scheduling set channel call with arg: {} in 5 seconds:".format(datetime.datetime.now(), newChannel)
+        controller.delay(5).radio.iface("wlan0").set_channel(newChannel)
 
     print "Local Control Program - Name: {}, Id: {} - STOPPED".format(controller.name, controller.ctrProgId)
 
@@ -148,7 +146,11 @@ if __name__ == "__main__":
     elif args['--quiet']:
         log_level = logging.ERROR
 
-    logging.basicConfig(level=log_level,
+    logfile = None
+    if args['--logfile']:
+        logfile = args['--logfile']
+
+    logging.basicConfig(filename=logfile, level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
     try:

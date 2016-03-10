@@ -8,8 +8,8 @@ Usage:
    wishful_agent_simple.py [options] [-q | -v]
 
 Options:
-   -f                  foo
-   --config configFile config file path
+   --logfile name      Name of the logfile
+   --config configFile Config file path
 
 Example:
    ./wishful_agent_simple -v --config ./config.yaml
@@ -68,7 +68,11 @@ if __name__ == "__main__":
     elif args['--quiet']:
         log_level = logging.ERROR
 
-    logging.basicConfig(level=log_level,
+    logfile = None
+    if args['--logfile']:
+        logfile = args['--logfile']
+
+    logging.basicConfig(filename=logfile, level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
     try:

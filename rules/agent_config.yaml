@@ -12,7 +12,7 @@ modules:
       kwargs: {"downlink":"tcp://127.0.0.1:8989", "uplink":"tcp://127.0.0.1:8990"}
 
   rule_manager:
-      module : wishful_module_local_control
+      module : wishful_module_rules
       class_name : RuleManagerModule
 
   simple:
