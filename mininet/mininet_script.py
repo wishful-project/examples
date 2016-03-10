@@ -21,7 +21,7 @@ __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
 '''
-Two APs with two STAs.
+Simple topology with two APs with two STAs.
 '''
 def topology():
 
