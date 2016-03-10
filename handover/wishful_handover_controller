@@ -11,7 +11,11 @@ Req.:
 - 1-2 client STAs
 
 Usage:
-   wifi_handover_controller.py [-q | -v]
+   wifi_handover_controller.py [options] [-q | -v]
+
+Options:
+   --logfile name      Name of the logfile
+   --config configFile Config file path
 
 Example:
    ./wifi_handover_controller -v
@@ -243,7 +247,11 @@ if __name__ == "__main__":
     elif args['--quiet']:
         log_level = logging.ERROR
 
-    logging.basicConfig(level=log_level,
+    logfile = None
+    if args['--logfile']:
+        logfile = args['--logfile']
+
+    logging.basicConfig(filename=logfile, level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
     try:
