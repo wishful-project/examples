@@ -105,7 +105,7 @@ def main(args):
             controller.exec_time(exec_time).node(nodes[0]).radio.iface("wlan1").set_channel(channel=4)
 
             #execute blocking function immediately
-            result = controller.node(nodes[0]).radio.iface("wlan1").get_channel()
+            result = controller.node(nodes[0]).timeout(2).radio.iface("wlan1").get_channel()
             print "{} Channel is: {}".format(datetime.datetime.now(), result)
 
 
