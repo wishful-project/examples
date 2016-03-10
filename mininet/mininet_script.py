@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-Wishful IEEE 802.11 example.
+Wishful IEEE 802.11 example consisting of two APs and two mobile STAs. Each AP is controlled by an
+Wishful agent. Moreover, a global controller which is running on AP1 is controlling the two APs through
+their agents.
 """
 
 from mininet.net import Mininet
@@ -18,7 +20,9 @@ __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
-
+'''
+Two APs with two STAs.
+'''
 def topology():
 
     "Create a network."
@@ -42,6 +46,7 @@ def topology():
     ap1.start( [c1] )
     ap2.start( [c1] )
 
+    "Configure IP addresses on APs for binding Wishful agent"
     ap1.cmd('ifconfig ap1-eth1 20.0.0.2/8')
     ap2.cmd('ifconfig ap2-eth1 20.0.0.3/8')
 
