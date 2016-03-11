@@ -3,8 +3,8 @@
 controller:
     name: "Controller"
     info: "WiSHFUL Controller"
-    dl: "tcp://127.0.0.1:8990"
-    ul: "tcp://127.0.0.1:8989"
+    dl: "tcp://20.0.0.2:8990"
+    ul: "tcp://20.0.0.2:8989"
 
 modules:
     discovery:

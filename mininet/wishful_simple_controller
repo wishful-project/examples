@@ -36,7 +36,7 @@ __version__ = "0.1.0"
 __email__ = "{gawlowicz, chwalisz, zubow}@tkn.tu-berlin.de"
 
 
-log = logging.getLogger('wishful_agent.main')
+log = logging.getLogger('wishful_controller.main')
 controller = wishful_controller.Controller()
 nodes = []
 node0 = None
@@ -110,8 +110,8 @@ def main(args):
         log.info("Connected nodes ... %s" % str([str(node.name) for node in nodes]))
         log.info("Connected nodes ... %s" % str([str(node.ip) for node in nodes]))
 
-        ap1_sta = controller.node(node0).net.iface(node0_iface).get_info_of_connected_devices()
-        ap2_sta = controller.node(node1).net.iface(node1_iface).get_info_of_connected_devices()
+        ap1_sta = controller.node(node0).net.iface(node0_iface).get_tx_bytes_of_connected_devices()
+        ap2_sta = controller.node(node1).net.iface(node1_iface).get_rx_bytes_of_connected_devices()
 
         log.info('STAs of AP1:\n{}'.format(pprint.pformat(ap1_sta)))
         log.info('STAs of AP2:\n{}'.format(pprint.pformat(ap2_sta)))

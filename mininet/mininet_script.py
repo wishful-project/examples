@@ -20,8 +20,15 @@ __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
+# enable GUI
+GUI = False
+# enable mobility
+MOBILITY = False
+
 '''
 Simple topology with two APs with two STAs.
+
+sudo python ./mininet_script.py
 '''
 def topology():
 
@@ -66,14 +73,16 @@ def topology():
     print "*** Starting network"
 
     """uncomment to plot graph"""
-    net.plotGraph(max_x=100, max_y=100)
+    if GUI:
+        net.plotGraph(max_x=100, max_y=100)
 
-    net.startMobility(startTime=0)
-    net.mobility('sta1', 'start', time=0, position='10,45,0')
-    net.mobility('sta1', 'stop', time=60, position='50,20,0')
-    net.mobility('sta2', 'start', time=0, position='0,60,0')
-    net.mobility('sta2', 'stop', time=60, position='30,10,0')
-    net.stopMobility(stopTime=60)
+    if MOBILITY:
+        net.startMobility(startTime=0)
+        net.mobility('sta1', 'start', time=0, position='10,45,0')
+        net.mobility('sta1', 'stop', time=60, position='50,20,0')
+        net.mobility('sta2', 'start', time=0, position='0,60,0')
+        net.mobility('sta2', 'stop', time=60, position='30,10,0')
+        net.stopMobility(stopTime=60)
 
     print "*** Running CLI"
     CLI( net )
