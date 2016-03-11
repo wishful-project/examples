@@ -96,9 +96,6 @@ def main(args):
         config = yaml.load(f)
 
     controller.load_config(config)
-    controller.add_upi_module(upi="global", pyModuleName="wishful_module_hierarchical_control ", 
-                          className="HierarchicalControlModule", importAs="hc")
-
     controller.start()
    
     #control loop
