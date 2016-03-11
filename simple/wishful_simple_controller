@@ -108,11 +108,11 @@ def main(args):
             result = controller.node(nodes[0]).radio.iface("wlan1").get_channel()
             print "{} Channel is: {}".format(datetime.datetime.now(), result)
 
-            #exception handling
+            #exception handling, clean_per_flow_tx_power_table implementation raises exception
             try:
                 controller.node(nodes[0]).radio.iface("wlan1").clean_per_flow_tx_power_table()
             except Exception as e:
-                print e
+                print "{} !!!Exception!!!: {}".format(datetime.datetime.now(), e)
 
 
 if __name__ == "__main__":
