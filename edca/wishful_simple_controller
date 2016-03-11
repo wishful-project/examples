@@ -37,10 +37,9 @@ __email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
 
 
 log = logging.getLogger('wishful_agent.main')
-controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+controller = wishful_controller.Controller()
 nodes = []
 
-#TODO: allways return call_id to identify response in callback?
 
 @controller.new_node_callback()
 def printNodeName(node):

@@ -37,7 +37,7 @@ __email__ = "{gawlowicz, chwalisz, zubow}@tkn.tu-berlin.de"
 
 
 log = logging.getLogger('wishful_agent.main')
-controller = wishful_controller.Controller(dl="tcp://20.0.0.2:8990", ul="tcp://20.0.0.2:8989")
+controller = wishful_controller.Controller()
 nodes = []
 node0 = None
 node1 = None

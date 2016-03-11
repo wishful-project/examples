@@ -44,7 +44,7 @@ wlan_iface = 'wifi0'
 wlan_inject_iface = 'mon0'
 
 log = logging.getLogger('wishful_agent.main')
-controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+controller = wishful_controller.Controller()
 nodes = []
 gateway_ip = "192.168.103.123"
 
