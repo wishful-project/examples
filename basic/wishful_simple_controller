@@ -56,7 +56,7 @@ def print_response(group, node, data):
     print "{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data) 
 
 
-def main():
+try:
     #Start controller
     controller.start()
 
@@ -83,11 +83,7 @@ def main():
             result = controller.node(nodes[0]).radio.iface("wlan1").get_channel()
             print "{} Channel is: {}".format(datetime.datetime.now(), result)
 
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print "Controller exits"
-    finally:
-        controller.stop()
+except KeyboardInterrupt:
+    print "Controller exits"
+finally:
+    controller.stop()
