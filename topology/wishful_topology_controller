@@ -84,10 +84,10 @@ def main(args):
         config = yaml.load(f)
 
     controller.load_config(config)
-    controller.add_upi_module(upi="global", pyModuleName="wishful_module_wireless_topology ", 
+    controller.add_module(moduleName="wireless_topology", pyModuleName="wishful_module_wireless_topology ",
                           className="WirelessTopologyModule", importAs="wireless_topology")
     controller.start()
-   
+
     log.debug("waiting for nodes ...")
 
     # wait until all nodes become available
