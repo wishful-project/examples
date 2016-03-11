@@ -27,6 +27,8 @@ MOBILITY = False
 
 '''
 Simple topology with two APs with two STAs.
+
+sudo python ./mininet_script.py
 '''
 def topology():
 
