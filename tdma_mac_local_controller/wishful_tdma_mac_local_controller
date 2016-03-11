@@ -1,0 +1,126 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+wishful_tdma_mac_local_controller: TDMA MAC local example
+
+Usage:
+   wishful_tdma_mac_local_controller [options] [-q | -v]
+
+Options:
+   --config configFile config file path
+
+Example:
+   ./wishful_tdma_mac_local_controller -v --config ./config.yaml
+
+Other options:
+   -h, --help          show this help message and exit
+   -q, --quiet         print less text
+   -v, --verbose       print more text
+   --version           show version and exit
+"""
+
+import sys
+import datetime
+import logging
+import wishful_agent
+import time
+import yaml
+import wishful_upis as upis
+import wishful_framework.upi_arg_classes.hmac as hmac
+
+__author__ = "Piotr Gawlowicz, Antolij Zubow, Sven Zehl"
+__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__version__ = "0.1.0"
+__email__ = "gawlowicz, zubow, zehl, @tkn.tu-berlin.de"
+
+
+log = logging.getLogger('wishful_agent.main')
+agent = wishful_agent.Agent(local=True)
+controller = agent.get_local_controller()
+
+
+def main(args):
+    log.debug(args)
+
+    config_file_path = args['--config']
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+
+    agent.load_config(config)
+    agent.run()
+
+
+    # hybrid MAC parameter
+    dstHWAddr = "04:f0:21:17:36:68" #node on which scheme should be applied, e.g. nuc15 interface sta1
+    total_slots = 10
+    slot_duration = 20000
+    iface = 'ap1'
+
+    log.info("\nStarting Hybrid MAC:")
+
+    # create new MAC for local node
+    mac = hmac.HybridTDMACSMAMac(no_slots_in_superframe=total_slots, slot_duration_ns=slot_duration)
+
+    be_slots = [1,2,3,4]
+
+    # assign access policies to each slot in superframe
+    for slot_nr in range(total_slots):
+        if slot_nr in be_slots:
+            acBE = hmac.AccessPolicy()
+            acBE.addDestMacAndTosValues(dstHWAddr, 0)
+            mac.addAccessPolicy(slot_nr, acBE)
+        else:
+            acGuard = hmac.AccessPolicy()
+            acGuard.disableAll() # guard slot
+            mac.addAccessPolicy(slot_nr, acGuard)
+
+    # install MAC Processor
+    if controller.blocking(False).radio.iface(iface).install_mac_processor(iface, mac):
+        log.info('%s' % mac.printConfiguration())
+
+    time.sleep(15)
+
+    log.info("\nStopping Hybrid MAC:")
+
+    if controller.blocking(False).radio.iface(iface).uninstall_mac_processor(iface, mac):
+        #log.info('Hybrid MAC installed on %s ... OK' % str(nodes[ni].getIpAddress()))
+        log.info('%s' % mac.printConfiguration())
+
+
+
+if __name__ == "__main__":
+    try:
+        from docopt import docopt
+    except:
+        print("""
+        Please install docopt using:
+            pip install docopt==0.6.1
+        For more refer to:
+        https://github.com/docopt/docopt
+        """)
+        raise
+
+    args = docopt(__doc__, version=__version__)
+
+    log_level = logging.INFO  # default
+    if args['--verbose']:
+        log_level = logging.DEBUG
+    elif args['--quiet']:
+        log_level = logging.ERROR
+
+    logging.basicConfig(level=log_level,
+        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    try:
+        main(args)
+    except KeyboardInterrupt:
+        log.debug("Controller exits")
+    finally:
+        log.debug("Exit")
+        agent.stop()
+
+
+
+
