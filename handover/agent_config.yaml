@@ -9,7 +9,7 @@ modules:
   discovery:
       module : wishful_module_static_discovery
       class_name : StaticDiscoveryModule
-      kwargs: {"downlink":"tcp://127.0.0.1:8989", "uplink":"tcp://127.0.0.1:8990"}
+      kwargs: {"downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"}
 
   simple:
       module : wishful_module_wifi_ath
