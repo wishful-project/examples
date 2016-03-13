@@ -30,6 +30,8 @@ import gevent
 import yaml
 import wishful_upis as upis
 
+from local_control_program import my_local_control_program
+
 __author__ = "Piotr Gawlowicz, Mikolaj Chwalisz"
 __copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
 __version__ = "0.1.0"
@@ -57,34 +59,6 @@ def printNodeName(node, reason):
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
     print "DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)
-
-
-#Definition of Local Control Program
-def my_local_control_program(controller):
-    #do all needed imports here!!!
-    import time
-    import datetime
-
-
-    @controller.set_default_callback()
-    def default_callback(cmd, data):
-        print "{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)
-        result = controller.radio.iface("wlan0").get_channel()
-        print "{} Channel is: {}".format(datetime.datetime.now(), result)
-        controller.send_upstream({"myChannel":result})        
-
-
-    #control loop
-    print "\nLocal Control Program - Name: {}, Id: {} - STARTED".format(controller.name, controller.ctrProgId)
-    while not controller.is_stopped():
-        msg = controller.recv()
-        newChannel = msg["new_channel"]
-        print "Next iteration:"
-
-        print "{} Scheduling set channel call with arg: {} in 5 seconds:".format(datetime.datetime.now(), newChannel)
-        controller.delay(5).radio.iface("wlan0").set_channel(newChannel)
-
-    print "Local Control Program - Name: {}, Id: {} - STOPPED".format(controller.name, controller.ctrProgId)
 
 
 def main(args):
