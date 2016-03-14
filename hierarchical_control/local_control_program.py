@@ -22,11 +22,14 @@ def my_local_control_program(controller):
     #control loop
     print "\nLocal Control Program - Name: {}, Id: {} - STARTED".format(controller.name, controller.id)
     while not controller.is_stopped():
-        msg = controller.recv()
-        newChannel = msg["new_channel"]
-        print "Next iteration:"
+        msg = controller.recv(timeout=1)
+        if msg:
+            newChannel = msg["new_channel"]
+            print "Next iteration:"
 
-        print "{} Scheduling set channel call with arg: {} in 5 seconds:".format(datetime.datetime.now(), newChannel)
-        controller.delay(5).radio.iface("wlan0").set_channel(newChannel)
+            print "{} Scheduling set channel call with arg: {} in 5 seconds:".format(datetime.datetime.now(), newChannel)
+            controller.delay(5).radio.iface("wlan0").set_channel(newChannel)
+        else:
+            print "{} Waiting for message".format(datetime.datetime.now())
 
     print "Local Control Program - Name: {}, Id: {} - STOPPED".format(controller.name, controller.id)
