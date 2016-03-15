@@ -31,7 +31,6 @@ from scapy.all import *
 import wishful_upis as upis
 from wishful_framework import TimeEvent, PktEvent, MovAvgFilter, PeakDetector, Match, Action, Permanance, PktMatch, FieldSelector
 
-import cPickle as pickle
 
 __author__ = "Piotr Gawlowicz, Anatolij Zubow"
 __copyright__ = "Copyright (c) 2015, Technische Universitat Berlin"
@@ -72,7 +71,6 @@ def pkt_based_rule_matched(group, node, ruleId, data):
 def pkt_based_rule(group, node, ruleId, pkt):
     print "{} Pkt Rule in node: {} with id: {} was matched;".format(datetime.datetime.now(), node.name, ruleId) 
     try:
-      pkt = pickle.loads(pkt)
       print pkt.show()
     except:
       print pkt
