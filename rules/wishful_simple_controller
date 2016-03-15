@@ -97,21 +97,6 @@ def main(args):
         print "Connected nodes", [str(node.name) for node in nodes]
         if nodes:
             #######################################################################################
-            print "{} Get all packets".format(datetime.datetime.now())
-            ruleDesc = controller.nodes(nodes[0]).rule.add(
-                                        event=PktEvent(iface="eth0"),
-                                        permanence=Permanance.PERSISTENT,
-                                        ctrl_callback=pkt_based_rule)
-
-
-            print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
-            gevent.sleep(10)
-
-            retVal = ruleDesc.remove()
-            print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
-            gevent.sleep(1)
-
-            #######################################################################################
             print "{} Installing new UPI based rule".format(datetime.datetime.now())
             ruleDesc = controller.nodes(nodes[0]).rule.add(
                                         event=TimeEvent(func=upis.radio.get_noise, kwargs={}, interval=0.2, iface="wlan0"),
@@ -179,6 +164,20 @@ def main(args):
             print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
             gevent.sleep(1)
 
+            #######################################################################################
+            print "{} Get all packets".format(datetime.datetime.now())
+            ruleDesc = controller.nodes(nodes[0]).rule.add(
+                                        event=PktEvent(iface="eth0"),
+                                        permanence=Permanance.PERSISTENT,
+                                        ctrl_callback=pkt_based_rule)
+
+
+            print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
+            gevent.sleep(10)
+
+            retVal = ruleDesc.remove()
+            print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
+            gevent.sleep(1)
 
             #######################################################################################
 
