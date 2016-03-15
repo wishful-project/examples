@@ -33,6 +33,9 @@ __copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
 
+simpleModuleLogger = logging.getLogger('SimpleModule2')
+simpleModuleLogger.setLevel(logging.CRITICAL)
+
 log = logging.getLogger('wishful_agent.main')
 agent = wishful_agent.Agent()
 
