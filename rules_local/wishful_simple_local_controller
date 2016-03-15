@@ -107,7 +107,7 @@ def main(args):
                                        match=Match(">", -40),
                                        action=Action(upis.radio.set_channel, iface="wlan0", kwargs={"channel":8}),
                                        permanence=Permanance.PERSISTENT,
-                                       ctrl_callback=upi_based_rule_matched)
+                                       ctrl_callback=upi_based_rule_matched)l
 
         print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
         time.sleep(10)
