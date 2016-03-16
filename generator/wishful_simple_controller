@@ -185,8 +185,8 @@ def main(args):
 
             sampleNum = 5
             i = 0
-            for sample in myGenerator:
-                print i, sample
+            for pkt in myGenerator:
+                print i, pkt.show()
                 i = i + 1
                 if i == sampleNum:
                   break
