@@ -19,3 +19,7 @@ modules:
   iperf:
       module : wishful_module_iperf
       class_name : IperfModule
+
+  robot:
+      module : wishful_module_robot
+      class_name : RobotModule
