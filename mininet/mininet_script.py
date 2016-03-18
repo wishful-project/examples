@@ -35,19 +35,19 @@ def topology():
     "Create a network."
     net = Mininet( controller=Controller, link=TCLink, switch=OVSKernelSwitch )
 
-    print "*** Creating nodes"
+    print("*** Creating nodes")
     sta1 = net.addStation( 'sta1', mac='00:00:00:00:00:02', ip='10.0.0.2/8' )
     sta2 = net.addStation( 'sta2', mac='00:00:00:00:00:03', ip='10.0.0.3/8' )
     ap1 = net.addBaseStation( 'ap1', ssid= 'new-ssid1', mode= 'g', channel= '1', position='15,50,0' )
     ap2 = net.addBaseStation( 'ap2', ssid= 'new-ssid2', mode= 'g', channel= '6', position='25,30,0' )
     c1 = net.addController( 'c1', controller=Controller )
 
-    print "*** Creating links"
+    print("*** Creating links")
     net.addLink(ap1, ap2)
     net.addLink(ap1, sta1)
     net.addLink(ap1, sta2)
 
-    print "*** Starting network"
+    print("*** Starting network")
     net.build()
     c1.start()
     ap1.start( [c1] )
@@ -57,20 +57,20 @@ def topology():
     ap1.cmd('ifconfig ap1-eth1 20.0.0.2/8')
     ap2.cmd('ifconfig ap2-eth1 20.0.0.3/8')
 
-    print "*** Starting Wishful framework"
+    print("*** Starting Wishful framework")
     folder = './'
 
-    print "*** ... agents ..."
+    print("*** ... agents ...")
     agent1 = WishfulAgent(ap1, folder + 'wishful_simple_agent', folder + 'agent_config_1.yaml')
     agent2 = WishfulAgent(ap2, folder + 'wishful_simple_agent', folder + 'agent_config_2.yaml')
     agent1.start()
     agent2.start()
 
-    print "*** ... controller ..."
+    print("*** ... controller ...")
     wf_ctrl = WishfulController(ap1, folder + 'wishful_simple_controller', folder + 'controller_config.yaml')
     wf_ctrl.start()
 
-    print "*** Starting network"
+    print("*** Starting network")
 
     """uncomment to plot graph"""
     if GUI:
@@ -84,10 +84,10 @@ def topology():
         net.mobility('sta2', 'stop', time=60, position='30,10,0')
         net.stopMobility(stopTime=60)
 
-    print "*** Running CLI"
+    print("*** Running CLI")
     CLI( net )
 
-    print "*** Stopping network"
+    print("*** Stopping network")
     wf_ctrl.stop()    
     agent1.stop()
     agent2.stop()

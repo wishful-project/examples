@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -44,37 +44,37 @@ nodes = []
 
 
 @controller.new_node_callback()
-def newNode(node):
+def new_node(node):
     nodes.append(node)
-    print "New node appeared:"
-    print node
+    print("New node appeared:")
+    print(node)
 
 
 @controller.node_exit_callback()
-def nodeExit(node, reason):
+def node_exit(node, reason):
     if node in nodes:
         nodes.remove(node);
-    print "NodeExit : NodeName : {} Reason : {}".format(node.name, reason)
+    print(("NodeExit : NodeName : {} Reason : {}".format(node.name, reason)))
 
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
-    print "DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)
+    print(("DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)))
 
 
 def upi_based_rule_matched(group, node, ruleId, data):
-    print "{} UPI based Rule in node: {} with id: {} was matched; Data: {}".format(datetime.datetime.now(), node.name, ruleId, data) 
+    print(("{} UPI based Rule in node: {} with id: {} was matched; Data: {}".format(datetime.datetime.now(), node.name, ruleId, data))) 
 
 def pkt_based_rule_matched(group, node, ruleId, data):
-    print "{} Pkt Rule in node: {} with id: {} was matched; Data: {}".format(datetime.datetime.now(), node.name, ruleId, data) 
+    print(("{} Pkt Rule in node: {} with id: {} was matched; Data: {}".format(datetime.datetime.now(), node.name, ruleId, data))) 
 
 def pkt_based_rule(group, node, ruleId, pkt):
-    print "{} Pkt Rule in node: {} with id: {} was matched;".format(datetime.datetime.now(), node.name, ruleId) 
+    print("{} Pkt Rule in node: {} with id: {} was matched;".format(datetime.datetime.now(), node.name, ruleId)) 
     try:
-      print pkt.show()
+      print(pkt.show())
     except:
-      print pkt
-    print ""
+      print(pkt)
+    print("")
 
 
 def main(args):
@@ -94,10 +94,10 @@ def main(args):
 
     #control loop
     while True:
-        print "Connected nodes", [str(node.name) for node in nodes]
+        print(("Connected nodes", [str(node.name) for node in nodes]))
         if nodes:
             #######################################################################################
-            print "{} Installing new UPI based rule".format(datetime.datetime.now())
+            print("{} Installing new UPI based rule".format(datetime.datetime.now()))
             ruleDesc = controller.nodes(nodes[0]).rule.add(
                                         event=TimeEvent(func=upis.radio.get_noise, kwargs={}, interval=0.2, iface="wlan0"),
                                         filters=[MovAvgFilter(10), PeakDetector(-90)],
@@ -106,15 +106,15 @@ def main(args):
                                         permanence=Permanance.PERSISTENT,
                                         ctrl_callback=upi_based_rule_matched)
 
-            print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
+            print(("{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)))
             gevent.sleep(10)
 
             retVal = ruleDesc.remove()
-            print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
+            print(("{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)))
             gevent.sleep(1)
 
             #######################################################################################
-            print "{} Installing new UPI (GENERATOR) based rule".format(datetime.datetime.now())
+            print(("{} Installing new UPI (GENERATOR) based rule".format(datetime.datetime.now())))
             ruleDesc = controller.nodes(nodes[0]).rule.add(
                                         event=TimeEvent(func=upis.radio.get_rssi, kwargs={}, iface="wlan0"),
                                         filters=[MovAvgFilter(10)],
@@ -123,15 +123,15 @@ def main(args):
                                         permanence=Permanance.PERSISTENT,
                                         ctrl_callback=upi_based_rule_matched)
 
-            print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
+            print(("{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)))
             gevent.sleep(10)
 
             retVal = ruleDesc.remove()
-            print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
+            print(("{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)))
             gevent.sleep(1)
 
             #######################################################################################
-            print "{} Installing new packet based rule".format(datetime.datetime.now())
+            print(("{} Installing new packet based rule".format(datetime.datetime.now())))
             ruleDesc = controller.nodes(nodes[0]).rule.add(
                                         event=PktEvent(iface="eth0"),
                                         pktMatch=PktMatch("icmp"),
@@ -142,41 +142,41 @@ def main(args):
                                         permanence=Permanance.PERSISTENT,
                                         ctrl_callback=pkt_based_rule_matched)
 
-            print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
+            print(("{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)))
             gevent.sleep(10)
 
             retVal = ruleDesc.remove()
-            print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
+            print(("{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)))
             gevent.sleep(1)
 
             #######################################################################################
-            print "{} Get dest of all packets".format(datetime.datetime.now())
+            print(("{} Get dest of all packets".format(datetime.datetime.now())))
             ruleDesc = controller.nodes(nodes[0]).rule.add(
                                         event=PktEvent(iface="eth0"),
                                         selector=FieldSelector("IP.dst"),
                                         permanence=Permanance.PERSISTENT,
                                         ctrl_callback=pkt_based_rule_matched)
 
-            print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
+            print(("{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)))
             gevent.sleep(10)
 
             retVal = ruleDesc.remove()
-            print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
+            print(("{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)))
             gevent.sleep(1)
 
             #######################################################################################
-            print "{} Get all packets".format(datetime.datetime.now())
+            print(("{} Get all packets".format(datetime.datetime.now())))
             ruleDesc = controller.nodes(nodes[0]).rule.add(
                                         event=PktEvent(iface="eth0"),
                                         permanence=Permanance.PERSISTENT,
                                         ctrl_callback=pkt_based_rule)
 
 
-            print "{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)
+            print(("{} New rule with ID: {} was added".format(datetime.datetime.now(), ruleDesc.id)))
             gevent.sleep(10)
 
             retVal = ruleDesc.remove()
-            print "{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)
+            print(("{} Rule with ID: {} was {}".format(datetime.datetime.now(), ruleDesc.id, retVal)))
             gevent.sleep(1)
 
             #######################################################################################

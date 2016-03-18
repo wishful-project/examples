@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import datetime
@@ -31,29 +31,29 @@ nodes = []
 @controller.new_node_callback()
 def new_node(node):
     nodes.append(node)
-    print "New node appeared:"
-    print node
+    print("New node appeared:")
+    print(node)
 
 
 @controller.node_exit_callback()
 def node_exit(node, reason):
     if node in nodes:
         nodes.remove(node);
-    print "NodeExit : NodeID : {} Reason : {}".format(node.id, reason)
+    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
 
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
-    print "{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data)
+    print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
 
 
 @controller.add_callback(upis.radio.get_channel)
 def get_channel_reponse(group, node, data):
-    print "{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data)
+    print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
 
 def print_response(group, node, data):
-    print "{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data) 
+    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data)) 
 
 
 try:
@@ -62,9 +62,8 @@ try:
 
     #control loop
     while True:
-        gevent.sleep(10)
-        print "\n"
-        print "Connected nodes", [str(node.name) for node in nodes]
+        print("\n")
+        print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
             #execute non-blocking function immediately
             controller.blocking(False).node(nodes[0]).radio.iface("wlan0").set_power(12)
@@ -81,9 +80,10 @@ try:
 
             #execute blocking function immediately
             result = controller.node(nodes[0]).radio.iface("wlan1").get_channel()
-            print "{} Channel is: {}".format(datetime.datetime.now(), result)
+            print("{} Channel is: {}".format(datetime.datetime.now(), result))
+        gevent.sleep(10)
 
 except KeyboardInterrupt:
-    print "Controller exits"
+    print("Controller exits")
 finally:
     controller.stop()

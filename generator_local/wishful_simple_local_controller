@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -47,7 +47,7 @@ controller = agent.get_local_controller()
 
 @controller.set_default_callback()
 def default_callback(cmd, data):
-    print "{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)
+    print(("{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)))
 
 
 def main(args):
@@ -64,62 +64,62 @@ def main(args):
     #control loop
     while True:
         #######################################################################################
-        print "{} Get new generator".format(datetime.datetime.now())
+        print(("{} Get new generator".format(datetime.datetime.now())))
         myGenerator = controller.generator.start(
                                       event=TimeEvent(func=upis.radio.get_noise, kwargs={}, interval=0.2, iface="wlan0"),
                                       filters=[MovAvgFilter(10)])
 
-        print "{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)
+        print(("{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)))
 
         sampleNum = 20
         i = 0
         for sample in myGenerator:
-            print i, sample
+            print((i, sample))
             i = i + 1
             if i == sampleNum:
               break
 
         retVal = myGenerator.stop()
-        print "{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)
+        print(("{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)))
         time.sleep(2)
         #######################################################################################
 
 
-        print "{} Get new generator".format(datetime.datetime.now())
+        print(("{} Get new generator".format(datetime.datetime.now())))
         myGenerator = controller.generator.start(
                                     event=TimeEvent(func=upis.radio.get_rssi, kwargs={}, iface="wlan0"),
                                     filters=[MovAvgFilter(10)])
 
-        print "{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)
+        print(("{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)))
 
         sampleNum = 20
         i = 0
         for sample in myGenerator:
-            print i, sample
+            print((i, sample))
             i = i + 1
             if i == sampleNum:
               break
 
         retVal = myGenerator.stop()
-        print "{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)
+        print(("{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)))
         time.sleep(2)
 
         #######################################################################################
-        print "{} Get packet in generator".format(datetime.datetime.now())
+        print(("{} Get packet in generator".format(datetime.datetime.now())))
         myGenerator = controller.generator.start(event=PktEvent(iface="eth0"))
 
-        print "{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)
+        print(("{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)))
 
         sampleNum = 20
         i = 0
         for pkt in myGenerator:
-            print i, pkt.show()
+            print((i, pkt.show()))
             i = i + 1
             if i == sampleNum:
               break
 
         retVal = myGenerator.stop()
-        print "{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)
+        print(("{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)))
         time.sleep(2)
 
 

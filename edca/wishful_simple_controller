@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -42,22 +42,22 @@ nodes = []
 
 
 @controller.new_node_callback()
-def printNodeName(node):
+def new_node(node):
     nodes.append(node)
-    print "New node appeared:"
-    print node
+    print("New node appeared:")
+    print(node)
 
 
 @controller.node_exit_callback()
-def printNodeName(node, reason):
+def node_exit(node, reason):
     if node in nodes:
         nodes.remove(node);
-    print "NodeExit : NodeID : {} Reason : {}".format(node.id, reason)
+    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
 
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
-    print "DEFAULT CALLBACK : Group: {}, NodeId: {}, Cmd: {}, Returns: {}".format(group, node.id, cmd, data)
+    print("DEFAULT CALLBACK : Group: {}, NodeId: {}, Cmd: {}, Returns: {}".format(group, node.id, cmd, data))
 
 
 def main(args):
@@ -76,8 +76,8 @@ def main(args):
     #control loop
     while True:
         gevent.sleep(10)
-        print "\n"
-        print "Connected nodes", [str(node.name) for node in nodes]
+        print("\n")
+        print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
             controller.blocking(False).nodes(nodes[0]).radio.iface("wlan0").set_mac_access_parameters(queueId=0, qParam=edcaParams)
 

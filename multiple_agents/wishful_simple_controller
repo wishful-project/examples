@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -52,7 +52,7 @@ def new_node_cb(node):
     elif node.name == "agent_2":
         node1 = node
 
-    print "New node appeared: {}".format(node.name)
+    print("New node appeared: {}".format(node.name))
 
 @controller.node_exit_callback()
 def node_exit_cb(node, reason):
@@ -65,27 +65,27 @@ def node_exit_cb(node, reason):
     elif node.name == "agent_2":
         node1 = None
 
-    print "NodeExit : NodeName : {} Reason : {}".format(node.name, reason)
+    print("NodeExit : NodeName : {} Reason : {}".format(node.name, reason))
 
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
-    print "DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)
+    print("DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data))
 
 
 @controller.add_callback(upis.radio.set_channel)
 def set_channel_reponse(group, node, data):
-    print "set_channel_reponse : Group:{}, NodeName:{}, msg:{}".format(group, node.name, data)
+    print("set_channel_reponse : Group:{}, NodeName:{}, msg:{}".format(group, node.name, data))
     controller.delay(3).node(node).net.create_packetflow_sink(port=1234)
 
 
 @controller.add_callback(upis.radio.get_channel)
 def get_channel_reponse(group, node, data):
-    print "get_channel_reponse : Group:{}, NodeName:{}, msg:{}".format(group, node.name, data)
+    print("get_channel_reponse : Group:{}, NodeName:{}, msg:{}".format(group, node.name, data))
 
 
 def print_response(group, node, data):
-    print "Print response : Group:{}, NodeName:{}, Result:{}".format(group, node.name, data) 
+    print("Print response : Group:{}, NodeName:{}, Result:{}".format(group, node.name, data)) 
 
 
 def main(args):
@@ -102,13 +102,13 @@ def main(args):
 
     #wait for 2 nodes
     while True:
-        print "Waiting for 2 nodes"
+        print("Waiting for 2 nodes")
         gevent.sleep(2)
 
         #control loop
         while node0 and node1:
-            print ""
-            print "Connected nodes", [str(node.name) for node in nodes]
+            print("")
+            print("Connected nodes", [str(node.name) for node in nodes])
 
             #execute non-blocking function immediately
             controller.blocking(False).nodes(nodes).radio.iface("wlan0").set_power(12)
@@ -125,9 +125,9 @@ def main(args):
 
             #execute blocking function immediately
             result = controller.nodes([node0, node1]).radio.iface("wlan1").get_channel()
-            print "Channel in nodes:"
-            for node, value in result.iteritems():
-                print "\tNodeName: {}, Channel: {}".format(node.name, value)
+            print("Channel in nodes:")
+            for node, value in result.items():
+                print("\tNodeName: {}, Channel: {}".format(node.name, value))
 
             gevent.sleep(10)
 

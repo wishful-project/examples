@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -44,37 +44,37 @@ nodes = []
 
 
 @controller.new_node_callback()
-def newNode(node):
+def new_node(node):
     nodes.append(node)
-    print "New node appeared:"
-    print node
+    print("New node appeared:")
+    print(node)
 
 
 @controller.node_exit_callback()
-def nodeExit(node, reason):
+def node_exit(node, reason):
     if node in nodes:
         nodes.remove(node);
-    print "NodeExit : NodeName : {} Reason : {}".format(node.name, reason)
+    print("NodeExit : NodeName : {} Reason : {}".format(node.name, reason))
 
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
-    print "DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data)
+    print("DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data))
 
 
 def upi_based_rule_matched(group, node, ruleId, data):
-    print "{} UPI based Rule in node: {} with id: {} was matched; Data: {}".format(datetime.datetime.now(), node.name, ruleId, data) 
+    print("{} UPI based Rule in node: {} with id: {} was matched; Data: {}".format(datetime.datetime.now(), node.name, ruleId, data)) 
 
 def pkt_based_rule_matched(group, node, ruleId, data):
-    print "{} Pkt Rule in node: {} with id: {} was matched; Data: {}".format(datetime.datetime.now(), node.name, ruleId, data) 
+    print("{} Pkt Rule in node: {} with id: {} was matched; Data: {}".format(datetime.datetime.now(), node.name, ruleId, data)) 
 
 def pkt_based_rule(group, node, ruleId, pkt):
-    print "{} Pkt Rule in node: {} with id: {} was matched;".format(datetime.datetime.now(), node.name, ruleId) 
+    print("{} Pkt Rule in node: {} with id: {} was matched;".format(datetime.datetime.now(), node.name, ruleId)) 
     try:
-      print pkt.show()
+      print(pkt.show())
     except:
-      print pkt
-    print ""
+      print(pkt)
+    print("")
 
 
 def main(args):
@@ -94,105 +94,105 @@ def main(args):
 
     #control loop
     while True:
-        print "Connected nodes", [str(node.name) for node in nodes]
+        print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
             #######################################################################################
-            print "{} Get new generator".format(datetime.datetime.now())
+            print("{} Get new generator".format(datetime.datetime.now()))
             myGenerator = controller.nodes(nodes[0]).generator.start(
                                         event=TimeEvent(func=upis.radio.get_noise, kwargs={}, interval=0.2, iface="wlan0"))
 
-            print "{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)
+            print("{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id))
 
             sampleNum = 5
             i = 0
             for sample in myGenerator:
-                print i, sample
+                print(i, sample)
                 i = i + 1
                 if i == sampleNum:
                   break
 
             retVal = myGenerator.stop()
-            print "{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)
+            print("{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal))
             gevent.sleep(2)
 
             #######################################################################################
-            print "{} Get new generator".format(datetime.datetime.now())
+            print("{} Get new generator".format(datetime.datetime.now()))
             myGenerator = controller.nodes(nodes[0]).generator.start(
                                         event=TimeEvent(func=upis.radio.get_rssi, kwargs={}, iface="wlan0"),
                                         filters=[MovAvgFilter(10)])
 
-            print "{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)
+            print("{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id))
 
             sampleNum = 5
             i = 0
             for sample in myGenerator:
-                print i, sample
+                print(i, sample)
                 i = i + 1
                 if i == sampleNum:
                   break
 
             retVal = myGenerator.stop()
-            print "{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)
+            print("{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal))
             gevent.sleep(2)
 
             #######################################################################################
-            print "{} Get new generator".format(datetime.datetime.now())
+            print("{} Get new generator".format(datetime.datetime.now()))
             myGenerator = controller.nodes(nodes[0]).generator.start(
                                         event=PktEvent(iface="eth0"),
                                         pktMatch=PktMatch("icmp"),
                                         selector=FieldSelector("IP.ttl"))
 
-            print "{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)
+            print("{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id))
 
             sampleNum = 5
             i = 0
             for sample in myGenerator:
-                print i, sample
+                print(i, sample)
                 i = i + 1
                 if i == sampleNum:
                   break
 
             retVal = myGenerator.stop()
-            print "{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)
+            print("{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal))
             gevent.sleep(2)
 
             #######################################################################################
-            print "{} Get new generator".format(datetime.datetime.now())
+            print("{} Get new generator".format(datetime.datetime.now()))
             myGenerator = controller.nodes(nodes[0]).generator.start(
                                         event=PktEvent(iface="eth0"),
                                         selector=FieldSelector("IP.dst"))
 
-            print "{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)
+            print("{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id))
 
             sampleNum = 5
             i = 0
             for sample in myGenerator:
-                print i, sample
+                print(i, sample)
                 i = i + 1
                 if i == sampleNum:
                   break
 
             retVal = myGenerator.stop()
-            print "{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)
+            print("{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal))
             gevent.sleep(2)
 
             #######################################################################################
-            print "{} Get new generator".format(datetime.datetime.now())
+            print("{} Get new generator".format(datetime.datetime.now()))
             myGenerator = controller.nodes(nodes[0]).generator.start(
                                         event=PktEvent(iface="eth0"))
 
-            print "{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id)
+            print("{} New generator with ID: {}".format(datetime.datetime.now(), myGenerator.id))
 
             sampleNum = 5
             i = 0
             for pkt in myGenerator:
-                print i, pkt.show()
+                print(i, pkt.show())
                 i = i + 1
                 if i == sampleNum:
                   break
 
             retVal = myGenerator.stop()
-            print "{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal)
+            print("{} Generator with ID: {} was {}".format(datetime.datetime.now(), myGenerator.id, retVal))
             gevent.sleep(2)
 
             #######################################################################################

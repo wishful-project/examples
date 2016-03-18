@@ -13,23 +13,23 @@ def my_local_control_program(controller):
 
     @controller.set_default_callback()
     def default_callback(cmd, data):
-        print "{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)
+        print(("{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)))
         result = controller.radio.iface("wlan0").get_channel()
-        print "{} Channel is: {}".format(datetime.datetime.now(), result)
+        print(("{} Channel is: {}".format(datetime.datetime.now(), result)))
         controller.send_upstream({"myChannel":result})        
 
 
     #control loop
-    print "\nLocal Control Program - Name: {}, Id: {} - STARTED".format(controller.name, controller.id)
+    print(("\nLocal Control Program - Name: {}, Id: {} - STARTED".format(controller.name, controller.id)))
     while not controller.is_stopped():
         msg = controller.recv(timeout=1)
         if msg:
             newChannel = msg["new_channel"]
-            print "Next iteration:"
+            print("Next iteration:")
 
-            print "{} Scheduling set channel call with arg: {} in 5 seconds:".format(datetime.datetime.now(), newChannel)
+            print(("{} Scheduling set channel call with arg: {} in 5 seconds:".format(datetime.datetime.now(), newChannel)))
             controller.delay(5).radio.iface("wlan0").set_channel(newChannel)
         else:
-            print "{} Waiting for message".format(datetime.datetime.now())
+            print(("{} Waiting for message".format(datetime.datetime.now())))
 
-    print "Local Control Program - Name: {}, Id: {} - STOPPED".format(controller.name, controller.id)
+    print(("Local Control Program - Name: {}, Id: {} - STOPPED".format(controller.name, controller.id)))

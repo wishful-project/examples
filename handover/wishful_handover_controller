@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -186,7 +186,7 @@ def performHO(sta_mac_addr, sta_ip, ho_scheme):
 
 # possible scenarios
 class HOScenarios:
-    SINGLE_HARD, SINGLE_SOFT, DOUBLE_HARD_SOFT = range(2)
+    SINGLE_HARD, SINGLE_SOFT, DOUBLE_HARD_SOFT = list(range(2))
 
 def main(args):
     log.debug(args)
