@@ -15,6 +15,10 @@ modules:
       module : wishful_module_local_control
       class_name : LocalControlModule
 
+  rule_manager:
+      module : wishful_module_rules
+      class_name : RuleManagerModule
+
   simple:
       module : wishful_module_simple
       class_name : SimpleModule2
