@@ -12,7 +12,7 @@ Options:
    --config configFile Config file path
 
 Example:
-   ./wishful_simple_local_controller -v --config ./config.yaml 
+   ./wishful_simple_local_controller -v --config ./config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -71,7 +71,7 @@ def get_channel_reponse(group, node, data):
 
 
 def print_response(group, node, data):
-    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data)) 
+    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
 
 
 def main(args):
@@ -84,29 +84,36 @@ def main(args):
 
     controller.load_config(config)
     controller.start()
-   
+
     #control loop
     while True:
         gevent.sleep(10)
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
-            #execute non-blocking function immediately
-            controller.blocking(False).node(nodes[0]).radio.iface("wlan0").set_power(12)
+#            #execute non-blocking function immediately
+#            controller.blocking(False).node(nodes[0]).radio.iface("wlan0").set_power(12)
+#
+#            #execute non-blocking function immediately, with specific callback
+#            controller.callback(print_response).node(nodes[0]).radio.iface("wlan0").get_power()
+#
+#            #schedule non-blocking function delay
+#            controller.delay(3).node(nodes[0]).net.create_packetflow_sink(port=1234)
+#
+#            #schedule non-blocking function exec time
+#            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
+#            controller.exec_time(exec_time).node(nodes[0]).radio.iface("wlan1").set_channel(4)
+#
+#            #execute blocking function immediately
+#            result = controller.node(nodes[0]).radio.iface("wlan1").get_channel()
+#            print("{} Channel is: {}".format(datetime.datetime.now(), result))
 
-            #execute non-blocking function immediately, with specific callback
-            controller.callback(print_response).node(nodes[0]).radio.iface("wlan0").get_power()
+            # execute blocking function immediately [works]
+            csi = controller.node(nodes[0]).radio.iface("wlan0").receive_csi(runt=10)
+            print("{} Received CSI: {}".format(datetime.datetime.now(), csi))
 
-            #schedule non-blocking function delay
-            controller.delay(3).node(nodes[0]).net.create_packetflow_sink(port=1234)
-
-            #schedule non-blocking function exec time
-            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            controller.exec_time(exec_time).node(nodes[0]).radio.iface("wlan1").set_channel(4)
-
-            #execute blocking function immediately
-            result = controller.node(nodes[0]).radio.iface("wlan1").get_channel()
-            print("{} Channel is: {}".format(datetime.datetime.now(), result))
+            # execute non-blocking function immediately
+            #controller.callback(print_response).node(nodes[0]).radio.iface("wlan0").receive_csi(runt=10)
 
 
 
