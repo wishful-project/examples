@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Hello world with local WiSHFUL controller in Mininet-WiFi"
+echo "Hello world with global WiSHFUL controller and remote WiSHFUL agents in Mininet-WiFi"
 
 sudo python mn_script.py
 

@@ -27,10 +27,8 @@ import sys, os
 import yaml
 import wishful_agent
 
-__author__ = "Anatolij Zubow"
-__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__author__ = "WiSHFUL team"
 __version__ = "0.1.0"
-__email__ = "{zubow}@tkn.tu-berlin.de"
 
 log = logging.getLogger('wishful_agent.main')
 agent = wishful_agent.Agent()

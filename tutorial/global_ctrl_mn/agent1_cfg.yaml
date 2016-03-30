@@ -1,0 +1,18 @@
+## WiSHFUL agent config file
+
+agent_info:
+  name: 'agent_1'
+  info: 'Wishful IEEE 802.11 agent'
+  iface: 'ap1-eth1'
+
+modules:
+  discovery:
+      module : wishful_module_discovery_pyre
+      class_name : PyreDiscoveryAgentModule
+      kwargs: {"iface":"ap1-eth1", "groupName":"wishful_1234"}
+
+  wlan:
+      module : wishful_module_wifi
+      class_name : WifiModule
+      interfaces : ['ap1-wlan0']
+

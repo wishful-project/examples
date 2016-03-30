@@ -1,11 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+Wishful IEEE 802.11 example consisting of single APs and two stationary STAs. The AP is controlled by a
+local Wishful controller.
+"""
+
 import time
 from mininet.net import Mininet
 from mininet.node import Controller,OVSKernelSwitch
 from mininet.link import TCLink
-from wishful_mininet import WishfulNode, WishfulAgent, WishfulController
+from wishful_mininet import WishfulController
+
+__author__ = "WiSHFUL team"
+__version__ = "0.1.0"
 
 def topology():
     # Create a network
@@ -37,9 +45,9 @@ def topology():
     sta1.cmd('ping -c10 %s' % sta2.IP())
 
     # Show controller log file
-    print('<log file>')
+    print('WiSHFUL controller logfile content:')
     print(wf_ctrl.read_log_file())
-    print('</log file>')
+    print('')
 
     # Stop network
     wf_ctrl.stop()

@@ -2,11 +2,15 @@
 
 agent_info:
   name: 'local controller'
-  info: 'for IEEE 802.11 mininet'
+  info: 'for IEEE 802.11 linux'
   iface: 'lo'
 
 modules:
-  wlan:
+  network:
+      module : wishful_module_net_linux
+      class_name : NetworkModule
+
+  wifi:
       module : wishful_module_wifi
       class_name : WifiModule
-      interfaces : ['ap1-wlan0']
+      interfaces : ['wlan0', 'wlan1']

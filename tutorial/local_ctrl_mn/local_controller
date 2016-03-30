@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-local_controller.py: A simple Wishful local controller.
+local_controller.py: A Wishful local controller which retrieves MAC layer statistics, i.e. number of transmitted/received
+bytes, for each station served by the corresponding AP.
 
 Usage:
    local_controller.py [options] [-q | -v]

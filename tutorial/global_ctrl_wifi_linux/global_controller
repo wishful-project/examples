@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-global_controller.py: First implementation of WiSHFUL controller for wireless topology in IEEE 802.11.
+global_controller.py: Global controller learning topology in IEEE 802.11.
 From the set of wireless nodes it estimates:
 - which pair of nodes is in carrier sensing range,
 - which pair of nodes is in communication range,
@@ -33,10 +33,8 @@ import gevent
 import yaml
 import wishful_upis as upis
 
-__author__ = "Anatolij Zubow"
-__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
+__author__ = "WiSHFUL team"
 __version__ = "0.1.0"
-__email__ = "{zubow}@tkn.tu-berlin.de"
 
 # params
 # iface to use
@@ -46,14 +44,11 @@ wlan_inject_iface = 'mon0'
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller()
 nodes = []
-gateway_ip = "192.168.103.123"
 
 @controller.new_node_callback()
 def new_node_cb(node):
     nodes.append(node.id)
     log.debug('NodeEnter: NodeID: %s' % node.id)
-    if node.ip == gateway_ip:
-        gateway = node
 
 
 @controller.node_exit_callback()
@@ -69,7 +64,7 @@ def default_callback(group, node, cmd, data):
 
 
 def perform_hidden_node_detection(nodes, CSmat, CRmat):
-    log.debug("perform_hidden_node_detection")
+    log.debug("perform hidden node detection using reception and carrier sensing range matrices ...")
 
 
 '''
@@ -91,10 +86,11 @@ def main(args):
     log.debug("waiting for nodes ...")
 
     # wait until all nodes become available
+    NUM_NODES = 5
     while True:
         gevent.sleep(1)
 
-        if len(nodes) >= 2:
+        if len(nodes) >= NUM_NODES:
             # we need at least two nodes
             break
 

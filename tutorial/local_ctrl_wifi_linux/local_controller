@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import datetime, wishful_agent, time, yaml, wishful_upis as upis
+
+agent = wishful_agent.Agent(local=True)
+controller = agent.get_local_controller()
+
+@controller.add_callback(upis.radio.set_channel)
+def set_channel_reponse(data):
+    print("{} set_channel_reponse : {}".format(datetime.datetime.now(),data))
+
+@controller.add_callback(upis.net.get_iface_hw_addr)
+def get_iface_hw_addr(data):
+    print("{} get_iface_hw_addr_reponse : {}".format(datetime.datetime.now(),data))
+
+@controller.set_default_callback()
+def default_callback(cmd, data):
+    print("{} DEFAULT : Cmd: {}, Ret: {}".format(datetime.datetime.now(), cmd, data))
+
+def print_response(data):
+    print("{} Specific callback; response : {}".format(datetime.datetime.now(),data))
+
+if __name__ == "__main__":
+
+    config_file_path = './config.yaml'
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+
+    agent.load_config(config)
+    agent.run()
+
+    try:
+        while True:
+            #execute non-blocking function immediately
+            controller.blocking(False).net.get_iface_hw_addr('lo')
+
+            #execute non-blocking function immediately, with specific callback
+            controller.callback(print_response).net.get_iface_ip_addr('lo')
+
+            #schedule non-blocking function delay in 3 seconds
+            controller.delay(3).radio.iface("wlan0").set_channel(4)
+
+            #schedule non-blocking function at absolute time
+            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=6)
+            controller.exec_time(exec_time).radio.iface("wlan1").set_channel(4)
+
+            #execute blocking function immediately
+            result = controller.radio.iface("wlan1").get_channel()
+            print("{} channel is: {}".format(datetime.datetime.now(), result))
+
+            time.sleep(1)
+    finally:
+        agent.stop()
