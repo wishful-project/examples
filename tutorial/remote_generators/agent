@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-agent.py: A Linux IEEE 802.11 WiSHFUL agent.
+agent.py: remote WiSHFUL agent.
 
 Usage:
    agent.py [options] [-q | -v]
@@ -23,10 +23,9 @@ Other options:
 
 import logging
 import signal
-import sys, os
 import yaml
+import sys, os
 import wishful_agent
-from socket import gethostname
 
 __author__ = "Piotr Gawlowicz, Anatolij Zubow"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"

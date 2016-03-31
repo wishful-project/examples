@@ -30,7 +30,8 @@ import yaml
 import pprint
 import wishful_upis as upis
 
-__author__ = "WiSHFUL team"
+__author__ = "Piotr Gawlowicz, Anatolij Zubow"
+__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 
 log = logging.getLogger('wishful_controller.main')

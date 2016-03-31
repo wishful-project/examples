@@ -61,13 +61,13 @@ def topology():
     folder = './'
 
     print("*** ... agents ...")
-    agent1 = WishfulAgent(ap1, folder + 'wishful_simple_agent', folder + 'agent_config_1.yaml')
-    agent2 = WishfulAgent(ap2, folder + 'wishful_simple_agent', folder + 'agent_config_2.yaml')
+    agent1 = WishfulAgent(ap1, folder + 'agent', folder + 'agent_config_1.yaml')
+    agent2 = WishfulAgent(ap2, folder + 'agent', folder + 'agent_config_2.yaml')
     agent1.start()
     agent2.start()
 
     print("*** ... controller ...")
-    wf_ctrl = WishfulController(ap1, folder + 'wishful_simple_controller', folder + 'controller_config.yaml')
+    wf_ctrl = WishfulController(ap1, folder + 'global_controller', folder + 'controller_config.yaml')
     wf_ctrl.start()
 
     print("*** Starting network")

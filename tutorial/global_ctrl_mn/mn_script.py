@@ -16,7 +16,8 @@ from mininet.log import setLogLevel
 from wishful_mininet import WishfulNode, WishfulAgent, WishfulController
 import time
 
-__author__ = "WiSHFUL team"
+__author__ = "Piotr Gawlowicz, Anatolij Zubow"
+__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 
 # enable mininet cli

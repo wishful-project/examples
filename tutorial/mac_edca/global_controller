@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-agent.py: A Linux IEEE 802.11 WiSHFUL agent.
+global_controller.py: First implementation of WiSHFUL controller
 
 Usage:
-   agent.py [options] [-q | -v]
+   global_controller.py [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./agent -v --config ./agent_config.yaml
+   ./global_controller -v --config ./controller_config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -21,31 +21,66 @@ Other options:
    --version           show version and exit
 """
 
+import sys
+import datetime
 import logging
-import signal
-import sys, os
+import wishful_controller
+import gevent
 import yaml
-import wishful_agent
-from socket import gethostname
+import wishful_upis as upis
+import wishful_framework.upi_arg_classes.edca as edca
 
 __author__ = "Piotr Gawlowicz, Anatolij Zubow"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 
-log = logging.getLogger('wishful_agent.main')
-agent = wishful_agent.Agent()
+
+log = logging.getLogger('wishful_controller.main')
+controller = wishful_controller.Controller()
+nodes = []
+
+
+@controller.new_node_callback()
+def new_node(node):
+    nodes.append(node)
+    print("New node appeared:")
+    print(node)
+
+
+@controller.node_exit_callback()
+def node_exit(node, reason):
+    if node in nodes:
+        nodes.remove(node)
+    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
+
+
+@controller.set_default_callback()
+def default_callback(group, node, cmd, data):
+    print("DEFAULT CALLBACK : Group: {}, NodeId: {}, Cmd: {}, Returns: {}".format(group, node.id, cmd, data))
+
 
 def main(args):
     log.debug(args)
 
     config_file_path = args['--config']
-
     config = None
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
 
-    agent.load_config(config)
-    agent.run()
+    controller.load_config(config)
+    controller.start()
+
+    # define EDCA parameters
+    edcaParams = edca.EdcaQueueParameters(aifs=123, cwmin=127, cwmax=511, txop=0)
+
+    # control loop
+    while True:
+        gevent.sleep(2)
+        print("\n")
+        print("Connected nodes", [str(node.name) for node in nodes])
+        if nodes:
+            # set EDCA parameters on queue 0
+            controller.blocking(False).nodes(nodes).radio.iface("wlan0").set_mac_access_parameters(queueId=0, qParam=edcaParams)
 
 
 if __name__ == "__main__":
@@ -78,7 +113,7 @@ if __name__ == "__main__":
     try:
         main(args)
     except KeyboardInterrupt:
-        log.debug("Agent exits")
+        log.debug("Controller exits")
     finally:
         log.debug("Exit")
-        agent.stop()
+        controller.stop()

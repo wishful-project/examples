@@ -12,7 +12,8 @@ from mininet.node import Controller,OVSKernelSwitch
 from mininet.link import TCLink
 from wishful_mininet import WishfulController
 
-__author__ = "WiSHFUL team"
+__author__ = "Piotr Gawlowicz, Anatolij Zubow"
+__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 
 def topology():

@@ -1,0 +1,12 @@
+## WiSHFUL local controller config file
+
+agent_info:
+  name: 'local_controller'
+  info: 'local controller for hybrid TDMA control'
+  iface: 'lo'
+
+modules:
+  wifi_ath:
+      module : wishful_module_wifi_ath
+      class_name : Ath9kModule
+      interfaces : ['ap1']

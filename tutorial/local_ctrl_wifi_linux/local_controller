@@ -3,6 +3,10 @@
 
 import datetime, wishful_agent, time, yaml, wishful_upis as upis
 
+__author__ = "Piotr Gawlowicz, Anatolij Zubow"
+__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
+__version__ = "0.1.0"
+
 agent = wishful_agent.Agent(local=True)
 controller = agent.get_local_controller()
 

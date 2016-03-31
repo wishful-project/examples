@@ -2,11 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-global_controller.py: Global controller learning topology in IEEE 802.11.
-From the set of wireless nodes it estimates:
-- which pair of nodes is in carrier sensing range,
-- which pair of nodes is in communication range,
-- based on above information it estimates the hidden nodes
+global_controller.py: Example of a hierarchical controller. Here
+a global controller deploys local control program on a remote node
+and communicates with it by means of exchange of control messages.
 
 Usage:
    global_controller.py [options] [-q | -v]
@@ -28,49 +26,42 @@ Other options:
 import sys
 import datetime
 import logging
+import random
 import wishful_controller
 import gevent
 import yaml
 import wishful_upis as upis
 
+from local_control_program import my_local_control_program
+
 __author__ = "Piotr Gawlowicz, Anatolij Zubow"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 
-# params
-# iface to use
-wlan_iface = 'wifi0'
-wlan_inject_iface = 'mon0'
 
 log = logging.getLogger('wishful_controller.main')
 controller = wishful_controller.Controller()
 nodes = []
 
 @controller.new_node_callback()
-def new_node_cb(node):
-    nodes.append(node.id)
-    log.debug('NodeEnter: NodeID: %s' % node.id)
+def new_node(node):
+    nodes.append(node)
+    print("New node appeared:")
+    print(node)
 
 
 @controller.node_exit_callback()
-def exit_node_cb(node, reason):
-    if node.id in nodes:
-        nodes.remove(node.id)
-    log.debug("NodeExit : NodeID : %s Reason : %s" % (node.id, reason))
+def node_exit(node, reason):
+    if node in nodes:
+        nodes.remove(node);
+    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
 
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
-    log.debug("DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data))
+    print("DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(group, node.name, cmd, data))
 
 
-def perform_hidden_node_detection(nodes, CSmat, CRmat):
-    log.debug("perform hidden node detection using reception and carrier sensing range matrices ...")
-
-
-'''
-    main entry point ...
-'''
 def main(args):
     log.debug(args)
 
@@ -80,35 +71,35 @@ def main(args):
         config = yaml.load(f)
 
     controller.load_config(config)
-    controller.add_module(moduleName="wireless_topology", pyModuleName="wishful_module_wireless_topology ",
-                          className="WirelessTopologyModule", importAs="wireless_topology")
     controller.start()
-
-    log.debug("waiting for nodes ...")
-
-    # wait until all nodes become available
-    NUM_NODES = 5
+   
+    # control loop
     while True:
-        gevent.sleep(1)
+        print("Connected nodes", [str(node.name) for node in nodes])
 
-        if len(nodes) >= NUM_NODES:
-            # we need at least two nodes
-            break
+        if nodes:
+            print("Deploy local control program on a remote node")
+            lcpDescriptor = controller.node(nodes[0]).hc.start_local_control_program(program=my_local_control_program)
 
-    log.debug(" ... done: %s" % str(nodes))
+            msgNum = 5
+            while msgNum:
+                newCh = random.randint(1, 30)
+                print("Send ctrl message to remote control program")
+                lcpDescriptor.send({"new_channel": newCh})
 
-    # CS test
-    log.debug("Testing carrier sensing ...")
-    CSmat = controller.blocking(True).wireless_topology.estimate_nodes_in_carrier_sensing_range(nodes, wlan_inject_iface, TAU=0.9)
-    log.debug("done ... %s" % str(CSmat))
+                while True:
+                    msg = lcpDescriptor.recv(timeout=1)
+                    if msg:
+                        print("Recv ctrl message from remote local control program")
+                        msgNum = msgNum - 1
+                        break
 
-    # CR test
-    log.debug("Testing communication range ...")
-    CRmat = controller.blocking(True).wireless_topology.estimate_nodes_in_communication_range(nodes, wlan_inject_iface, MINPDR=0.9)
-    log.debug("done ... %s" % str(CRmat))
+                gevent.sleep(5)
 
-    # HN detection
-    perform_hidden_node_detection(nodes, CSmat, CRmat)
+            print("Terminate remote local control program")
+            lcpDescriptor.close()
+
+        gevent.sleep(10)
 
 
 if __name__ == "__main__":

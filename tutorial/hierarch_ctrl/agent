@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-agent.py: A Linux IEEE 802.11 WiSHFUL agent.
+agent.py: WiSHFUL IEEE 802.11 agent.
 
 Usage:
    agent.py [options] [-q | -v]
@@ -12,7 +12,7 @@ Options:
    --config configFile Config file path
 
 Example:
-   ./agent -v --config ./agent_config.yaml
+   ./agent -v --config ./config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -26,7 +26,6 @@ import signal
 import sys, os
 import yaml
 import wishful_agent
-from socket import gethostname
 
 __author__ = "Piotr Gawlowicz, Anatolij Zubow"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
