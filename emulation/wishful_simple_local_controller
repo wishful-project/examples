@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+wishful_simple_local_controller.py: First implementation of WiSHFUL controller
+
+Usage:
+   wishful_simple_local_controller.py [options] [-q | -v]
+
+Options:
+   --logfile name      Name of the logfile
+   --config configFile Config file path
+
+Example:
+   ./wishful_simple_local_controller -v --config ./config.yaml 
+
+Other options:
+   -h, --help          show this help message and exit
+   -q, --quiet         print less text
+   -v, --verbose       print more text
+   --version           show version and exit
+"""
+
+import sys
+import datetime
+import logging
+import wishful_agent
+import time
+import yaml
+import iptc
+import wishful_upis as upis
+from wishful_framework.upi_arg_classes.flow_id import FlowId
+
+from pytc.Profile import Profile
+from pytc.Filter import FlowDesc, Filter
+from pytc.Qdisc import *
+
+__author__ = "Piotr Gawlowicz"
+__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__version__ = "0.1.0"
+__email__ = "gawlowicz@tkn.tu-berlin.de"
+
+
+log = logging.getLogger('wishful_agent.main')
+agent = wishful_agent.Agent(local=True)
+controller = agent.get_local_controller()
+
+
+@controller.set_default_callback()
+def default_callback(cmd, data):
+    print("{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data))
+
+
+def main(args):
+    log.debug(args)
+
+    config_file_path = args['--config']
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+
+    agent.load_config(config)
+    agent.run()
+
+
+    #################################################################################################
+    log.info('Clear IpTables in node')
+    response = controller.net.clear_nf_tables()
+    print(response)
+    
+    log.info('Installing scheduler')
+    prioSched = PrioScheduler(bandNum=4)
+
+    pfifo1 = prioSched.addQueue(PfifoQueue(limit=50))
+    bfifo2 = prioSched.addQueue(BfifoQueue(limit=20000))
+    pfifo3 = prioSched.addQueue(SfqQueue(perturb=11))
+    tbf4   = prioSched.addQueue(TbfQueue(rate=1000*1024, burst=1600, limit=10*1024))
+
+    filter1 = Filter(name="BnControlTraffic");
+    filter1.setFiveTuple(src=None, dst='192.168.1.178', prot='udp', srcPort=None, dstPort='5001')
+    filter1.setTarget(pfifo1)
+    filter1.setTos(Filter.VI)
+    prioSched.addFilter(filter1)
+
+    filter4 = Filter(name="BestEffort");
+    filter4.setFiveTuple(src='10.0.0.2', dst=None, prot='tcp', srcPort='21', dstPort=None)
+    filter4.setTarget(tbf4)
+    prioSched.addFilter(filter4)
+
+    response = controller.net.install_egress_scheduler(iface='eth0', scheduler=prioSched)
+    print(response)
+
+    time.sleep(10)
+    log.info('Removing scheduler from node0')
+    response = controller.net.remove_egress_scheduler(iface='eth0')
+    print(response)
+
+    log.info('Clear IpTables in node')
+    response = controller.net.clear_nf_tables()
+    print(response)
+    
+    #################################################################################################
+
+    log.info('Emulate 3G link on node0')      
+    profile3G = Profile("profile3G")
+    profile3G.setPacketLimit(1000)
+    band_1Mbps = 1000 * 1000 / 8
+    profile3G.setRate(band_1Mbps)
+    profile3G.setDelay(delay=50, jitter=1)
+    response = controller.net.set_netem_profile('eth0', profile3G)
+    print(response)
+    time.sleep(10)
+
+    log.info('Update Profile')
+    band_3Mbps = 3 * 1000 * 1000 / 8
+    profile3G.setRate(band_3Mbps)
+    profile3G.setDelay(delay=20, jitter=1)
+    response = controller.net.update_netem_profile('eth0', profile3G)
+    print(response)
+    time.sleep(10)
+
+    log.info('Remove Profile')
+    response = controller.net.remove_netem_profile('eth0')
+    print(response)
+
+    #################################################################################################
+
+    log.info('Per-link emulation: 3G link to node1')
+    profile3G = Profile("profile3G")
+    profile3G.setPacketLimit(1000)
+    band_1Mbps = 1000 * 1000 / 8
+    profile3G.setRate(band_1Mbps)
+    profile3G.setDelay(delay=50, jitter=1)
+    response = controller.net.set_per_link_netem_profile('eth0', "192.168.8.1", profile3G)
+    print(response)
+
+    time.sleep(10)
+
+    log.info('Per-link emulation: 20Mbit link to node1')    
+    profile20Mbit = Profile("profile20Mbit")
+    profile20Mbit.setPacketLimit(1000)
+    band_20Mbps = 20 * 1000 * 1000 / 8
+    profile20Mbit.setRate(band_20Mbps)
+    profile20Mbit.setDelay(delay=5, jitter=1)
+    response = controller.net.update_per_link_netem_profile('eth0', "192.168.8.1", profile20Mbit)
+    print(response)
+
+    time.sleep(10)
+
+    log.info('Remove Per-Link Profiles')
+    response = controller.net.remove_per_link_netem_profile('eth0', "192.168.8.1")
+    print(response)
+    log.info('Remove Profile')
+    response = controller.net.remove_netem_profile('eth0')
+    print(response)
+
+if __name__ == "__main__":
+    try:
+        from docopt import docopt
+    except:
+        print("""
+        Please install docopt using:
+            pip install docopt==0.6.1
+        For more refer to:
+        https://github.com/docopt/docopt
+        """)
+        raise
+
+    args = docopt(__doc__, version=__version__)
+
+    log_level = logging.INFO  # default
+    if args['--verbose']:
+        log_level = logging.DEBUG
+    elif args['--quiet']:
+        log_level = logging.ERROR
+
+    logfile = None
+    if args['--logfile']:
+        logfile = args['--logfile']
+
+    logging.basicConfig(filename=logfile, level=log_level,
+        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    try:
+        main(args)
+    except KeyboardInterrupt:
+        log.debug("Controller exits")
+    finally:
+        log.debug("Exit")
+        agent.stop()
