@@ -19,3 +19,7 @@ modules:
   iperf:
       module : wishful_module_iperf
       class_name : IperfModule
+
+##  rule_manager:
+##      module : wishful_module_rules
+##      class_name : RuleManagerModule

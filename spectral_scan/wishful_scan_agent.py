@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-wishful_agent_simple.py: First implementation of WiSHFUL agent
+agent.py: remote WiSHFUL agent.
 
 Usage:
-   wishful_agent_simple.py [options] [-q | -v]
+   agent.py [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./wishful_agent_simple -v --config ./config.yaml
+   ./agent -v --config ./agent_config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -23,14 +23,13 @@ Other options:
 
 import logging
 import signal
-import sys, os
 import yaml
+import sys, os
 import wishful_agent
 
-__author__ = "Piotr Gawlowicz, Mikolaj Chwalisz"
-__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__author__ = "Piotr Gawlowicz, Anatolij Zubow"
+__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
-__email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
 
 log = logging.getLogger('wishful_agent.main')
 agent = wishful_agent.Agent()
