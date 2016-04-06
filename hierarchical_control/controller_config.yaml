@@ -7,11 +7,6 @@ controller:
     ul: "tcp://127.0.0.1:8989"
 
 modules:
-    hc:
-        module: wishful_module_hierarchical_control
-        class_name: HierarchicalControlModule
-        import_as: hc
-
     discovery:
         module : wishful_module_discovery_pyre
         class_name : PyreDiscoveryControllerModule
