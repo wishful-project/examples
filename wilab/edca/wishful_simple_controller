@@ -5,26 +5,20 @@
 wishful_controller_simple.py: First implementation of WiSHFUL controller
 
 Usage:
-   wishful_controller_simple.py [options] [-q | -v]
-
-Options:
-   --logfile name      Name of the logfile
-   --ip_controller   IP address of the global controller
+   wishful_controller_simple.py --ip-controller <IP_ADDRESS>
 
 Example:
-   ./wishful_simple_local_controller -v --ip_controller 127.0.0.1
+   ./wishful_simple_local_controller -v --ip-controller 127.0.0.1
 
-Other options:
-   -h, --help          show this help message and exit
-   -q, --quiet         print less text
-   -v, --verbose       print more text
-   --version           show version and exit
+Options:
+   --ip-controller     IP address of the global controller
 """
 
 import logging
 import wishful_controller
 import gevent
 import wishful_framework.upi_arg_classes.edca as edca
+import argparse
 
 __author__ = "Piotr Gawlowicz, Mikolaj Chwalisz"
 __copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
@@ -50,34 +44,16 @@ def main(controller, nodes):
 
 
 if __name__ == "__main__":
-    try:
-        from docopt import docopt
-    except:
-        print("""
-        Please install docopt using:
-            pip install docopt==0.6.1
-        For more refer to:
-        https://github.com/docopt/docopt
-        """)
-        raise
-
-    args = docopt(__doc__, version=__version__)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip_controller", help="increase output verbosity")
+    args = parser.parse_args()
 
     log_level = logging.INFO  # default
-    if args['--verbose']:
-        log_level = logging.DEBUG
-    elif args['--quiet']:
-        log_level = logging.ERROR
-
     logfile = None
-    if args['--logfile']:
-        logfile = args['--logfile']
-
     logging.basicConfig(filename=logfile, level=log_level,
                         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
-    log.debug(args)
 
-    controller_ip = args['--ip_controller']
+    controller_ip = args.ip_controller
     # Create controller
     controller = wishful_controller.Controller(
         dl="tcp://" + controller_ip + ":8990", ul="tcp://" + controller_ip + ":8989")
