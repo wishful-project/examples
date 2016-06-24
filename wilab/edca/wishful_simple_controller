@@ -36,8 +36,8 @@ def main(controller, nodes):
     # control loop
     while True:
         gevent.sleep(10)
-        print("\n")
-        print("Connected nodes", [str(node.name) for node in nodes])
+        log.info("\n")
+        log.info("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
             controller.blocking(False).nodes(nodes[0]).radio.iface(
                 "wlan0").set_mac_access_parameters(queueId=0, qParam=edcaParams)
