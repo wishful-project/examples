@@ -9,10 +9,10 @@ Usage:
 
 Options:
    --logfile name      Name of the logfile
-   --config configFile Config file path
+   --ip_controller   IP address of the global controller
 
 Example:
-   ./wishful_simple_local_controller -v --config ./config.yaml
+   ./wishful_simple_local_controller -v --ip_controller 127.0.0.1
 
 Other options:
    -h, --help          show this help message and exit
