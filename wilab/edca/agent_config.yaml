@@ -3,15 +3,15 @@
 agent_info:
   name: 'wishful_simple_agent_123'
   info: 'wishful_simple_agent_info'
-  iface: 'lo'
+  iface: 'eth0'
 
 modules:
   discovery:
-      module : wishful_module_static_discovery
-      class_name : StaticDiscoveryModule
-      kwargs: {"downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"}
+      module : wishful_module_discovery_pyre
+      class_name : PyreDiscoveryAgentModule
+      kwargs: {"iface":"eth0", "groupName":"wishful_1234"}
 
-  simple:
-      module : wishful_module_simple
-      class_name : SimpleModule2
+  wifi:
+      module : wishful_module_wifi_ath
+      class_name : Ath9kModule
       interfaces : ['wlan0']
