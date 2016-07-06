@@ -15,3 +15,7 @@ modules:
       module : wishful_module_wifi
       class_name : WifiModule
       interfaces : ['wlan0']
+
+  netModule:
+      module : wishful_module_net_linux
+      class_name : NetworkModule
