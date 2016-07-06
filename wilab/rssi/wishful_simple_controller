@@ -33,8 +33,8 @@ log = logging.getLogger('wishful_agent.main')
 
 
 def main(controller, nodes):
-    omlDB=OMLBase("station_info", "wifi_dense9","controller","tcp:am.wilab2.ilabt.iminds.be:3004")
-    omlDB.addmp("stats", "timestamp:int32 inactive_time:int32 rx_bytes:int32 rx_packets:int32 tx_bytes:int32 tx_packets:int32 tx_retries:int32 tx_failed:int32 signal:int32 signal_avg:int32 tx_bitrate:int32")
+    omlDB=OMLBase("station_info", "wifi_dense16","controller","tcp:am.wilab2.ilabt.iminds.be:3004")
+    omlDB.addmp("stats", "timestamp:int32 agent_control_ip:string agent_wlan0_ip:string station_mac:string inactive_time:int32 rx_bytes:int32 rx_packets:int32 tx_bytes:int32 tx_packets:int32 tx_retries:int32 tx_failed:int32 signal:int32 signal_avg:int32 tx_bitrate:int32")
     omlDB.start()
     while True:
         gevent.sleep(10)
@@ -43,10 +43,12 @@ def main(controller, nodes):
         if nodes:
             station_info = controller.nodes(nodes).net.iface("wlan0").get_info_of_connected_devices()
             if station_info is not None:
-               for node in station_info.keys():
-                   station_info_node = station_info[node]
-                   for mac in station_info_node.keys():
-                       omlDB.inject("stats", (int(time.time()), station_info[node][mac]['inactive time'][0], station_info[node][mac]['rx bytes'][0], station_info[node][mac]['rx packets'][0], station_info[node][mac]['tx bytes'][0], station_info[node][mac]['tx packets'][0], station_info[node][mac]['tx retries'][0], station_info[node][mac]['tx failed'][0], station_info[node][mac]['signal'][0], station_info[node][mac]['signal avg'][0], station_info[node][mac]['tx bitrate'][0] ))
+                agent_control_ip = controller.nodes(nodes).net.get_iface_ip_addr(iface='eth0')
+                agent_wlan0_ip = controller.nodes(nodes).net.get_iface_ip_addr(iface='wlan0')
+                for node in station_info.keys():
+                    station_info_node = station_info[node]
+                    for mac in station_info_node.keys():
+                        omlDB.inject("stats", (int(time.time()),agent_control_ip, agent_wlan0_ip, mac, station_info[node][mac]['inactive time'][0], station_info[node][mac]['rx bytes'][0], station_info[node][mac]['rx packets'][0], station_info[node][mac]['tx bytes'][0], station_info[node][mac]['tx packets'][0], station_info[node][mac]['tx retries'][0], station_info[node][mac]['tx failed'][0], station_info[node][mac]['signal'][0], station_info[node][mac]['signal avg'][0], station_info[node][mac]['tx bitrate'][0] ))
 
     omlDB.close()
 
@@ -72,6 +74,9 @@ if __name__ == "__main__":
     controller.add_module(moduleName="discovery", pyModuleName="wishful_module_discovery_pyre",
                           className="PyreDiscoveryControllerModule",
                           kwargs={"iface": "eth0", "groupName": "wishful_wilab", "downlink": "tcp://" + controller_ip + ":8990", "uplink": "tcp://" + controller_ip + ":8989"})
+    controller.add_module(moduleName="netModule", pyModuleName="wishful_module_net_linux",
+                          className="NetworkModule")
+
     nodes = []
 
     @controller.new_node_callback()
