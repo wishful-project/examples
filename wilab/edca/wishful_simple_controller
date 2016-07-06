@@ -32,15 +32,15 @@ log = logging.getLogger('wishful_agent.main')
 def main(controller, nodes):
 
     edcaParams = edca.EdcaQueueParameters(
-        aifs=123, cwmin=127, cwmax=511, txop=0)
+        aifs=1, cwmin=7, cwmax=15, txop=3)
     # control loop
-    while True:
-        gevent.sleep(10)
-        log.info("\n")
-        log.info("Connected nodes %s", nodes)
-        if nodes:
-            controller.blocking(False).nodes(nodes[0]).radio.iface(
-                "wlan0").set_mac_access_parameters(queueId=0, qParam=edcaParams)
+
+    gevent.sleep(30)
+    log.info("\n")
+    log.info("Connected nodes %s", nodes)
+    if nodes:
+        controller.blocking(False).nodes(nodes).radio.iface(
+            "wlan0").set_mac_access_parameters(queueId=0, qParam=edcaParams)
 
 
 if __name__ == "__main__":
