@@ -74,8 +74,6 @@ if __name__ == "__main__":
     controller.add_module(moduleName="discovery", pyModuleName="wishful_module_discovery_pyre",
                           className="PyreDiscoveryControllerModule",
                           kwargs={"iface": "eth0", "groupName": "wishful_wilab", "downlink": "tcp://" + controller_ip + ":8990", "uplink": "tcp://" + controller_ip + ":8989"})
-    controller.add_module(moduleName="netModule", pyModuleName="wishful_module_net_linux",
-                          className="NetworkModule")
 
     nodes = []
 
