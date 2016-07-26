@@ -16,4 +16,6 @@ modules:
       module : wishful_module_wifi_wmp
       class_name : WmpModule
 
-
+  iperf:
+      module : wishful_module_iperf
+      class_name : IperfModule

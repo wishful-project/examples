@@ -114,10 +114,16 @@ def local_control_program(controller):
         #UPI_myargs = {'interface' : interface, UPI_R.CSMA_CW : CWMIN, UPI_R.CSMA_CW_MIN : CWMIN, UPI_R.CSMA_CW_MAX : CWMAX }
         #controller.radio.set_parameter(UPI_myargs)
 
-        #upiHCImpl.startFunc()
-        #while not upiHCImpl.stopIsSet():
+        #receive message from controller
+        msg = controller.recv(timeout=1)
+        if msg:
+            n_tx_sta = msg["traffic_number"]
+            log.warning("num_tx_nodes=%d" % n_tx_sta )
+        else:
+            n_tx_sta = 0
+
+        #local controller loop
         while not controller.is_stopped():
-            msg = controller.recv(timeout=1)
 
             #find linux system time
             tsf=time.time()*1e6;
@@ -195,30 +201,23 @@ def local_control_program(controller):
             num_rx_match_ = num_rx_match
             delta_num_rx_match=float(delta_num_rx_match)
 
-            """""""""""""""""""""""""""""""""""""""""""""
-            execute MEDCA algorithm and find new CW value
-            # ipt = ipt + a * (delta_freezing - ipt);
-            # targetcw = -0.0131 * ipt ** 2 + 3.2180 * ipt + 13.9265;  # determine the target CW for this IPT
-            """""""""""""""""""""""""""""""""""""""""""""
-
             #PHY
             bw=20;
             Tpre=16*20/bw;
             Tsig=4*20/bw;
             Tsym=4*20/bw;
-            rate=6; #Mbps
-            basic_rate=6; #Mbps
+            rate=2; #Mbps
+            basic_rate=2; #Mbps
 
             #MAC
             tslot=9;
-            SIFS=16;
-            AIFS=3;
+            SIFS=10;
+            AIFS=2;
             DIFS=AIFS*tslot+SIFS;
 
             #PKT SIZE
             l_ack=14; #byte
-            #data_size=200;
-            data_size=1000;
+            data_size=200;
 
             t_data= Tpre + Tsig + math.ceil(Tsym/2+(22+8*(data_size))/rate);
             t_ack=Tpre + Tsig+math.ceil(l_ack*8/basic_rate);
@@ -227,7 +226,13 @@ def local_control_program(controller):
             #select algorithm to tune node CW
             alg="CW_OPT"
 
+            #MEDCA algorithm
             if alg == "MEDCA" :
+                """""""""""""""""""""""""""""""""""""""""""""
+                execute MEDCA algorithm and find new CW value
+                # ipt = ipt + a * (delta_freezing - ipt);
+                # targetcw = -0.0131 * ipt ** 2 + 3.2180 * ipt + 13.9265;  # determine the target CW for this IPT
+                """""""""""""""""""""""""""""""""""""""""""""
                 targetcw = -0.0106 * ipt ** 2 + 2.9933 * ipt + 18.5519;  # determine the target CW for this IPT
                 cw_f = cw_f + b * (targetcw - cw_f);
                 cw = round(cw_f);
@@ -235,46 +240,41 @@ def local_control_program(controller):
                 cw = max(cw,CWMIN);
                 cw = min(cw,CWMAX);
 
-            # if alg == "FIXED":
-            #     info_ctrl=upiHCImpl.getMsgFromController()
-            #     if info_ctrl :
-            #         n_tx_sta = info_ctrl['traffic_number']
-            #         log.warning("num_tx_nodes=%d" % info_ctrl['traffic_number'] )
-            #
-            #     cw = 46
+            #set fixed contention windows
+            if alg == "FIXED":
+                cw = 46
 
             if alg == "CW_OPT":
-
-                msg = controller.recv(timeout=1)
-                if msg:
-                    n_tx_sta = msg["traffic_number"]
-                    log.warning("num_tx_nodes=%d" % n_tx_sta )
-                else:
-                    n_tx_sta = 0
-
                 Tc = t_data + EIFS; #Collision time
-                cw_f = n_tx_sta * math.sqrt(2*Tc / tslot);
-                cw = round(cw_f);
+                cw_f = n_tx_sta * math.sqrt(2*Tc / tslot)
+                cw = round(cw_f)
                 cw = int(cw)
-                cw = max(cw,CWMIN);
-                cw = min(cw,CWMAX);
+                cw = max(cw,CWMIN)
+                cw = min(cw,CWMAX)
 
             #update CW
             if tuning_enabler == 1 and alg != "DCF" :
-                log.warning(' >>>>>>>> CW setting : ENABLED');
+                log.warning(' >>>>>>>> CW setting : ENABLED')
                 UPI_myargs = {'interface' : interface, UPI_R.CSMA_CW : cw, UPI_R.CSMA_CW_MIN : cw }
-                controller.radio.set_parameter(UPI_myargs)
+                controller.radio.set_parameter_lower_layer(UPI_myargs)
             else:
-                log.warning(' >>>>>>>> CW setting : DISABLED');
+                log.warning(' >>>>>>>> CW setting : DISABLED')
 
             #send value to MASTER
             cycle_update += 1
             if not(cycle_update % 1):
                 #communicate with global controller by passing control message
-                #upiHCImpl.transmitCtrlMsgUpstream( { "measure" : [[delta_freezing, tsf_reg, delta_ack_rx_ramatch, cw, ipt, delta_data_tx, delta_ack_rx,  delta_busytime, delta_tsf_reg, delta_num_rx_match]], "ip_address" : (ip_address) } )
-                #controller.send_upstream({"myResult": result})
+                log.warning('Sending result message to control program ');
                 controller.send_upstream({ "measure" : [[delta_freezing, tsf_reg, delta_ack_rx_ramatch, cw, ipt, delta_data_tx, delta_ack_rx,  delta_busytime, delta_tsf_reg, delta_num_rx_match]], "ip_address" : (ip_address) })
-            time.sleep(T)
+
+             #receive message from controller
+            msg = controller.recv(timeout=1)
+            if msg:
+                    n_tx_sta = msg["traffic_number"]
+                    log.warning("num_tx_nodes=%d" % n_tx_sta )
+            else:
+                    n_tx_sta = 0
+            #time.sleep(T)
 
         log.warning('Local WiSHFUL Controller END');
         return 'Local WiSHFUL Controller END'
@@ -291,223 +291,3 @@ def local_control_program(controller):
             #controller.send_upstream({"myResult": result})
         customLocalCtrlFunction(controller, interface, tuning_enabler)
 
-    # """
-    # Custom callback function used to receive result values from scheduled calls, i.e. if you schedule the execution of a
-    # particular UPI_R/N function in the future this callback allows you to be informed about any function return values.
-    # """
-    # numCBs = {}
-    # numCBs['res'] = 0
-    # # use in while to lern if the local logic stopped e.g.
-    # # while numCBs['res'] < 2:
-    #
-    # def resultCollector(json_message, funcId):
-    #     log.warning('json: %s' % json_message)
-    #     time_val = json_message['time']
-    #     peer_node = json_message['peer']
-    #     messagedata = json_message['msg']
-    #     log.warning('Callback %d: Local controller receives data msg at %s from %s : %s' % (funcId, str(time_val), peer_node, messagedata))
-    #     numCBs['res'] = numCBs['res'] + 1
-    #
-    #
-    #
-    # # stations_dump = [["192.168.3.103", "alix3", 0, 0, 0, 0, 0 ,0],
-    # #                 ["192.168.3.104", "alix4", 0, 0, 0, 0, 0, 0],
-    # #                 ["192.168.3.105", "alix5", 0, 0, 0, 0, 0, 0],
-    # #                 ["192.168.3.106", "alix6", 0, 0, 0, 0, 0, 0],
-    # #                 ["192.168.3.107", "alix7", 0, 0, 0, 0, 0, 0],
-    # #                 ["192.168.3.110", "alix10", 0, 0, 0, 0, 0, 0],
-    # #                 ["192.168.3.111", "alix11", 0, 0, 0, 0, 0, 0],
-    # #                 ["192.168.3.112", "alix12", 0, 0, 0, 0, 0, 0],
-    # #                 ["192.168.3.113", "alix13", 0, 0, 0, 0, 0, 0],
-    # #                 ["192.168.3.114", "alix14", 0, 0, 0, 0, 0, 0]]
-    #
-    # # stations_dump = [["192.168.3.12", "alix12", 0, 0, 0, 0, 0 ,0, 0],
-    # #             ["192.168.3.6", "alix6", 0, 0, 0, 0, 0, 0, 0],
-    # #             ["192.168.3.7", "alix7", 0, 0, 0, 0, 0, 0, 0],
-    # #             ["192.168.3.8", "alix8", 0, 0, 0, 0, 0, 0, 0],
-    # #             ["192.168.3.10", "alix10", 0, 0, 0, 0, 0, 0, 0],
-    # #             ["192.168.3.11", "alix11", 0, 0, 0, 0, 0, 0, 0],
-    # #             ["192.168.3.13", "alix13", 0, 0, 0, 0, 0, 0, 0],
-    # #             ["192.168.3.14", "alix14", 0, 0, 0, 0, 0, 0, 0]]
-    #
-    # """
-    # Custom callback function used to receive control feedback results from local controllers.
-    # """
-    # def ctrlMsgCollector(json_message):
-    #     global socket_visualizer
-    #     global omlInst
-    #
-    #     time_val = json_message['time']
-    #     peer_node = json_message['peer']
-    #     msg_data = json_message['msg']
-    #     remote_wlan_ipAddress = msg_data['ip_address']
-    #     measurement_types = 'MEASURE'
-    #     measurement = msg_data['measure']
-    #
-    #     #log.info('Global controller receives ctrl msg at %s from %s : %s' % (str(time_val), peer_node, str(msg_data) ))
-    #     # add measurement on nodes element
-    #     for node in mytestbed.wifinodes:
-    #         if node.wlan_ipAddress == remote_wlan_ipAddress and measurement != False:
-    #             node.last_bunch_measurement.append(measurement)
-    #             #log.debug('Append measurements at node %s : %s' % (str(remote_wlan_ipAddress), str(measurement) ))
-    #
-    #
-    #
-    #     # measurement_types=['FREEZING_NUMBER', 'TSF', 'RX_ACK_RAMATCH', 'CW', 'IPT', 'TX_DATA', 'RX_ACK', 'BUSY_TIME', 'delta_TSF', 'NUM_RX_MATCH']
-    #     # measure': [[0.0, 287963817, 0.0, 15, 1.79296875, 0, 0.0, 1786.0, 1017947.0, 0.0]]}
-    #     #omlInst.addmp("IEEE802154_MACSTATS",
-    #
-    #     # "timestamp:int32
-    #     # nodeID:int32
-    #     # packetSize:int32
-    #     # activeRadioprogram:string
-    #
-    #     # timeDiff:int32
-    #
-    #     # numTxRequest:int32
-    #     # numTxRequestFail:int32
-    #     # numTxAttempt:int32
-    #     # numTxSuccess:int32
-    #     # numTxFail:int32
-    #     # numTxBusy:int32
-    #     # numTxNoAck:int32
-    #     # numTxCollision:int32
-    #
-    #     # numRx:int32
-    #     # avgBackoffExponent:int32")
-    #
-    #     # omlLst = [int(time.time()),1,100,"TDMA"]
-    #     # temp = [measurement_key_values["IEEE802154_MACSTATS"][0]]
-    #     # for i in range(1,len(sensor_measurements_dct[1])):
-    #     #   temp.append((measurement_key_values["IEEE802154_MACSTATS"])[i] - (sensor_measurements_dct[1])[i])
-    #     # sensor_measurements_dct[1] = measurement_key_values["IEEE802154_MACSTATS"]
-    #     # omlLst = omlLst + list(temp)
-    #     # #~ log.info("%s",omlLst)
-    #     # omlInst.inject("IEEE802154_MACSTATS", omlLst)
-    #
-    #     node_id = int(remote_wlan_ipAddress.split('.')[3])
-    #     omlLst = [ int(time.time()), node_id, 1000, "RADIO_PROGRAM", 100000, measurement[0][5], measurement[0][5], measurement[0][5], measurement[0][5], 0, 0, 0, 0, measurement[0][9], measurement[0][3] ]
-    #     # temp = [measurement_key_values["IEEE802154_MACSTATS"][0]]
-    #     # for i in range(1,len(sensor_measurements_dct[1])):
-    #     #   temp.append((measurement_key_values["IEEE802154_MACSTATS"])[i] - (sensor_measurements_dct[1])[i])
-    #     # sensor_measurements_dct[1] = measurement_key_values["IEEE802154_MACSTATS"]
-    #     # omlLst = omlLst + list(temp)
-    #     # #~ log.info("%s",omlLst)
-    #     omlInst.inject("IEEE802154_MACSTATS", omlLst)
-    #
-    #     # # add measurement on nodes element
-    #     # #measurement_types=['FREEZING_NUMBER', 'TSF', 'RX_ACK_RAMATCH', 'CW', 'IPT', 'TX_DATA', 'RX_ACK', 'BUSY_TIME', 'delta_TSF', 'NUM_RX_MATCH']
-    #     # for i in range(0,len(stations_dump)):
-    #     #     if stations_dump[i][0] == remote_wlan_ipAddress and measurement != False:
-    #     #         stations_dump[i][2] = measurement[0][0]
-    #     #         stations_dump[i][3] = round(measurement[0][3], 1)
-    #     #         stations_dump[i][4] = round(measurement[0][5], 1)
-    #     #         stations_dump[i][5] = round(measurement[0][3], 1)
-    #     #         stations_dump[i][6] = round(measurement[0][2], 1)
-    #     #         stations_dump[i][7] = round((measurement[0][2] * 200 * 8 * 10 ), 1) #(I use frame of 200byte collected every 100ms)
-    #
-    #     # # add measurement on nodes element
-    #     # #measurement_types=['FREEZING_NUMBER', 'TSF', 'RX_ACK_RAMATCH', 'CW', 'IPT', 'TX_DATA', 'RX_ACK', 'BUSY_TIME', 'delta_TSF', 'NUM_RX_MATCH']
-    #     # for i in range(0,len(stations_dump)):
-    #     #     if stations_dump[i][0] == remote_wlan_ipAddress and measurement != False:
-    #     #         stations_dump[i][2] = measurement[0][0]				#'FREEZING_NUMBER'
-    #     #         stations_dump[i][3] = round(measurement[0][3], 1)	#'CW'
-    #     #         stations_dump[i][4] = round(measurement[0][5], 1)	#'TX_DATA'
-    #     #         stations_dump[i][5] = round(measurement[0][2], 1)	#'TSF'
-    #     #         stations_dump[i][6] = round((measurement[0][2] * 200 * 8 * 10 ), 1) #(I use frame of 200byte collected every 100ms)
-    #     #         stations_dump[i][7] = round((measurement[0][9]), 1) #(I use frame of 200byte collected every 100ms)
-    #
-    #     # if remote_wlan_ipAddress == stations_dump[i][0] :
-    #     #     # topic = random.randrange(9999,10005)
-    #     #     # messagedata = random.randrange(1,215) - 80
-    #     #     topic = 1001
-    #     #     messagedata = 15
-    #     #     print "%d %d" % (topic, messagedata)
-    #     #     socket_visualizer.send("%d %d" % (topic, messagedata))
-    #     json_message['traffic'] = get_traffic()
-    #     socket_visualizer.send_json(json_message)
-
-    #    # text_file.seek(0)
-    #    # text_file.write('*********************************************************************************************************\n')
-    #    # text_file.write('***************************      WiSHFUL SHOWCASE 3      ************************************************\n')
-    #    # text_file.write('*********************************************************************************************************\n')
-    #    # text_file.write('STATION\t\t\tFREEZING NUM\t\tCW\t\t\tTX DATA\t\t\tRX ACK\t\t\tTHR\n')
-    #    #
-    #    # for i in range(0,6):
-    #    #     for j in range(1,7):
-    #    #         text_file.write('%s\t\t\t' % (str(stations_dump[i][j])))
-    #    #     text_file.write('\n')
-
-
-
-
-    # """
-    # Stop function used to send stop function to local controllers.
-    # """
-    # def stop_local_controller(mytestbed):
-    #     CtrlFuncImpl = UPI_RN.stopFunc
-    #     CtrlFuncargs =  {'interface' : 'wlan0'}
-    #     now = get_now_full_second()
-    #     # exec immediately
-    #     exec_time = now + timedelta(seconds=3)
-    #     log.warning(' >>>> Stop local WiSHFUL controller on all nodes - stop at : %s', str(exec_time))
-    #     #nodes = upi_hc.getNodes()
-    #     nodes = mytestbed.nodes
-    #     try:
-    #         callback = partial(resultCollector, funcId=99)
-    #         mytestbed.global_mgr.runAt(nodes, UPI_RN.stopFunc, CtrlFuncargs, unix_time_as_tuple(exec_time), callback)
-    #     except Exception as e:
-    #         log.fatal("An error occurred when stop the local WiSHFUL controller: %s" % e)
-
-
-    # ''' START MAIN CONTROL PROGRAM '''
-    # if disable:
-    #     stop_local_controller(mytestbed)
-    #     return
-    #
-    # # register callback function for collecting results
-    # mytestbed.global_mgr.setCtrlCollector(ctrlMsgCollector)
-    # # deploy a custom control program on each node
-    # CtrlFuncImpl = customLocalCtrlFunction
-    # # get current time
-    # now = get_now_full_second()
-    # # exec immediately
-    # exec_time = now + timedelta(seconds=3)
-    # log.warning('Sending local WiSHFUL controller on all nodes - start at : %s', str(exec_time))
-    #
-    # #nodes = upi_hc.getNodes()
-    # for node in mytestbed.wifinodes:
-    #     node.measurement_types.append('FREEZING_NUMBER')
-    #     node.measurement_types.append('CW')
-    # nodes = mytestbed.nodes
-    #
-    #
-    # ''' IMPLEMENT PYTHON VISUALIZER '''
-    # ''' implement message zmq for realtime visualizer '''
-    # #global socket_visualizer
-    # #port = "12345"
-    # #context = zmq.Context()
-    # #socket_visualizer = context.socket(zmq.PUB)
-    # #socket_visualizer.bind("tcp://*:%s" % port)
-    #
-    # ''' implement OML database setup for realtime visualizer '''
-    # #global omlInst
-    # #omlInst = oml4py.OMLBase("LocalControlProgram", "WiSHFUL", socket.gethostname(),"tcp:am.wilab2.ilabt.iminds.be:3004")
-    # #omlInst.addmp("IEEE802154_MACSTATS", "timestamp:int32 nodeID:int32 packetSize:int32 activeRadioprogram:string timeDiff:int32 numTxRequest:int32 numTxRequestFail:int32 numTxAttempt:int32 numTxSuccess:int32 numTxFail:int32 numTxBusy:int32 numTxNoAck:int32 numTxCollision:int32 numRx:int32 avgBackoffExponent:int32")
-    # #omlInst.start()
-    #
-    # try:
-    #     # this is a non-blocking call
-    #     callback = partial(resultCollector, funcId=99)
-    #     #isOntheflyReconfig = True
-    # 	CtrlFuncargs =  {'interface' : 'wlan0','medca_enabler' : 2}
-    #     mytestbed.global_mgr.runAt(nodes[0], CtrlFuncImpl, CtrlFuncargs, unix_time_as_tuple(exec_time), callback )
-    #     # CtrlFuncargs =  {'interface' : 'wlan0','medca_enabler' : 1}
-    #     # mytestbed.global_mgr.runAt(nodes[1:2], CtrlFuncImpl, CtrlFuncargs, unix_time_as_tuple(exec_time), callback )
-    #     CtrlFuncargs =  {'interface' : 'wlan0','medca_enabler' : 1}
-    #     mytestbed.global_mgr.runAt(nodes[1:len(nodes)], CtrlFuncImpl, CtrlFuncargs, unix_time_as_tuple(exec_time), callback )
-    # except Exception as e:
-    #     log.fatal("An error occurred in local controller WiSHFUL sending and running : %s" % e)
-    #
-    # log.warning("Local logic STARTED")
-    # return

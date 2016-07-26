@@ -55,48 +55,47 @@ class MeasurementCollector:
 
         res_measurements = []
 
-        def monitorCallback(json_message):
-            """  Is called when a bunch of measurements are received from nodes.
-                 Extracts the ip address of the sender node and uses it to find appropriate object in WiFiNode list.
-                 Stores the bunch of measurements in last_bunch_measurement WiFinode attribute.
-
-            :param json_message: message received from node every iterations.
-            """
-
-            time_val = json_message['time']
-            peer_node = json_message['peer']
-            messagedata = json_message['msg']
-            callback_id = json_message['callbackId']
-            res_measurements.append(1)
-
-            # add every response in a wifinode element
-            for node in nodes:
-                if node.getIpAddress() == callback_id.split('//')[1].split(':')[0] and messagedata != False:
-                    node.last_bunch_measurement.append(messagedata)
-
-            # call user-defined callback (the controller logic)
-            ucallback(messagedata)
-
-            return
-
-        self.log.info('CALL getMonitor bunch  ....')
-        now = get_now_full_second()
-        UPIfunc = UPI_RN.getMonitorBounce
-        UPIargs = {'measurements': measurement_types, 'slot_period': sampling_time, 'frame_period': reporting_period,
-                   'interface': 'wlan0', 'iterator': iterations}
-        print "UPIargs are ", UPIargs
-
-        exec_time = now + timedelta(seconds=2)
-        callback = monitorCallback
-        try:
-            self.mytestbed.global_mgr.runAt(node_list, UPIfunc, UPIargs, unix_time_as_tuple(exec_time), callback)
-        except Exception as e:
-            self.log.warning("An error occurred (e.g. scheduling events in the past): %s" % e)
-
-        # plot data
-        self.measurement_types = measurement_types
-
-        return
+        # def monitorCallback(json_message):
+        #     """  Is called when a bunch of measurements are received from nodes.
+        #          Extracts the ip address of the sender node and uses it to find appropriate object in WiFiNode list.
+        #          Stores the bunch of measurements in last_bunch_measurement WiFinode attribute.
+        #
+        #     :param json_message: message received from node every iterations.
+        #     """
+        #
+        #     time_val = json_message['time']
+        #     peer_node = json_message['peer']
+        #     messagedata = json_message['msg']
+        #     callback_id = json_message['callbackId']
+        #     res_measurements.append(1)
+        #
+        #     # add every response in a wifinode element
+        #     for node in nodes:
+        #         if node.getIpAddress() == callback_id.split('//')[1].split(':')[0] and messagedata != False:
+        #             node.last_bunch_measurement.append(messagedata)
+        #
+        #     # call user-defined callback (the controller logic)
+        #     ucallback(messagedata)
+        #
+        #     return
+        #
+        # self.log.info('CALL getMonitor bunch  ....')
+        # now = get_now_full_second()
+        # UPIfunc = UPI_RN.getMonitorBounce
+        # UPIargs = {'measurements': measurement_types, 'slot_period': sampling_time, 'frame_period': reporting_period,
+        #            'interface': 'wlan0', 'iterator': iterations}
+        #
+        # exec_time = now + timedelta(seconds=2)
+        # callback = monitorCallback
+        # try:
+        #     self.mytestbed.global_mgr.runAt(node_list, UPIfunc, UPIargs, unix_time_as_tuple(exec_time), callback)
+        # except Exception as e:
+        #     self.log.warning("An error occurred (e.g. scheduling events in the past): %s" % e)
+        #
+        # # plot data
+        # self.measurement_types = measurement_types
+        #
+        # return
 
     def clear_nodes_measurements(self, nodes):
         """ Clear all the measurement stored in WiFiNode object.
@@ -184,9 +183,9 @@ class MeasurementCollector:
             
                                     #if nodeIp=="10.8.8.102" :
                                     #if nodeIp=="10.8.8.102" or nodeIp=="10.8.8.105" or nodeIp=="10.8.8.107" or nodeIp=="10.8.8.110" or nodeIp=="10.8.8.111" or nodeIp=="10.8.8.112" or nodeIp=="10.8.8.113" or nodeIp=="10.8.8.114" or nodeIp=="10.8.8.5":
-                                    if nodeIp=="10.8.8.102" or nodeIp=="10.8.8.105" or nodeIp=="10.8.8.107" or nodeIp=="10.8.8.110" or nodeIp=="10.8.8.111" or nodeIp=="10.8.8.112" or nodeIp=="10.8.8.113" or nodeIp=="10.8.8.114" or nodeIp=="10.8.8.5":
+                                    if nodeIp=="10.8.8.102" or nodeIp=="10.8.8.105" or nodeIp=="10.8.8.107" or nodeIp=="10.8.8.110" or nodeIp=="10.8.8.111" or nodeIp=="10.8.8.103" or nodeIp=="10.8.8.104" or nodeIp=="10.8.8.114" or nodeIp=="10.8.8.5":
 
-                                            print " node : " + nodeIp + " ( plot --> " + measurement_types[meas_type_id] + " )"
+                                            print(" node : " + nodeIp + " ( plot --> " + measurement_types[meas_type_id] + " )")
                                             for ii in range(dim[0]):
                                                     for jj in range(dim[1]):
                                                             yaxis.append(x[ii][jj][meas_type_id])

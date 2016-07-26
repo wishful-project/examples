@@ -252,6 +252,7 @@ def set_TDMA_parameters(node, log, controller, tdma_params):
     log.warning('TDMA parameters = %s' %(str(tdma_params)))
     UPIargs = { 'interface' : 'wlan0', UPI_R.TDMA_SUPER_FRAME_SIZE: tdma_params['TDMA_SUPER_FRAME_SIZE'], UPI_R.TDMA_NUMBER_OF_SYNC_SLOT : tdma_params['TDMA_NUMBER_OF_SYNC_SLOT'], UPI_R.TDMA_ALLOCATED_SLOT : tdma_params['TDMA_ALLOCATED_SLOT'] }
     rvalue = controller.nodes(node).radio.set_parameter_lower_layer(UPIargs)
+
     log.warning('The change parameter result is %s  (O for SUCCESS)' % str(rvalue))
     time.sleep(1)
     # Active new configuration

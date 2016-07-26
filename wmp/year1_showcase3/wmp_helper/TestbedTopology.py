@@ -3,25 +3,14 @@ __author__ = 'Pierluigi Gallo'
 """
 EU project WISHFUL
 """
-# from upis.upi_rn import UPI_RN
-# from upis.upi_m import UPI_M
-# from upis.upi_rn import UPI_RN
-#
-# from common.upihelper import from_unix_time, unix_time_as_tuple, get_now_full_second
-# from helpers.application import ServerApplication, ClientApplication
-# from helpers.mac_layer import EdcaQueueParameters
-# from common.upihelper import Time
 from controller.wishful_controller.node_manager import *
-# from helpers.helper import NetworkFunctionHelper
-# from helpers.helper import NetworkHelper, RadioHelper
-# from functools import partial
 from datetime import date, datetime, timedelta
 import re
 import time
 import sys
 import csv
 
-class WiFiNode(Node):
+class WiFiNode():
     """
     This class defines an WiFi node and takes the most appropriate actions in order to :
         Set wireless lan interface ip address and network role (Station/AccessPoint)
@@ -31,9 +20,10 @@ class WiFiNode(Node):
     def __init__(self, node):
         """ Creates a new WiFiNode
         """
-        super( WiFiNode, self ).__init__(node)
-        eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node))
-        self.wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[3]
+        self.node = node
+        # eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node))
+        # self.wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[3]
+        self.wlan_ipAddress = '192.168.3.' + str(node.ip[7:10])
         self.last_bunch_measurement = []
         self.measurement_types = []
         self.role = None
@@ -61,21 +51,22 @@ class TestbedTopology:
         Managing the interface with WiSHFUL controller
     """
 
-    def __init__(self, testbed_name, log):
+    def __init__(self, testbed_name, log, controller):
         """ create a new testbed topology whose nodes belong to the same group
         """
         # name of the experiment group; only nodes of this group can be controlled
         self.exp_group_name=testbed_name
         self.log = log
+        self.controller = controller
 
         #used to save specific information for WiFi node
-        self.wifi_ap_wmp_nodes = []
+        #self.wifi_ap_wmp_nodes = []
         self.wifinodes = [] #
-        self.athnodes = [] #
+        #self.athnodes = [] #
 
         #used to run UPI function on node
         self.nodes = []     #
-        self.ap_wmp_nodes = [] #
+        #self.ap_node
         self.wmp_nodes = []  #
         self.ath_nodes = []  #
 
@@ -84,25 +75,19 @@ class TestbedTopology:
         self.wmp_nodes_number = 0
         self.ath_nodes_number = 0
 
-    def setExperimentNodesNumber(self, nodes_number):
-        # for ttilab testbed
-        # 1 10.163.8.26     alix2     AP
-        # 2 10.163.8.44     alix5     STA1
-        # 3 10.163.8.57     alix7     STA2
-        # 4 10.163.8.60     alix10    STA3
-        # 5 10.163.8.69     alix11    STA4
-        # 6 10.163.8.70     alix12    STA5
-        # 7 10.163.8.71     alix13    STA6
-        self.experiment_nodes_number = nodes_number
-        return
+    def add_discovered_node(self, node):
+        self.nodes.append(node)
 
     def getExperimentNodesNumber(self):
+        with open('testbed_nodes.csv') as csvfile:
+            reader = csv.DictReader(filter(lambda row: row[0]!='#', csvfile))
+            for row in reader:
+                self.experiment_nodes_number += 1
         return self.experiment_nodes_number
 
     def initializeTestbedTopology(self):
         """ Initializes testbed setup one AP and one STA
         """
-
         #get available nodes on testbed
         nodes_ip_list = []
         nodes_role_list = []
@@ -111,133 +96,36 @@ class TestbedTopology:
             #reader = csv.DictReader(csvfile)
             reader = csv.DictReader(filter(lambda row: row[0]!='#', csvfile))
             for row in reader:
-                self.experiment_nodes_number += 1
-                nodes_ip_list.append(row['ip'])
-                nodes_role_list.append(row['role'])
-                nodes_platform_list.append(row['platform'])
-                if row['platform'] == 'wmp' and row['role'] != 'AP':
-                    self.wmp_nodes_number += 1
-                if row['platform'] == 'ath' and row['role'] != 'AP':
-                    self.ath_nodes_number += 1
-    #
-    #
-    #     node_index = 0
-    #     if self.experiment_nodes_number >= 1 :
-    #
-    #         self.log.warning('get ip node 1  %s ', str(nodes_ip_list[node_index]))
-    #
-    #         self.ap1 = WiFiNode(nodes_ip_list[node_index])
-    #         self.ap1.role = nodes_role_list[node_index]
-    #         self.ap1.platform = nodes_platform_list[node_index]
-    #         self.wifi_ap_wmp_nodes.append(self.ap1)
-    #         self.nodes.append(self.ap1)
-    #         node_index += 1
-    #
-    #     while node_index < self.experiment_nodes_number:
-    #
-    #         self.log.warning('get ip node 2  %s ', str(nodes_ip_list[node_index]))
-    #
-    #         self.sta_n = WiFiNode(nodes_ip_list[node_index])
-    #         self.sta_n.role = nodes_role_list[node_index]
-    #         self.sta_n.platform = nodes_platform_list[node_index]
-    #         if self.sta_n.platform == 'wmp':
-    #             self.wifinodes.append(self.sta_n)
-    #         if self.sta_n.platform == 'ath':
-    #             self.athnodes.append(self.sta_n)
-    #         self.nodes.append(self.sta_n)
-    #         node_index += 1
-    #
-    #     self.log.info('***************** %s ***************' % self.initializeTestbedTopology.__name__)
-    #     self.log.info('Initializing testbed identified by group %s - Testbed nodes :', self.exp_group_name)
-    #
-    #     # get reference to global UPI, we use Hierarchical, not GlobalManager manager, in order to execute custom
-    #     # function on exeperiments nodes
-    #     self.global_mgr  = HierarchicalManager(self.exp_group_name)
-    #
-    #     # initializes NetworkHelper: to run session traffic
-    #     self.netHelper = NetworkHelper(self.global_mgr)
-    #
-    #     self.radioHelper = RadioHelper(self.global_mgr)
-    #     self.networkFuncHelper = NetworkFunctionHelper(self.global_mgr)
-    #     #self.log.warning('networkFuncHelper: %s' % str(self.networkFuncHelper))
-    #
-    #
-    #     # node discovery: wait until all specified nodes are available
-    #     self.nodes = self.global_mgr.waitForNodes(self.nodes)
-    #
-    #     #split nodes reference in ath nodes and wmp nodes
-    #     for node in self.nodes:
-    #         for wifinode in self.wifi_ap_wmp_nodes:
-    #             if node._ipAddress == wifinode._ipAddress:
-    #                 self.ap_wmp_nodes.append(node)
-    #         for wifinode in self.wifinodes:
-    #             if node._ipAddress == wifinode._ipAddress:
-    #                 self.wmp_nodes.append(node)
-    #         for athnode in self.athnodes:
-    #             if node._ipAddress == athnode._ipAddress:
-    #                 self.ath_nodes.append(node)
-    #
-    #     expectedNodeIps = [node.getIpAddress() for node in self.nodes]
-    #     self.log.info('Expected Wishful nodes: %s' % str(expectedNodeIps))
-    #     nodeRpcIds = [str(node._rpcId) for node in self.nodes]
-    #     self.log.info('Discovered Wishful nodes: %s' % str(nodeRpcIds))
-    #
-    #     # start thread for callback, have to be done after some peers are available
-    #     self.global_mgr.startResultCollector()
-    #     # this operation require a proportional time at the nodes numbers
-    #     # need to wait response from all nodes before go on
-    #     time.sleep(10)
+                for ii in range(0, len(self.nodes)):
+                    if self.nodes[ii].ip == row['ip']:
+                        nodes_ip_list.append(row['ip'])
+                        nodes_role_list.append(row['role'])
+                        nodes_platform_list.append(row['platform'])
+
+                        if row['role'] == 'AP':
+                            self.ap_node = self.nodes[ii]
+
+                        if row['platform'] == 'wmp' and row['role'] != 'AP':
+                            self.wmp_nodes.append(self.nodes[ii])
+                            self.wmp_nodes_number += 1
+
+                        if row['platform'] == 'ath' and row['role'] != 'AP':
+                            self.ath_nodes.append(self.nodes[ii])
+                            self.ath_nodes_number += 1
+
+                        if row['platform'] == 'ath' or row['platform'] == 'wmp' or row['role'] == 'AP':
+                            #self.wifinodes.append(self.nodes[ii])
+                            self.wifinodes.append(WiFiNode(self.nodes[ii]))
+
+        #self.log.debug('ath_nodes_number : %s - wmp_nodes_number : %s' % (str(self.ath_nodes_number), str(self.wmp_nodes_number) ) )
+        self.log.debug('ath_nodes_number : %s - wmp_nodes_number : %s' % (str(len(self.ath_nodes)), str(len(self.wmp_nodes)) ) )
+        self.log.debug('len wifinodes : %s' % (str(len(self.wifinodes) ) ) )
 
 
-
-    def add_wmp_node(self, node, role):
-        if role == 'AP':
-            self.ap_wmp_nodes.append(node)
-        elif role == 'STA':
-            self.wmp_nodes.append(node)
-        else:
-            self.log.error('Error in node role : %s' % role)
-
-
-    def setAP(self, node, essid):
-        """ Creates infrastructure BSS, uses node such as Access Point
-        :param node: elected Access Point Node
-        :param essid: the SSID
+        """ Check if all expected nodes are present in the testbed
         """
-        # UPI_R function is execute immediately
-        exec_time = None
-
-        # eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node))
-        # wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
-        # UPIfunc = UPI_M.initTest
-        # UPIargs = {'interface' : 'wlan0', 'operation' : ['create-network'], 'ssid' : [essid], 'ip_address' : [wlan_ipAddress] }
-        # try:
-        #     rvalue = self.global_mgr.runAt(node, UPIfunc, UPIargs, exec_time)
-        #     self.log.info('Ret value of blocking call is %s' % str(rvalue))
-        # except Exception as e:
-        #     self.log.fatal("An error occurred : %s" % e)
-        #     return False
-
-    def setSTA(self, node, essid):
-        """ Associate node to infrastructure BSS
-
-        :param node: elected station node by associate
-        :param essid: the SSID
-        """
-
-        # # UPI_R function is execute immediately
-        # exec_time = None
-        #
-        # eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node))
-        # wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
-        # UPIfunc = UPI_M.initTest
-        # UPIargs = {'interface' : 'wlan0', 'operation' : ['association'], 'ssid' : [essid], 'ip_address' : [wlan_ipAddress] }
-        # try:
-        #     rvalue = self.global_mgr.runAt(node, UPIfunc, UPIargs, exec_time)
-        #     self.log.info('Ret value of blocking call is %s' % str(rvalue))
-        # except Exception as e:
-        #     self.log.fatal("An error occurred : %s" % e)
-        #     return False
+        # if experiment_nodes_number != testbed_node_number :
+        #         return FAILURE
 
     def initializeTestbedFunctions(self, controller):
         """ Setups all the node in the experiment, executes the follow operation :
@@ -247,80 +135,48 @@ class TestbedTopology:
 
         :return  result: True if the operation are successful execute, False otherwise
         """
-
         self.log.info(' %s - SETUP NODES' % self.initializeTestbedFunctions.__name__)
-
         # All the UPI functions are execute immediately
-        # UPIargs = {'execution_engine' : ['runtime/connectors/wmp_linux/execution_engine/factory'] }
-        # rvalue = controller.nodes(self.ap1).radio.install_execution_engine(UPIargs)
-        # self.log.debug('Ret value of blocking call is %s' % str(rvalue))
-        # UPIargs = {'interface' : 'wlan0', 'operation' : ['module'] }
-        # rvalue = controller.nodes(self.ap1).radio.init_test(UPIargs)
-        # self.log.debug('Ret value of blocking call is %s' % str(rvalue))
+        UPIargs = {'execution_engine' : ['../../../agent_modules/wifi_wmp/execution_engine/factory'] }
+        rvalue = controller.nodes(self.ap_node).radio.install_execution_engine(UPIargs)
+        self.log.debug('Ret value of blocking call is %s' % str(rvalue))
+        UPIargs = {'interface' : 'wlan0', 'operation' : ['module'] }
+        rvalue = controller.nodes(self.ap_node).radio.init_test(UPIargs)
+        self.log.debug('Ret value of blocking call is %s' % str(rvalue))
 
-        UPIargs = {'execution_engine' : ['../../agent_modules/wifi_wmp/execution_engine/wmp'] }
-        #UPIargs = {'execution_engine' : ['.... /execution_engine/medca-openfwwf-logcw'] }
+        UPIargs = {'execution_engine' : ['../../../agent_modules/wifi_wmp/execution_engine/wmp'] }
         rvalue = controller.nodes(self.wmp_nodes).radio.install_execution_engine(UPIargs)
         self.log.debug('Ret value of blocking call is %s' % str(rvalue))
         UPIargs = {'interface' : 'wlan0', 'operation' : ['module'] }
         rvalue = controller.nodes(self.wmp_nodes).radio.init_test(UPIargs)
         self.log.debug('Ret value of blocking call is %s' % str(rvalue))
 
-        self.log.debug('ath_nodes_number : %s - wmp_nodes_number : %s' % (str(self.ath_nodes_number), str(self.wmp_nodes_number) ) )
-        self.log.debug('len ath_nodes_number : %s - len wmp_nodes_number : %s' % (str(len(self.athnodes)), str(len(self.wifinodes) ) ) )
-
-        # self.setAP(self.ap1, self.exp_group_name)
-        # node_index = 0
-        # while node_index < self.wmp_nodes_number :
-        #     self.setSTA(self.wifinodes[node_index], self.exp_group_name)
-        #     node_index += 1
-        #
-        # self.log.warning('Configure EDCA parameters for each hardware queue in wireless card (Atheros AR928X)')
-        # # queueParam0 = EdcaQueueParameters(aifs=1,  cwmin=1,  cwmax=3,  txop=900)
-        # # queueParam1 = EdcaQueueParameters(aifs=50, cwmin=15, cwmax=63, txop=4)
-        # # queueParam2 = EdcaQueueParameters(aifs=55, cwmin=63, cwmax=127, txop=2)
-        # # queueParam3 = EdcaQueueParameters(aifs=123, cwmin=127, cwmax=511, txop=0)
-        # queueParam0 = EdcaQueueParameters(aifs=3,  cwmin=30,  cwmax=30,  txop=1)
-        # queueParam1 = EdcaQueueParameters(aifs=3, cwmin=30, cwmax=30, txop=1)
-        # queueParam2 = EdcaQueueParameters(aifs=3, cwmin=30, cwmax=30, txop=1)
-        # queueParam3 = EdcaQueueParameters(aifs=3, cwmin=30, cwmax=30, txop=1)
-        #
-        # node_index = 0
-        # while node_index < self.ath_nodes_number :
-        #     self.setSTA(self.athnodes[node_index], self.exp_group_name)
-        #
-        #     self.radioHelper.setEdcaParameters(self.athnodes[node_index], ifname='wlan0', queueId=0, qParam=queueParam0)
-        #     self.radioHelper.setEdcaParameters(self.athnodes[node_index], ifname='wlan0', queueId=1, qParam=queueParam1)
-        #     self.radioHelper.setEdcaParameters(self.athnodes[node_index], ifname='wlan0', queueId=2, qParam=queueParam2)
-        #     self.radioHelper.setEdcaParameters(self.athnodes[node_index], ifname='wlan0', queueId=3, qParam=queueParam3)
-        #
-        #     qParams = self.radioHelper.getEdcaParameters(self.athnodes[node_index], ifname='wlan0')
-        #     self.radioHelper.printEdcaParameters(self.athnodes[node_index], ifname='wlan0', qParam=qParams)
-        #     node_index += 1
+        self.setAP(self.ap_node, self.exp_group_name)
+        node_index = 0
+        while node_index < self.wmp_nodes_number :
+            self.setSTA(self.wmp_nodes[node_index], self.exp_group_name)
+            node_index += 1
 
         return True
 
-    def start_iperf_server_application(self, dnode, log, mytestbed):
-        log.debug("-> Running: Iperf server application")
-        serverApp = ServerApplication()
-        serverApp.setStartTime(Time.Now() + Time.Seconds(2))
-        serverApp.setProtocol("UDP")
-        eth_ipAddress_part = re.split(r'[:./\s]\s*', str(dnode))
-        wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
-        serverApp.setBind(wlan_ipAddress)
-        mytestbed.netHelper.installApplication(dnode, serverApp)
-        return serverApp
+    def setAP(self, node, essid):
+        """ Creates infrastructure BSS, uses node such as Access Point
+        :param node: elected Access Point Node
+        :param essid: the SSID
+        """
+        #eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node.ip))
+        #wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
+        wlan_ipAddress = '192.168.3.' + str(node.ip[7:10])
+        UPIargs = {'interface' : 'wlan0', 'operation' : ['create-network'], 'ssid' : [essid], 'ip_address' : [wlan_ipAddress] }
+        rvalue = self.controller.nodes(node).radio.init_test(UPIargs)
 
-    def start_iperf_client_application(self, snode, dnode, log, mytestbed,duration):
-        clientApp = ClientApplication()
-        clientApp.setStartTime(Time.Now() + Time.Seconds(2))
-        eth_ipAddress_part = re.split(r'[:./\s]\s*', str(dnode))
-        wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
-        clientApp.setDestination(wlan_ipAddress)
-        clientApp.setProtocol("UDP")
-        clientApp.setTransmissionTime(duration)
-        clientApp.setBandwidth("50M")
-        #clientApp.setFrameLen(200)
-        #clientApp.setFrameLen(1000)
-        mytestbed.netHelper.installApplication(snode, clientApp)
-        return clientApp
+    def setSTA(self, node, essid):
+        """ Associate node to infrastructure BSS
+        :param node: elected station node by associate
+        :param essid: the SSID
+        """
+        # eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node))
+        # wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
+        wlan_ipAddress = '192.168.3.' + str(node.ip[7:10])
+        UPIargs = {'interface' : 'wlan0', 'operation' : ['association'], 'ssid' : [essid], 'ip_address' : [wlan_ipAddress] }
+        rvalue = self.controller.nodes(node).radio.init_test(UPIargs)\

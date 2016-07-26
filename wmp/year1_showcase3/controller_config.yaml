@@ -11,4 +11,3 @@ modules:
         module : wishful_module_discovery_pyre
         class_name : PyreDiscoveryControllerModule
         kwargs: {"iface":"eth0", "groupName":"wishful_1234", "downlink":"tcp://10.8.8.6:8990", "uplink":"tcp://10.8.8.6:8989"}
-

@@ -35,6 +35,7 @@ sys.path.append("../../../agent_modules/wifi")
 sys.path.append('../../../upis')
 sys.path.append('../../../framework')
 sys.path.append('../../../agent')
+sys.path.append('../../../controller')
 
 sys.path.append('../../../controller_modules')
 sys.path.append('../../../controller_modules/wireless_topology')
@@ -44,8 +45,6 @@ import wishful_controller
 
 from examples.wmp.wmp_radio_program.wmp_helper.controller_utils import *
 from examples.wmp.wmp_radio_program.wmp_helper.TestbedTopology import TestbedTopology
-#from examples.wmp_edca.wmp_helper.MeasurementManager import *
-#from examples.wmp_edca.wmp_helper.TestbedTopology import *
 from agent_modules.wifi_wmp.wmp_structure import UPI_R
 
 

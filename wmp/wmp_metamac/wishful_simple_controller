@@ -29,19 +29,20 @@ import yaml
 import time
 import random
 
-sys.path.append('../../')
-sys.path.append("../../agent_modules/wifi_ath")
-sys.path.append("../../agent_modules/wifi_wmp")
-sys.path.append("../../agent_modules/wifi")
-sys.path.append('../../upis')
-sys.path.append('../../framework')
-sys.path.append('../../agent')
+sys.path.append('../../../')
+sys.path.append("../../../agent_modules/wifi_ath")
+sys.path.append("../../../agent_modules/wifi_wmp")
+sys.path.append("../../../agent_modules/wifi")
+sys.path.append('../../../upis')
+sys.path.append('../../../framework')
+sys.path.append('../../../agent')
+sys.path.append('../../../controller')
 
 import wishful_upis as upis
 import wishful_controller
 
-from examples.wmp_radio_program.wmp_helper.controller_utils import *
-from examples.wmp_radio_program.wmp_helper.TestbedTopology import TestbedTopology
+from examples.wmp.wmp_radio_program.wmp_helper.controller_utils import *
+from examples.wmp.wmp_radio_program.wmp_helper.TestbedTopology import TestbedTopology
 #from examples.wmp_edca.wmp_helper.MeasurementManager import *
 #from examples.wmp_edca.wmp_helper.TestbedTopology import *
 from agent_modules.wifi_wmp.wmp_structure import UPI_R
@@ -114,40 +115,40 @@ def main(args):
             #execute non-blocking function immediately
             controller.blocking(False).nodes(nodes[0]).radio.set_parameter_lower_layer(UPIargs_2)
 
-            #execute non-blocking function immediately, with specific callback
-            controller.callback(print_response).nodes(nodes[0]).radio.get_parameter_lower_layer(UPIargs_1)
-
-            #schedule non-blocking function delay
-            controller.delay(3).nodes(nodes[0]).radio.get_parameter_lower_layer(UPIargs_1)
-
-            #schedule non-blocking function exec time
-            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=6)
-            controller.exec_time(exec_time).nodes(nodes[0]).radio.get_parameter_lower_layer(UPIargs_1)
-
-            #execute blocking function immediately
-            result = controller.nodes(nodes[0]).radio.set_parameter_lower_layer(UPIargs_2)
-            print("{} setting (0 for SUCCESS) : {}".format(datetime.datetime.now(), result))
-
-
-            print("Deploy local control program on a remote node")
-            lcpDescriptor = controller.node(nodes[0]).hc.start_local_control_program(program=my_local_control_program)
-            msgNum = 5
-            while msgNum:
-                newCh = random.randint(1, 30)
-                print("Send ctrl message to remote control program")
-                lcpDescriptor.send({"new_channel": newCh})
-
-                while True:
-                    msg = lcpDescriptor.recv(timeout=1)
-                    if msg:
-                        print("Recv ctrl message from remote local control program")
-                        msgNum = msgNum - 1
-                        break
-
-                gevent.sleep(10)
-
-            print("Terminate remote local control program")
-            lcpDescriptor.close()
+            # #execute non-blocking function immediately, with specific callback
+            # controller.callback(print_response).nodes(nodes[0]).radio.get_parameter_lower_layer(UPIargs_1)
+            #
+            # #schedule non-blocking function delay
+            # controller.delay(3).nodes(nodes[0]).radio.get_parameter_lower_layer(UPIargs_1)
+            #
+            # #schedule non-blocking function exec time
+            # exec_time = datetime.datetime.now() + datetime.timedelta(seconds=6)
+            # controller.exec_time(exec_time).nodes(nodes[0]).radio.get_parameter_lower_layer(UPIargs_1)
+            #
+            # #execute blocking function immediately
+            # result = controller.nodes(nodes[0]).radio.set_parameter_lower_layer(UPIargs_2)
+            # print("{} setting (0 for SUCCESS) : {}".format(datetime.datetime.now(), result))
+            #
+            #
+            # print("Deploy local control program on a remote node")
+            # lcpDescriptor = controller.node(nodes[0]).hc.start_local_control_program(program=my_local_control_program)
+            # msgNum = 5
+            # while msgNum:
+            #     newCh = random.randint(1, 30)
+            #     print("Send ctrl message to remote control program")
+            #     lcpDescriptor.send({"new_channel": newCh})
+            #
+            #     while True:
+            #         msg = lcpDescriptor.recv(timeout=1)
+            #         if msg:
+            #             print("Recv ctrl message from remote local control program")
+            #             msgNum = msgNum - 1
+            #             break
+            #
+            #     gevent.sleep(10)
+            #
+            # print("Terminate remote local control program")
+            # lcpDescriptor.close()
 
             while True:
                 gevent.sleep(10)

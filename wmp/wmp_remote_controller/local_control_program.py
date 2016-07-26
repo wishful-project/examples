@@ -13,13 +13,13 @@ def my_local_control_program(controller):
     import time
     import datetime
     import sys
-    sys.path.append('../../')
-    sys.path.append("../../agent_modules/wifi_ath")
-    sys.path.append("../../agent_modules/wifi_wmp")
-    sys.path.append("../../agent_modules/wifi")
-    sys.path.append('../../upis')
-    sys.path.append('../../framework')
-    sys.path.append('../../agent')
+    sys.path.append('../../../')
+    sys.path.append("../../../agent_modules/wifi_ath")
+    sys.path.append("../../../agent_modules/wifi_wmp")
+    sys.path.append("../../../agent_modules/wifi")
+    sys.path.append('../../../upis')
+    sys.path.append('../../../framework')
+    sys.path.append('../../../agent')
     from agent_modules.wifi_wmp.wmp_structure import UPI_R
 
 

@@ -26,13 +26,13 @@ import signal
 import sys, os
 import yaml
 
-sys.path.append('../../')
-sys.path.append("../../agent_modules/wifi_ath")
-sys.path.append("../../agent_modules/wifi_wmp")
-sys.path.append("../../agent_modules/wifi")
-sys.path.append('../../upis')
-sys.path.append('../../framework')
-sys.path.append('../../agent')
+sys.path.append('../../../')
+sys.path.append("../../../agent_modules/wifi_ath")
+sys.path.append("../../../agent_modules/wifi_wmp")
+sys.path.append("../../../agent_modules/wifi")
+sys.path.append('../../../upis')
+sys.path.append('../../../framework')
+sys.path.append('../../../agent')
 
 import wishful_agent
 from agent_modules.wifi_wmp.wmp_structure import UPI_R
