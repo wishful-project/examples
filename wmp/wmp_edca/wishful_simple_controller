@@ -100,13 +100,13 @@ def main(args):
         if nodes:
             #nodes_platform_info.append(getPlatformInformation( nodes[0], log, controller))
             UPIargs = { 'interface' : 'wlan0', 'parameters' : [UPI_R.CSMA_CW, UPI_R.CSMA_CW_MIN, UPI_R.CSMA_CW_MAX] }
-            node_parameters = controller.nodes(nodes[0]).radio.iface("wlan0").get_parameter_lower_layer(UPIargs)
+            node_parameters = controller.nodes(nodes[0]).radio.iface("wlan0").get_parameters(UPIargs)
             print("node_parameters : %s" % str(node_parameters) )
             UPIargs = { 'interface' : 'wlan0', UPI_R.CSMA_CW: 127, UPI_R.CSMA_CW_MIN : 127, UPI_R.CSMA_CW_MAX : 511 }
-            node_result = controller.nodes(nodes[0]).radio.iface("wlan0").set_parameter_lower_layer(UPIargs)
+            node_result = controller.nodes(nodes[0]).radio.iface("wlan0").set_parameters(UPIargs)
             print("node_result : %s" % str(node_result) )
             UPIargs = { 'interface' : 'wlan0', 'parameters' : [UPI_R.CSMA_CW, UPI_R.CSMA_CW_MIN, UPI_R.CSMA_CW_MAX] }
-            node_parameters = controller.nodes(nodes[0]).radio.iface("wlan0").get_parameter_lower_layer(UPIargs)
+            node_parameters = controller.nodes(nodes[0]).radio.iface("wlan0").get_parameters(UPIargs)
             print("node_parameters after setting : %s" % str(node_parameters) )
             break
 

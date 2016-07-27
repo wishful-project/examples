@@ -107,7 +107,7 @@ def main(args):
             mytestbed.initializeTestbedFunctions(controller)
 
             UPIargs = { 'interface' : 'wlan0' }
-            active_radio_program = controller.nodes(nodes[0]).radio.iface("wlan0").get_active(UPIargs)
+            active_radio_program = controller.nodes(nodes[0]).radio.iface("wlan0").get_running_radio_program(UPIargs)
             print("radio program activated : %s" % str(active_radio_program) )
 
             node_index = 0
@@ -126,7 +126,7 @@ def main(args):
             #active_TDMA_radio_program_slot_2(node, log, controller, nodes_platform_info[0])
 
             UPIargs = { 'interface' : 'wlan0' }
-            active_radio_program = controller.nodes(nodes[0]).radio.iface("wlan0").get_active(UPIargs)
+            active_radio_program = controller.nodes(nodes[0]).radio.iface("wlan0").get_running_radio_program(UPIargs)
             print("radio program after switching : %s" % str(active_radio_program) )
 
             break

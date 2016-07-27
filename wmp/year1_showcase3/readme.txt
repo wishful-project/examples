@@ -1,4 +1,7 @@
-# Wishful showcase 3 - Load and Interference aware MAC adaptation
+Wishful showcase 3 year 1 - Load and Interference aware MAC adaptation
+============================
+
+For any information or issue, please contact Domenico Garlisi at domenico.garlisi@cnit.it
 
 It is well known that contention-based access protocols work better than scheduled-based protocols in case of intermittent and unpredictable traffic flows;
 moreover, the contention parameters can be optimized as a function of the time-varying number of nodes which have traffic to transmit.

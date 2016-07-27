@@ -126,7 +126,7 @@ def active_CSMA_radio_program(node, log, global_mgr, current_platform_info):
 
     # Active CSMA radio program
     UPIargs = {'position' : position, 'radio_program_name' : 'CSMA', 'path' : radio_program_pointer_CSMA, 'interface' : 'wlan0' }
-    rvalue = controller.nodes(node).radio.set_active(UPIargs)#     if rvalue == SUCCESS :
+    rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)#     if rvalue == SUCCESS :
     if rvalue == SUCCESS:
         log.warning('Radio program activation successful')
     else :
@@ -164,7 +164,7 @@ def active_CSMA_radio_program_slot_1(node, log, controller):
     position = '1'
     # Active CSMA radio program
     UPIargs = {'position' : position, 'interface' : 'wlan0' }
-    rvalue = controller.nodes(node).radio.set_active(UPIargs)
+    rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)
     if rvalue == SUCCESS :
         log.warning('Radio program activation successful')
     else :
@@ -186,7 +186,7 @@ def active_TDMA_radio_program_slot_2(node, log, controller):
     position = '2'
     # # Active CSMA radio program
     UPIargs = {'position' : position, 'interface' : 'wlan0' }
-    rvalue = controller.nodes(node).radio.set_active(UPIargs)
+    rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)
     if rvalue == SUCCESS :
         log.warning('Radio program activation successful')
     else :
@@ -227,7 +227,7 @@ def active_TDMA_radio_program(node, log, controller, current_platform_info):
 
     # Active TDMA radio program
     UPIargs = {'position' : position, 'radio_program_name' : 'TDMA', 'path' : radio_program_pointer_TDMA, 'interface' : 'wlan0' }
-    rvalue = controller.nodes(node).radio.set_active(UPIargs)
+    rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)
     if rvalue == SUCCESS :
         log.warning('Radio program activation succesfull')
     else :
@@ -251,13 +251,13 @@ def set_TDMA_parameters(node, log, controller, tdma_params):
     # Set the TDMA parameter
     log.warning('TDMA parameters = %s' %(str(tdma_params)))
     UPIargs = { 'interface' : 'wlan0', UPI_R.TDMA_SUPER_FRAME_SIZE: tdma_params['TDMA_SUPER_FRAME_SIZE'], UPI_R.TDMA_NUMBER_OF_SYNC_SLOT : tdma_params['TDMA_NUMBER_OF_SYNC_SLOT'], UPI_R.TDMA_ALLOCATED_SLOT : tdma_params['TDMA_ALLOCATED_SLOT'] }
-    rvalue = controller.nodes(node).radio.set_parameter_lower_layer(UPIargs)
+    rvalue = controller.nodes(node).radio.set_parameters(UPIargs)
 
     log.warning('The change parameter result is %s  (O for SUCCESS)' % str(rvalue))
     time.sleep(1)
     # Active new configuration
     UPIargs = {'radio_program_name' : 'TDMA' }
-    rvalue = controller.nodes(node).radio.set_active(UPIargs)
+    rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)
     if rvalue == SUCCESS :
         log.warning('Radio program activation succesfull')
     else :

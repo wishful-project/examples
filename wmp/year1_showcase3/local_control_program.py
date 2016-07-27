@@ -35,7 +35,7 @@ def my_local_control_program(controller):
             ch = msg["new_channel"]
             print("Schedule get monitor to {} in 5s:".format(ch))
             UPI_myargs = {'interface' : 'wlan0', 'measurements' : [UPI_R.REGISTER_1, UPI_R.REGISTER_2, UPI_R.NUM_TX_DATA_FRAME, UPI_R.NUM_RX_ACK, UPI_R.NUM_RX_ACK_RAMATCH, UPI_R.BUSY_TYME , UPI_R.TSF, UPI_R.NUM_RX_MATCH] }
-            result = controller.delay(5).radio.get_measurement(UPI_myargs)
+            result = controller.delay(5).radio.get_measurements(UPI_myargs)
             controller.send_upstream({"myResult": result})
 
     print("Local ctrl program stopped: {}".format(controller.name))
@@ -130,7 +130,7 @@ def local_control_program(controller):
 
             #get node statistics
             UPI_myargs = {'interface' : interface, 'measurements' : [UPI_R.REGISTER_1, UPI_R.REGISTER_2, UPI_R.NUM_TX_DATA_FRAME, UPI_R.NUM_RX_ACK, UPI_R.NUM_RX_ACK_RAMATCH, UPI_R.BUSY_TYME , UPI_R.TSF, UPI_R.NUM_RX_MATCH] }
-            node_measures = controller.radio.get_measurement(UPI_myargs)
+            node_measures = controller.radio.get_measurements(UPI_myargs)
 
             #IPT
             pos = 0
@@ -256,7 +256,7 @@ def local_control_program(controller):
             if tuning_enabler == 1 and alg != "DCF" :
                 log.warning(' >>>>>>>> CW setting : ENABLED')
                 UPI_myargs = {'interface' : interface, UPI_R.CSMA_CW : cw, UPI_R.CSMA_CW_MIN : cw }
-                controller.radio.set_parameter_lower_layer(UPI_myargs)
+                controller.radio.set_parameters(UPI_myargs)
             else:
                 log.warning(' >>>>>>>> CW setting : DISABLED')
 
