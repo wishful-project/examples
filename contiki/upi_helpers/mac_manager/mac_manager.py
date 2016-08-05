@@ -8,142 +8,26 @@ import pickle
 
 
 class MACManager(object):
-    """Abstract MAC manager class listing all the mandatory MACManager functions.
-    These functions must be implemented by the subclassess.
-    """
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def update_macconfiguration(self, parameter_key_values):
-        """Update the current MAC configuration.
-        This function takes a dictionary argument containing parameter key-value pairs.
-        This function returs a dictionary containing parameter key-error_code pairs.
-
-        Args:
-            parameter_key_values (Dict[str,Any]): a dictionary argument containing parameter key-value pairs.
-
-        Returns:
-            Dict[str, int]: This function returs a dictionary containing parameter key-error_codes pairs.
-        """
-        return -1
-
-    @abc.abstractmethod
-    def read_macconfiguration(self, parameter_keys):
-        """Reads the current MAC configuration.
-        This function takes a list of parameter keys as arguments.
-        This function returns a dictionary containing parameter key-value pairs.
-
-        Args:
-            parameter_keys (List[str]): a list of parameter keys as arguments.
-
-        Returns:
-            Dict[str,Any]: a dictionary containing parameter key-value pairs.
-        """
-        return -1
-
-    @abc.abstractmethod
-    def monitor_mac(self, measurement_keys):
-        """Monitor the current MAC behaviour in a pull based manner.
-        This function takes a list of measurement keys as arguments.
-        This function returns a dictionary containing measurement key-value pairs.
-
-        Args:
-            measurement_keys (List[str]): a list of measurement keys as arguments.
-
-        Returns:
-            Dict[str,Any]: a dictionary containing measurement key-value pairs.
-        """
-        return -1
-
-    @abc.abstractmethod
-    def monitor_mac_periodic(self, measurement_keys, collect_period, collect_iterations, report_period, report_callback):
-        """Monitor the current MAC behaviour periodically in a pull based manner.
-        This function takes a list of measurement keys and configuration alues for the periodic collection as arguments.
-        This function returns an error code.
-
-        Args:
-            measurement_keys (List[str]): a list of measurement keys as arguments
-            collect_period (int): Period between measurements.
-            collect_iterations (int): Number of collect periods.
-            report_period (int): Period between reports (report_period<=collect_period*collect_iterations)
-            report_callback (Callable[[str,Dict[str,List[Any]]], None]): Callback with arguments radio_platform and measurement report.
-
-        Returns:
-            int: error code (0 = success, -1 = fail, >=1 errno value)
-        """
-        return -1
-
-    @abc.abstractmethod
-    def monitor_mac_async(self, event_keys, event_callback):
-        """Monitor the MAC behaviour asynchroniously in a push based manner by registering for events.
-        This function takes a list of event keys and an event callback as arguements.
-        This function returns an error code.
-
-        Args:
-            event_keys (List[str]): a list of event keys
-            event_callback (Callable[[str,str,Any],None]): Callback with arguments radio_platform, event name and event value.
-
-        Returns:
-            int: error code (0 = success, -1 = fail, >=1 errno value)
-        """
-        return -1
-
-    @abc.abstractmethod
-    def activate_mac(self, name):
-        """Activate a MAC radio program.
-
-        Args:
-            name (str): Name of the MAC radioprogram (CSMA, TDMA, TSCH).
-
-        Returns:
-            int: error code (0 = success, -1 = fail, >=1 errno value)
-        """
-        return -1
-
-    @abc.abstractmethod
-    def get_radioinfo(self):
-        """Returns a radio_info_t object containing all parameter, measurement and event keys as well as the available radio programs.
-
-        Returns:
-            UPI_R.radio_info_t: a radio_info_t object containing all parameter, measurement and event keys as well as the available radio programs.
-        """
-        return -1
-
-    @abc.abstractmethod
-    def get_radioplatforms(self):
-        """Returns a list of radio_platform_t objects containing interface name and platform name.
-
-        Returns:
-            List[UPI_R.radio_platform_t]: a list of radio_platform_t objects containing interface name and platform name.
-        """
-        return -1
-
-    @abc.abstractmethod
-    def get_macaddress(self):
-        """Returns the macaddress of the interface.
-
-        Returns:
-            int: the macaddress
-        """
-        return -1
 
 
 class LocalMACManager(MACManager):
     """Local MAC manager class implementing all the mandatory MACManager functions.
     This class can be extended to support extra functions, specific to a MAC protocol (CSMA,TDMA,TSCH)
     """
-    def __init__(self, local_manager):
+    def __init__(self, control_engine):
         """Creates a Local MAC Manager object.
 
         Args:
-            local_manager (LocalManager): a reference to the local WiSHFUL engine.
+            local_engine (LocalManager): a reference to the local WiSHFUL engine.
         """
-        self.local_manager = local_manager
+        self.control_engine = control_engine
         self.log = logging.getLogger()
+        self.radio_platforms = control_engine.radio.iface("lowpan0").get_radio_platforms()
         pass
 
     def __execute_local_upi_func(self, UPIfunc, UPIargs, radioplatform_lst=None):
         if radioplatform_lst is None:
+            control_engine.exec_cmd("radio",UPIfunc,UPIargs,UPIargs)
             UPIargs['interface'] = pickle.dumps('ALL,ALL')
         else:
             UPIargs['interface'] = pickle.dumps(radioplatform_lst)
@@ -172,6 +56,22 @@ class LocalMACManager(MACManager):
         UPIfunc = UPI_R.setParameterLowerLayer
         UPIargs = {'param_key_values': parameter_key_values}
         return self.__execute_local_upi_func(UPIfunc, UPIargs, radioplatform_lst)
+        if radioplatform_lst is None:
+            ret = {}
+            for rp in self.radio_platforms:
+                ret[rp] = control_engine.radio.iface(rp).set_parameters(parameter_key_values)
+            return ret
+        elif type(radioplatform_lst) is str:
+            rp = radioplatform_lst
+            return control_engine.radio.iface(rp).set_parameters(parameter_key_values)
+        else:
+            ret = {}
+            for rp in radioplatform_lst:
+                ret[rp] = control_engine.radio.iface(rp).set_parameters(parameter_key_values)
+            return ret
+
+
+        return self.control_engine.radio.
 
     def read_macconfiguration(self, parameter_keys, radioplatform_lst=None):
         """Update the current MAC configuration.
