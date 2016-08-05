@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Showacase 3 (Year 1) implementation of WiSHFUL Project
+This python script performs the topology creation of the testbed, specifically,
+the script starts the access point and connect the stations.
+
+Usage:
+   showcase3_testbed_controller.py [options] [-q | -v]
+
+Options:
+   --logfile name      Name of the logfile
+   --config configFile Config file path
+
+Example:
+   ./showcase3_testbed_controller -v --config ./controller_config.yaml
+
+Other options:
+   -h, --help          show this help message and exit
+   -q, --quiet         print less text
+   -v, --verbose       print more text
+   --version           show version and exit
+"""
+__author__ = "Domenico Garlisi"
+__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__version__ = "0.1.0"
+__email__ = "domenico.garlisi@cnit.it"
+
+import sys
+import datetime
+import logging
+import gevent
+import yaml
+import time
+import random
+import _thread
+import zmq
+import csv
+import shutil
+from tempfile import NamedTemporaryFile
+
+sys.path.append('../../../')
+sys.path.append("../../../agent_modules/wifi_ath")
+sys.path.append("../../../agent_modules/wifi_wmp")
+sys.path.append("../../../agent_modules/wifi")
+sys.path.append("../../../agent_modules/iperf")
+sys.path.append('../../../upis')
+sys.path.append('../../../framework')
+sys.path.append('../../../agent')
+sys.path.append('../../../controller')
+
+
+import wishful_upis as upis
+import wishful_controller
+
+from examples.wmp.year1_showcase3.wmp_helper.controller_utils import *
+from examples.wmp.year1_showcase3.wmp_helper.TestbedTopology import TestbedTopology
+#from examples.wmp_edca.wmp_helper.MeasurementManager import *
+#from examples.wmp_edca.wmp_helper.TestbedTopology import *
+from agent_modules.wifi_wmp.wmp_structure import UPI_R
+from local_control_program import *
+
+log = logging.getLogger('wishful_agent.main')
+controller = wishful_controller.Controller()
+mytestbed = TestbedTopology("wishful-showcase3", log, controller)
+nodes = []
+
+@controller.new_node_callback()
+def new_node(node):
+    print("New node appeared:")
+    print(node)
+    nodes.append(node)
+    mytestbed.add_discovered_node(node)
+
+@controller.node_exit_callback()
+def node_exit(node, reason):
+    if node in nodes:
+        nodes.remove(node);
+    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
+
+
+@controller.set_default_callback()
+def default_callback(group, node, cmd, data):
+    print("DEFAULT CALLBACK : Group: {}, NodeId: {}, Cmd: {}, Returns: {}".format(group, node.id, cmd, data))
+
+def print_response(par_1, par_2, data):
+    print("{} Specific callback for function call; Print response : {}".format(datetime.datetime.now(),data))
+
+
+def get_traffic():
+    """ The interface between WiSHFUL controller and Experiment controller, provided by a csv file
+        (./testbed_nodes.csv), is used to store the traffic nodes activity (e.g. traffic on/off).
+        This function return the number of stations that have an active traffic
+
+        :return traffic_number: number of active traffic
+    """
+    filename = 'testbed_nodes.csv'
+    traffic_number = 0
+    with open(filename, 'r') as csvFile:
+        reader = csv.DictReader(csvFile)
+        for row in reader:
+            if row['traffic'] == '1':
+                traffic_number += 1
+    return traffic_number
+
+def register_traffic(station_index, value):
+    """ The interface between WiSHFUL controller and Experiment controller, provided by a csv file
+	    (./testbed_nodes.csv), it is used also to store the traffic nodes activity (e.g. traffic on/off).
+	  This function update the state of traffic activation for a specific station
+
+	    :param station_index: index of station in csv file to update
+	    :param value: value used to update traffic station
+	"""
+    filename = 'testbed_nodes.csv'
+    tempfile = NamedTemporaryFile(delete=False)
+    with open(filename, 'rb') as csvFile, tempfile:
+        fieldnames = ['ip', 'hostname', 'role', 'platform', 'traffic']
+        reader = csv.DictReader(csvFile)
+        writer = csv.DictWriter(tempfile, fieldnames=fieldnames)
+        writer.writeheader()
+        row_number = 0
+        for row in reader:
+            if row_number in station_index:
+                writer.writerow({'ip': row['ip'], 'hostname': row['hostname'], 'role': row['role'], 'platform' : row['platform'], 'traffic': value })
+            else:
+                writer.writerow({'ip': row['ip'], 'hostname': row['hostname'], 'role': row['role'], 'platform' : row['platform'], 'traffic': row['traffic'] })
+            row_number += 1
+    shutil.move(tempfile.name, filename)
+    return
+
+def main(args):
+    log.debug(args)
+
+    config_file_path = args['--config']
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+
+    controller.load_config(config)
+    controller.start()
+    num_testbed_nodes = mytestbed.getExperimentNodesNumber()
+
+    nodes_platform_info = []
+    #control loop
+    while True:
+        gevent.sleep(10)
+        print("\n")
+        print("Connected nodes ", [str(node.name) for node in nodes])
+        print("(we wait for %d nodes)" % num_testbed_nodes)
+        if len(nodes) == num_testbed_nodes:
+
+            #find node rules
+            mytestbed.initializeTestbedTopology()
+
+            EXPERIMENT_DURATION = 100 * num_testbed_nodes
+            dt=0
+            index = 1
+
+            controller.delay(3).nodes(mytestbed.ap_node).net.create_packetflow_sink(port='1234')
+            while True:
+
+                log.warning('waiting for node increase (%d sec / %d)' % (dt, EXPERIMENT_DURATION) )
+                dt += 1
+
+                for node in mytestbed.wmp_nodes:
+                    controller.delay(6).nodes(node).net.start_packetflow(dest_ip = '192.168.3.103', port='1234')
+                    register_traffic([index], '1')
+                    log.warning('Start traffic  %d' % index )
+                    index += 1
+                    time.sleep(30)
+
+                controller.delay(6).nodes(mytestbed.wmp_nodes).net.stop_packetflow()
+                register_traffic([1, 2, 3, 4], '0')
+                time.sleep(30)
+                index = 0
+
+                # if dt > EXPERIMENT_DURATION:
+                #     break
+
+            break
+    print("END TRAFFIC CONTROL")
+
+
+
+
+
+if __name__ == "__main__":
+    try:
+        from docopt import docopt
+    except:
+        print("""
+        Please install docopt using:
+            pip install docopt==0.6.1
+        For more refer to:
+        https://github.com/docopt/docopt
+        """)
+        raise
+
+    args = docopt(__doc__, version=__version__)
+
+    log_level = logging.INFO  # default
+    if args['--verbose']:
+        log_level = logging.DEBUG
+    elif args['--quiet']:
+        log_level = logging.ERROR
+
+    logfile = None
+    if args['--logfile']:
+        logfile = args['--logfile']
+
+    logging.basicConfig(filename=logfile, level=log_level,
+        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    try:
+        main(args)
+    except KeyboardInterrupt:
+        log.debug("Controller exits")
+    finally:
+        log.debug("Exit")
+        controller.stop()
