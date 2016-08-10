@@ -14,7 +14,7 @@ class GlobalUPIHelper(object):
     """
     def __init__(self, group_name):
         self.log = logging.getLogger()
-        self.global_mgr = GlobalManager(group_name)
+        self.control_engine = control_engine
         self.log.info('Created global manager')
         pass
 
