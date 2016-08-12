@@ -68,7 +68,7 @@ def main(args):
         if nodes:
             channel_no = int(raw_input())
             if channel_no >= 11 and channel_no <= 26:
-                result = global_control_engine.node(nodes).radio.iface("lowpan0").set_rxchannel(channel_no)
+                result = global_control_engine.node(nodes).radio.iface("lowpan0").set_rxchannel(channel_no, 5)
                 print json.dumps({"ERROR Code": result})
             else:
                 break
