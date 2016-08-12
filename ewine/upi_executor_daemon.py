@@ -55,7 +55,8 @@ def node_exit(node, reason):
 def main(args):
     log.debug(args)
 
-    config_file_path = args['--config']
+    # config_file_path = args['--config']
+    config_file_path = raw_input("Gimme path to config file")
     config = None
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
