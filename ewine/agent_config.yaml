@@ -6,10 +6,14 @@ agent_info:
     iface: 'lo'
 
 modules:
+    # discovery:
+    #     module : wishful_module_discovery_pyre
+    #     class_name : PyreDiscoveryAgentModule
+    #     kwargs: {"iface":lo, "groupName":"wishful_ewine"}
     discovery:
-        module : wishful_module_discovery_pyre
-        class_name : PyreDiscoveryAgentModule
-        kwargs: {"iface":lo, "groupName":"wishful_ewine"}
+        module : wishful_module_static_discovery
+        class_name : StaticDiscoveryModule
+        kwargs: {"downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"}
     gitar_engine:
         module : wishful_module_gitar
         class_name : GitarEngine
