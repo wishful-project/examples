@@ -5,6 +5,12 @@ agent_info:
   info: 'agent_info'
   iface: 'lo'
 
+controllers:
+  myController:
+      module : wishful_agent
+      class_name : MyController
+      kwargs : {"arg": 1}
+
 modules:
   discovery:
       module : wishful_module_discovery_pyre
@@ -14,7 +20,7 @@ modules:
   simple:
       module : wishful_module_simple
       class_name : SimpleModule2
-      interfaces : ['wlan0', 'wlan1']
+      devices : ['phy0']
 
   iperf:
       module : wishful_module_iperf

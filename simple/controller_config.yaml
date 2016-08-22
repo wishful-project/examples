@@ -1,5 +1,9 @@
 ## WiSHFUL Controller's config file
 
+agent_info:
+  name: 'master_agent_1'
+  info: 'agent_info'
+
 controller:
     name: "Controller"
     info: "WiSHFUL Controller"

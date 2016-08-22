@@ -22,8 +22,6 @@ Other options:
 """
 
 import logging
-import signal
-import sys, os
 import yaml
 import wishful_agent
 
@@ -34,6 +32,7 @@ __email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
 
 log = logging.getLogger('wishful_agent.main')
 agent = wishful_agent.Agent()
+
 
 def main(args):
     log.debug(args)
