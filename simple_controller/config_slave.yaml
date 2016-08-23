@@ -1,15 +1,16 @@
 ## WiSHFUL Agent config file
 
-agent_info:
-  name: 'agent_123'
-  info: 'agent_info'
+agent_config:
+  name: 'HC node'
+  info: 'filter runs on local node'
+  type: 'slave'
   iface: 'lo'
 
 controllers:
-  myController:
+  myFilter:
       module : simple_controller
-      class_name : MyController
-      kwargs : {"arg": 1}
+      class_name : MyAvgFilter
+      kwargs : {"window": 5}
 
 modules:
   discovery:
