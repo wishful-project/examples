@@ -63,6 +63,7 @@ class MyController(wishful_module.ControllerModule):
         self.spectralScanStarted = True
 
     @wishful_module.on_event(upis.mgmt.NodeExitEvent)
+    @wishful_module.on_event(upis.mgmt.NodeLostEvent)
     def remove_node(self, event):
         node = event.node
         reason = event.reason
@@ -103,7 +104,7 @@ class MyController(wishful_module.ControllerModule):
         # go over collected samples, etc....
         # make some decisions, etc...
         print("Periodic Evaluation")
-        print("Connected nodes", [str(node) for node in self.nodes])
+        print("Connected nodes: ", [node for node in self.nodes])
         self.timer.start(self.timeInterval)
 
         node = self.nodes[0]
