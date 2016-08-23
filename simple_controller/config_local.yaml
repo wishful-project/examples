@@ -11,6 +11,12 @@ controllers:
       class_name : MyController
       kwargs : {"arg": 1}
 
+  myFilter:
+      module : simple_controller
+      class_name : MyAvgFilter
+      kwargs : {"window": 5}
+
+
 modules:
   discovery:
       module : wishful_module_discovery_pyre

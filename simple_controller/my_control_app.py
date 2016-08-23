@@ -4,7 +4,7 @@ import random
 import wishful_upis as upis
 import wishful_framework as wishful_module
 from wishful_agent.timer import TimerEventSender
-
+from .common import AveragedSpectrumScanSampleEvent
 
 __author__ = "Piotr Gawlowicz"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
@@ -76,13 +76,11 @@ class MyController(wishful_module.ControllerModule):
         device = event.device
         self.log.info("Packet loss in node {}, dev: {}".format(node, device))
 
-    @wishful_module.on_event(upis.radio.SpectralScanSampleEvent)
+    @wishful_module.on_event(AveragedSpectrumScanSampleEvent)
     def serve_spectral_scan_sample(self, event):
-        sample = event.sample
-        node = event.node
-        device = event.device
-        self.log.info("New SpectralScan Sample:{} from node {}, device: {}"
-                      .format(sample, node, device))
+        avgSample = event.avg
+        self.log.info("Averaged Spectral Scan Sample: {}"
+                      .format(avgSample))
 
     def default_cb(self, data):
         node = data.node
