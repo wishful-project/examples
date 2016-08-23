@@ -17,18 +17,7 @@ class MyAvgFilter(wishful_module.ControllerModule):
         self.log = logging.getLogger('MyFilter')
         self.window = window
         self.running = False
-        self.nodes = []
         self.samples = []
-
-    @wishful_module.on_start()
-    def my_start_function(self):
-        print("start control app")
-        self.running = True
-
-    @wishful_module.on_exit()
-    def my_stop_function(self):
-        print("stop control app")
-        self.running = False
 
     @wishful_module.on_event(upis.radio.SpectralScanSampleEvent)
     def serve_spectral_scan_sample(self, event):
