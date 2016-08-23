@@ -120,6 +120,7 @@ def main(args):
         print("\n")
         print("Connected nodes ", [str(node.name) for node in nodes])
         print("(we wait for %d nodes)" % num_testbed_nodes)
+
         if len(nodes) == num_testbed_nodes:
 
             #find node rules

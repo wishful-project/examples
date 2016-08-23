@@ -10,6 +10,15 @@ import time
 import sys
 import csv
 
+sys.path.append('../../../../')
+sys.path.append("../../../../agent_modules/wifi_ath")
+sys.path.append("../../../../agent_modules/wifi_wmp")
+sys.path.append("../../../../agent_modules/wifi")
+sys.path.append('../../../../upis')
+sys.path.append('../../../../framework')
+sys.path.append('../../../../agent')
+sys.path.append('../../../../controller')
+
 class WiFiNode():
     """
     This class defines an WiFi node and takes the most appropriate actions in order to :
@@ -75,6 +84,8 @@ class TestbedTopology:
         self.wmp_nodes_number = 0
         self.ath_nodes_number = 0
 
+        self.iface = "wlan0"
+
     def add_discovered_node(self, node):
         self.nodes.append(node)
 
@@ -135,26 +146,12 @@ class TestbedTopology:
 
         :return  result: True if the operation are successful execute, False otherwise
         """
-        self.log.info(' %s - SETUP NODES' % self.initializeTestbedFunctions.__name__)
-        # All the UPI functions are execute immediately
-        UPIargs = {'execution_engine' : ['../../../agent_modules/wifi_wmp/execution_engine/factory'] }
-        rvalue = controller.nodes(self.ap_node).radio.install_execution_engine(UPIargs)
-        self.log.debug('Ret value of blocking call is %s' % str(rvalue))
-        UPIargs = {'interface' : 'wlan0', 'operation' : ['module'] }
-        rvalue = controller.nodes(self.ap_node).radio.init_test(UPIargs)
-        self.log.debug('Ret value of blocking call is %s' % str(rvalue))
-
-        UPIargs = {'execution_engine' : ['../../../agent_modules/wifi_wmp/execution_engine/wmp'] }
-        rvalue = controller.nodes(self.wmp_nodes).radio.install_execution_engine(UPIargs)
-        self.log.debug('Ret value of blocking call is %s' % str(rvalue))
-        UPIargs = {'interface' : 'wlan0', 'operation' : ['module'] }
-        rvalue = controller.nodes(self.wmp_nodes).radio.init_test(UPIargs)
-        self.log.debug('Ret value of blocking call is %s' % str(rvalue))
 
         self.setAP(self.ap_node, self.exp_group_name)
         node_index = 0
         while node_index < self.wmp_nodes_number :
-            self.setSTA(self.wmp_nodes[node_index], self.exp_group_name)
+            connected = self.setSTA(self.wmp_nodes[node_index], self.exp_group_name)
+            print('Node %s connected %s' % (str( self.wmp_nodes[node_index].ip), str(connected) ))
             node_index += 1
 
         return True
@@ -167,8 +164,20 @@ class TestbedTopology:
         #eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node.ip))
         #wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
         wlan_ipAddress = '192.168.3.' + str(node.ip[7:10])
-        UPIargs = {'interface' : 'wlan0', 'operation' : ['create-network'], 'ssid' : [essid], 'ip_address' : [wlan_ipAddress] }
-        rvalue = self.controller.nodes(node).radio.init_test(UPIargs)
+
+        #stop hostpad
+        rvalue = self.controller.nodes(node).net.stop_hostapd()
+        #set ip address
+        rvalue = self.controller.nodes(node).net.set_ip_address(self.iface, wlan_ipAddress)
+        #set hostapd configuration
+        rvalue = self.controller.nodes(node).net.set_hostapd_conf(self.iface, './wmp_helper/hostapd.conf', 6, essid)
+        #start hostapd
+        rvalue = self.controller.nodes(node).net.start_hostapd('./wmp_helper/hostapd.conf')
+        #set power
+        rvalue = self.controller.nodes(node).radio.set_power(15)
+        #set modulation rate
+        rvalue = self.controller.nodes(node).radio.set_modulation_rate(2)
+
 
     def setSTA(self, node, essid):
         """ Associate node to infrastructure BSS
@@ -178,5 +187,26 @@ class TestbedTopology:
         # eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node))
         # wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
         wlan_ipAddress = '192.168.3.' + str(node.ip[7:10])
-        UPIargs = {'interface' : 'wlan0', 'operation' : ['association'], 'ssid' : [essid], 'ip_address' : [wlan_ipAddress] }
-        rvalue = self.controller.nodes(node).radio.init_test(UPIargs)\
+
+        #stop hostpad
+        rvalue = self.controller.nodes(node).net.stop_hostapd()
+        #set ip address
+        rvalue = self.controller.nodes(node).net.set_ip_address(self.iface, wlan_ipAddress)
+        #set power
+        rvalue = self.controller.nodes(node).radio.set_power(15)
+        #set modulation rate
+        rvalue = self.controller.nodes(node).radio.set_modulation_rate(2)
+        connected = False
+        for ii in range(10):
+            #associate station
+            rvalue = self.controller.nodes(node).net.connect_to_network(self.iface, essid)
+            time.sleep(2)
+            #dump connection
+            rvalue = self.controller.nodes(node).net.network_dump(self.iface)
+            #self.log.debug('dump connection :\n%s\n'  % (str(rvalue) ))
+            flow_info_lines = rvalue.rstrip().split('\n')
+            if flow_info_lines[0][0:9] == "Connected" :
+                connected = True
+                break
+
+        return connected

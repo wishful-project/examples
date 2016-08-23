@@ -15,6 +15,7 @@ modules:
   wifi:
       module : wishful_module_wifi_wmp
       class_name : WmpModule
+      kwargs: {"executionEngine":"wmp"}
 
   iperf:
       module : wishful_module_iperf
