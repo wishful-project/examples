@@ -45,7 +45,8 @@ class MyController(wishful_module.ControllerModule):
         self.log.info("New Node".format())
         node = event.node
         self.nodes.append(node)
-        # self.log.info("Added new node: {}".format(node))
+        self.log.info("Added new node: {}, Local: {}"
+                      .format(node.uuid, node.local))
 
         retVal = node.net.create_packetflow_sink(port=1234)
         print("Server started: {}".format(retVal))
@@ -71,13 +72,15 @@ class MyController(wishful_module.ControllerModule):
         reason = event.reason
         if node in self.nodes:
             self.nodes.remove(node)
-            # self.log.info("Node: {} removed reason: {}".format(node, reason))
+            self.log.info("Node: {}, Local: {} removed reason: {}"
+                          .format(node.uuid, node.local, reason))
 
     @wishful_module.on_event(upis.radio.PacketLossEvent)
     def serve_packet_loss_event(self, event):
         node = event.node
         device = event.device
-        self.log.info("Packet loss in node {}, dev: {}".format(node, device))
+        self.log.info("Packet loss in node {}, dev: {}"
+                      .format(node.uuid, device))
 
     @wishful_module.on_event(AveragedSpectrumScanSampleEvent)
     def serve_spectral_scan_sample(self, event):
@@ -91,7 +94,7 @@ class MyController(wishful_module.ControllerModule):
         msg = data.msg
         print("Default Callback: "
               "Node: {}, Dev: {}, Data: {}"
-              .format(node, dev, msg))
+              .format(node.uuid, dev, msg))
 
     def get_power_cb(self, data):
         node = data.node
@@ -99,14 +102,14 @@ class MyController(wishful_module.ControllerModule):
         msg = data.msg
         print("Power in "
               "Node: {}, Dev: {}, was set to: {}"
-              .format(node, dev, msg))
+              .format(node.uuid, dev, msg))
 
     @wishful_module.on_event(PeriodicEvaluationTimeEvent)
     def periodic_evaluation(self, event):
         # go over collected samples, etc....
         # make some decisions, etc...
         print("Periodic Evaluation")
-        # print("Connected nodes: ", [node for node in self.nodes])
+        print("Connected nodes: ", [node.uuid for node in self.nodes])
         self.timer.start(self.timeInterval)
 
         node = self.nodes[0]
