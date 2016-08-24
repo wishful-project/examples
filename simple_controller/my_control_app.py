@@ -5,6 +5,8 @@ import wishful_upis as upis
 import wishful_framework as wishful_module
 from wishful_agent.timer import TimerEventSender
 from .common import AveragedSpectrumScanSampleEvent
+from .common import StartMyFilterEvent
+from .common import StopMyFilterEvent
 
 __author__ = "Piotr Gawlowicz"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
@@ -29,6 +31,8 @@ class MyController(wishful_module.ControllerModule):
         self.timeInterval = 10
         self.timer = TimerEventSender(self, PeriodicEvaluationTimeEvent)
         self.timer.start(self.timeInterval)
+
+        self.myFilterRunning = False
 
     @wishful_module.on_start()
     def my_start_function(self):
@@ -62,7 +66,6 @@ class MyController(wishful_module.ControllerModule):
         self.packetLossEventsEnabled = True
         device.start_service(
             upis.radio.SpectralScanService(rate=1000, f_range=[2200, 2500]))
-        self.spectralScanStarted = True
 
     @wishful_module.on_event(upis.mgmt.NodeExitEvent)
     @wishful_module.on_event(upis.mgmt.NodeLostEvent)
@@ -125,14 +128,12 @@ class MyController(wishful_module.ControllerModule):
             device.enable_event(upis.radio.PacketLossEvent)
             self.packetLossEventsEnabled = True
 
-        if self.spectralScanStarted:
-            device.stop_service(
-                upis.radio.SpectralScanService(rate=100, f_range=[2200, 2500]))
-            self.spectralScanStarted = False
+        if self.myFilterRunning:
+            self.send_event(StopMyFilterEvent())
+            self.myFilterRunning = False
         else:
-            device.start_service(
-                upis.radio.SpectralScanService)
-            self.spectralScanStarted = True
+            self.send_event(StartMyFilterEvent())
+            self.myFilterRunning = True
 
         # execute non-blocking function immediately
         node.blocking(False).device("phy0").radio.set_power(12)

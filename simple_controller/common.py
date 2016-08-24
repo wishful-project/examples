@@ -10,3 +10,13 @@ class AveragedSpectrumScanSampleEvent(upis.upi.EventBase):
     def __init__(self, avg):
         super().__init__()
         self.avg = avg
+
+
+class StartMyFilterEvent(upis.upi.EventBase):
+    def __init__(self):
+        super().__init__()
+
+
+class StopMyFilterEvent(upis.upi.EventBase):
+    def __init__(self):
+        super().__init__()
