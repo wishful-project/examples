@@ -33,6 +33,7 @@ class MyController(wishful_module.ControllerModule):
         self.timer.start(self.timeInterval)
 
         self.myFilterRunning = False
+        self.packetLossEventsEnabled = False
 
     @wishful_module.on_start()
     def my_start_function(self):
@@ -57,10 +58,12 @@ class MyController(wishful_module.ControllerModule):
 
         devs = node.get_devices()
         for dev in devs:
-            print("Dev: ", dev)
+            print("Dev: ", dev.name)
 
         device = node.get_device(0)
+        print("eee")
         device.radio.set_power(15)
+        print("DUPS")
         device.radio.set_channel(random.randint(1, 11))
         device.enable_event(upis.radio.PacketLossEvent)
         self.packetLossEventsEnabled = True
@@ -115,9 +118,10 @@ class MyController(wishful_module.ControllerModule):
         print("Connected nodes: ", [node.uuid for node in self.nodes])
         self.timer.start(self.timeInterval)
 
-        node = self.nodes[0]
-        if not node:
+        if len(self.nodes) == 0:
             return
+
+        node = self.nodes[0]
 
         device = node.get_device(0)
 
