@@ -42,12 +42,13 @@ class MyController(wishful_module.ControllerModule):
 
     @wishful_module.on_event(upis.mgmt.NewNodeEvent)
     def add_node(self, event):
+        self.log.info("New Node".format())
         node = event.node
         self.nodes.append(node)
-        self.log.info("Added new node: {}".format(node))
+        # self.log.info("Added new node: {}".format(node))
 
         retVal = node.net.create_packetflow_sink(port=1234)
-        print(retVal)
+        print("Server started: {}".format(retVal))
 
         devs = node.get_devices()
         for dev in devs:
@@ -65,11 +66,12 @@ class MyController(wishful_module.ControllerModule):
     @wishful_module.on_event(upis.mgmt.NodeExitEvent)
     @wishful_module.on_event(upis.mgmt.NodeLostEvent)
     def remove_node(self, event):
+        self.log.info("Node lost".format())
         node = event.node
         reason = event.reason
         if node in self.nodes:
             self.nodes.remove(node)
-            self.log.info("Node: {} removed, reason: {}".format(node, reason))
+            # self.log.info("Node: {} removed reason: {}".format(node, reason))
 
     @wishful_module.on_event(upis.radio.PacketLossEvent)
     def serve_packet_loss_event(self, event):
@@ -104,7 +106,7 @@ class MyController(wishful_module.ControllerModule):
         # go over collected samples, etc....
         # make some decisions, etc...
         print("Periodic Evaluation")
-        print("Connected nodes: ", [node for node in self.nodes])
+        # print("Connected nodes: ", [node for node in self.nodes])
         self.timer.start(self.timeInterval)
 
         node = self.nodes[0]
