@@ -110,7 +110,7 @@ def local_control_program(controller):
         num_rx_match = 0
         num_rx_match_ = 0
 
-        ip_address = controller.radio.get_iface_ip_addr(interface)
+        ip_address = controller.net.get_iface_ip_addr(interface)
         #UPI_myargs = {'interface' : interface, UPI_R.CSMA_CW : CWMIN, UPI_R.CSMA_CW_MIN : CWMIN, UPI_R.CSMA_CW_MAX : CWMAX }
         #controller.radio.set_parameter(UPI_myargs)
 
