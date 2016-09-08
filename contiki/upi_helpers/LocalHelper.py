@@ -61,7 +61,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.get_radio_platforms()
 
-    def getRadioInfo(self, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def getRadioInfo(self, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """Gets the radio capabilities of a given radio platform in terms of supported measurement and supported
         parameter and list of supported radio program. The information elements used by the UPI_R interface, to manage
         parameters, measurements and radio program, are organized into data structures, which provide information
@@ -96,7 +96,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).get_radio_info()
 
-    def setParameterLowerLayer(self, param_key_values, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def setParameterLowerLayer(self, param_key_values, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ The UPI_R interface is able to configure the radio behavior thanks to the abstraction of the hardware
         platform and radio programs in terms of Radio Capabilities. A subset of radio capabilities are the parameter.
         Parameters correspond to the configuration registers of the hardware platform and to the variables used in
@@ -136,7 +136,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).set_parameters(param_key_values)
 
-    def getParameterLowerLayer(self, param_keys, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def getParameterLowerLayer(self, param_keys, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ The UPI_R interface is able to configure the radio behavior thanks to the abstraction of the hardware
         platform and radio programs in terms of Radio Capabilities. A subset of radio capabilities are the parameters.
         Parameters correspond to the configuration registers of the hardware platform and to the variables used in the
@@ -177,7 +177,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).get_parameters(param_keys)
 
-    def getMonitorLowerLayer(self, measurement_keys, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def getMonitorLowerLayer(self, measurement_keys, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ The UPI_R interface is able to get the radio measurements thanks to the abstraction of the hardware
         platform and radio programs in terms of Radio Capabilities. A subset of radio capabilities are the low-level
         measurements. The low-level measurements are continuously monitored by the hardware platform and by the
@@ -219,7 +219,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).get_measurements(measurement_keys)
 
-    def getMonitorBounceLowerLayer(self, measurement_keys, collect_period, report_period, num_iterations, report_callback, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def getMonitorBounceLowerLayer(self, measurement_keys, collect_period, report_period, num_iterations, report_callback, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ The UPI_R interface is able to get the radio measurements thanks to the abstraction of the hardware
         platform and radio programs in terms of Radio Capabilities. A subset of radio capabilities are the low-level
         measurements.The low-level measurements are continuously monitored by the hardware platform and by the
@@ -272,7 +272,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).get_measurements_periodic(measurement_keys, collect_period, report_period, num_iterations, report_callback)
 
-    def setActive(self, radio_program_name, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def setActive(self, radio_program_name, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ After the inject operation, a radio program is locally available on a platform but it is not under execution
         until it is explicitly activated. Only one radio program can be active at a given time.
         When executed, this function stops the current radio program and enables the execution of the radio program
@@ -312,7 +312,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).activate_radio_program(radio_program_name)
 
-    def setInactive(self, radio_program_name, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def setInactive(self, radio_program_name, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ When executed, this function stops the current radio program if it maches with the radio program
         specified tin the parameter radioProgramName.
 
@@ -347,7 +347,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).deactivate_radio_program(radio_program_name)
 
-    def getActive(self, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def getActive(self, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ Each radio program is associated with a name and an index.
         This function returns the index of the active radio program.
 
@@ -380,7 +380,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).get_running_radio_program()
 
-    def getHwAddr(self, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def getHwAddr(self, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ Returns the Hardware address of the interface.
 
         :param execution_time: absolute time since epoch (2 element list of second & microsecond) when the function will be executed or None for immediate execution
@@ -407,7 +407,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).get_hwaddr()
 
-    def setRfChannel(self, freq_Hz, bandwidth, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def setRfChannel(self, freq_Hz, bandwidth, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ Sets the RF channel on the specified interface.
 
         :param channel: the channel number.
@@ -436,7 +436,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).radio.iface(self.interface).set_rxchannel(freq_Hz, bandwidth)
 
-    def defineEventLowerLayer(self, event_keys, event_callback, event_duration, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def defineEventLowerLayer(self, event_keys, event_callback, event_duration, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ Define an event listener for push-based monitoring. The event callback is called each time the event is posted. 
 
         :param event_key: Unique name idenifying the event.
@@ -471,7 +471,7 @@ class LocalUPIHelper():
 
     # Generic functions for configuration
 
-    def getNetworkInfo(self, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def getNetworkInfo(self, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """This function returns the available network parameters, measurements and events in a network_info_t object.
 
         Args:
@@ -497,7 +497,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).net.get_network_info()
 
-    def setParameterHigherLayer(self, param_key_values, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def setParameterHigherLayer(self, param_key_values, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ The UPI_N interface is able to configure the network stack behavior. The list of available parameters is defined as attributes of the UPI_N class.
 
         :param param_key: list of parameters and values to set, in term of a dictionary data type (list of key: value) in which key is the desired UPI_R attribute, and value is the value to set. An example of argument dictionary data type is {UPI_N.RPL_DIO_INTERVAL_MIN : 15, UPI_N.RPL_DIO_INTERVAL_DOUBLINGS : 15}.
@@ -532,7 +532,7 @@ class LocalUPIHelper():
             self.control_engine.callback(result_callback).blocking(
                 False).net.set_parameters(param_key_values)
 
-    def getParameterHigherLayer(self, param_keys, execution_delay=None, execution_time=None, result_callback=None, blocking=True):
+    def getParameterHigherLayer(self, param_keys, interface="lowpan0", execution_delay=None, execution_time=None, result_callback=None, blocking=True):
         """ The UPI_N interface is able to monitor the network stack.
         This function get the value(s) of the monitored parameters specified in the list argument.
         The available parameters are defined as attributes of the UPI_N class.

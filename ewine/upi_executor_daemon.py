@@ -26,6 +26,10 @@ import wishful_controller
 import gevent
 import yaml
 import json
+# <----!!!!! Important to include it here; otherwise cannot be pickled!!!!
+from wishful_framework.upi_arg_classes.radio_info import RadioInfo
+# <----!!!!! Important to include it here; otherwise cannot be pickled!!!!
+from wishful_framework.upi_arg_classes.net_classes import NetworkInfo
 
 __author__ = "Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2016, Ghent University - iMinds - IBCN"
@@ -64,10 +68,14 @@ def main(args):
     global_control_engine.load_config(config)
     global_control_engine.start()
 
+    if nodes:
+        radio_info = global_control_engine.node(nodes).radio.iface("lowpan0").get_radio_info()
+        network_info = global_control_engine.node(nodes).net.get_network_info()
+
     # control loop
     while True:
         if nodes:
-            channel_no = int(raw_input())
+            channel_no = int(raw_input("Which parameter do you want to configure:"))
             if channel_no >= 11 and channel_no <= 26:
                 result = global_control_engine.node(nodes).radio.iface("lowpan0").set_rxchannel(channel_no, 5)
                 print json.dumps({"ERROR Code": result})

@@ -32,7 +32,7 @@ __copyright__ = "Copyright (c) 2016, Ghent University, iMinds"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
-log = logging.getLogger('wishful_agent.main')
+vlog = logging.getLogger('wishful_agent.main')
 agent = wishful_agent.Agent(local=True)
 control_engine = agent.get_local_controller()
 
