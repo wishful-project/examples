@@ -10,7 +10,7 @@ controllers:
   myController:
       module : simple_controller
       class_name : MyController
-      kwargs : {"arg": 1}
+      kwargs : {"mode": "LOCAL"}
 
   myFilter:
       module : simple_controller

@@ -21,10 +21,10 @@ class PeriodicEvaluationTimeEvent(upis.mgmt.TimeEvent):
 
 @wishful_module.build_module
 class MyController(wishful_module.ControllerModule):
-    def __init__(self, arg):
+    def __init__(self, mode):
         super(MyController, self).__init__()
         self.log = logging.getLogger('MyController')
-        self.arg = arg
+        self.mode = mode
         self.running = False
         self.nodes = []
 
@@ -48,6 +48,10 @@ class MyController(wishful_module.ControllerModule):
     @wishful_module.on_event(upis.mgmt.NewNodeEvent)
     def add_node(self, event):
         node = event.node
+
+        if self.mode == "GLOBAL" and node.local:
+            return
+
         self.log.info("Added new node: {}, Local: {}"
                       .format(node.uuid, node.local))
         self.nodes.append(node)
@@ -118,14 +122,7 @@ class MyController(wishful_module.ControllerModule):
         if len(self.nodes) == 0:
             return
 
-        # in local mode there is only one node
         node = self.nodes[0]
-
-        # in global mode there should be more than 1,
-        # first one is local node, so get next one
-        if len(self.nodes) > 1:
-            node = self.nodes[1]
-
         device = node.get_device(0)
 
         if self.packetLossEventsEnabled:

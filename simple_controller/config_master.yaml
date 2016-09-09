@@ -13,7 +13,7 @@ controllers:
   myController:
       module : simple_controller
       class_name : MyController
-      kwargs : {"arg": 1}
+      kwargs : {"mode": "GLOBAL"}
 
 modules:
   discovery:
