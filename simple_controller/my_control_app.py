@@ -47,11 +47,13 @@ class MyController(wishful_module.ControllerModule):
 
     @wishful_module.on_event(upis.mgmt.NewNodeEvent)
     def add_node(self, event):
-        self.log.info("New Node".format())
         node = event.node
-        self.nodes.append(node)
+        if node.local:
+            return
+
         self.log.info("Added new node: {}, Local: {}"
                       .format(node.uuid, node.local))
+        self.nodes.append(node)
 
         retVal = node.net.create_packetflow_sink(port=1234)
         print("Server started: {}".format(retVal))
