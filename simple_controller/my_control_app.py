@@ -48,9 +48,6 @@ class MyController(wishful_module.ControllerModule):
     @wishful_module.on_event(upis.mgmt.NewNodeEvent)
     def add_node(self, event):
         node = event.node
-        if node.local:
-            return
-
         self.log.info("Added new node: {}, Local: {}"
                       .format(node.uuid, node.local))
         self.nodes.append(node)
@@ -115,13 +112,19 @@ class MyController(wishful_module.ControllerModule):
         # go over collected samples, etc....
         # make some decisions, etc...
         print("Periodic Evaluation")
-        print("Connected nodes: ", [node.uuid for node in self.nodes])
+        print("My nodes: ", [node.uuid for node in self.nodes])
         self.timer.start(self.timeInterval)
 
         if len(self.nodes) == 0:
             return
 
+        # in local mode there is only one node
         node = self.nodes[0]
+
+        # in global mode there should be more than 1,
+        # first one is local node, so get next one
+        if len(self.nodes) > 1:
+            node = self.nodes[1]
 
         device = node.get_device(0)
 
@@ -140,7 +143,7 @@ class MyController(wishful_module.ControllerModule):
             self.myFilterRunning = True
 
         # execute non-blocking function immediately
-        node.blocking(False).device("phy0").radio.set_power(12)
+        node.blocking(False).device("phy0").radio.set_power(random.randint(1, 20))
 
         # execute non-blocking function immediately, with specific callback
         node.callback(self.get_power_cb).radio.device("phy0").get_power()
