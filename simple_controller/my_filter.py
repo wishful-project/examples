@@ -1,6 +1,6 @@
 import logging
 import wishful_upis as upis
-import wishful_framework as wishful_module
+from wishful_agent.core import wishful_module
 from .common import AveragedSpectrumScanSampleEvent
 from .common import StartMyFilterEvent
 from .common import StopMyFilterEvent
