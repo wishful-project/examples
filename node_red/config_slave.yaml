@@ -1,22 +1,10 @@
 ## WiSHFUL Agent config file
 
 agent_config:
-  name: 'Local_Controller'
-  info: 'CPs and modules on single node'
-  type: 'local'
+  name: 'HC node'
+  info: 'filter runs on local node'
+  type: 'slave'
   iface: 'lo'
-
-controllers:
-  myController:
-      module : simple_controller
-      class_name : MyController
-      kwargs : {"mode": "LOCAL"}
-
-  myFilter:
-      module : simple_controller
-      class_name : MyAvgFilter
-      kwargs : {"window": 5}
-
 
 modules:
   discovery:
