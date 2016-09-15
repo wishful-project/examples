@@ -1,0 +1,22 @@
+## WiSHFUL Agent config file
+
+agent_config:
+  name: "Global_Controller"
+  info: 'agent hosts global controller'
+  type: 'master'
+  iface: 'lo'
+  dl: "tcp://127.0.0.1:8990"
+  ul: "tcp://127.0.0.1:8989"
+
+
+controllers:
+  myController:
+      module : simple_controller
+      class_name : MyController
+      kwargs : {"mode": "GLOBAL"}
+
+modules:
+  discovery:
+        module : wishful_module_discovery_pyre
+        class_name : PyreDiscoveryControllerModule
+        kwargs: {"iface":"lo", "groupName":"wishful_1234", "downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"}
