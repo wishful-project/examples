@@ -8,7 +8,7 @@ agent_config:
 
 controllers:
   myFilter:
-      module : simple_controller
+      file : my_filter.py
       class_name : MyAvgFilter
       kwargs : {"window": 5}
 

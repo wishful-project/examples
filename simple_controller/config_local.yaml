@@ -8,12 +8,12 @@ agent_config:
 
 controllers:
   myController:
-      module : simple_controller
+      file : my_control_app.py
       class_name : MyController
       kwargs : {"mode": "LOCAL"}
 
   myFilter:
-      module : simple_controller
+      file : my_filter.py
       class_name : MyAvgFilter
       kwargs : {"window": 5}
 

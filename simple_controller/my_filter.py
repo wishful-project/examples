@@ -1,9 +1,9 @@
 import logging
 import wishful_upis as upis
 from wishful_agent.core import wishful_module
-from .common import AveragedSpectrumScanSampleEvent
-from .common import StartMyFilterEvent
-from .common import StopMyFilterEvent
+from common import AveragedSpectrumScanSampleEvent
+from common import StartMyFilterEvent
+from common import StopMyFilterEvent
 
 __author__ = "Piotr Gawlowicz"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
