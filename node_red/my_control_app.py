@@ -89,24 +89,6 @@ class MyController(wishful_module.ControllerModule):
         self.log.info("Averaged Spectral Scan Sample: {}"
                       .format(avgSample))
 
-    def default_cb(self, data):
-        node = data.node
-        devName = None
-        if data.device:
-            devName = data.device.name
-        msg = data.msg
-        print("Default Callback: "
-              "Node: {}, Dev: {}, Data: {}"
-              .format(node.uuid, devName, msg))
-
-    def get_power_cb(self, data):
-        node = data.node
-        dev = data.device
-        msg = data.msg
-        print("Power in "
-              "Node: {}, Dev: {}, was set to: {}"
-              .format(node.uuid, dev.name, msg))
-
     @wishful_module.on_event(PeriodicEvaluationTimeEvent)
     def periodic_evaluation(self, event):
         # go over collected samples, etc....
