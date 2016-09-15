@@ -11,6 +11,14 @@ class AveragedSpectrumScanSampleEvent(upis.upi.EventBase):
         super().__init__()
         self.avg = avg
 
+    def serialize(self):
+        return {"avg": self.avg}
+
+    @classmethod
+    def parse(cls, buf):
+        avg = buf.get("avg", None)
+        return cls(avg)
+
 
 class StartMyFilterEvent(upis.upi.EventBase):
     def __init__(self):
