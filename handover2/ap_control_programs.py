@@ -1,0 +1,174 @@
+import logging
+import datetime
+import random
+import wishful_upis as upis
+from wishful_agent.core import wishful_module
+from wishful_agent.timer import TimerEventSender
+from common import CQIReportingEvent
+
+import subprocess
+import time
+
+__author__ = "Anatolij Zubow"
+__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
+__version__ = "0.1.0"
+__email__ = "{zubow}@tkn.tu-berlin.de"
+
+
+class PeriodicChannelSwitchTimeEvent(upis.mgmt.TimeEvent):
+    def __init__(self):
+        super().__init__()
+
+class PeriodicCQIReportingTimeEvent(upis.mgmt.TimeEvent):
+    def __init__(self):
+        super().__init__()
+
+"""
+    Local control program running on each AP node to collect information about current link signal power and towards
+    candidate APs using passive scanning.
+
+    @return it announces the results using periodic events; i.e. CQIReportingEvent
+"""
+@wishful_module.build_module
+class Scanner(wishful_module.ControllerModule):
+    def __init__(self, mode, ap_iface, scan_iface, channels, hopping_interval, reporting_interval):
+        super(Scanner, self).__init__()
+        self.log = logging.getLogger('Scanner')
+        self.mode = mode
+        self.ap_iface = ap_iface
+        self.scan_iface = scan_iface
+        self.channels = channels
+        self.hopping_interval = hopping_interval
+        self.reporting_interval = reporting_interval
+        self.sta_map_file = '/tmp/sta_map.dat'
+        self.next_ch_id = 0
+        self.running = False
+        self.node = None
+
+    @wishful_module.on_start()
+    def my_start_function(self):
+        print("start scanner app")
+
+        # start scanner
+        self.exec_file = 'scanner/scanner'
+        self.processArgs = self.exec_file + ' ' + self.scan_iface
+        self.process = subprocess.Popen(self.processArgs.split(), shell=False)
+        # wait to settle down
+        time.sleep(1)
+
+        # channel hopping every 100ms
+        self.chHoppingTimeInterval = self.hopping_interval
+        self.chTimer = TimerEventSender(self, PeriodicChannelSwitchTimeEvent)
+        self.chTimer.start(self.chHoppingTimeInterval)
+
+        # reporting signal quality as event
+        self.reportingTimeInterval = self.reporting_interval
+        self.reportingTimer = TimerEventSender(self, PeriodicCQIReportingTimeEvent)
+        self.reportingTimer.start(self.reportingTimeInterval)
+
+        self.running = True
+
+    @wishful_module.on_exit()
+    def my_stop_function(self):
+        print("stop scanner app")
+        # stop scanner
+        self.process.kill()
+
+        self.running = False
+
+    @wishful_module.on_event(upis.mgmt.NewNodeEvent)
+    def add_node(self, event):
+        if not event.node.local:
+            return
+
+        self.node = event.node
+        self.log.info("My node: {}, Local: {}"
+                      .format(self.node.uuid, self.node.local))
+
+
+    @wishful_module.on_event(upis.mgmt.NodeExitEvent)
+    @wishful_module.on_event(upis.mgmt.NodeLostEvent)
+    def remove_node(self, event):
+        if not event.node.local:
+            return
+
+        node = event.node
+        reason = event.reason
+        self.log.info("Node: {}, Local: {} removed reason: {}"
+                      .format(node.uuid, node.local, reason))
+
+
+    @wishful_module.on_event(PeriodicChannelSwitchTimeEvent)
+    def periodic_channel_switch(self, event):
+
+        if self.node == None:
+            return
+
+        print("Periodic channel hopping")
+        print("My node: %s" % self.node.uuid)
+        self.chTimer.start(self.chHoppingTimeInterval)
+
+        device = self.node.get_device(0)
+
+        try:
+            # switch to next channel
+            device.radio.set_channel(self.channels[self.next_ch_id ])
+
+            self.next_ch_id = (self.next_ch_id + 1) % len(self.channels)
+        except Exception as e:
+            print("{} !!!Exception!!!: {}".format(
+                datetime.datetime.now(), e))
+
+
+    @wishful_module.on_event(PeriodicCQIReportingTimeEvent)
+    def periodic_reporting(self, event):
+
+        if self.node == None:
+            return
+
+        print("Periodic reporting")
+        print("My node: %s" % self.node.uuid)
+        self.chTimer.start(self.reportingTimeInterval)
+
+        device = self.node.get_device(0)
+
+        try:
+            # read and create event
+            candidate_sigpower = self.read_passive_scan_results()
+
+            curr_sigpower = self.get_avg_sigpower()
+
+            event = CQIReportingEvent(candidate_sigpower, curr_sigpower)
+
+            self.send_event(event)
+        except Exception as e:
+            print("{} !!!Exception!!!: {}".format(
+                datetime.datetime.now(), e))
+
+    def read_passive_scan_results(self):
+        scan_results = open(self.sta_map_file, 'r')
+        rv = {}
+        for line in scan_results:
+            row_arr = line.split(",")
+            if (len(row_arr) >= 2):
+                macAddr = row_arr[0]
+                sigPow = row_arr[1]
+            else:
+                continue
+            rv[macAddr] = sigPow
+        return rv
+
+
+    def get_avg_sigpower(self):
+        rv = {}
+        sout = self.run_command('iw dev ' + self.ap_iface + ' station dump')
+        sout_arr = sout.split("\n")
+        for row in sout_arr:
+            if "Station" in row:
+                row_arr = row.split()
+                mac = row_arr[1]
+            if 'signal avg:' in row:
+                row_arr = row.split()
+                sigPow = row_arr[2]
+                rv[mac] = sigPow
+        return rv
