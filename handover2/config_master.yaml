@@ -1,0 +1,34 @@
+## WiSHFUL Agent config file of the BigAP controller
+
+agent_config:
+  name: "BigAP_Controller"
+  info: 'global BIGAP controller'
+  type: 'master'
+  iface: 'lo'
+  sub: "tcp://127.0.0.1:8990"
+  pub: "tcp://127.0.0.1:8989"
+
+broker:
+  xpub: "tcp://127.0.0.1:8990"
+  xsub: "tcp://127.0.0.1:8989"
+
+controllers:
+  bigApController:
+      file : bigap_control_program.py
+      class_name : BigAPController
+      kwargs : {"mode": "GLOBAL", "ap_iface": "ap1"}
+
+  dhcp:
+      file : bigap_control_program.py
+      class_name : DHCPDaemon
+      kwargs : {"mode": "GLOBAL", "zmq_port" : 6868}
+
+modules:
+  discovery:
+        module : wishful_module_discovery_pyre
+        class_name : PyreDiscoveryControllerModule
+        kwargs: {"iface":"lo",
+                 "groupName":"wishful_1234",
+                 "sub":"tcp://127.0.0.1:8990",
+                 "pub":"tcp://127.0.0.1:8989"
+                }
