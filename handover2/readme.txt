@@ -17,6 +17,11 @@ cd build/
 cmake ../
 make
 
+# install DHCP server
+https://github.com/flan/staticdhcpd
+
+plus add patches ... tbd
+
 # 1. local scanning program
 
 sudo ../../dev/bin/wishful-agent --config config_ap.yaml

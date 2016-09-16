@@ -7,7 +7,7 @@ agent_config:
   iface: 'lo'
 
 controllers:
-  myController:
+  scanner:
       file : ap_control_programs.py
       class_name : Scanner
       kwargs : {"mode": "LOCAL", "ap_iface": "ap1", "scan_iface": "lo", "channels": [44, 48], "hopping_interval": 1, "reporting_interval":1}
