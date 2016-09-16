@@ -5,13 +5,16 @@ agent_config:
   info: 'agent hosts global controller'
   type: 'master'
   iface: 'lo'
-  dl: "tcp://127.0.0.1:8990"
-  ul: "tcp://127.0.0.1:8989"
+  sub: "tcp://127.0.0.1:8990"
+  pub: "tcp://127.0.0.1:8989"
 
+broker:
+  xpub: "tcp://127.0.0.1:8990"
+  xsub: "tcp://127.0.0.1:8989"
 
 controllers:
   myController:
-      file: my_control_app.py
+      file : my_control_app.py
       class_name : MyController
       kwargs : {"mode": "GLOBAL"}
 
@@ -19,4 +22,8 @@ modules:
   discovery:
         module : wishful_module_discovery_pyre
         class_name : PyreDiscoveryControllerModule
-        kwargs: {"iface":"lo", "groupName":"wishful_1234", "downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"}
+        kwargs: {"iface":"lo",
+                 "groupName":"wishful_1234",
+                 "sub":"tcp://127.0.0.1:8990",
+                 "pub":"tcp://127.0.0.1:8989"
+                }
