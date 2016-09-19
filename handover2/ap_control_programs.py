@@ -14,6 +14,10 @@ __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
+'''
+Set of control programs to be executed on each AP locally:
+(1) Scanner for reporting handover opportunities
+'''
 
 class PeriodicChannelSwitchTimeEvent(upis.mgmt.TimeEvent):
     def __init__(self):
@@ -47,7 +51,7 @@ class Scanner(wishful_module.ControllerModule):
 
     @wishful_module.on_start()
     def my_start_function(self):
-        print("start scanner app")
+        self.log.debug("start scanner app")
 
         # start scanner
         self.exec_file = 'scanner/scanner'
@@ -70,7 +74,7 @@ class Scanner(wishful_module.ControllerModule):
 
     @wishful_module.on_exit()
     def my_stop_function(self):
-        print("stop scanner app")
+        self.log.debug("stop scanner app")
         # stop scanner
         self.process.kill()
 
@@ -104,8 +108,8 @@ class Scanner(wishful_module.ControllerModule):
         if self.node == None:
             return
 
-        print("Periodic channel hopping")
-        print("My node: %s" % self.node.uuid)
+        self.log.debug("Periodic channel hopping")
+        self.log.debug("My node: %s" % self.node.uuid)
         self.chTimer.start(self.chHoppingTimeInterval)
 
         device = self.node.get_device(0)
@@ -116,7 +120,7 @@ class Scanner(wishful_module.ControllerModule):
 
             self.next_ch_id = (self.next_ch_id + 1) % len(self.channels)
         except Exception as e:
-            print("{} !!!Exception!!!: {}".format(
+            self.log.error("{} !!!Exception!!!: {}".format(
                 datetime.datetime.now(), e))
 
 
@@ -126,8 +130,8 @@ class Scanner(wishful_module.ControllerModule):
         if self.node == None:
             return
 
-        print("Periodic reporting")
-        print("My node: %s" % self.node.uuid)
+        self.log.debug("Periodic reporting")
+        self.log.debug("My node: %s" % self.node.uuid)
         self.chTimer.start(self.reportingTimeInterval)
 
         device = self.node.get_device(0)
@@ -142,10 +146,17 @@ class Scanner(wishful_module.ControllerModule):
 
             self.send_event(event)
         except Exception as e:
-            print("{} !!!Exception!!!: {}".format(
+            self.log.error("{} !!!Exception!!!: {}".format(
                 datetime.datetime.now(), e))
 
+
     def read_passive_scan_results(self):
+        '''
+        Get the signal quality towards co-located clients being served by neighboring APs.
+        Returns in dBm
+        -------
+
+        '''
         scan_results = open(self.sta_map_file, 'r')
         rv = {}
         for line in scan_results:
@@ -160,15 +171,17 @@ class Scanner(wishful_module.ControllerModule):
 
 
     def get_avg_sigpower(self):
+        '''
+        Get the signal quality of currently served/associated client stations.
+        Returns in dBm
+        -------
+        '''
         rv = {}
-        sout = self.run_command('iw dev ' + self.ap_iface + ' station dump')
-        sout_arr = sout.split("\n")
-        for row in sout_arr:
-            if "Station" in row:
-                row_arr = row.split()
-                mac = row_arr[1]
-            if 'signal avg:' in row:
-                row_arr = row.split()
-                sigPow = row_arr[2]
-                rv[mac] = sigPow
+        station_info = self.node.net.iface(self.ap_iface).get_info_of_connected_devices()
+        if station_info is not None:
+            for node in station_info.keys():
+                agent_control_ip = node.ip
+                station_info_node = station_info[node]
+                for mac in station_info_node.keys():
+                    rv[mac] = station_info[node][mac]['signal avg'][0]
         return rv

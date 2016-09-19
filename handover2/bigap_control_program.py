@@ -7,6 +7,7 @@ from wishful_agent.timer import TimerEventSender
 from common import CQIReportingEvent
 from common import DHCPNewEvent
 from common import DHCPDelEvent
+from common import HOTriggerRequestEvent
 
 import time
 import subprocess
@@ -17,6 +18,11 @@ __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
+'''
+Set of control programs to be executed on central node, e.g. server:
+(1) BigAP controller - makes handover decisions based on the CQI reports of the APs. Gets information about new clients from DHCP.
+(2) DHCPDaemon - wraps DHCP server and informs BigAP controller about new and removed leases.
+'''
 
 @wishful_module.build_module
 class BigAPController(wishful_module.ControllerModule):
@@ -154,34 +160,16 @@ class BigAPController(wishful_module.ControllerModule):
             raise e
 
 
-    ''' TBD '''
-    def performHO(self, sta_mac_addr, sta_ip, target_AP, target_channel, serving_channel, target_AP_ip, target_AP_name, ho_scheme):
+    def performHO(self, sta_mac_addr, serving_AP, target_AP):
 
-        """
-            Functions perform handover.
-        """
-
+        '''
+            Functions triggers handover by sending a HOTriggerRequestEvent to the corresponding app.
+        '''
         try:
-            self.log.debug('********* testPerformHardHO **********')
+            self.log.debug('performHO')
 
-            # find out which AP is currently controlling this client STA
-            serving_AP = self.get_servingAP(sta_mac_addr)
-            serving_AP_ip = serving_AP.ip
-            serving_AP_name = serving_AP.name
-
-
-            self.log.debug('Serving AP of %s is %s' % (str(sta_mac_addr), str(serving_AP_name)))
-            self.log.debug('Move STA %s from %s to %s' % (str(sta_mac_addr), str(serving_AP_name), str(target_AP_name)))
-
-            retVal = controller.handover.perform_handover(wlan_iface, serving_AP, target_AP, sta_mac_addr,
-                                                          wlan_inject_iface = wlan_inject_iface, sta_ip = sta_ip,
-                                                          servingAP_ip = serving_AP_ip, servingChannel = serving_channel,
-                                                          network_bssid = network_bssid, targetAP_ip = target_AP_ip,
-                                                          targetChannel = target_channel, gateway = gateway,
-                                                          ho_type = ho_scheme)
-
-            self.log.debug('HO result %s' % (str(retVal)))
-
+            ho_event = HOTriggerRequestEvent(candidate_sigpower, curr_sigpower)
+            self.send_event(ho_event)
         except Exception as e:
             self.log.fatal("... An error occurred : %s" % e)
             raise e
