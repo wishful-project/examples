@@ -3,7 +3,7 @@
 agent_config:
   name: 'local_AP_control_progs'
   info: 'Local WiFi agent'
-  type: 'local'
+  type: 'slave'
   iface: 'lo'
 
 modules:

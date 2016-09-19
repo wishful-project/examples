@@ -53,10 +53,6 @@ class WiFiTopologyController(wishful_module.ControllerModule):
                       .format(node.uuid))
         self.nodes[node.uuid] = node
 
-        devs = node.get_devices()
-        for dev in devs:
-            self.log.info("Dev: ", dev.name)
-
 
     @wishful_module.on_event(upis.mgmt.NodeExitEvent)
     @wishful_module.on_event(upis.mgmt.NodeLostEvent)
@@ -88,10 +84,9 @@ class WiFiTopologyController(wishful_module.ControllerModule):
 
 
     @wishful_module.on_event(upis.wifi.WiFiGetServingAPReplyEvent)
-    def add_node(self, event):
-        node = event.node
+    def rx_serving_reply(self, event):
 
-        if self.mode == "GLOBAL":
-            return
+        if event.ap_uuid in self.nodes:
+            node = self.nodes[event.ap_uuid]
 
-        self.log.info("New event: %s, %s, %s" % (event.sta_mac_addr, event.wifi_intf, event.ap_uuid))
+        self.log.info("RX WiFiGetServingAPReplyEvent: %s, %s, %s, %s" % (event.sta_mac_addr, event.wifi_intf, event.ap_uuid, node.hostname))
