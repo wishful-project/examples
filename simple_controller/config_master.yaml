@@ -16,7 +16,7 @@ controllers:
   myController:
       file : my_control_app.py
       class_name : MyController
-      kwargs : {"mode": "GLOBAL"}
+      kwargs : {}
 
 modules:
   discovery:

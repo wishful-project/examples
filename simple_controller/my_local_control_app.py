@@ -39,18 +39,9 @@ class MyController(wishful_module.ControllerModule):
         print("start control app")
         self.running = True
 
-    @wishful_module.on_exit()
-    def my_stop_function(self):
-        print("stop control app")
-        self.running = False
-
-    @wishful_module.on_event(upis.mgmt.NewNodeEvent)
-    def add_node(self, event):
-        node = event.node
-
-        self.log.info("Added new node: {}, Local: {}"
-                      .format(node.uuid, node.local))
-        self.nodes.append(node)
+        node = self.localNode
+        self.log.info("My local node: {}, Local: {}"
+                      .format(node.hostname, node.local))
 
         retVal = node.net.create_packetflow_sink(port=1234)
         print("Server started: {}".format(retVal))
@@ -67,16 +58,10 @@ class MyController(wishful_module.ControllerModule):
         device.start_service(
             upis.radio.SpectralScanService(rate=1000, f_range=[2200, 2500]))
 
-    @wishful_module.on_event(upis.mgmt.NodeExitEvent)
-    @wishful_module.on_event(upis.mgmt.NodeLostEvent)
-    def remove_node(self, event):
-        self.log.info("Node lost".format())
-        node = event.node
-        reason = event.reason
-        if node in self.nodes:
-            self.nodes.remove(node)
-            self.log.info("Node: {}, Local: {} removed reason: {}"
-                          .format(node.uuid, node.local, reason))
+    @wishful_module.on_exit()
+    def my_stop_function(self):
+        print("stop control app")
+        self.running = False
 
     @wishful_module.on_event(upis.radio.PacketLossEvent)
     def serve_packet_loss_event(self, event):
@@ -114,14 +99,13 @@ class MyController(wishful_module.ControllerModule):
         # go over collected samples, etc....
         # make some decisions, etc...
         print("Periodic Evaluation")
-        print("My nodes: ", [node.hostname for node in self.nodes])
-        self.timer.start(self.timeInterval)
 
-        if len(self.nodes) == 0:
-            return
-
-        node = self.nodes[0]
+        node = self.localNode
         device = node.get_device(0)
+
+        self.log.info("My local node: {}, Local: {}"
+                      .format(node.hostname, node.local))
+        self.timer.start(self.timeInterval)
 
         if self.packetLossEventsEnabled:
             device.disable_event(upis.radio.PacketLossEvent)
@@ -138,21 +122,20 @@ class MyController(wishful_module.ControllerModule):
             self.myFilterRunning = True
 
         # execute non-blocking function immediately
-        node.blocking(False).device("phy0").radio.set_power(random.randint(1, 20))
+        device.blocking(False).radio.set_power(random.randint(1, 20))
 
         # execute non-blocking function immediately, with specific callback
-        node.callback(self.get_power_cb).radio.device("phy0").get_power()
+        device.callback(self.get_power_cb).radio.get_power()
 
         # schedule non-blocking function delay
         node.delay(3).callback(self.default_cb).net.create_packetflow_sink(port=1234)
 
         # schedule non-blocking function exec time
         exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-        node.exec_time(exec_time).radio.device(
-            "phy0").set_channel(channel=random.randint(1, 11))
+        device.exec_time(exec_time).radio.set_channel(channel=random.randint(1, 11))
 
         # execute blocking function immediately
-        result = node.radio.device("phy0").get_channel()
+        result = device.radio.get_channel()
         print("{} Channel is: {}".format(datetime.datetime.now(), result))
 
         # exception handling, clean_per_flow_tx_power_table implementation

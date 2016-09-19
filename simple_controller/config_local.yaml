@@ -8,9 +8,9 @@ agent_config:
 
 controllers:
   myController:
-      file : my_control_app.py
+      file : my_local_control_app.py
       class_name : MyController
-      kwargs : {"mode": "LOCAL"}
+      kwargs : {}
 
   myFilter:
       file : my_filter.py
