@@ -137,7 +137,8 @@ class MyController(wishful_module.ControllerModule):
 
         # schedule non-blocking function exec time
         exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-        device.exec_time(exec_time).radio.set_channel(channel=random.randint(1, 11))
+        newChannel = random.randint(1, 11)
+        device.exec_time(exec_time).radio.set_channel(channel=newChannel)
 
         # execute blocking function immediately
         result = device.radio.get_channel()
