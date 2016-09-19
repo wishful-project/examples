@@ -1,13 +1,30 @@
-## WiSHFUL Controller's config file
 
-controller:
-    name: "Controller"
-    info: "WiSHFUL Controller"
-    dl: "tcp://20.0.0.2:8990"
-    ul: "tcp://20.0.0.2:8989"
+## WiSHFUL Agent config file for the mininet wifi controller
+
+agent_config:
+  name: "Mininet_WiFi_Controller"
+  info: 'global wifi mininet controller'
+  type: 'master'
+  iface: 'lo'
+  sub: "tcp://20.0.0.2:8990"
+  pub: "tcp://20.0.0.2:8989"
+
+broker:
+  xpub: "tcp://20.0.0.2:8990"
+  xsub: "tcp://20.0.0.2:8989"
+
+controllers:
+  mn_wifi_controller:
+      file : wishful_mn_controller.py
+      class_name : MininetWiFiController
+      kwargs : {}
 
 modules:
-    discovery:
+  discovery:
         module : wishful_module_discovery_pyre
         class_name : PyreDiscoveryControllerModule
-        kwargs: {"iface":"ap1-eth1", "groupName":"wishful_1234", "downlink":"tcp://20.0.0.2:8990", "uplink":"tcp://20.0.0.2:8989"}
+        kwargs: {"iface":"ap1-eth1",
+                 "groupName":"wishful_1234",
+                 "sub":"tcp://20.0.0.2:8990",
+                 "pub":"tcp://20.0.0.2:8989"
+                }
