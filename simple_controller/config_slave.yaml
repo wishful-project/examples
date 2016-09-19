@@ -21,6 +21,7 @@ modules:
   simple:
       module : wishful_module_simple
       class_name : SimpleModule2
+      mode : local # able to communicate only with local apps; by default global
       devices : ['phy0']
 
   iperf:
