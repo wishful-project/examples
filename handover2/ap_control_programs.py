@@ -47,7 +47,6 @@ class Scanner(wishful_module.ControllerModule):
         self.sta_map_file = '/tmp/sta_map.dat'
         self.next_ch_id = 0
         self.running = False
-        self.node = None
 
     @wishful_module.on_start()
     def my_start_function(self):
@@ -77,42 +76,16 @@ class Scanner(wishful_module.ControllerModule):
         self.log.debug("stop scanner app")
         # stop scanner
         self.process.kill()
-
         self.running = False
-
-    @wishful_module.on_event(upis.mgmt.NewNodeEvent)
-    def add_node(self, event):
-        if not event.node.local:
-            return
-
-        self.node = event.node
-        self.log.info("My node: {}, Local: {}"
-                      .format(self.node.uuid, self.node.local))
-
-
-    @wishful_module.on_event(upis.mgmt.NodeExitEvent)
-    @wishful_module.on_event(upis.mgmt.NodeLostEvent)
-    def remove_node(self, event):
-        if not event.node.local:
-            return
-
-        node = event.node
-        reason = event.reason
-        self.log.info("Node: {}, Local: {} removed reason: {}"
-                      .format(node.uuid, node.local, reason))
-
 
     @wishful_module.on_event(PeriodicChannelSwitchTimeEvent)
     def periodic_channel_switch(self, event):
 
-        if self.node == None:
-            return
-
         self.log.debug("Periodic channel hopping")
-        self.log.debug("My node: %s" % self.node.uuid)
+        self.log.debug("My node: %s" % self.localNode.hostname)
         self.chTimer.start(self.chHoppingTimeInterval)
 
-        device = self.node.get_device(0)
+        device = self.localNode.get_device(0)
 
         try:
             # switch to next channel
@@ -127,14 +100,11 @@ class Scanner(wishful_module.ControllerModule):
     @wishful_module.on_event(PeriodicCQIReportingTimeEvent)
     def periodic_reporting(self, event):
 
-        if self.node == None:
-            return
-
         self.log.debug("Periodic reporting")
-        self.log.debug("My node: %s" % self.node.uuid)
+        self.log.debug("My node: %s" % self.localNode.hostname)
         self.chTimer.start(self.reportingTimeInterval)
 
-        device = self.node.get_device(0)
+        device = self.localNode.get_device(0)
 
         try:
             # read and create event
@@ -152,7 +122,7 @@ class Scanner(wishful_module.ControllerModule):
 
     def read_passive_scan_results(self):
         '''
-        Get the signal quality towards co-located clients being served by neighboring APs.
+        Get the signal quality towards co-located clients being served by neighboring APs. STA_MAC_ADDR -> dBm
         Returns in dBm
         -------
 
@@ -172,12 +142,12 @@ class Scanner(wishful_module.ControllerModule):
 
     def get_avg_sigpower(self):
         '''
-        Get the signal quality of currently served/associated client stations.
+        Get the signal quality of currently served/associated client stations. STA_MAC_ADDR -> dBm
         Returns in dBm
         -------
         '''
         rv = {}
-        station_info = self.node.net.iface(self.ap_iface).get_info_of_connected_devices()
+        station_info = self.localNode.net.iface(self.ap_iface).get_info_of_connected_devices()
         if station_info is not None:
             for node in station_info.keys():
                 agent_control_ip = node.ip

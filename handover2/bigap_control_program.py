@@ -17,6 +17,10 @@ __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
+class PeriodicSTADiscoveryTimeEvent(upis.mgmt.TimeEvent):
+    def __init__(self):
+        super().__init__()
+
 '''
 Set of control programs to be executed on central node, e.g. server:
 (1) BigAP controller - makes handover decisions based on the CQI reports of the APs. Gets information about new clients from DHCP.
@@ -30,13 +34,21 @@ class BigAPController(wishful_module.ControllerModule):
         self.log = logging.getLogger('BigAPController')
         self.mode = mode
         self.ap_iface = ap_iface
+        self.sta_discovery_interval = 5
+
         self.running = False
         self.activeSTAs = {} # MAC_ADDR -> IP_ADDR
-        self.nodes = []
+        self.nodes = {} # APs UUID -> node
+        self.servingAPs = {} # STA_MAC_ADDR -> AP node
 
     @wishful_module.on_start()
     def my_start_function(self):
         print("BiGAP control app started")
+
+        # channel hopping every 100ms
+        self.staDiscoveryTimer = TimerEventSender(self, PeriodicSTADiscoveryTimeEvent)
+        self.staDiscoveryTimer.start(self.sta_discovery_interval)
+
         self.running = True
 
     @wishful_module.on_exit()
@@ -53,7 +65,7 @@ class BigAPController(wishful_module.ControllerModule):
 
         self.log.info("Added new node: {}, Local: {}"
                       .format(node.uuid, node.local))
-        self.nodes.append(node)
+        self.nodes[node.uuid] = node
 
         devs = node.get_devices()
         for dev in devs:
@@ -67,9 +79,30 @@ class BigAPController(wishful_module.ControllerModule):
         node = event.node
         reason = event.reason
         if node in self.nodes:
-            self.nodes.remove(node)
+            del self.nodes[node.uuid]
             self.log.info("Node: {}, Local: {} removed reason: {}"
                           .format(node.uuid, node.local, reason))
+
+
+    @wishful_module.on_event(PeriodicSTADiscoveryTimeEvent)
+    def periodic_sta_discovery(self, event):
+
+        if self.node == None:
+            return
+
+        self.log.debug("Periodic STA discovery")
+        self.log.debug("My node: %s" % self.node.uuid)
+        self.staDiscoveryTimer.start(self.sta_discovery_interval)
+
+        try:
+            active_sta_mac_addrs = list(self.nodes.keys())
+
+            for sta_mac_addr_tmp in active_sta_mac_addrs:
+                self.send_servingAP_req(sta_mac_addr_tmp, self.ap_iface)
+        except Exception as e:
+            self.log.error("{} !!!Exception!!!: {}".format(
+                datetime.datetime.now(), e))
+
 
 
     @wishful_module.on_event(CQIReportingEvent)
@@ -83,6 +116,13 @@ class BigAPController(wishful_module.ControllerModule):
                       .format(curr_sigpower))
         self.log.info("CQIReportingEvent curr: {}"
                       .format(candidate_sigpower))
+
+        # data structure: STA_MAC_ADDR -> dBm
+        mac_addrs = list(self.curr_sigpower.keys())
+
+        for sta_mac_addr in mac_addrs:
+            print('tbd')
+            pass
 
 
     @wishful_module.on_event(DHCPNewEvent)
@@ -122,42 +162,36 @@ class BigAPController(wishful_module.ControllerModule):
             pass
 
 
-    ''' TBD '''
-    def get_servingAP(self, sta_mac_addr):
-        """
-        Estimates the AP which serves the given STA. Note: if an STA is associated with multiple APs the one with the
-        smallest inactivity time is returned.
-        """
-
-        self.log.debug('Function: is_associated_with')
+    def send_servingAP_req(self, sta_mac_addr, iface):
+        '''
+            Functions send out a message to wireless topology app to discover the AP serving a particular client.
+        '''
         try:
-            nodes_with_sta = {}
+            self.log.debug('send_servingAP_req')
 
-            for node in self.nodes:
-                res = node.iface(self.ap_iface).blocking(True).radio.get_inactivity_time_of_connected_devices()
-
-                if sta_mac_addr in res:
-                    self.log.debug(res[sta_mac_addr])
-                    nodes_with_sta[node] = int(res[sta_mac_addr][0])
-
-                    # dictionary of aps where station is associated
-                    self.log.debug("STA found on the following APs with the following idle times:")
-                    self.log.debug(str(nodes_with_sta))
-
-            if not bool(nodes_with_sta):
-                # If no serving AP was found; return None
-                return None
-
-            # serving AP is the one with minimal STA idle value
-            servingAP = min(nodes_with_sta, key=nodes_with_sta.get)
-            self.log.info("STA %s is served by AP %s " % (sta_mac_addr, servingAP))
-
-            return servingAP
-
+            ho_event = upis.wifi.WiFiGetServingAPRequestEvent(sta_mac_addr, iface)
+            self.send_event(ho_event)
         except Exception as e:
-            self.log.fatal("An error occurred in get_servingAP: %s" % e)
+            self.log.fatal("... An error occurred : %s" % e)
             raise e
 
+    @wishful_module.on_event(upis.wifi.WiFiGetServingAPReplyEvent)
+    def rx_servingAP_reply(self, event):
+        '''
+            From wireless topology app.
+        '''
+        self.log.info("rx_servingAP_reply: {}"
+                      .format(event))
+
+        sta_mac_addr = event.sta_mac_addr
+        wifi_intf = event.wifi_intf
+        ap_uuids = event.ap_uuids
+
+        # STA_MAC_ADDR -> AP node
+        if ap_uuids in self.nodes:
+            self.servingAPs[sta_mac_addr] = self.nodes[ap_uuids]
+        else:
+            self.log.error('Unknown ap_uuids %s' % ap_uuids)
 
     def trigger_handover(self, sta_mac_addr, serving_AP, target_AP):
         '''

@@ -28,6 +28,11 @@ controllers:
       class_name : HandoverModule
       kwargs : {"mode": "GLOBAL"}
 
+  wifi_topology:
+      module : wishful_module_wireless_topology
+      class_name : WifiTopologyModule
+      kwargs : {"mode": "GLOBAL"}
+
 modules:
   discovery:
         module : wishful_module_discovery_pyre
