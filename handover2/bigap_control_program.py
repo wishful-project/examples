@@ -7,7 +7,6 @@ from wishful_agent.timer import TimerEventSender
 from common import CQIReportingEvent
 from common import DHCPNewEvent
 from common import DHCPDelEvent
-from common import HOTriggerRequestEvent
 
 import time
 import subprocess
@@ -58,7 +57,7 @@ class BigAPController(wishful_module.ControllerModule):
 
         devs = node.get_devices()
         for dev in devs:
-            print("Dev: ", dev.name)
+            self.log.info("Dev: ", dev.name)
 
 
     @wishful_module.on_event(upis.mgmt.NodeExitEvent)
@@ -160,19 +159,29 @@ class BigAPController(wishful_module.ControllerModule):
             raise e
 
 
-    def performHO(self, sta_mac_addr, serving_AP, target_AP):
-
+    def trigger_handover(self, sta_mac_addr, serving_AP, target_AP):
         '''
-            Functions triggers handover by sending a HOTriggerRequestEvent to the corresponding app.
+            Functions triggers handover by sending a WiFiTriggerHandoverRequestEvent to the corresponding app.
         '''
         try:
-            self.log.debug('performHO')
+            self.log.debug('performHO: tbd!!!')
 
-            ho_event = HOTriggerRequestEvent(candidate_sigpower, curr_sigpower)
+            ho_event = upis.wifi.WiFiTriggerHandoverRequestEvent()
             self.send_event(ho_event)
         except Exception as e:
             self.log.fatal("... An error occurred : %s" % e)
             raise e
+
+
+    @wishful_module.on_event(upis.net_func.TriggerHandoverReplyEvent)
+    def handle_handover_reply(self, event):
+        '''
+            From Handover module
+        '''
+        if not event.success:
+            self.log.error('Handover failed!')
+        else:
+            self.log.info('Handover done')
 
 """
     DHCP daemon which sends events used for STA client discovery

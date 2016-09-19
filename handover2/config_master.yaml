@@ -16,12 +16,17 @@ controllers:
   bigApController:
       file : bigap_control_program.py
       class_name : BigAPController
-      kwargs : {"mode": "GLOBAL", "ap_iface": "ap1"}
+      kwargs : {"mode": "GLOBAL", "ap_iface": "ap1", "gateway_host_name": "gateway"}
 
   dhcp:
       file : bigap_control_program.py
       class_name : DHCPDaemon
       kwargs : {"mode": "GLOBAL", "zmq_port" : 6868}
+
+  handover:
+      module : wishful_module_handover
+      class_name : HandoverModule
+      kwargs : {"mode": "GLOBAL"}
 
 modules:
   discovery:
