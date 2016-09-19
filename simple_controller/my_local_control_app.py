@@ -46,9 +46,14 @@ class MyController(wishful_module.ControllerModule):
         retVal = node.net.create_packetflow_sink(port=1234)
         print("Server started: {}".format(retVal))
 
-        devs = node.get_devices()
-        for dev in devs:
+        for dev in node.get_devices():
             print("Dev: ", dev.name)
+
+        for m in node.get_modules():
+            print("Module: ", m.name)
+
+        for apps in node.get_apps():
+            print("App: ", m.name)
 
         device = node.get_device(0)
         device.radio.set_power(15)
