@@ -87,7 +87,7 @@ class MyController(wishful_module.ControllerModule):
         node = event.node
         device = event.device
         self.log.info("Packet loss in node {}, dev: {}"
-                      .format(node.uuid, device.name))
+                      .format(node.hostname, device.name))
 
     @wishful_module.on_event(AveragedSpectrumScanSampleEvent)
     def serve_spectral_scan_sample(self, event):
@@ -103,7 +103,7 @@ class MyController(wishful_module.ControllerModule):
         msg = data.msg
         print("Default Callback: "
               "Node: {}, Dev: {}, Data: {}"
-              .format(node.uuid, devName, msg))
+              .format(node.hostname, devName, msg))
 
     def get_power_cb(self, data):
         node = data.node
@@ -111,14 +111,14 @@ class MyController(wishful_module.ControllerModule):
         msg = data.msg
         print("Power in "
               "Node: {}, Dev: {}, was set to: {}"
-              .format(node.uuid, dev.name, msg))
+              .format(node.hostname, dev.name, msg))
 
     @wishful_module.on_event(PeriodicEvaluationTimeEvent)
     def periodic_evaluation(self, event):
         # go over collected samples, etc....
         # make some decisions, etc...
         print("Periodic Evaluation")
-        print("My nodes: ", [node.uuid for node in self.nodes])
+        print("My nodes: ", [node.hostname for node in self.nodes])
         self.timer.start(self.timeInterval)
 
         if len(self.nodes) == 0:
