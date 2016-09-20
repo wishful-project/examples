@@ -17,7 +17,7 @@
     cd ./examples/node_red
     node-red my_filter.json
 
-    ![my_filter](./my_filter.png)
+![my_filter](./my_filter.png)
 
 # Run wishful-agent with master config:
 
