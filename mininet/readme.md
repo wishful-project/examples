@@ -14,7 +14,7 @@ sudo service network-manager stop
 cd wishful/
 sudo pip2 install -U ./mininet/
 
-## Running example
+## Run the example
 cd wishful/examples/mininet
 sudo python2 ./mininet_script.py
 
@@ -23,3 +23,5 @@ sta1 ping sta2
 
 Open new terminal to see the output of the controller:
 tail -f /tmp/controller_ap1.log
+
+![mn_example](./mn_example.png)
