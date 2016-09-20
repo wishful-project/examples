@@ -2,7 +2,7 @@
 """
 import csv
 from enum import IntEnum
-from upi_helpers.mac_manager.mac_manager import *
+from upi_helpers.mac_manager.taisc_manager import *
 import logging
 
 
