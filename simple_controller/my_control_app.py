@@ -62,7 +62,7 @@ class MyController(wishful_module.ControllerModule):
             print("Module: ", m.name)
 
         for apps in node.get_apps():
-            print("App: ", m.name)
+            print("App: ", apps.name)
 
         device = node.get_device(0)
         device.radio.set_power(15)
