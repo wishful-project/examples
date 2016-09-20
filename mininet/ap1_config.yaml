@@ -1,8 +1,9 @@
 ## WiSHFUL Agent config file
 
-agent_info:
-  name: 'agent_1'
-  info: 'agent_info'
+agent_config:
+  name: 'AP1'
+  info: 'config for agent running on AP'
+  type: 'slave'
   iface: 'ap1-eth1'
 
 modules:

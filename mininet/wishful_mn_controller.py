@@ -1,5 +1,6 @@
 import logging
 import datetime
+import pprint
 import wishful_upis as upis
 from wishful_agent.core import wishful_module
 from wishful_agent.timer import TimerEventSender
@@ -55,7 +56,7 @@ class MininetWiFiController(wishful_module.ControllerModule):
         self.log.info("Node lost".format())
         node = event.node
         reason = event.reason
-        if node in self.nodes:
+        if node.uuid in self.nodes:
             del self.nodes[node.uuid]
             self.log.info("Node: {}, removed reason: {}"
                           .format(node.uuid, reason))
@@ -69,7 +70,20 @@ class MininetWiFiController(wishful_module.ControllerModule):
 
         try:
 
+            ap_uuids = list(self.nodes.keys())
 
+            for ap_uuid in ap_uuids:
+                ap_node = self.nodes[ap_uuid]
+
+                if ap_node.name == "AP1":
+                    node_iface = 'ap1-wlan0'
+                elif ap_node.name == "AP2":
+                    node_iface = 'ap2-wlan0'
+
+                self.log.info("Querying node ... %s for iface: %s" % (ap_node.name, node_iface))
+                ap_sta = ap_node.net.get_tx_bytes_of_connected_devices(node_iface)
+
+                self.log.info('STAs of AP:\n{}'.format(pprint.pformat(ap_sta)))
 
         except Exception as e:
             self.log.error("{} !!!Exception!!!: {}".format(

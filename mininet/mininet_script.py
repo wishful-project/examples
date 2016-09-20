@@ -28,7 +28,16 @@ MOBILITY = False
 '''
 Simple topology with two APs with two STAs.
 
-sudo python ./mininet_script.py
+Setup:
+(1) sudo pip2 install -U ./mininet/
+sudo python2 ./mininet_script.py
+
+Type in mininet-wifi CLI:
+sta1 ping sta2
+
+Open terminal to see the output of the controller:
+tail -f /tmp/controller_ap1.log
+
 '''
 def topology():
 
