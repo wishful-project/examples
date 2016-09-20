@@ -9,7 +9,6 @@
 
     cd $HOME/.node-red
     sudo npm install zmq
-    sudo npm install reddec/node-red-contrib-zmq
     sudo npm install wishful-project/node-red-wishful
     sudo npm install node-red-node-smooth
 
@@ -17,6 +16,8 @@
 
     cd ./examples/node_red
     node-red my_filter.json
+
+    ![my_filter](/my_filter.png)
 
 # Run wishful-agent with master config:
 
@@ -27,3 +28,5 @@
     wishful-agent --config ./config_slave.yaml
 
 # For debugging mode run with -v option
+
+
