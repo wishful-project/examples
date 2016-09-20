@@ -14,12 +14,15 @@ from mininet.cli import CLI
 from mininet.log import setLogLevel
 
 from wishful_mininet import WishfulNode, WishfulAgent, WishfulController
+import time
 
 __author__ = "Zubow"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
+# enable mininet cli
+MN_CLI = False
 # enable GUI
 GUI = False
 # enable mobility
@@ -28,16 +31,9 @@ MOBILITY = False
 '''
 Simple topology with two APs with two STAs.
 
-Setup:
-(1) sudo pip2 install -U ./mininet/
-sudo python2 ./mininet_script.py
+see readme.md
 
-Type in mininet-wifi CLI:
-sta1 ping sta2
-
-Open terminal to see the output of the controller:
-tail -f /tmp/controller_ap1.log
-
+python2 ./mininet_script.py
 '''
 def topology():
 
@@ -93,8 +89,23 @@ def topology():
         net.mobility('sta2', 'stop', time=60, position='30,10,0')
         net.stopMobility(stopTime=60)
 
-    print("*** Running CLI")
-    CLI( net )
+    print("*** Starting network")
+
+    print("*** wait for discovery")
+    time.sleep(2)
+
+    print("*** perform ping")
+    sta1.cmd('ping -c20 %s' % sta2.IP())
+
+    print("*** Check that Wishful agents/controllers are still running ...")
+    if not wf_ctrl.check_is_running() or not agent1.check_is_running() or not agent2.check_is_running():
+        raise Exception("Error; wishful controller or agents not running; check logfiles ... ")
+    else:
+        print("*** Wishful agents/controllers: OK")
+
+    if MN_CLI:
+        print("*** Running CLI")
+        CLI( net )
 
     print("*** Stopping network")
     wf_ctrl.stop()    
