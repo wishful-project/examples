@@ -34,9 +34,9 @@ class taiscLinkOptions(IntEnum):
 class taiscLinkType(IntEnum):
     """Possible MacLinkTypes
     """
-    NORMAL = 0,
-    ADVERTISING = 1,
-    COEXISTENCE = 2,
+    NORMAL = 0
+    ADVERTISING = 1
+    COEXISTENCE = 2
 
 
 class taiscLink(object):
