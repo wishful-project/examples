@@ -54,7 +54,7 @@ def read_tsch_slotframe(slotframe_csv):
             # reason: we update the slotframe for all nodes regardless if they are local
             src_address = int(row['macSrcNodeAddress'])
             dst_address = int(row['macDstNodeAddress'])
-            tsch_slot = taiscSlot(src_address, dst_address, int(row['macLinkType']), int(row['macChannelOffset']))
+            tsch_slot = taiscLink(src_address, dst_address, int(row['macLinkType']), int(row['macChannelOffset']))
             tsch_slotframe.add_slot(tsch_slot)
         return tsch_slotframe
     except Exception as e:
@@ -80,10 +80,10 @@ def read_tsch_slot_list_local(slot_list_csv, mac_adress_list):
             src_address = int(row['macSrcNodeAddress'])
             if src_address in mac_adress_list:
                 if int(row['macLinkType']) == taiscLinkType.NORMAL:
-                    mac_address_slotlist_dict[src_address].append(taiscSlotListItem(
+                    mac_address_slotlist_dict[src_address].append(taiscSlot(
                         int(row['macTimeslot']), taiscLinkType.TX, int(row['macChannelOffset'])))
                 elif int(row['macLinkType']) == taiscLinkType.ADVERTISING:
-                    mac_address_slotlist_dict[src_address].append(taiscSlotListItem(
+                    mac_address_slotlist_dict[src_address].append(taiscSlot(
                         int(row['macTimeslot']), taiscLinkType.BEACON, int(row['macChannelOffset'])))
 
             # check if the destination address is known to the local control engine or
@@ -92,23 +92,23 @@ def read_tsch_slot_list_local(slot_list_csv, mac_adress_list):
             if dst_address in mac_adress_list or dst_address == 0xFFFF:
                 if int(row['macLinkType']) == taiscLinkType.NORMAL:
                     if dst_address != 0xFFFF:
-                        mac_address_slotlist_dict[dst_address].append(taiscSlotListItem(
+                        mac_address_slotlist_dict[dst_address].append(taiscSlot(
                             int(row['macTimeslot']), taiscLinkType.RX, int(row['macChannelOffset'])))
                     else:
                         for mac_address in mac_address_slotlist_dict.keys():
                             if mac_address != src_address:
-                                mac_address_slotlist_dict[mac_address].append(taiscSlotListItem(
+                                mac_address_slotlist_dict[mac_address].append(taiscSlot(
                                     int(row['macTimeslot']), taiscLinkType.RX, int(row['macChannelOffset'])))
                 elif int(row['macLinkType']) == taiscLinkType.ADVERTISING:
                     for mac_address in mac_address_slotlist_dict.keys():
                         if mac_address != src_address:
-                            mac_address_slotlist_dict[mac_address].append(taiscSlotListItem(
+                            mac_address_slotlist_dict[mac_address].append(taiscSlot(
                                 int(row['macTimeslot']), taiscLinkType.SYNC, int(row['macChannelOffset'])))
 
             # special case for wifi beacons
             if int(row['macLinkType']) == taiscLinkType.COEXISTENCE:
                 for mac_address in mac_address_slotlist_dict.keys():
-                    mac_address_slotlist_dict[mac_address].append(taiscSlotListItem(
+                    mac_address_slotlist_dict[mac_address].append(taiscSlot(
                         int(row['macTimeslot']), taiscLinkType.IEEE80211_BEACON, int(row['macChannelOffset'])))
 
         return mac_address_slotlist_dict
@@ -136,26 +136,26 @@ def read_tsch_slot_list_global(slot_list_csv, mac_adress_list):
             dst_address = int(row['macDstNodeAddress'])
             if (src_address in mac_adress_list and (dst_address in mac_adress_list or dst_address == 0xFFFF)):
                 if int(row['macLinkType']) == taiscLinkType.NORMAL:
-                    mac_address_slotlist_dict[src_address].append(taiscSlotListItem(
+                    mac_address_slotlist_dict[src_address].append(taiscSlot(
                         int(row['macTimeslot']), taiscLinkType.TX, int(row['macChannelOffset'])))
                     if dst_address != 0xFFFF:
-                        mac_address_slotlist_dict[dst_address].append(taiscSlotListItem(
+                        mac_address_slotlist_dict[dst_address].append(taiscSlot(
                             int(row['macTimeslot']), taiscLinkType.RX, int(row['macChannelOffset'])))
                     else:
                         for mac_address in mac_address_slotlist_dict.keys():
                             if mac_address != src_address:
-                                mac_address_slotlist_dict[mac_address].append(taiscSlotListItem(
+                                mac_address_slotlist_dict[mac_address].append(taiscSlot(
                                     int(row['macTimeslot']), taiscLinkType.RX, int(row['macChannelOffset'])))
                 elif int(row['macLinkType']) == taiscLinkType.ADVERTISING:
-                    mac_address_slotlist_dict[src_address].append(taiscSlotListItem(
+                    mac_address_slotlist_dict[src_address].append(taiscSlot(
                         int(row['macTimeslot']), taiscLinkType.BEACON, int(row['macChannelOffset'])))
                     for mac_address in mac_address_slotlist_dict.keys():
                         if mac_address != src_address:
-                            mac_address_slotlist_dict[mac_address].append(taiscSlotListItem(
+                            mac_address_slotlist_dict[mac_address].append(taiscSlot(
                                 int(row['macTimeslot']), taiscLinkType.SYNC, int(row['macChannelOffset'])))
                 elif int(row['macLinkType']) == taiscLinkType.COEXISTENCE:
                     for mac_address in mac_address_slotlist_dict.keys():
-                        mac_address_slotlist_dict[mac_address].append(taiscSlotListItem(
+                        mac_address_slotlist_dict[mac_address].append(taiscSlot(
                             int(row['macTimeslot']), taiscLinkType.IEEE80211_BEACON, int(row['macChannelOffset'])))
             else:
                 print("Source {} or destination {} address unknown, skipping!!".format(src_address, dst_address))

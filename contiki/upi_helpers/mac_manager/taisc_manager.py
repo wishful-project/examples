@@ -39,7 +39,7 @@ class taiscLinkType(IntEnum):
     COEXISTENCE = 2,
 
 
-class taiscSlot(object):
+class taiscLink(object):
 
     SLOT_SIZE = 6
 
@@ -54,7 +54,7 @@ class taiscSlot(object):
 
     @staticmethod
     def from_tuple(tpl):
-        return taiscSlot(tpl[0], tpl[1], tpl[2], tpl[3])
+        return taiscLink(tpl[0], tpl[1], tpl[2], tpl[3])
 
     def __str__(self):
         return "{" + format(self.src_address, '#04x') + "->" + format(self.dst_address, '#04x') + ":" + str(self.slot_type) + "," + str(self.channel_offset) + "}"
@@ -83,7 +83,7 @@ class taiscSlotFrame(object):
             mac_address_list.append(dst_address)
 
     def to_tuple(self, slotframe_offset, max_size):
-        num_slots = (max_size - 2) // taiscSlot.SLOT_SIZE
+        num_slots = (max_size - 2) // taiscLink.SLOT_SIZE
         if slotframe_offset + num_slots > self.slotframe_length:
             num_slots = self.slotframe_length - slotframe_offset
         ret_tuple = (slotframe_offset, num_slots)
@@ -98,8 +98,7 @@ class taiscSlotFrame(object):
         taisc_slot_frame = taiscSlotFrame()
         tpl_offset = 2
         for i in range(slotframe_offset, slotframe_offset + num_slots):
-            taisc_slot_frame.add_slot(taiscSlot(tpl[tpl_offset], tpl[tpl_offset + 1],
-                                                tpl[tpl_offset + 2], tpl[tpl_offset + 3]))
+            taisc_slot_frame.add_slot(taiscLink.from_tuple(tpl[tpl_offset:tpl_offset + 4]))
             tpl_offset += 4
         return taisc_slot_frame
 
@@ -108,7 +107,7 @@ class taiscSlotFrame(object):
         num_slots = tpl(1)
         tpl_offset = 2
         for i in range(slotframe_offset, slotframe_offset + num_slots):
-            self.add_slot(taiscSlot(tpl[tpl_offset], tpl[tpl_offset + 1], tpl[tpl_offset + 2], tpl[tpl_offset + 3]))
+            self.add_slot(taiscLink.from_tuple(tpl[tpl_offset:tpl_offset + 4]))
             tpl_offset += 4
         return self
 
@@ -120,7 +119,7 @@ class taiscSlotFrame(object):
         return ret_str
 
 
-class taiscSlotListItem(object):
+class taiscSlot(object):
 
     SLOT_ITEM_SIZE = 3
 
@@ -134,7 +133,7 @@ class taiscSlotListItem(object):
 
     @staticmethod
     def from_tuple(tpl):
-        return taiscSlotListItem(tpl[0], tpl[1], tpl[2])
+        return taiscSlot(tpl[0], tpl[1], tpl[2])
 
     def __str__(self):
         return "{" + self.slot_index + "," + self.slot_option + "," + self.channel_offset + "}"
@@ -159,7 +158,7 @@ class taiscSlotList(object):
         self.slot_list = []
 
     def to_tuple(self, slotlist_offset, max_size):
-        num_slots = (max_size - 1) // taiscSlotListItem.SLOT_ITEM_SIZE
+        num_slots = (max_size - 1) // taiscSlot.SLOT_ITEM_SIZE
         if slotlist_offset + t_num_slots > self.slot_list_length:
             num_slots = self.slot_list_length - slotlist_offset
         ret_tuple = (num_slots,)
@@ -173,7 +172,7 @@ class taiscSlotList(object):
         num_slots = tpl(0)
         tpl_offset = 1
         for i in range(0, num_slots):
-            slot_list.add_slot(taiscSlotListItem.from_tuple(tpl[tpl_offset:tpl_offset + 3]))
+            slot_list.add_slot(taiscSlot.from_tuple(tpl[tpl_offset:tpl_offset + 3]))
             tpl_offset += 3
         return slot_list
 
@@ -181,7 +180,7 @@ class taiscSlotList(object):
         num_slots = tpl(0)
         tpl_offset = 1
         for i in range(0, num_slots):
-            self.slot_list.add_slot(taiscSlotListItem.from_tuple(tpl[tpl_offset:tpl_offset + 3]))
+            self.slot_list.add_slot(taiscSlot.from_tuple(tpl[tpl_offset:tpl_offset + 3]))
             tpl_offset += 3
         return self.slot_list
 
