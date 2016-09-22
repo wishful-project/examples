@@ -1,6 +1,5 @@
 import csv
 from upi_helpers.mac_manager.taisc_manager import *
-import logging
 
 
 class TSCHHoppingSequence(object):
@@ -276,7 +275,7 @@ class GlobalTSCHManager(GlobalTAISCMACManager):
             tsch_slotlist = tsch_mac_address_slot_list_dict[mac_address]
             while(current_offset < tsch_slotlist.slot_list_length):
                 slotlist_tpl = tsch_slotlist.to_tuple(current_offset, MAX_MSG_SIZE)
-                param_key_values_dict = {'taiscSlotList', slotlist_tpl,}
+                param_key_values_dict = {'taiscSlotList', slotlist_tpl}
                 ret_val += self.update_macconfiguration(param_key_values_dict, mac_address)
                 current_offset += slotlist_tpl[0]
         return ret_val

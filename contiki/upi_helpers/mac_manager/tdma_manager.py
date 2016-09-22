@@ -1,325 +1,207 @@
 """Summary
 """
 import csv
-from enum import IntEnum
 from upi_helpers.mac_manager.taisc_manager import *
-import logging
 
 
-class TDMALink(object):
-    """This class represents a TDMA link with another node.
+def read_tdma_slotframe(slotframe_csv):
+    """Create TSCH slotframe from CSV file.
     """
-
-    def __init__(self, macNodeAddress, macLinkOptions, macLinkType, macTimeslot, phyChannel):
-        """Create a TDMA link
-
-        Args
-            macNodeAddress (int): Address of the neighboring node that shares this TDMA link.
-            macLinkOptions (int): Transmit = 4 / Receive =  5 / Beacon = 2 / Sync = 3/ NoOp = 1 / WiFi Sync = 8
-            macLinkType (int): Advertising or normal link.
-            macTimeslot (int): Slotnumber in slotframe
-            phyChannel (int): 802.15.4 channel used in slot
-        """
-        self.macNodeAddress = macNodeAddress
-        self.macLinkOptions = macLinkOptions
-        self.macLinkType = macLinkType
-        self.macTimeslot = macTimeslot
-        self.phyChannel = phyChannel
-
-    def toTuple(self):
-        """Converts TDMA link object to tuple
-
-        Returns:
-            tuple: A tuple representing the TDMA link
-        """
-        return self.macNodeAddress, self.macLinkOptions, self.macLinkType, self.macTimeslot, self.phyChannel
-
-    @staticmethod
-    def fromTuple(tpl):
-        """Create a TDMA link from tuple.
-
-        Args:
-            tpl (tuple): input tuple
-
-        Returns:
-            TDMALink: The TDMA link
-        """
-        return TDMALink(tpl[0], tpl[1], tpl[2], tpl[3], tpl[4])
-
-    def __str__(self):
-        return "{" + format(self.macNodeAddress, '#04x') + "," + str(self.macLinkOptions) + "," + str(self.macLinkType) + "," + str(self.macTimeslot) + "," + str(self.phyChannel) + "}"
+    try:
+        file_sf = open(slotframe_csv, 'rt')
+        reader = csv.DictReader(file_sf)
+        tdma_slotframe = taiscSlotFrame()
+        for row in reader:
+            # don't need to check if src and dst are in mac address list
+            # reason: we update the slotframe for all nodes regardless if they are local
+            src_address = int(row['macSrcNodeAddress'])
+            dst_address = int(row['macDstNodeAddress'])
+            tdma_slot = taiscLink(src_address, dst_address, int(row['macLinkType']), 0)
+            tdma_slotframe.add_slot(tdma_slot)
+        return tdma_slotframe
+    except Exception as e:
+        print("An error occurred while reading parameters: %s" % e)
+        return -1
+    finally:
+        file_sf.close()
 
 
-class TDMASlot(object):
-    """This class represents a TDMA slot.
+def read_tdma_slot_list_local(slot_list_csv, mac_adress_list):
+    """Create TSCH slotlist from CSV file.
     """
+    try:
+        file_sf = open(slot_list_csv, 'rt')
+        reader = csv.DictReader(file_sf)
 
-    def __init__(self, macSrcNodeAddress, macDstNodeAddress, macLinkType, macTimeslot, phyChannel):
-        """Create a TDMA slot.
+        mac_address_slotlist_dict = {}
+        for mac_address in mac_adress_list:
+            mac_address_slotlist_dict[mac_address] = taiscSlotList()
 
-        Args:
-            macSrcNodeAddress (int): Source address
-            macDstNodeAddress (int): Destination address
-            macLinkType (int): Link type (Transmit = 4 / Receive =  5 / Beacon = 2 / Sync = 3/ NoOp = 1 / WiFi Sync = 8)
-            macTimeslot (int): Slotnumber in slotframe
-            phyChannel (int): 802.15.4 channel used in slot
-        """
-        self.macSrcNodeAddress = macSrcNodeAddress
-        self.macDstNodeAddress = macDstNodeAddress
-        self.macLinkType = macLinkType
-        self.macTimeslot = macTimeslot
-        self.phyChannel = phyChannel
+        for row in reader:
+            # check if the source address is known to the local control engine
+            src_address = int(row['macSrcNodeAddress'])
+            if src_address in mac_adress_list:
+                if int(row['macLinkType']) == taiscLinkType.NORMAL:
+                    mac_address_slotlist_dict[src_address].append(taiscSlot(
+                        int(row['macTimeslot']), taiscLinkType.TX, 0))
+                elif int(row['macLinkType']) == taiscLinkType.ADVERTISING:
+                    mac_address_slotlist_dict[src_address].append(taiscSlot(
+                        int(row['macTimeslot']), taiscLinkType.BEACON, 0))
 
-    def __str__(self):
-        return "{" + format(self.macSrcNodeAddress, '#04x') + ":" + format(self.macDstNodeAddress, '#04x') + "," + str(self.macLinkType) + "," + str(self.macTimeslot) + "," + str(self.phyChannel) + "}"
+            # check if the destination address is known to the local control engine or
+            # equals the broadcast mac address (i.e. 0xFFFF)
+            dst_address = int(row['macDstNodeAddress'])
+            if dst_address in mac_adress_list or dst_address == 0xFFFF:
+                if int(row['macLinkType']) == taiscLinkType.NORMAL:
+                    if dst_address != 0xFFFF:
+                        mac_address_slotlist_dict[dst_address].append(taiscSlot(
+                            int(row['macTimeslot']), taiscLinkType.RX, 0))
+                    else:
+                        for mac_address in mac_address_slotlist_dict.keys():
+                            if mac_address != src_address:
+                                mac_address_slotlist_dict[mac_address].append(taiscSlot(
+                                    int(row['macTimeslot']), taiscLinkType.RX, 0))
+                elif int(row['macLinkType']) == taiscLinkType.ADVERTISING:
+                    for mac_address in mac_address_slotlist_dict.keys():
+                        if mac_address != src_address:
+                            mac_address_slotlist_dict[mac_address].append(taiscSlot(
+                                int(row['macTimeslot']), taiscLinkType.SYNC, 0))
+
+            # special case for wifi beacons
+            if int(row['macLinkType']) == taiscLinkType.COEXISTENCE:
+                for mac_address in mac_address_slotlist_dict.keys():
+                    mac_address_slotlist_dict[mac_address].append(taiscSlot(
+                        int(row['macTimeslot']), taiscLinkType.IEEE80211_BEACON, 0))
+
+        return mac_address_slotlist_dict
+    except Exception as e:
+        print("An error occurred while reading parameters: %s" % e)
+        return -1
+    finally:
+        file_sf.close()
 
 
-class TDMASlotFrame(object):
-    """This class represents a TDMA slotfrane.
+def read_tdma_slot_list_global(slot_list_csv, mac_adress_list):
+    """Create TSCH slotlist from CSV file.
     """
+    try:
+        file_sf = open(slot_list_csv, 'rt')
+        reader = csv.DictReader(file_sf)
 
-    def __init__(self, slotframe_length):
-        """Create a TDMA slotframe object.
+        mac_address_slotlist_dict = {}
+        for mac_address in mac_adress_list:
+            mac_address_slotlist_dict[mac_address] = taiscSlotList()
 
-        Args:
-            slotframe_length (int): number of slot in slotframe.
-        """
-        self.log = logging.getLogger()
-        self.slotframe_length = slotframe_length
-        self.slots = [TDMASlot(0, 0, 0, 0, 0) for x in range(slotframe_length)]
-        pass
-
-    def read_tdma_slotframe(self, slotframe_csv):
-        """Create TDMA slotframe from CSV file.
-
-        Args:
-            slotframe_csv (int): CSV file containing slotframe structures with following columns: macSrcNodeAddress,macDstNodeAddress,macLinkType,macTimeslot,phyChannel
-        """
-        try:
-            file_sf = open(slotframe_csv, 'rt')
-            reader = csv.DictReader(file_sf)
-            index = 0
-            for row in reader:
-                if index < self.slotframe_length:
-                    self.slots[int(row['macTimeslot'])] = TDMASlot(int(row['macSrcNodeAddress']), int(
-                        row['macDstNodeAddress']), int(row['macLinkType']), int(row['macTimeslot']), int(row['phyChannel']))
-                else:
-                    self.log.info("Skipping slot %s", row)
-                index += 1
-        except Exception as e:
-            self.log.fatal(
-                "An error occurred while reading parameters: %s" % e)
-        finally:
-            file_sf.close()
-
-    def __str__(self):
-        str_val = "Sl#\t"
-        for i in range(0, self.slotframe_length):
-            str_val = str_val + str(i) + "\t\t\t"
-        str_val = str_val + "\n"
-        for j in range(0, self.slotframe_length):
-            str_val = str_val + "\t" + str(self.slots[j])
-        str_val = str_val + "\n"
-        return str_val
-
-
-class macLinkOptions(IntEnum):
-    """Possible MACLinkOptions
-    """
-    NOPI = 1
-    IEEE802154_BEACON = 2
-    SYNC = 3
-    TX = 4
-    RX = 5
-    OFF = 6
-    IEEE80211_BEACON = 8
+        for row in reader:
+            # check if the mac address is known to the global control engine
+            src_address = int(row['macSrcNodeAddress'])
+            dst_address = int(row['macDstNodeAddress'])
+            if (src_address in mac_adress_list and (dst_address in mac_adress_list or dst_address == 0xFFFF)):
+                if int(row['macLinkType']) == taiscLinkType.NORMAL:
+                    mac_address_slotlist_dict[src_address].append(taiscSlot(
+                        int(row['macTimeslot']), taiscLinkType.TX, 0))
+                    if dst_address != 0xFFFF:
+                        mac_address_slotlist_dict[dst_address].append(taiscSlot(
+                            int(row['macTimeslot']), taiscLinkType.RX, 0))
+                    else:
+                        for mac_address in mac_address_slotlist_dict.keys():
+                            if mac_address != src_address:
+                                mac_address_slotlist_dict[mac_address].append(taiscSlot(
+                                    int(row['macTimeslot']), taiscLinkType.RX, 0))
+                elif int(row['macLinkType']) == taiscLinkType.ADVERTISING:
+                    mac_address_slotlist_dict[src_address].append(taiscSlot(
+                        int(row['macTimeslot']), taiscLinkType.BEACON, 0))
+                    for mac_address in mac_address_slotlist_dict.keys():
+                        if mac_address != src_address:
+                            mac_address_slotlist_dict[mac_address].append(taiscSlot(
+                                int(row['macTimeslot']), taiscLinkType.SYNC, 0))
+                elif int(row['macLinkType']) == taiscLinkType.COEXISTENCE:
+                    for mac_address in mac_address_slotlist_dict.keys():
+                        mac_address_slotlist_dict[mac_address].append(taiscSlot(
+                            int(row['macTimeslot']), taiscLinkType.IEEE80211_BEACON, 0))
+            else:
+                print("Source {} or destination {} address unknown, skipping!!".format(src_address, dst_address))
+        return mac_address_slotlist_dict
+    except Exception as e:
+        print("An error occurred while reading parameters: %s" % e)
+        return -1
+    finally:
+        file_sf.close()
 
 
-class macLinkType(IntEnum):
-    """Possible MacLinkTypes
-    """
-    NORMAL = 0,
-    ADVERTISING = 1,
-
-
-class LocalTDMAManager(LocalMACManager):
+class LocalTDMAManager(LocalTAISCMACManager):
     """This class implements a local TDMA MAC Manager. It extends the LocalMACManager with TDMA specific functions.
     """
 
-    def __init__(self, local_manager, slotframe_csv, slotframe_length):
+    def __init__(self, control_engine):
         """Creates a local TDMA manager
-
-        Args:
-            local_manager (LocalManager): A reference to the WiSHFUL local manager.
-            slotframe_csv (string): the filename and path to a slotframe CSV file. If empty, the default slotframe will be loaded
-            slotframe_length (int): Number of slots in slotframe
         """
-        super(LocalTDMAManager, self).__init__(local_manager)
-        self.slotframe = TDMASlotFrame(slotframe_length)
-        if slotframe_csv == '':
-            slotframe_csv = 'upi_helpers/mac_manager/default_tdma_slotframe.csv'
-        self.slotframe.read_tdma_slotframe(slotframe_csv)
+        super(LocalTDMAManager, self).__init__(control_engine, "TDMA")
         pass
 
-    def configure_tdmaschedule(self, nodeID_radioplatform_map):
-        """Configure the TDMA schedule on the nodes included in nodeID_radioplatform_map.
-        The TDMA schedule is read from the CSV file givven as argument during object creation.
+    def update_slotframe(self, slotframe_csv):
+        if slotframe_csv == '':
+            slotframe_csv = 'upi_helpers/mac_manager/default_tdma_slotframe.csv'
+        tdma_slotframe = read_tdma_slotframe(slotframe_csv)
+        current_offset = 0
+        ret_val = 0
+        while(current_offset < tdma_slotframe.slotframe_length):
+            slotframe_tpl = tdma_slotframe.to_tuple(current_offset, MAX_MSG_SIZE)
+            param_key_values_dict = {'taiscSlotframe', slotframe_tpl}
+            ret_val += self.update_macconfiguration(param_key_values_dict, self.get_hwaddr_list())
+            current_offset += slotframe_tpl[1]
+        return ret_val
 
-        Args:
-            nodeID_radioplatform_map (dict): Dictionary with keys = node_id (mac short addr) and values the corresponding radioplatforms.
-
-        Returns:
-            dict: for each node_id a list of error codes.
-        """
-        my_ret = {}
-        for nodeID in nodeID_radioplatform_map.keys():
-            my_ret[nodeID] = []
-        for i in range(0, self.slotframe.slotframe_length):
-            slot = self.slotframe.slots[i]
-            if slot.macSrcNodeAddress != 0:
-                if slot.macLinkType == macLinkType.NORMAL:
-                    if slot.macSrcNodeAddress in nodeID_radioplatform_map.keys():
-                        dst_link = TDMALink(slot.macDstNodeAddress, macLinkOptions.TX,
-                                            slot.macLinkType, slot.macTimeslot, slot.phyChannel)
-                        param_key_values = {
-                            "IEEE802154e_macTimeslot": dst_link.toTuple()}
-                        ret = self.update_macconfiguration(
-                            param_key_values, nodeID_radioplatform_map[slot.macSrcNodeAddress])
-                        if ret != -1:
-                            ret = ret["IEEE802154e_macTimeslot"]
-                        else:
-                            self.log.info('Error setting timeslot')
-                        my_ret[slot.macSrcNodeAddress].append(ret)
-                    if slot.macDstNodeAddress in nodeID_radioplatform_map.keys():
-                        src_link = TDMALink(slot.macSrcNodeAddress, macLinkOptions.RX,
-                                            slot.macLinkType, slot.macTimeslot, slot.phyChannel)
-                        param_key_values = {
-                            "IEEE802154e_macTimeslot": src_link.toTuple()}
-                        ret = self.update_macconfiguration(
-                            param_key_values, nodeID_radioplatform_map[slot.macDstNodeAddress])
-                        if ret != -1:
-                            ret = ret["IEEE802154e_macTimeslot"]
-                        else:
-                            self.log.info('Error setting timeslot')
-                        my_ret[slot.macSrcNodeAddress].append(ret)
-                elif slot.macLinkType == macLinkType.ADVERTISING:
-                    for nodeID in nodeID_radioplatform_map.keys():
-                        param_key_values = {}
-                        if nodeID == slot.macSrcNodeAddress:
-                            param_key_values["IEEE802154e_macTimeslot"] = TDMALink(
-                                slot.macDstNodeAddress, macLinkOptions.IEEE802154_BEACON, slot.macLinkType, slot.macTimeslot, slot.phyChannel).toTuple()
-                        else:
-                            param_key_values["IEEE802154e_macTimeslot"] = TDMALink(
-                                slot.macSrcNodeAddress, macLinkOptions.SYNC, slot.macLinkType, slot.macTimeslot, slot.phyChannel).toTuple()
-                        ret = self.update_macconfiguration(
-                            param_key_values, nodeID_radioplatform_map[nodeID])
-                        if ret != -1:
-                            ret = ret["IEEE802154e_macTimeslot"]
-                        else:
-                            self.log.info('Error setting timeslot')
-                        my_ret[slot.macSrcNodeAddress].append(ret)
-                else:
-                    self.log.info('Unknown slot type: %s',
-                                  str(self.slotframe.slots[i]))
-        return my_ret
+    def add_slots(self, slotframe_csv):
+        if slotframe_csv == '':
+            slotframe_csv = 'upi_helpers/mac_manager/default_tdma_slotframe.csv'
+        current_offset = 0
+        ret_val = 0
+        tdma_mac_address_slot_list_dict = read_tdma_slot_list_local(slotframe_csv, self.get_hwaddr_list())
+        for mac_address in tdma_mac_address_slot_list_dict.keys():
+            tdma_slotlist = tdma_mac_address_slot_list_dict[mac_address]
+            while(current_offset < tdma_slotlist.slot_list_length):
+                slotlist_tpl = tdma_slotlist.to_tuple(current_offset, MAX_MSG_SIZE)
+                param_key_values_dict = {'taiscSlotList', slotlist_tpl}
+                ret_val += self.update_macconfiguration(param_key_values_dict, mac_address)
+                current_offset += slotlist_tpl[0]
+        return ret_val
 
 
-class GlobalTDMAManager(GlobalMACManager):
+class GlobalTDMAManager(GlobalTAISCMACManager):
     """This class implements a global TDMA MAC Manager. It extends the GlobalMACManager with TDMA specific functions.
     """
 
-    def __init__(self, global_manager, slotframe_csv, slotframe_length):
-        """Creates a global TDMA manager.
+    def __init__(self, control_engine):
+        """Creates a global TDMA manager
 
         Args:
-            global_manager (GlobalManager): A reference to the WiSHFUL global manager.
-            slotframe_csv (string): the filename and path to a slotframe CSV file. If empty, the default slotframe will be loaded
-            slotframe_length (int): Number of slots in slotframe
+            control_engine (Global Control Engine): A reference to the WiSHFUL global control engine.
         """
-        super(GlobalTDMAManager, self).__init__(global_manager)
-        self.slotframe = TDMASlotFrame(slotframe_length)
+        super(GlobalTDMAManager, self).__init__(control_engine, "TDMA")
+
+    def update_slotframe(self, slotframe_csv):
         if slotframe_csv == '':
             slotframe_csv = 'upi_helpers/mac_manager/default_tdma_slotframe.csv'
-        self.slotframe.read_tdma_slotframe(slotframe_csv)
-        pass
+        tdma_slotframe = read_tdma_slotframe(slotframe_csv)
+        current_offset = 0
+        ret_val = 0
+        while(current_offset < tdma_slotframe.slotframe_length):
+            slotframe_tpl = tdma_slotframe.to_tuple(current_offset, MAX_MSG_SIZE)
+            param_key_values_dict = {'taiscSlotframe', slotframe_tpl}
+            ret_val += self.update_macconfiguration(param_key_values_dict)
+            current_offset += slotframe_tpl[1]
+        return ret_val
 
-    def configure_tdmaschedule(self, nodes, nodeID_ipaddress_map, nodeID_radioplatform_map):
-        """Configure the TDMA schedule on the nodes included in nodeID_radioplatform_map.
-        The TDMA schedule is read from the CSV file givven as argument during object creation.
-
-        Args:
-            nodes (list): List of nodes.
-            nodeID_ipaddress_map (dict of int: str): Dictionary with keys = node_id (mac short addr) and values the IPAdress of the WiSHFUL agent controlling the node.
-            nodeID_radioplatform_map (dict): Dictionary with keys = node_id (mac short addr) and values the corresponding radioplatforms.
-
-        Returns:
-            dict: for each node_id a list of error codes.
-        """
-        my_ret = {}
-        for nodeID in nodeID_radioplatform_map.keys():
-            my_ret[nodeID] = []
-        for i in range(0, self.slotframe.slotframe_length):
-            slot = self.slotframe.slots[i]
-            if slot.macSrcNodeAddress != 0:
-                if slot.macLinkType == macLinkType.NORMAL:
-                    if slot.macSrcNodeAddress in nodeID_radioplatform_map.keys():
-                        dst_link = TDMALink(slot.macDstNodeAddress, macLinkOptions.TX,
-                                            slot.macLinkType, slot.macTimeslot, slot.phyChannel)
-                        param_key_values = {
-                            "IEEE802154e_macTimeslot": dst_link.toTuple()}
-                        ret = self.configure_mac(param_key_values, [nodeID_ipaddress_map[
-                                                 slot.macSrcNodeAddress]], nodeID_radioplatform_map[slot.macSrcNodeAddress])
-                        if ret != -1:
-                            error = ret[str(nodeID_ipaddress_map[slot.macSrcNodeAddress])][
-                                nodeID_radioplatform_map[slot.macSrcNodeAddress]]["IEEE802154e_macTimeslot"]
-                            # error : corrected ret
-                            self.log.info("Node %s, %s:%s  adding IEEE802154e_macTimeslot %s: error %s", nodeID, str(nodeID_ipaddress_map[
-                                          slot.macSrcNodeAddress]), nodeID_radioplatform_map[slot.macSrcNodeAddress], param_key_values["IEEE802154e_macTimeslot"], error)
-                            my_ret[slot.macSrcNodeAddress].append(error)
-                        else:
-                            my_ret[slot.macSrcNodeAddress].append(ret)
-                            self.log.info('Error setting timeslot for node %s,%s,%s', str(nodeID_ipaddress_map[
-                                          slot.macSrcNodeAddress]), nodeID_radioplatform_map[slot.macSrcNodeAddress], nodeID)
-                    if slot.macDstNodeAddress in nodeID_radioplatform_map.keys():
-                        src_link = TDMALink(slot.macSrcNodeAddress, macLinkOptions.RX,
-                                            slot.macLinkType, slot.macTimeslot, slot.phyChannel)
-                        param_key_values = {
-                            "IEEE802154e_macTimeslot": src_link.toTuple()}
-                        ret = self.configure_mac(param_key_values, [nodeID_ipaddress_map[
-                                                 slot.macDstNodeAddress]], nodeID_radioplatform_map[slot.macDstNodeAddress])
-                        if ret != -1:
-                            error = ret[str(nodeID_ipaddress_map[slot.macDstNodeAddress])][
-                                nodeID_radioplatform_map[slot.macDstNodeAddress]]["IEEE802154e_macTimeslot"]
-                            # error : corrected ret
-                            self.log.info("Node %s, %s:%s  adding IEEE802154e_macTimeslot %s: error %s", nodeID, str(nodeID_ipaddress_map[
-                                          nodeID]), nodeID_radioplatform_map[nodeID], param_key_values["IEEE802154e_macTimeslot"], error)
-                            my_ret[slot.macDstNodeAddress].append(error)
-                        else:
-                            my_ret[slot.macDstNodeAddress].append(ret)
-                            self.log.info('Error setting timeslot for node %s,%s,%s', str(nodeID_ipaddress_map[
-                                          slot.macDstNodeAddress]), nodeID_radioplatform_map[slot.macSrcNodeAddress], nodeID)
-                elif slot.macLinkType == macLinkType.ADVERTISING:
-                    for nodeID in nodeID_radioplatform_map.keys():
-                        param_key_values = {}
-                        if nodeID == slot.macSrcNodeAddress:
-                            param_key_values["IEEE802154e_macTimeslot"] = TDMALink(
-                                slot.macDstNodeAddress, macLinkOptions.IEEE802154_BEACON, slot.macLinkType, slot.macTimeslot, slot.phyChannel).toTuple()
-                        else:
-                            param_key_values["IEEE802154e_macTimeslot"] = TDMALink(
-                                slot.macSrcNodeAddress, macLinkOptions.SYNC, slot.macLinkType, slot.macTimeslot, slot.phyChannel).toTuple()
-                        ret = self.configure_mac(param_key_values, [nodeID_ipaddress_map[
-                                                 nodeID]], nodeID_radioplatform_map[nodeID])
-                        if ret != -1:
-                            error = ret[str(nodeID_ipaddress_map[nodeID])][
-                                nodeID_radioplatform_map[nodeID]]["IEEE802154e_macTimeslot"]
-                            self.log.info("Node %s, %s:%s  adding IEEE802154e_macTimeslot %s: error %s", nodeID, str(nodeID_ipaddress_map[
-                                          nodeID]), nodeID_radioplatform_map[nodeID], param_key_values["IEEE802154e_macTimeslot"], error)
-                            my_ret[nodeID].append(error)
-                        else:
-                            self.log.info('Error setting timeslot for node %s,%s,%s', str(
-                                nodeID_ipaddress_map[nodeID]), nodeID_radioplatform_map[nodeID], nodeID)
-                            my_ret[nodeID].append(ret)
-                else:
-                    self.log.info('Unknown slot type: %s',
-                                  str(self.slotframe.slots[i]))
-        return my_ret
+    def add_slots(self, slotframe_csv):
+        current_offset = 0
+        ret_val = 0
+        tdma_mac_address_slot_list_dict = read_tsch_slot_list_global(slotframe_csv, self.get_hwaddr_list())
+        for mac_address in tdma_mac_address_slot_list_dict.keys():
+            tdma_slotlist = tdma_mac_address_slot_list_dict[mac_address]
+            while(current_offset < tdma_slotlist.slot_list_length):
+                slotlist_tpl = tdma_slotlist.to_tuple(current_offset, MAX_MSG_SIZE)
+                param_key_values_dict = {'taiscSlotList', slotlist_tpl}
+                ret_val += self.update_macconfiguration(param_key_values_dict, mac_address)
+                current_offset += slotlist_tpl[0]
+        return ret_val
