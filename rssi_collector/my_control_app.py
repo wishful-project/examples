@@ -2,6 +2,7 @@ import logging
 import wishful_upis as upis
 from wishful_agent.core import wishful_module
 from wishful_agent.timer import TimerEventSender
+from wishful_agent.node import Node, Device
 from common import AveragedRssiSampleEvent
 
 
@@ -41,10 +42,9 @@ class MyController(wishful_module.ControllerModule):
     @wishful_module.on_event(upis.mgmt.NewNodeEvent)
     def add_node(self, event):
         node = event.node
-
         self.log.info("Added new node: {}, Local: {}"
                       .format(node.uuid, node.local))
-        self.nodes.append(node)
+        self._add_node(node)
 
         for device in node.get_devices():
             print("Dev: ", device.name)
@@ -58,17 +58,29 @@ class MyController(wishful_module.ControllerModule):
         self.log.info("Node lost".format())
         node = event.node
         reason = event.reason
-        if node in self.nodes:
-            self.nodes.remove(node)
+        if self._remove_node(node):
             self.log.info("Node: {}, Local: {} removed reason: {}"
                           .format(node.uuid, node.local, reason))
 
     @wishful_module.on_event(AveragedRssiSampleEvent)
     def serve_spectral_scan_sample(self, event):
+        receiver = event.receiverUuid
+        if self._get_node_by_uuid(event.receiverUuid):
+            receiver = self._get_node_by_uuid(event.receiverUuid)
+
+        dev = event.receiverDevId
+        if receiver:
+            dev = receiver.get_device(event.receiverDevId)
+
         ta = event.ta
         avgSample = event.rssi
-        self.log.info("Averaged RSSI Sample: source: {}, value: {}"
-                      .format(avgSample, ta))
+
+        if isinstance(receiver, Node) and isinstance(dev, Device):
+            self.log.info("Avg RSSI: receiver: {}:{}, TA: {}, value: {}"
+                          .format(receiver.hostname, dev.name, ta, avgSample))
+        else:
+            self.log.info("Avg RSSI: receiver: {}:{}, TA: {}, value: {}"
+                          .format(receiver, dev, ta, avgSample))
 
     @wishful_module.on_event(PeriodicEvaluationTimeEvent)
     def periodic_evaluation(self, event):

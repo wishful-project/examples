@@ -7,19 +7,25 @@ __email__ = "{gawlowicz}@tkn.tu-berlin.de"
 
 
 class AveragedRssiSampleEvent(upis.upi.EventBase):
-    def __init__(self, ta, rssi):
+    def __init__(self, receiverUuid, receiverDevId, ta, rssi):
         super().__init__()
+        self.receiverUuid = receiverUuid
+        self.receiverDevId = receiverDevId
         self.ta = ta
         self.rssi = rssi
 
     def serialize(self):
-        return {"ta": self.ta, "rssi": self.rssi}
+        return {"receiverUuid": self.receiverUuid,
+                "receiverDevId": self.receiverDevId,
+                "ta": self.ta, "rssi": self.rssi}
 
     @classmethod
     def parse(cls, buf):
+        receiverUuid = buf.get("receiverUuid", None)
+        receiverDevId = buf.get("receiverDevId", None)
         rssi = buf.get("rssi", None)
         ta = buf.get("ta", None)
-        return cls(ta, rssi)
+        return cls(receiverUuid, receiverDevId, ta, rssi)
 
 
 class StartMyFilterEvent(upis.upi.EventBase):
