@@ -10,7 +10,7 @@ controllers:
   myFilter:
       file : my_filter.py
       class_name : MyAvgFilter
-      kwargs : {"window": 20}
+      kwargs : {"window": 50}
 
 modules:
   discovery:

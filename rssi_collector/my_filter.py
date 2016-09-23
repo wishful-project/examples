@@ -33,8 +33,9 @@ class MyAvgFilter(wishful_module.ControllerModule):
         else:
             self.rssi[receiverUuid][ta] = [sample]
 
-    def pop_sample(self, receiverUuid, ta):
-        self.rssi[receiverUuid][ta].pop(0)
+    def pop_samples(self, receiverUuid, ta, sampleNum=1):
+        for i in range(sampleNum):
+            self.rssi[receiverUuid][ta].pop(0)
 
     @wishful_module.on_event(upis.radio.RssiSampleEvent)
     def serve_rssi_sample(self, event):
@@ -52,7 +53,7 @@ class MyAvgFilter(wishful_module.ControllerModule):
 
         if len(samples) == self.window:
             s = sum(samples)
-            self.pop_sample(node.uuid, ta)
+            self.pop_samples(node.uuid, ta, 25)
             avg = s / self.window
             event = AveragedRssiSampleEvent(node.uuid, device._id, ta, avg)
             self.send_event(event)
