@@ -25,8 +25,8 @@ class MyAvgFilter(wishful_module.ControllerModule):
         node = event.node
         device = event.device
         self.log.info(
-            "RSSI Sample: device: {}, transmitter: {}, value: {}"
-            .format(device, ta, rssi))
+            "RSSI Sample: node: {}, device: {}, transmitter: {}, value: {}"
+            .format(node.hostname, device.name, ta, rssi))
 
         if ta not in self.samplesPerTransmitter:
             self.samplesPerTransmitter[ta] = [rssi]
