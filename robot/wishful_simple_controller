@@ -62,7 +62,8 @@ def default_callback(group, node, cmd, data):
 @controller.add_callback(upis.radio.set_channel)
 def set_channel_reponse(group, node, data):
     print("{} set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
-    controller.delay(3).node(node.id).net.create_packetflow_sink(port=1234)
+    # TODO: create_packetflow_sink no longer available
+    #controller.delay(3).node(node.id).net.create_packetflow_sink(port=1234)
 
 
 @controller.add_callback(upis.radio.get_channel)

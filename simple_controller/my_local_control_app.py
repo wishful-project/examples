@@ -43,8 +43,9 @@ class MyController(wishful_module.ControllerModule):
         self.log.info("My local node: {}, Local: {}"
                       .format(node.hostname, node.local))
 
-        retVal = node.net.create_packetflow_sink(port=1234)
-        print("Server started: {}".format(retVal))
+        # TODO: create_packetflow_sink no longer available
+        #retVal = node.net.create_packetflow_sink(port=1234)
+        #print("Server started: {}".format(retVal))
 
         for dev in node.get_devices():
             print("Dev: ", dev.name)
@@ -133,7 +134,8 @@ class MyController(wishful_module.ControllerModule):
         device.callback(self.get_power_cb).radio.get_power('ath0')
 
         # schedule non-blocking function delay
-        node.delay(3).callback(self.default_cb).net.create_packetflow_sink(port=1234)
+        # TODO: create_packetflow_sink no longer available
+        #node.delay(3).callback(self.default_cb).net.create_packetflow_sink(port=1234)
 
         # schedule non-blocking function exec time
         exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)

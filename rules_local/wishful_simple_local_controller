@@ -47,7 +47,8 @@ controller = agent.get_local_controller()
 @controller.add_callback(upis.radio.set_channel)
 def set_channel_reponse(data):
     print(("{} set_channel_reponse : {}".format(datetime.datetime.now(),data)))
-    controller.delay(4).net.create_packetflow_sink(port=1234)
+    # TODO: create_packetflow_sink no longer available
+    #controller.delay(4).net.create_packetflow_sink(port=1234)
 
 @controller.add_callback(upis.radio.get_power)
 def get_power_reponse(data):

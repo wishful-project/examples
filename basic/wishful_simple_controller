@@ -72,7 +72,8 @@ try:
             controller.callback(print_response).node(nodes[0]).radio.iface("wlan0").get_power()
 
             #schedule non-blocking function delay
-            controller.delay(3).node(nodes[0]).net.create_packetflow_sink(port=1234)
+            # TODO: create_packetflow_sink no longer available
+            #controller.delay(3).node(nodes[0]).net.create_packetflow_sink(port=1234)
 
             #schedule non-blocking function exec time
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
