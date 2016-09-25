@@ -1,0 +1,34 @@
+## WiSHFUL Agent config file
+
+agent_config:
+  name: 'Local_Controller'
+  info: 'CPs and modules on single node'
+  type: 'local'
+  iface: 'en0'
+
+controllers:
+  myController:
+      file : my_local_control_app.py
+      class_name : MyController
+      kwargs : {}
+
+  myFilter:
+      file : my_filter.py
+      class_name : MyAvgFilter
+      kwargs : {"window": 5}
+
+
+modules:
+  discovery:
+      module : wishful_module_discovery_pyre
+      class_name : PyreDiscoveryAgentModule
+      kwargs: {"iface":"lo", "groupName":"wishful_1234"}
+
+  simple:
+      module : wishful_module_simple
+      class_name : SimpleModule2
+      devices : ['phy0']
+
+  iperf:
+      module : wishful_module_iperf
+      class_name : IperfModule
