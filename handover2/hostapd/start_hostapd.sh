@@ -48,6 +48,6 @@ echo 3600 | sudo tee /proc/sys/net/ipv4/neigh/default/gc_stale_time
 sleep 1
 echo "Starting hapd..."
 
-sudo ../../runtime/connectors/dot80211_linux/hostapd_ho/bin/Linux/64bit/x86_64/hostapd ./hostapd-config/hostapd-ch${CH}.conf
+sudo hostapd ./hostapd-config/hostapd-ch${CH}.conf
 
 
