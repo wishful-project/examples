@@ -87,7 +87,7 @@ class MyController(wishful_module.ControllerModule):
         # go over collected samples, etc....
         # make some decisions, etc...
         print("Periodic Evaluation")
-        print("My nodes: ", [node.hostname for node in self.nodes])
+        print("My nodes: ", [node.hostname for node in self.get_nodes()])
         self.timer.start(self.timeInterval)
 
         if len(self.nodes) == 0:
