@@ -5,20 +5,20 @@ WiSHFUL IEEE 802.11 handover example
 
 # install libtins on each AP node
 
-sudo apt-get install libboost-all-dev
-git clone https://github.com/mfontanini/libtins.git
-cd libtins/
-mkdir build
-cd build/
-cmake ../
-make
-sudo make install
+    sudo apt-get install libboost-all-dev
+    git clone https://github.com/mfontanini/libtins.git
+    cd libtins/
+    mkdir build
+    cd build/
+    cmake ../
+    make
+    sudo make install
 
 # build external scanner daemon
-cd scanner
-cd build/
-cmake ../
-make
+    cd scanner
+    cd build/
+    cmake ../
+    make
 
 # install DHCP server
 https://github.com/flan/staticdhcpd
@@ -29,15 +29,15 @@ plus add patches ... tbd
 
 ## 1.1 start local Wishful agent on each AP:
 
-sudo ../../dev/bin/wishful-agent --config config_ap.yaml
+    sudo ../../dev/bin/wishful-agent --config config_ap.yaml
 
 ## 1.2 start local Wishful agent on the Gateway node (Linux):
 
-sudo ../../dev/bin/wishful-agent --config config_gw.yaml
+    sudo ../../dev/bin/wishful-agent --config config_gw.yaml
 
 ## 1.3 start global Wishful controller (BigAP):
 
-wishful-agent --config config_master.yaml
+    wishful-agent --config config_master.yaml
 
 # 2. How to reference to?
 
