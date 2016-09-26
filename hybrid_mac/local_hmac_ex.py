@@ -53,12 +53,8 @@ class HybridMACLocalController(wishful_module.ControllerModule):
                     acGuard.disableAll()  # guard slot
                     mac.addAccessPolicy(slot_nr, acGuard)
 
-            res = device.radio.install_mac_processor(iface, mac)
-
-            if res:
-                self.log.info('HMAC successfully installed.')
-            else:
-                self.log.info('HMAC install failed.')
+            # install configuration in MAC
+            device.radio.install_mac_processor(iface, mac)
 
         except Exception as e:
             self.log.error("{} Failed with install_mac_processor, err_msg: {}".format(datetime.datetime.now(), e))
