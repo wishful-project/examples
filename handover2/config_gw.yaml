@@ -1,0 +1,17 @@
+## WiSHFUL Agent config file
+
+agent_config:
+  name: 'local_GW_control_progs'
+  info: 'Pure agent running on Gateway node for changing routing in the backhaul'
+  type: 'local'
+  iface: 'lo'
+
+modules:
+  discovery:
+      module : wishful_module_discovery_pyre
+      class_name : PyreDiscoveryAgentModule
+      kwargs: {"iface":"lo", "groupName":"wishful_1234"}
+
+  netlinux:
+      module : wishful_module_net_linux
+      class_name : NetworkModule
