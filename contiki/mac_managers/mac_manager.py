@@ -115,7 +115,7 @@ class LocalMACManager(MACManager):
     This class can be extended to support extra functions, specific to a MAC protocol (CSMA,TDMA,TSCH)
     """
 
-    def __init__(self, control_engine):
+    def __init__(self, control_engine, mac_mode):
         """Creates a Local MAC Manager object.
 
         Args:
@@ -126,6 +126,7 @@ class LocalMACManager(MACManager):
         self.radio_platforms = control_engine.radio.blocking(True).iface("lowpan0").get_radio_platforms()
         self.mac_address_radio_platform_dict = {}
         self.radio_platform_mac_address_dict = {}
+        self.mac_mode = mac_mode
         for radio_platform in self.radio_platforms:
             mac_address = control_engine.radio.blocking(True).iface(radio_platform).get_hwaddr()
             self.mac_address_radio_platform_dict[mac_address] = radio_platform
@@ -247,9 +248,12 @@ class LocalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
+        if self.mac_mode == name:
+            return 0
         UPIfunc = "activate_radio_program"
         UPIargs = (name)
         UPIkwargs = {'name': name}
+        self.mac_mode = name
         return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
 
     def get_radio_info(self, mac_address_list=None):
@@ -279,13 +283,14 @@ class LocalMACManager(MACManager):
 class GlobalMACManager(MACManager):
     """ Class doc """
 
-    def __init__(self, control_engine):
+    def __init__(self, control_engine, mac_mode):
         """ Class initialiser """
         self.control_engine = control_engine
         self.log = logging.getLogger("global_mac_manager")
         self.nodes = []
         self.nodes_radio_platform_dict = {}
         self.mac_address_node_radioplatform_dict = {}
+        self.mac_mode = mac_mode
         pass
 
     def add_node(self, node):
@@ -436,9 +441,12 @@ class GlobalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
+        if self.mac_mode == name:
+            return 0
         UPIfunc = "activate_radio_program"
         UPIargs = (name)
         UPIkwargs = {'name': name}
+        self.mac_mode = name
         return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
 
     def get_hwaddr_list(self):
