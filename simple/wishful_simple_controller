@@ -92,10 +92,10 @@ def main(args):
         print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
             #execute non-blocking function immediately
-            controller.blocking(False).node(nodes[0]).radio.iface("wlan0").set_power(12)
+            controller.blocking(False).node(nodes[0]).radio.iface("wlan0").set_tx_power(12)
 
             #execute non-blocking function immediately, with specific callback
-            controller.callback(print_response).node(nodes[0]).radio.iface("wlan0").get_power()
+            controller.callback(print_response).node(nodes[0]).radio.iface("wlan0").get_tx_power()
 
             #schedule non-blocking function delay
             controller.delay(3).node(nodes[0]).net.create_packetflow_sink(port=1234)
