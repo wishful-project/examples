@@ -1,6 +1,6 @@
 ## WiSHFUL Agent config file
 
-agent_config:
+agent_info:
     name: 'contiki_control_agent'
     info: 'WiSHFUL example Contiki control agent'
     iface: 'lo'
