@@ -43,18 +43,17 @@ class MyController(wishful_module.ControllerModule):
         self.log.info("My local node: {}, Local: {}"
                       .format(node.hostname, node.local))
 
-        # TODO: create_packetflow_sink no longer available
-        #retVal = node.net.create_packetflow_sink(port=1234)
-        #print("Server started: {}".format(retVal))
-
         for dev in node.get_devices():
             print("Dev: ", dev.name)
+            print(dev)
 
         for m in node.get_modules():
             print("Module: ", m.name)
+            print(m)
 
-        for apps in node.get_apps():
-            print("App: ", m.name)
+        for app in node.get_apps():
+            print("App: ", app.name)
+            print(app)
 
         device = node.get_device(0)
         device.radio.set_tx_power(15, 'ath0')
@@ -148,7 +147,7 @@ class MyController(wishful_module.ControllerModule):
         # exception handling, clean_per_flow_tx_power_table implementation
         # raises exception
         try:
-            device.radio.clean_per_flow_tx_power_table()
+            device.radio.clean_per_flow_tx_power_table("wlan0")
         except Exception as e:
             print("{} !!!Exception!!!: {}".format(
                 datetime.datetime.now(), e))

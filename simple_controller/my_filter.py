@@ -12,7 +12,7 @@ __email__ = "{gawlowicz}@tkn.tu-berlin.de"
 
 
 @wishful_module.build_module
-class MyAvgFilter(wishful_module.ControllerModule):
+class MyAvgFilter(wishful_module.Application):
     def __init__(self, window):
         super(MyAvgFilter, self).__init__()
         self.log = logging.getLogger('MyFilter')
