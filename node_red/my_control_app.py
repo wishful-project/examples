@@ -58,7 +58,7 @@ class MyController(wishful_module.ControllerModule):
             print("Dev: ", dev.name)
 
         device = node.get_device(0)
-        device.radio.set_power(15)
+        device.radio.set_tx_power(15)
         device.radio.set_channel(random.randint(1, 11))
         device.enable_event(upis.radio.PacketLossEvent)
         self.packetLossEventsEnabled = True

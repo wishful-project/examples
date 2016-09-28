@@ -66,7 +66,7 @@ class MyController(wishful_module.ControllerModule):
             print("App: ", apps.name)
 
         device = node.get_device(0)
-        device.radio.set_power(15)
+        device.radio.set_tx_power(15)
         device.radio.set_channel(random.randint(1, 11))
         device.enable_event(upis.radio.PacketLossEvent)
         self.packetLossEventsEnabled = True
@@ -144,10 +144,10 @@ class MyController(wishful_module.ControllerModule):
             self.myFilterRunning = True
 
         # execute non-blocking function immediately
-        device.blocking(False).radio.set_power(random.randint(1, 20))
+        device.blocking(False).radio.set_tx_power(random.randint(1, 20))
 
         # execute non-blocking function immediately, with specific callback
-        device.callback(self.get_power_cb).radio.get_power()
+        device.callback(self.get_power_cb).radio.get_tx_power()
 
         # schedule non-blocking function delay
         # TODO: create_packetflow_sink no longer available

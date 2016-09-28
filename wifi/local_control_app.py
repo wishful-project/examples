@@ -86,10 +86,10 @@ class MyController(wishful_module.ControllerModule):
         self.timer.start(self.timeInterval)
 
         # execute non-blocking function immediately
-        device.radio.set_power(random.randint(1, 20))
+        device.radio.set_tx_power(random.randint(1, 20))
 
         # execute non-blocking function immediately, with specific callback
-        device.radio.get_power()
+        device.radio.get_tx_power()
 
         newChannel = random.randint(1, 11)
         device.radio.set_channel(channel=newChannel)
