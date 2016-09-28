@@ -52,10 +52,6 @@ class MyController(wishful_module.ControllerModule):
                       .format(node.uuid, node.local))
         self.nodes.append(node)
 
-        # TODO: create_packetflow_sink no longer available
-        #retVal = node.net.create_packetflow_sink(port=1234)
-        #print("Server started: {}".format(retVal))
-
         for dev in node.get_devices():
             print("Dev: ", dev.name)
 
@@ -66,8 +62,8 @@ class MyController(wishful_module.ControllerModule):
             print("App: ", apps.name)
 
         device = node.get_device(0)
-        device.radio.set_tx_power(15)
-        device.radio.set_channel(random.randint(1, 11))
+        device.radio.set_tx_power(15, "wlan0")
+        device.radio.set_channel(random.randint(1, 11), "wlan0")
         device.enable_event(upis.radio.PacketLossEvent)
         self.packetLossEventsEnabled = True
         device.start_service(
@@ -144,22 +140,21 @@ class MyController(wishful_module.ControllerModule):
             self.myFilterRunning = True
 
         # execute non-blocking function immediately
-        device.blocking(False).radio.set_tx_power(random.randint(1, 20))
+        device.blocking(False).radio.set_tx_power(random.randint(1, 20), "wlan0")
 
         # execute non-blocking function immediately, with specific callback
-        device.callback(self.get_power_cb).radio.get_tx_power()
+        device.callback(self.get_power_cb).radio.get_tx_power("wlan0")
 
         # schedule non-blocking function delay
-        # TODO: create_packetflow_sink no longer available
-        #node.delay(3).callback(self.default_cb).net.create_packetflow_sink(port=1234)
+        device.delay(3).callback(self.default_cb).radio.get_tx_power("wlan0")
 
         # schedule non-blocking function exec time
         exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
         newChannel = random.randint(1, 11)
-        device.exec_time(exec_time).radio.set_channel(channel=newChannel)
+        device.exec_time(exec_time).radio.set_channel(newChannel, "wlan0")
 
         # execute blocking function immediately
-        result = device.radio.get_channel()
+        result = device.radio.get_channel("wlan0")
         print("{} Channel is: {}".format(datetime.datetime.now(), result))
 
         # exception handling, clean_per_flow_tx_power_table implementation

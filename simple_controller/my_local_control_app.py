@@ -134,8 +134,7 @@ class MyController(wishful_module.ControllerModule):
         device.callback(self.get_power_cb).radio.get_tx_power('ath0')
 
         # schedule non-blocking function delay
-        # TODO: create_packetflow_sink no longer available
-        #node.delay(3).callback(self.default_cb).net.create_packetflow_sink(port=1234)
+        device.delay(3).callback(self.default_cb).radio.get_tx_power("wlan0")
 
         # schedule non-blocking function exec time
         exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
