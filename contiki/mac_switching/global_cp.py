@@ -47,7 +47,6 @@ nodes = []
 @global_control_engine.new_node_callback()
 def new_node(node):
     nodes.append(node)
-    global_taisc_manager.add_node(node)
     print("New node appeared:")
     print(node)
 
@@ -55,7 +54,7 @@ def new_node(node):
 @global_control_engine.node_exit_callback()
 def node_exit(node, reason):
     if node in nodes:
-        global_taisc_manager.remove_node(node)
+        # global_taisc_manager.remove_node(node)
         nodes.remove(node)
     print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
 
@@ -96,8 +95,11 @@ def main(args):
         else:
             log.info("Still waiting for %d nodes", num_nodes - len(nodes))
 
-    hc_connector = global_control_engine.node(nodes).hc.start_local_control_program(program=my_local_control_program)
-    _thread.start_new_thread(hc_message_handler, (hc_connector,))
+    gevent.sleep(10)
+    for node in nodes:
+        global_taisc_manager.add_node(node)
+        hc_connector = global_control_engine.node(node).hc.start_local_control_program(program=my_local_control_program)
+        _thread.start_new_thread(hc_message_handler, (hc_connector,))
 
     ret = global_taisc_manager.update_slotframe('./mac_managers/default_taisc_slotframe.csv')
     self.log.info(ret)

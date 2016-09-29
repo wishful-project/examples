@@ -287,27 +287,33 @@ class GlobalMACManager(MACManager):
         """ Class initialiser """
         self.control_engine = control_engine
         self.log = logging.getLogger("global_mac_manager")
-        self.nodes = []
+        self.nodes = {}
         self.nodes_radio_platform_dict = {}
         self.mac_address_node_radioplatform_dict = {}
         self.mac_mode = mac_mode
         pass
 
     def add_node(self, node):
-        self.nodes.append(node)
+        self.nodes[node.id] = node
         radio_platforms = self.control_engine.node(node).blocking(True).iface("lowpan0").radio.get_radio_platforms()
-        self.nodes_radio_platform_dict[node] = radio_platforms
+        print("radioplatforms {}".format(radio_platforms))
+        self.nodes_radio_platform_dict[node.id] = radio_platforms
+        print("before")
         for radio_platform in radio_platforms:
             mac_addr = self.control_engine.node(node).blocking(True).iface(radio_platform).radio.get_hwaddr()
-            self.mac_address_node_radioplatform_dict[mac_addr] = [node, radio_platform]
+            self.mac_address_node_radioplatform_dict[mac_addr] = [node.id, radio_platform]
+        print("%s %s %s", self.nodes, self.nodes_radio_platform_dict, self.mac_address_node_radioplatform_dict)
 
     def remove_node(self, node):
-        self.nodes.remove(node)
-        del self.nodes_radio_platform_dict[node]
-        for mac_addr in self.mac_address_node_radioplatform_dict.keys():
-            if self.mac_address_node_radioplatform_dict[mac_addr][0] == node:
-                del self.mac_address_node_radioplatform_dict[mac_addr]
-                break
+        if node.id in self.nodes:
+            del self.nodes[node.id]
+            del self.nodes_radio_platform_dict[node.id]
+            for mac_addr in self.mac_address_node_radioplatform_dict.keys():
+                if self.mac_address_node_radioplatform_dict[mac_addr][0] == node.id:
+                   del self.mac_address_node_radioplatform_dict[mac_addr]
+                   break
+        else:
+            self.log.info("Node %s not found", node)
 
     def __execute_global_upi_func(self, UPIfunc, UPIargs, UPIkwargs, mac_address_list=None):
         if mac_address_list is None:
