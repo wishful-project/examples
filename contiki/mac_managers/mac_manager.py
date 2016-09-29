@@ -159,7 +159,8 @@ class LocalMACManager(MACManager):
         """
         UPIfunc = "set_parameters"
         UPIargs = (param_key_values_dict)
-        UPIkwargs = {"param_key_values_dict": param_key_values_dict}
+        #UPIkwargs = {"param_key_values_dict": param_key_values_dict}
+        UPIkwargs = None # {"param_key_values_dict": param_key_values_dict}
         return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
 
     def read_macconfiguration(self, param_key_list, mac_address_list=None):
