@@ -316,7 +316,7 @@ class GlobalMACManager(MACManager):
         else:
             self.log.info("Node %s not found", node)
 
-    def __execute_global_upi_func(self, UPIfunc, UPIargs, UPIkwargs, mac_address_list=None):
+    def __execute_global_upi_func(self, UPIfunc, mac_address_list=None, *UPIargs, **UPIkwargs):
         if mac_address_list is None:
             mac_address_list = self.mac_address_node_radioplatform_dict.keys()
         ret = {}
@@ -341,9 +341,11 @@ class GlobalMACManager(MACManager):
             Dict[str, int]: This function returs a dictionary containing parameter key-error_codes pairs.
         """
         UPIfunc = "set_parameters"
-        UPIargs = (param_key_values_dict)
+        UPIargs = (param_key_values_dict,)
+        #UPIargs = ()
         UPIkwargs = {'param_key_values_dict': param_key_values_dict}
-        return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
+        #UPIkwargs = {'args': (param_key_values_dict,), 'kwargs': {}}
+        return self.__execute_global_upi_func(UPIfunc, mac_address_list, *UPIargs, **UPIkwargs)
 
     def read_macconfiguration(self, param_key_list, mac_address_list=None):
         """Update the current MAC configuration.
@@ -359,9 +361,9 @@ class GlobalMACManager(MACManager):
             Dict[str,Any]: a dictionary containing parameter key-value pairs.
         """
         UPIfunc = "get_parameters"
-        UPIargs = (param_key_list)
+        UPIargs = (param_key_list,)
         UPIkwargs = {'param_key_list': param_key_list}
-        return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
+        return self.__execute_global_upi_func(UPIfunc, mac_address_list, *UPIargs, **UPIkwargs)
 
     def get_measurements(self, measurement_key_list, mac_address_list=None):
         """Monitor the current MAC behaviour in a pull based manner.

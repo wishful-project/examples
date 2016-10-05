@@ -95,12 +95,15 @@ def main(args):
         else:
             log.info("Still waiting for %d nodes", num_nodes - len(nodes))
 
-    gevent.sleep(10)
     for node in nodes:
         global_taisc_manager.add_node(node)
         hc_connector = global_control_engine.node(node).hc.start_local_control_program(program=my_local_control_program)
         _thread.start_new_thread(hc_message_handler, (hc_connector,))
 
+    gevent.sleep(10)
+
+    #param_key_values = {'taiscSlotframe': (0, 10, 1, 65535, 1, 0, 2, 1, 0, 0, 3, 1, 0, 0, 4, 1, 0, 0, 5, 1, 0, 0, 6, 1, 0, 0, 7, 1, 0, 0, 8, 1, 0, 0, 9, 1, 0, 0, 10, 1, 0, 0)}
+    #ret = global_control_engine.nodes(nodes).blocking(True).radio.iface("lowpan0").set_parameters(param_key_values)
     ret = global_taisc_manager.update_slotframe('./mac_managers/default_taisc_slotframe.csv')
     self.log.info(ret)
     parameters = {"RIME_exampleUnicastActivateApplication": 1}
