@@ -30,6 +30,7 @@ import gevent
 import yaml
 import _thread
 from contiki.mac_managers.taisc_manager import *
+from contiki.app_managers.app_manager import *
 from local_cp import my_local_control_program
 
 __author__ = "Peter Ruckebusch"
@@ -41,6 +42,7 @@ __email__ = "peter.ruckebusch@intec.ugent.be"
 log = logging.getLogger('global_cp.main')
 global_control_engine = wishful_controller.Controller()
 global_taisc_manager = GlobalTAISCMACManager(global_control_engine, "CSMA")
+global_app_manager = GlobalAppManager(global_control_engine, global_taisc_manager)
 nodes = []
 
 
@@ -115,28 +117,31 @@ def main(args):
     while True:
         log.info("Activating CSMA MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
-        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
-        global_taisc_manager.activate_radio_program("CSMA")
+        err1 = global_app_manager.update_configuration(parameters)
+        err2 = global_taisc_manager.activate_radio_program("CSMA")
         gevent.sleep(5)
         parameters["RIME_exampleUnicastActivateApplication"] = 1
-        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
-        gevent.sleep(60)
+        err3 = global_app_manager.update_configuration(parameters)
+        log.info("Error: MAC {} APP {},{}".format(err1,err2,err3))
+        gevent.sleep(20)
         log.info("Activating TDMA MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
-        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
-        global_taisc_manager.activate_radio_program("TDMA")
+        err1 = global_app_manager.update_configuration(parameters)
+        err2 = global_taisc_manager.activate_radio_program("TDMA")
         gevent.sleep(5)
         parameters["RIME_exampleUnicastActivateApplication"] = 1
-        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
-        gevent.sleep(60)
+        err3 = global_app_manager.update_configuration(parameters)
+        log.info("Error: MAC {} APP {},{}".format(err1,err2,err3))
+        gevent.sleep(20)
         log.info("Activating TSCH MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
-        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
-        global_taisc_manager.activate_radio_program("TSCH")
+        err1 = global_app_manager.update_configuration(parameters)
+        err2 = global_taisc_manager.activate_radio_program("TSCH")
         gevent.sleep(5)
         parameters["RIME_exampleUnicastActivateApplication"] = 1
-        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
-        gevent.sleep(60)
+        err3 = global_app_manager.update_configuration(parameters)
+        log.info("Error: MAC {} APP {},{}".format(err1,err2,err3))
+        gevent.sleep(20)
 
 if __name__ == "__main__":
     try:
