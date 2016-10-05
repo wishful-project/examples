@@ -327,10 +327,10 @@ class LocalMACManager(MACManager):
         return ret
  
     def get_radio_platforms(self, mac_address_list=None):
-		radio_platforms = []
+        radio_platforms = []
         for mac_address in mac_address_list:
             radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
-		return radio_platforms
+        return radio_platforms
 
     def get_hwaddr_list(self):
         """Returns the macaddress of the interface.
@@ -359,13 +359,13 @@ class GlobalMACManager(MACManager):
     def add_node(self, node):
         self.nodes[node.id] = node
         radio_platforms = self.control_engine.node(node).blocking(True).iface("lowpan0").radio.get_radio_platforms()
-        print("radioplatforms {}".format(radio_platforms))
+        #print("radioplatforms {}".format(radio_platforms))
         self.nodes_radio_platform_dict[node.id] = radio_platforms
-        print("before")
+        #print("before")
         for radio_platform in radio_platforms:
             mac_addr = self.control_engine.node(node).blocking(True).iface(radio_platform).radio.get_hwaddr()
             self.mac_address_node_radioplatform_dict[mac_addr] = [node.id, radio_platform]
-        print("%s %s %s", self.nodes, self.nodes_radio_platform_dict, self.mac_address_node_radioplatform_dict)
+        #print("%s %s %s", self.nodes, self.nodes_radio_platform_dict, self.mac_address_node_radioplatform_dict)
 
     def remove_node(self, node):
         if node.id in self.nodes:
@@ -386,7 +386,7 @@ class GlobalMACManager(MACManager):
             node = self.mac_address_node_radioplatform_dict[mac_addr][0]
             radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
             ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).exec_cmd("radio", UPIfunc, *UPIargs, **UPIkwargs)
+                radio_platform).exec_cmd(upi_type="radio", fname=UPIfunc, args=UPIargs, kwargs=UPIkwargs)
         return ret
 
     def update_macconfiguration(self, param_key_values_dict, mac_address_list=None):
@@ -592,7 +592,7 @@ class GlobalMACManager(MACManager):
         return self.mac_address_node_radioplatform_dict.keys()
 
     def get_radio_platforms(self, mac_address_list):
-		ret = {}
-		for mac_addr in mac_address_list:
+        ret = {}
+        for mac_addr in mac_address_list:
             ret[mac_addr] = self.mac_address_node_radioplatform_dict[mac_addr][1]
-		return ret
+        return ret
