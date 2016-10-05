@@ -15,13 +15,14 @@ modules:
         module : wishful_module_gitar
         class_name : GitarEngine
         interfaces : ['lowpan0']
-        kwargs : {'GitarConfig' : './localhost/gitar.ini','SupportedInterfaces' : ['lowpan0'],'ControlExtensions' : {'taisc' : './taisc_control_extensions.csv', 'rime' : './rime_control_extensions.csv'}}
+        kwargs : {'GitarConfig' : './config/localhost/gitar.ini','SupportedInterfaces' : ['lowpan0'],'ControlExtensions' : {'taisc' : './taisc_control_extensions.csv', 'rime' : './rime_control_extensions.csv'}}
     taisc_connector:
         module : wishful_module_taisc
         class_name : TAISCConnector
         interfaces : ['lowpan0']
-        kwargs : {'RadioPrograms' : {"CSMA":0,"TDMA":2,"TSCH":1}}
+        kwargs : {'RadioPrograms' : {"CSMA":0,"TDMA":2,"TSCH":1}, 'SupportedInterfaces' : ['lowpan0']}
     rime_connector:
         module : wishful_module_rime
         class_name : RIMEConnector
         interfaces : ['lowpan0']
+        kwargs : {'SupportedInterfaces' : ['lowpan0']}

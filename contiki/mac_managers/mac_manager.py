@@ -142,7 +142,7 @@ class LocalMACManager(MACManager):
         ret = {}
         for radio_platform in radio_platforms:
             ret[self.radio_platform_mac_address_dict[radio_platform]] = self.control_engine.blocking(
-                True).iface(radio_platform).exec_cmd("radio", UPIfunc, *UPIargs, **UPIkwargs)
+                True).iface(radio_platform).exec_cmd(upi_type="radio", fname=UPIfunc, args=UPIargs, kwargs=UPIkwargs)  
         return ret
 
     def update_macconfiguration(self, param_key_values_dict, mac_address_list=None):
@@ -157,19 +157,7 @@ class LocalMACManager(MACManager):
         Returns:
             Dict[str, int]: This function returs a dictionary containing parameter key-error_codes pairs.
         """
-        #~ UPIfunc = "set_parameters"
-        #~ UPIargs = (param_key_values_dict)
-        #~ UPIkwargs = {"param_key_values_dict": param_key_values_dict}
-        #~ return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        #~ return self.__execute_local_upi_func(UPIfunc, mac_address_list, param_key_values_dict)
-        radio_platforms = []
-        for mac_address in mac_address_list:
-            radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
-        ret = {}
-        for radio_platform in radio_platforms:
-            ret[self.radio_platform_mac_address_dict[radio_platform]] = self.control_engine.blocking(
-                True).iface(radio_platform).radio.set_parameters(param_key_values_dict)
-        return ret
+        return self.__execute_local_upi_func("set_parameters", mac_address_list, param_key_values_dict)
 
     def read_macconfiguration(self, param_key_list, mac_address_list=None):
         """Update the current MAC configuration.
@@ -183,18 +171,7 @@ class LocalMACManager(MACManager):
         Returns:
             Dict[str,Any]: a dictionary containing parameter key-value pairs.
         """
-        #~ UPIfunc = "get_parameters"
-        #~ UPIargs = (param_key_list)
-        #~ UPIkwargs = {'param_key_list': param_key_list}
-        #~ return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        radio_platforms = []
-        for mac_address in mac_address_list:
-            radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
-        ret = {}
-        for radio_platform in radio_platforms:
-            ret[self.radio_platform_mac_address_dict[radio_platform]] = self.control_engine.blocking(
-                True).iface(radio_platform).radio.get_parameters(param_key_list)
-        return ret
+        return self.__execute_local_upi_func("get_parameters", mac_address_list, param_key_list)
 
     def get_measurements(self, measurement_key_list, mac_address_list=None):
         """Monitor the current MAC behaviour in a pull based manner.
@@ -208,18 +185,7 @@ class LocalMACManager(MACManager):
         Returns:
             Dict[str,Any]: a dictionary containing measurement key-value pairs.
         """
-        #~ UPIfunc = "get_measurements"
-        #~ UPIargs = (measurement_key_list)
-        #~ UPIkwargs = {'measurement_key_list': measurement_key_list}
-        #~ return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        radio_platforms = []
-        for mac_address in mac_address_list:
-            radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
-        ret = {}
-        for radio_platform in radio_platforms:
-            ret[self.radio_platform_mac_address_dict[radio_platform]] = self.control_engine.blocking(
-                True).iface(radio_platform).radio.get_measurements(measurement_key_list)
-        return ret
+        return self.__execute_local_upi_func("get_measurements", mac_address_list, measurement_key_list)
 
     def get_measurements_periodic(self, measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list=None):
         """Monitor the current MAC behaviour periodically in a pull based manner.
@@ -237,20 +203,7 @@ class LocalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        #~ UPIfunc = "get_measurements_periodic"
-        #~ UPIargs = (measurement_key_list, collect_period, report_period, num_iterations, report_callback)
-        #~ UPIkwargs = {'measurement_key_list': measurement_key_list, 'collect_period': collect_period,
-                     #~ 'report_period': report_period, 'num_iterations': num_iterations,
-                     #~ 'report_callback': report_callback}
-        #~ return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        radio_platforms = []
-        for mac_address in mac_address_list:
-            radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
-        ret = {}
-        for radio_platform in radio_platforms:
-            ret[self.radio_platform_mac_address_dict[radio_platform]] = self.control_engine.blocking(
-                True).iface(radio_platform).radio.get_measurements_periodic(measurement_key_list, collect_period, report_period, num_iterations, report_callback)
-        return ret
+        return self.__execute_local_upi_func("get_measurements_periodic", mac_address_list, measurement_key_list, collect_period, report_period, num_iterations, report_callback)
 
     def subscribe_events(self, event_key_list, event_callback, event_duration, mac_address_list=None):
         """Monitor the MAC behaviour asynchroniously in a push based manner by registering for events.
@@ -265,19 +218,7 @@ class LocalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        #~ UPIfunc = "subscribe_events"
-        #~ UPIargs = (event_key_list, event_callback, event_duration)
-        #~ UPIkwargs = {'event_key_list': event_key_list,
-                     #~ 'event_callback': event_callback, 'event_duration': event_duration}
-        #~ return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        radio_platforms = []
-        for mac_address in mac_address_list:
-            radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
-        ret = {}
-        for radio_platform in radio_platforms:
-            ret[self.radio_platform_mac_address_dict[radio_platform]] = self.control_engine.blocking(
-                True).iface(radio_platform).radio.subscribe_events(event_key_list,event_callback, event_duration)
-        return ret
+        return self.__execute_local_upi_func("subscribe_events", mac_address_list, event_key_list, event_callback, event_duration)
 
     def activate_radio_program(self, name, mac_address_list=None):
         """Activate a MAC radio program.
@@ -291,19 +232,7 @@ class LocalMACManager(MACManager):
         """
         if self.mac_mode == name:
             return 0
-        #~ UPIfunc = "activate_radio_program"
-        #~ UPIargs = (name)
-        #~ UPIkwargs = {'name': name}
-        #~ self.mac_mode = name
-        #~ return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        radio_platforms = []
-        for mac_address in mac_address_list:
-            radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
-        ret = {}
-        for radio_platform in radio_platforms:
-            ret[self.radio_platform_mac_address_dict[radio_platform]] = self.control_engine.blocking(
-                True).iface(radio_platform).radio.activate_radio_program(name)
-        return ret
+        return self.__execute_local_upi_func("activate_radio_program", mac_address_list, name)
 
     def get_radio_info(self, mac_address_list=None):
         """Returns a radio_info_t object containing all parameter, measurement and event keys as well as the available radio programs.
@@ -313,24 +242,13 @@ class LocalMACManager(MACManager):
         Returns:
             UPI_R.radio_info_t: a radio_info_t object containing all parameter, measurement and event keys as well as the available radio programs.
         """
-        #~ UPIfunc = "get_radio_info"
-        #~ UPIargs = ()
-        #~ UPIkwargs = {}
-        #~ return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
+        return self.__execute_local_upi_func("get_radio_info", mac_address_list)
+ 
+    def get_radio_platforms(self, mac_address_list=None):
         radio_platforms = []
         for mac_address in mac_address_list:
             radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
-        ret = {}
-        for radio_platform in radio_platforms:
-            ret[self.radio_platform_mac_address_dict[radio_platform]] = self.control_engine.blocking(
-                True).iface(radio_platform).radio.get_radio_info()
-        return ret
- 
-    def get_radio_platforms(self, mac_address_list=None):
-		radio_platforms = []
-        for mac_address in mac_address_list:
-            radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
-		return radio_platforms
+        return radio_platforms
 
     def get_hwaddr_list(self):
         """Returns the macaddress of the interface.
@@ -359,13 +277,10 @@ class GlobalMACManager(MACManager):
     def add_node(self, node):
         self.nodes[node.id] = node
         radio_platforms = self.control_engine.node(node).blocking(True).iface("lowpan0").radio.get_radio_platforms()
-        print("radioplatforms {}".format(radio_platforms))
         self.nodes_radio_platform_dict[node.id] = radio_platforms
-        print("before")
         for radio_platform in radio_platforms:
             mac_addr = self.control_engine.node(node).blocking(True).iface(radio_platform).radio.get_hwaddr()
             self.mac_address_node_radioplatform_dict[mac_addr] = [node.id, radio_platform]
-        print("%s %s %s", self.nodes, self.nodes_radio_platform_dict, self.mac_address_node_radioplatform_dict)
 
     def remove_node(self, node):
         if node.id in self.nodes:
@@ -385,8 +300,7 @@ class GlobalMACManager(MACManager):
         for mac_addr in mac_address_list:
             node = self.mac_address_node_radioplatform_dict[mac_addr][0]
             radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
-            ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).exec_cmd("radio", UPIfunc, *UPIargs, **UPIkwargs)
+            ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(radio_platform).exec_cmd(upi_type="radio", fname=UPIfunc, args=UPIargs, kwargs=UPIkwargs)
         return ret
 
     def update_macconfiguration(self, param_key_values_dict, mac_address_list=None):
@@ -402,19 +316,7 @@ class GlobalMACManager(MACManager):
         Returns:
             Dict[str, int]: This function returs a dictionary containing parameter key-error_codes pairs.
         """
-        UPIfunc = "set_parameters"
-        UPIargs = (param_key_values_dict)
-        UPIkwargs = {'param_key_values_dict': param_key_values_dict}
-        return self.__execute_global_upi_func(UPIfunc, mac_address_list, param_key_values_dict)
-        #~ if mac_address_list is None:
-            #~ mac_address_list = self.mac_address_node_radioplatform_dict.keys()
-        #~ ret = {}
-        #~ for mac_addr in mac_address_list:
-            #~ node = self.mac_address_node_radioplatform_dict[mac_addr][0]
-            #~ radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
-            #~ ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                #~ radio_platform).radio.set_parameters(param_key_values_dict)
-        #~ return ret
+        return self.__execute_global_upi_func("set_parameters", mac_address_list, param_key_values_dict)
 
     def read_macconfiguration(self, param_key_list, mac_address_list=None):
         """Update the current MAC configuration.
@@ -429,19 +331,7 @@ class GlobalMACManager(MACManager):
         Returns:
             Dict[str,Any]: a dictionary containing parameter key-value pairs.
         """
-        #~ UPIfunc = "get_parameters"
-        #~ UPIargs = (param_key_list)
-        #~ UPIkwargs = {'param_key_list': param_key_list}
-        #~ return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        if mac_address_list is None:
-            mac_address_list = self.mac_address_node_radioplatform_dict.keys()
-        ret = {}
-        for mac_addr in mac_address_list:
-            node = self.mac_address_node_radioplatform_dict[mac_addr][0]
-            radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
-            ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).radio.get_parameters(param_key_list)
-        return ret
+        return self.__execute_global_upi_func("get_parameters", mac_address_list, param_key_list)
 
     def get_measurements(self, measurement_key_list, mac_address_list=None):
         """Monitor the current MAC behaviour in a pull based manner.
@@ -456,19 +346,7 @@ class GlobalMACManager(MACManager):
         Returns:
             Dict[str,Any]: a dictionary containing measurement key-value pairs.
         """
-        #~ UPIfunc = "get_measurements"
-        #~ UPIargs = (measurement_key_list)
-        #~ UPIkwargs = {'measurement_key_list': measurement_key_list}
-        #~ return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        if mac_address_list is None:
-            mac_address_list = self.mac_address_node_radioplatform_dict.keys()
-        ret = {}
-        for mac_addr in mac_address_list:
-            node = self.mac_address_node_radioplatform_dict[mac_addr][0]
-            radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
-            ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).radio.get_measurements(measurement_key_list)
-        return ret
+        return self.__execute_global_upi_func("get_measurements", mac_address_list, measurement_key_list)
 
     def get_measurements_periodic(self, measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list=None):
         """Monitor the current MAC behaviour periodically in a pull based manner.
@@ -487,20 +365,7 @@ class GlobalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        #~ UPIfunc = "get_measurements_periodic"
-        #~ UPIargs = (measurement_key_list, collect_period, report_period, num_iterations, report_callback)
-        #~ UPIkwargs = {'measurement_key_list': measurement_key_list, 'collect_period': collect_period,
-                     #~ 'report_period': report_period, 'num_iterations': num_iterations, 'report_callback': report_callback}
-        #~ return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        if mac_address_list is None:
-            mac_address_list = self.mac_address_node_radioplatform_dict.keys()
-        ret = {}
-        for mac_addr in mac_address_list:
-            node = self.mac_address_node_radioplatform_dict[mac_addr][0]
-            radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
-            ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).radio.get_measurements_periodic(measurement_key_list, collect_period, report_period, num_iterations, report_callback)
-        return ret
+        return self.__execute_global_upi_func("get_measurements_periodic", mac_address_list, measurement_key_list, collect_period, report_period, num_iterations, report_callback)
 
     def subscribe_events(self, event_keys, event_callback, event_duration, mac_address_list=None):
         """Monitor the MAC behaviour asynchroniously in a push based manner by registering for events.
@@ -516,19 +381,7 @@ class GlobalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        #~ UPIfunc = "subscribe_events"
-        #~ UPIargs = (event_keys, event_callback, event_duration)
-        #~ UPIkwargs = {'event_keys': event_keys, 'event_callback': event_callback, 'event_duration': event_duration}
-        #~ return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        if mac_address_list is None:
-            mac_address_list = self.mac_address_node_radioplatform_dict.keys()
-        ret = {}
-        for mac_addr in mac_address_list:
-            node = self.mac_address_node_radioplatform_dict[mac_addr][0]
-            radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
-            ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).radio.subscribe_events(event_keys, event_callback, event_duration)
-        return ret
+        return self.__execute_global_upi_func("subscribe_events", mac_address_list, event_keys, event_callback, event_duration)
 
     def get_radio_info(self, mac_address_list=None):
         """Returns a radio_info_t object containing all parameter, measurement and event keys as well as the available radio programs.
@@ -539,19 +392,7 @@ class GlobalMACManager(MACManager):
         Returns:
             UPI_R.radio_info_t: a radio_info_t object containing all parameter, measurement and event keys as well as the available radio programs.
         """
-        #~ UPIfunc = "get_radio_info"
-        #~ UPIargs = ()
-        #~ UPIkwargs = {}
-        #~ return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        if mac_address_list is None:
-            mac_address_list = self.mac_address_node_radioplatform_dict.keys()
-        ret = {}
-        for mac_addr in mac_address_list:
-            node = self.mac_address_node_radioplatform_dict[mac_addr][0]
-            radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
-            ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).radio.get_radio_info()
-        return ret
+        return self.__execute_global_upi_func("get_radio_info", mac_address_list)
 
     def activate_radio_program(self, name, mac_address_list=None):
         """Activate a MAC radio program.
@@ -566,19 +407,7 @@ class GlobalMACManager(MACManager):
         """
         if self.mac_mode == name:
             return 0
-        #~ UPIfunc = "activate_radio_program"
-        #~ UPIargs = (name)
-        #~ UPIkwargs = {'name': name}
-        #~ self.mac_mode = name
-        #~ return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        if mac_address_list is None:
-            mac_address_list = self.mac_address_node_radioplatform_dict.keys()
-        ret = {}
-        for mac_addr in mac_address_list:
-            node = self.mac_address_node_radioplatform_dict[mac_addr][0]
-            radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
-            ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).radio.activate_radio_program(name)
+        return self.__execute_global_upi_func("activate_radio_program", mac_address_list, name)
 
     def get_hwaddr_list(self):
         """Returns the macaddress of the interface.
@@ -592,7 +421,7 @@ class GlobalMACManager(MACManager):
         return self.mac_address_node_radioplatform_dict.keys()
 
     def get_radio_platforms(self, mac_address_list):
-		ret = {}
-		for mac_addr in mac_address_list:
+        ret = {}
+        for mac_addr in mac_address_list:
             ret[mac_addr] = self.mac_address_node_radioplatform_dict[mac_addr][1]
-		return ret
+        return ret
