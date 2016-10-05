@@ -19,7 +19,7 @@ class LocalTAISCMACManager(LocalMACManager):
         ret_val = 0
         while(current_offset < taisc_slotframe.slotframe_length):
             slotframe_tpl = taisc_slotframe.to_tuple(current_offset, MAX_MSG_SIZE)
-            param_key_values_dict = {'taiscSlotframe', slotframe_tpl}
+            param_key_values_dict = {'taiscSlotframe': slotframe_tpl}
             ret_val += self.update_macconfiguration(param_key_values_dict, self.get_hwaddr_list())
             current_offset += slotframe_tpl[1]
         return ret_val
@@ -34,7 +34,7 @@ class LocalTAISCMACManager(LocalMACManager):
             taisc_slotlist = taisc_mac_address_slot_list_dict[mac_address]
             while(current_offset < taisc_slotlist.slot_list_length):
                 slotlist_tpl = taisc_slotlist.to_tuple(current_offset, MAX_MSG_SIZE)
-                param_key_values_dict = {'taiscSlotList', slotlist_tpl}
+                param_key_values_dict = {'taiscSlotList': slotlist_tpl}
                 ret_val += self.update_macconfiguration(param_key_values_dict, mac_address)
                 current_offset += slotlist_tpl[0]
         return ret_val
@@ -92,7 +92,7 @@ class GlobalTAISCMACManager(GlobalMACManager):
         ret_val = 0
         while(current_offset < taisc_slotframe.slotframe_length):
             slotframe_tpl = taisc_slotframe.to_tuple(current_offset, MAX_MSG_SIZE)
-            param_key_values_dict = {'taiscSlotframe', slotframe_tpl}
+            param_key_values_dict = {'taiscSlotframe': slotframe_tpl}
             ret_val += self.update_macconfiguration(param_key_values_dict)
             current_offset += slotframe_tpl[1]
         return ret_val
@@ -105,7 +105,7 @@ class GlobalTAISCMACManager(GlobalMACManager):
             taisc_slotlist = taisc_mac_address_slot_list_dict[mac_address]
             while(current_offset < taisc_slotlist.slot_list_length):
                 slotlist_tpl = taisc_slotlist.to_tuple(current_offset, MAX_MSG_SIZE)
-                param_key_values_dict = {'taiscSlotList', slotlist_tpl}
+                param_key_values_dict = {'taiscSlotList': slotlist_tpl}
                 ret_val += self.update_macconfiguration(param_key_values_dict, mac_address)
                 current_offset += slotlist_tpl[0]
         return ret_val
