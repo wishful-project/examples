@@ -2,7 +2,7 @@
 
 echo "Test global wishful controller in mininet:"
 
-python2 ./mininet_script.py
+sudo python2 ./mininet_script.py
 
 if [ "$?" != "0" ]; then
   echo "Wishful mininet failed !!!!"

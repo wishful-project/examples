@@ -13,7 +13,7 @@ from mininet.link import TCLink
 from mininet.cli import CLI
 from mininet.log import setLogLevel
 
-from wishful_mininet import WishfulNode, WishfulAgent, WishfulController
+from wishful_mininet import WishfulNode
 import time
 
 __author__ = "Zubow"
@@ -22,7 +22,7 @@ __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
 # enable mininet cli
-MN_CLI = False
+MN_CLI = True
 # enable GUI
 GUI = False
 # enable mobility
@@ -66,13 +66,13 @@ def topology():
     folder = './'
 
     print("*** ... agents ...")
-    agent1 = WishfulAgent(ap1, folder + 'ap1_config.yaml')
-    agent2 = WishfulAgent(ap2, folder + 'ap2_config.yaml')
+    agent1 = WishfulNode(ap1, folder + 'ap1_config.yaml', '/tmp/ap1.log')
+    agent2 = WishfulNode(ap2, folder + 'ap2_config.yaml', '/tmp/ap2.log')
     agent1.start()
     agent2.start()
 
     print("*** ... controller ...")
-    wf_ctrl = WishfulController(ap1, folder + 'controller_config.yaml')
+    wf_ctrl = WishfulNode(ap1, folder + 'controller_config.yaml', '/tmp/ctrl.log')
     wf_ctrl.start()
 
     print("*** Starting network")
@@ -95,17 +95,19 @@ def topology():
     time.sleep(2)
 
     print("*** perform ping")
-    sta1.cmd('ping -c20 %s' % sta2.IP())
-
-    print("*** Check that Wishful agents/controllers are still running ...")
-    if not wf_ctrl.check_is_running() or not agent1.check_is_running() or not agent2.check_is_running():
-        raise Exception("Error; wishful controller or agents not running; check logfiles ... ")
-    else:
-        print("*** Wishful agents/controllers: OK")
+    sta1.cmd('ping -c1 %s' % sta2.IP())
 
     if MN_CLI:
         print("*** Running CLI")
         CLI( net )
+
+    print("*** Check that Wishful agents/controllers are still running ...")
+    if not wf_ctrl.check_is_running() or not agent1.check_is_running() or not agent2.check_is_running():
+        #raise Exception("Error; wishful controller or agents not running; check logfiles ... ")
+        print('*** FAILED: wishful controller or agents not running; check logfiles ...  ***')
+        pass
+    else:
+        print("*** Wishful agents/controllers: OK")
 
     print("*** Stopping network")
     wf_ctrl.stop()    

@@ -15,7 +15,7 @@ modules:
   wlan:
       module : wishful_module_wifi
       class_name : WifiModule
-      interfaces : ['ap2-wlan0', 'wlan0', 'wlan1']
+      interfaces : ['phy0']
 
   iperf:
       module : wishful_module_iperf
