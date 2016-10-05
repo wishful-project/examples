@@ -101,7 +101,7 @@ class LocalAppManager(AppManager):
 
     def __execute_local_upi_func(self, UPIfunc, mac_address_list, *UPIargs, **UPIkwargs):
         if mac_address_list is None:
-			mac_address_list = self.mac_manager.mac_address_radio_platform_dict.keys()
+            mac_address_list = self.mac_manager.mac_address_radio_platform_dict.keys()
         ret = {}
         for mac_address in mac_address_list:
             ret[mac_address] = self.control_engine.blocking(True).iface(self.mac_manager.mac_address_radio_platform_dict[mac_address]).exec_cmd(upi_type="radio", fname=UPIfunc, args=UPIargs, kwargs=UPIkwargs)  
@@ -182,7 +182,7 @@ class LocalAppManager(AppManager):
         """
         return self.__execute_local_upi_func("subscribe_events_net", mac_address_list, event_key_list, event_callback, event_duration)
 
-class GlobalMACManager(MACManager):
+class GlobalAppManager(AppManager):
     """ Class doc """
 
     def __init__(self, control_engine, mac_manager):

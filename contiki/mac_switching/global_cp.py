@@ -122,7 +122,7 @@ def main(args):
         gevent.sleep(5)
         parameters["RIME_exampleUnicastActivateApplication"] = 1
         err3 = global_app_manager.update_configuration(parameters)
-        log.info("Error: MAC {} APP {},{}".format(err1,err2,err3))
+        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
         gevent.sleep(20)
         log.info("Activating TDMA MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
@@ -131,7 +131,7 @@ def main(args):
         gevent.sleep(5)
         parameters["RIME_exampleUnicastActivateApplication"] = 1
         err3 = global_app_manager.update_configuration(parameters)
-        log.info("Error: MAC {} APP {},{}".format(err1,err2,err3))
+        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
         gevent.sleep(20)
         log.info("Activating TSCH MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
@@ -140,7 +140,7 @@ def main(args):
         gevent.sleep(5)
         parameters["RIME_exampleUnicastActivateApplication"] = 1
         err3 = global_app_manager.update_configuration(parameters)
-        log.info("Error: MAC {} APP {},{}".format(err1,err2,err3))
+        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
         gevent.sleep(20)
 
 if __name__ == "__main__":

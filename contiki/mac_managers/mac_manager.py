@@ -136,7 +136,7 @@ class LocalMACManager(MACManager):
     def __execute_local_upi_func(self, UPIfunc, mac_address_list, *UPIargs, **UPIkwargs):
         # first get the radio platforms on which the UPI call needs to be executed
         if mac_address_list is None:
-			mac_address_list = self.mac_address_radio_platform_dict.keys()
+            mac_address_list = self.mac_address_radio_platform_dict.keys()
         ret = {}
         for mac_address in mac_address_list:
             ret[mac_address] = self.control_engine.blocking(True).iface(self.mac_address_radio_platform_dict[mac_address]).exec_cmd(upi_type="radio", fname=UPIfunc, args=UPIargs, kwargs=UPIkwargs)  
