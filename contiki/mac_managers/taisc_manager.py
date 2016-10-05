@@ -17,10 +17,16 @@ class LocalTAISCMACManager(LocalMACManager):
         taisc_slotframe = read_taisc_slotframe(slotframe_csv)
         current_offset = 0
         ret_val = 0
+        ret_dict = {}
+        for mac_address in self.get_hwaddr_list():
+            ret_dict[mac_address] = 0
         while(current_offset < taisc_slotframe.slotframe_length):
             slotframe_tpl = taisc_slotframe.to_tuple(current_offset, MAX_MSG_SIZE)
             param_key_values_dict = {'taiscSlotframe': slotframe_tpl}
-            ret_val += self.update_macconfiguration(param_key_values_dict, self.get_hwaddr_list())
+            ret = self.update_macconfiguration(param_key_values_dict)
+            for mac_address in ret:
+                ret_dict[mac_address] += ret[mac_address]['taiscSlotframe']
+                ret_val+=ret[mac_address]['taiscSlotframe']
             current_offset += slotframe_tpl[1]
         return ret_val
 
@@ -90,10 +96,16 @@ class GlobalTAISCMACManager(GlobalMACManager):
         taisc_slotframe = read_taisc_slotframe(slotframe_csv)
         current_offset = 0
         ret_val = 0
+        ret_dict = {}
+        for mac_address in self.get_hwaddr_list():
+            ret_dict[mac_address] = 0
         while(current_offset < taisc_slotframe.slotframe_length):
             slotframe_tpl = taisc_slotframe.to_tuple(current_offset, MAX_MSG_SIZE)
             param_key_values_dict = {'taiscSlotframe': slotframe_tpl}
-            ret_val += self.update_macconfiguration(param_key_values_dict)
+            ret = self.update_macconfiguration(param_key_values_dict)
+            for mac_address in ret:
+                ret_dict[mac_address] += ret[mac_address]['taiscSlotframe']
+                ret_val+=ret[mac_address]['taiscSlotframe']
             current_offset += slotframe_tpl[1]
         return ret_val
 

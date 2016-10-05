@@ -68,7 +68,7 @@ def default_callback(group, node, cmd, data):
 def hc_message_handler(hc_connector):
     while True:
         msg = hc_connector.recv(timeout=1)
-        print("{} Global CP received event {} from local CP: {}".format(datetime.datetime.now(), msg["event_name"], msg["event_value"]))
+        print("{} Global CP received msg {} from local CP".format(datetime.datetime.now(), msg))
     pass
 
 
@@ -105,34 +105,36 @@ def main(args):
     #param_key_values = {'taiscSlotframe': (0, 10, 1, 65535, 1, 0, 2, 1, 0, 0, 3, 1, 0, 0, 4, 1, 0, 0, 5, 1, 0, 0, 6, 1, 0, 0, 7, 1, 0, 0, 8, 1, 0, 0, 9, 1, 0, 0, 10, 1, 0, 0)}
     #ret = global_control_engine.nodes(nodes).blocking(True).radio.iface("lowpan0").set_parameters(param_key_values)
     ret = global_taisc_manager.update_slotframe('./mac_managers/default_taisc_slotframe.csv')
-    self.log.info(ret)
+    log.info(ret)
+
+    gevent.sleep(10)
     parameters = {"RIME_exampleUnicastActivateApplication": 1}
 
     # control loop
     while True:
         log.info("Activating CSMA MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
-        global_control_engine.blocking(False).node(nodes).net.set_parameters(parameters, "lowpan0")
+        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
         global_taisc_manager.activate_radio_program("CSMA")
         gevent.sleep(5)
         parameters["RIME_exampleUnicastActivateApplication"] = 1
-        global_control_engine.blocking(False).node(nodes).radio.iface("lowpan0").set_parameters(parameters)
+        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
         gevent.sleep(60)
         log.info("Activating TDMA MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
-        global_control_engine.blocking(False).node(nodes).radio.iface("lowpan0").set_parameters(parameters)
+        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
         global_taisc_manager.activate_radio_program("TDMA")
         gevent.sleep(5)
         parameters["RIME_exampleUnicastActivateApplication"] = 1
-        global_control_engine.blocking(False).node(nodes).radio.iface("lowpan0").set_parameters(parameters)
+        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
         gevent.sleep(60)
         log.info("Activating TSCH MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
-        global_control_engine.blocking(False).node(nodes).radio.iface("lowpan0").set_parameters(parameters)
+        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
         global_taisc_manager.activate_radio_program("TSCH")
         gevent.sleep(5)
         parameters["RIME_exampleUnicastActivateApplication"] = 1
-        global_control_engine.blocking(False).node(nodes).radio.iface("lowpan0").set_parameters(parameters)
+        global_control_engine.blocking(True).node(nodes).net.iface("lowpan0").set_parameters_net(parameters)
         gevent.sleep(60)
 
 if __name__ == "__main__":
