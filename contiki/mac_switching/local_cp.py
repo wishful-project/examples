@@ -9,6 +9,7 @@ def my_local_control_program(control_engine):
     # do all needed imports here!!!
     import time
     import datetime
+    import gevent
 
     @control_engine.set_default_callback()
     def default_callback(cmd, data):
@@ -22,12 +23,12 @@ def my_local_control_program(control_engine):
 
     radio_platforms = control_engine.blocking(True).radio.iface("lowpan0").get_radio_platforms()
     for platform in radio_platforms:
-        control_engine.blocking(False).radio.iface(platform.interface).subscribe_event("RIME_appPerPacket_rxstats",)
+        control_engine.blocking(False).net.iface(platform).subscribe_events_net(["RIME_appPerPacket_rxstats"],event_handler,0)
     print(("\nLocal Control Program - Name: {}, Id: {} - STARTED".format(control_engine.name, control_engine.id)))
 
     # control loop
     while not control_engine.is_stopped():
-        time.sleep(1)
+        gevent.sleep(10)
         print(("Local Control Program - Name: {}, Id: {} - RUNNING".format(control_engine.name, control_engine.id)))
 
     print(("Local Control Program - Name: {}, Id: {} - STOPPED".format(control_engine.name, control_engine.id)))

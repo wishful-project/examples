@@ -133,7 +133,7 @@ class LocalMACManager(MACManager):
             self.radio_platform_mac_address_dict[radio_platform] = mac_address
         pass
 
-    def __execute_local_upi_func(self, UPIfunc, UPIargs, UPIkwargs, mac_address_list):
+    def __execute_local_upi_func(self, UPIfunc, mac_address_list, *UPIargs, **UPIkwargs):
         # first get the radio platforms on which the UPI call needs to be executed
         radio_platforms = []
         for mac_address in mac_address_list:
@@ -142,7 +142,7 @@ class LocalMACManager(MACManager):
         ret = {}
         for radio_platform in radio_platforms:
             ret[self.radio_platform_mac_address_dict[radio_platform]] = self.control_engine.blocking(
-                True).iface(radio_platform).exec_cmd("radio", UPIfunc, UPIargs, UPIargs)
+                True).iface(radio_platform).exec_cmd("radio", UPIfunc, *UPIargs, **UPIkwargs)
         return ret
 
     def update_macconfiguration(self, param_key_values_dict, mac_address_list=None):
@@ -161,6 +161,7 @@ class LocalMACManager(MACManager):
         #~ UPIargs = (param_key_values_dict)
         #~ UPIkwargs = {"param_key_values_dict": param_key_values_dict}
         #~ return self.__execute_local_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
+        #~ return self.__execute_local_upi_func(UPIfunc, mac_address_list, param_key_values_dict)
         radio_platforms = []
         for mac_address in mac_address_list:
             radio_platforms.append(self.mac_address_radio_platform_dict[mac_address])
@@ -349,29 +350,35 @@ class GlobalMACManager(MACManager):
         """ Class initialiser """
         self.control_engine = control_engine
         self.log = logging.getLogger("global_mac_manager")
-        self.nodes = []
+        self.nodes = {}
         self.nodes_radio_platform_dict = {}
         self.mac_address_node_radioplatform_dict = {}
         self.mac_mode = mac_mode
         pass
 
     def add_node(self, node):
-        self.nodes.append(node)
+        self.nodes[node.id] = node
         radio_platforms = self.control_engine.node(node).blocking(True).iface("lowpan0").radio.get_radio_platforms()
-        self.nodes_radio_platform_dict[node] = radio_platforms
+        print("radioplatforms {}".format(radio_platforms))
+        self.nodes_radio_platform_dict[node.id] = radio_platforms
+        print("before")
         for radio_platform in radio_platforms:
             mac_addr = self.control_engine.node(node).blocking(True).iface(radio_platform).radio.get_hwaddr()
-            self.mac_address_node_radioplatform_dict[mac_addr] = [node, radio_platform]
+            self.mac_address_node_radioplatform_dict[mac_addr] = [node.id, radio_platform]
+        print("%s %s %s", self.nodes, self.nodes_radio_platform_dict, self.mac_address_node_radioplatform_dict)
 
     def remove_node(self, node):
-        self.nodes.remove(node)
-        del self.nodes_radio_platform_dict[node]
-        for mac_addr in self.mac_address_node_radioplatform_dict.keys():
-            if self.mac_address_node_radioplatform_dict[mac_addr][0] == node:
-                del self.mac_address_node_radioplatform_dict[mac_addr]
-                break
+        if node.id in self.nodes:
+            del self.nodes[node.id]
+            del self.nodes_radio_platform_dict[node.id]
+            for mac_addr in self.mac_address_node_radioplatform_dict.keys():
+                if self.mac_address_node_radioplatform_dict[mac_addr][0] == node.id:
+                   del self.mac_address_node_radioplatform_dict[mac_addr]
+                   break
+        else:
+            self.log.info("Node %s not found", node)
 
-    def __execute_global_upi_func(self, UPIfunc, UPIargs, UPIkwargs, mac_address_list=None):
+    def __execute_global_upi_func(self, UPIfunc, mac_address_list=None, *UPIargs, **UPIkwargs):
         if mac_address_list is None:
             mac_address_list = self.mac_address_node_radioplatform_dict.keys()
         ret = {}
@@ -379,7 +386,7 @@ class GlobalMACManager(MACManager):
             node = self.mac_address_node_radioplatform_dict[mac_addr][0]
             radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
             ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).exec_cmd("radio", UPIfunc, UPIargs, UPIkwargs)
+                radio_platform).exec_cmd("radio", UPIfunc, *UPIargs, **UPIkwargs)
         return ret
 
     def update_macconfiguration(self, param_key_values_dict, mac_address_list=None):
@@ -395,19 +402,19 @@ class GlobalMACManager(MACManager):
         Returns:
             Dict[str, int]: This function returs a dictionary containing parameter key-error_codes pairs.
         """
-        #~ UPIfunc = "set_parameters"
-        #~ UPIargs = (param_key_values_dict)
-        #~ UPIkwargs = {'param_key_values_dict': param_key_values_dict}
-        #~ return self.__execute_global_upi_func(UPIfunc, UPIargs, UPIkwargs, mac_address_list)
-        if mac_address_list is None:
-            mac_address_list = self.mac_address_node_radioplatform_dict.keys()
-        ret = {}
-        for mac_addr in mac_address_list:
-            node = self.mac_address_node_radioplatform_dict[mac_addr][0]
-            radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
-            ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
-                radio_platform).radio.set_parameters(param_key_values_dict)
-        return ret
+        UPIfunc = "set_parameters"
+        UPIargs = (param_key_values_dict)
+        UPIkwargs = {'param_key_values_dict': param_key_values_dict}
+        return self.__execute_global_upi_func(UPIfunc, mac_address_list, param_key_values_dict)
+        #~ if mac_address_list is None:
+            #~ mac_address_list = self.mac_address_node_radioplatform_dict.keys()
+        #~ ret = {}
+        #~ for mac_addr in mac_address_list:
+            #~ node = self.mac_address_node_radioplatform_dict[mac_addr][0]
+            #~ radio_platform = self.mac_address_node_radioplatform_dict[mac_addr][1]
+            #~ ret[mac_addr] = self.control_engine.blocking(True).node(node).iface(
+                #~ radio_platform).radio.set_parameters(param_key_values_dict)
+        #~ return ret
 
     def read_macconfiguration(self, param_key_list, mac_address_list=None):
         """Update the current MAC configuration.

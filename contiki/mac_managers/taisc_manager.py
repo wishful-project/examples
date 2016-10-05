@@ -1,5 +1,6 @@
 from enum import IntEnum
 from .mac_manager import *
+import csv
 
 MAX_MSG_SIZE = 64
 
@@ -179,14 +180,14 @@ class taiscLink(object):
         self.channel_offset = channel_offset
 
     def to_tuple(self):
-        return (self.src_address, dst_address, self.slot_type, self.channel_offset)
+        return (self.src_address, self.dst_address, self.slot_type, self.channel_offset)
 
     @staticmethod
     def from_tuple(tpl):
         return taiscLink(tpl[0], tpl[1], tpl[2], tpl[3])
 
     def __str__(self):
-        return "{" + format(self.src_address, '#04x') + "->" + format(self.dst_address, '#04x') + ":" + str(self.slot_type) + "," + str(self.channel_offset) + "}"
+        return "{" + self.src_address + "->" + self.dst_address + ":" + str(self.slot_type) + "," + str(self.channel_offset) + "}"
 
 
 class taiscSlotFrame(object):
@@ -194,22 +195,23 @@ class taiscSlotFrame(object):
     def __init__(self, slotframe=None):
         self.slotframe = []
         self.mac_address_list = []
+        self.slotframe_length = 0
         if slotframe is not None:
             self.slotframe_length = len(slotframe)
             self.slotframe = slotframe
-            for slot in slotframe:
-                if slot.src_address not in mac_address_list:
-                    mac_address_list.append(src_address)
-                if slot.dst_address not in mac_address_list and slot.dst_address != 0xFFFF:
-                    mac_address_list.append(dst_address)
+            for slot in self.slotframe:
+                if slot.src_address not in self.mac_address_list:
+                    self.mac_address_list.append(slot.src_address)
+                if slot.dst_address not in self.mac_address_list and slot.dst_address != 0xFFFF:
+                    self.mac_address_list.append(slot.dst_address)
 
     def add_slot(self, taisc_slot):
         self.slotframe.append(taisc_slot)
         self.slotframe_length += 1
-        if taisc_slot.src_address not in mac_address_list:
-            mac_address_list.append(src_address)
-        if taisc_slot.dst_address not in mac_address_list and taisc_slot.dst_address != 0xFFFF:
-            mac_address_list.append(dst_address)
+        if taisc_slot.src_address not in self.mac_address_list:
+            self.mac_address_list.append(taisc_slot.src_address)
+        if taisc_slot.dst_address not in self.mac_address_list and taisc_slot.dst_address != 0xFFFF:
+            self.mac_address_list.append(taisc_slot.dst_address)
 
     def to_tuple(self, slotframe_offset, max_size):
         num_slots = (max_size - 2) // taiscLink.SLOT_SIZE
