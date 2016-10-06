@@ -25,8 +25,12 @@ class LocalTAISCMACManager(LocalMACManager):
             param_key_values_dict = {'taiscSlotframe': slotframe_tpl}
             ret = self.update_macconfiguration(param_key_values_dict)
             for mac_address in ret:
-                ret_dict[mac_address] += ret[mac_address]['taiscSlotframe']
-                ret_val+=ret[mac_address]['taiscSlotframe']
+                if type(ret[mac_address]) is dict:
+                    ret_dict[mac_address] += ret[mac_address]['taiscSlotframe']
+                    ret_val+=ret[mac_address]['taiscSlotframe']
+                else:
+                    ret_dict[mac_address] += ret[mac_address]
+                    ret_val+=ret[mac_address]
             current_offset += slotframe_tpl[1]
         return ret_val
 
@@ -104,8 +108,12 @@ class GlobalTAISCMACManager(GlobalMACManager):
             param_key_values_dict = {'taiscSlotframe': slotframe_tpl}
             ret = self.update_macconfiguration(param_key_values_dict)
             for mac_address in ret:
-                ret_dict[mac_address] += ret[mac_address]['taiscSlotframe']
-                ret_val+=ret[mac_address]['taiscSlotframe']
+                if type(ret[mac_address]) is dict:
+                    ret_dict[mac_address] += ret[mac_address]['taiscSlotframe']
+                    ret_val+=ret[mac_address]['taiscSlotframe']
+                else:
+                    ret_dict[mac_address] += ret[mac_address]
+                    ret_val+=ret[mac_address]
             current_offset += slotframe_tpl[1]
         return ret_val
 
