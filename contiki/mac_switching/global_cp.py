@@ -69,9 +69,11 @@ def default_callback(group, node, cmd, data):
 
 def hc_message_handler(hc_connector):
     while True:
-        msg = hc_connector.recv(timeout=1)
-        if msg != None:
+        msg = hc_connector.recv(block=False, timeout=1)
+        while msg is not None:
             print("{} Global CP received msg {} from local CP".format(datetime.datetime.now(), msg))
+            msg = hc_connector.recv(block=False, timeout=1)
+        gevent.sleep(1)
     pass
 
 
