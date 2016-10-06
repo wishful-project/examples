@@ -84,7 +84,7 @@ class WiFiController(wishful_module.ControllerModule):
         self.discoveryTimer.start(self.discovery_interval)
 
         try:
-		    start = time.time()
+            start = time.time()
             for node in self.nodes.values():
 
                 self.log.info(node)
@@ -102,7 +102,7 @@ class WiFiController(wishful_module.ControllerModule):
 
             end = time.time()
             delta = end - start
-			self.log.info('Exec time: %0.6f" % delta)
+            self.log.info('Exec time: %0.6f' % delta)
             
         except Exception as e:
             self.log.error("{} !!!Exception!!!: {}".format(
