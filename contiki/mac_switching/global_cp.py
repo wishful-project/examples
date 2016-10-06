@@ -117,15 +117,15 @@ def main(args):
 
     # control loop
     while True:
-        log.info("Activating CSMA MAC!")
-        parameters["RIME_exampleUnicastActivateApplication"] = 0
-        err1 = global_app_manager.update_configuration(parameters)
-        err2 = global_taisc_manager.activate_radio_program("CSMA")
-        gevent.sleep(5)
-        parameters["RIME_exampleUnicastActivateApplication"] = 1
-        err3 = global_app_manager.update_configuration(parameters)
-        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
-        gevent.sleep(20)
+        #~ log.info("Activating CSMA MAC!")
+        #~ parameters["RIME_exampleUnicastActivateApplication"] = 0
+        #~ err1 = global_app_manager.update_configuration(parameters)
+        #~ err2 = global_taisc_manager.activate_radio_program("CSMA")
+        #~ gevent.sleep(5)
+        #~ parameters["RIME_exampleUnicastActivateApplication"] = 1
+        #~ err3 = global_app_manager.update_configuration(parameters)
+        #~ log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
+        #~ gevent.sleep(20)
         log.info("Activating TDMA MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
         err1 = global_app_manager.update_configuration(parameters)
@@ -134,16 +134,16 @@ def main(args):
         parameters["RIME_exampleUnicastActivateApplication"] = 1
         err3 = global_app_manager.update_configuration(parameters)
         log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
-        gevent.sleep(20)
-        log.info("Activating TSCH MAC!")
-        parameters["RIME_exampleUnicastActivateApplication"] = 0
-        err1 = global_app_manager.update_configuration(parameters)
-        err2 = global_taisc_manager.activate_radio_program("TSCH")
-        gevent.sleep(5)
-        parameters["RIME_exampleUnicastActivateApplication"] = 1
-        err3 = global_app_manager.update_configuration(parameters)
-        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
-        gevent.sleep(20)
+        gevent.sleep(200)
+        #~ log.info("Activating TSCH MAC!")
+        #~ parameters["RIME_exampleUnicastActivateApplication"] = 0
+        #~ err1 = global_app_manager.update_configuration(parameters)
+        #~ err2 = global_taisc_manager.activate_radio_program("TSCH")
+        #~ gevent.sleep(5)
+        #~ parameters["RIME_exampleUnicastActivateApplication"] = 1
+        #~ err3 = global_app_manager.update_configuration(parameters)
+        #~ log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
+        #~ gevent.sleep(20)
 
 if __name__ == "__main__":
     try:
