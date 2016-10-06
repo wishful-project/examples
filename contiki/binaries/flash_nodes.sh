@@ -1,5 +1,4 @@
 #!/bin/bash
-export PATH=$PATH:/opt/compilers/mspgcc-4.7.3/bin
 if [ $# = 3 ] && [ -e $1 ]; then
         BINARY=$1
         NODE_ID=$2
@@ -9,5 +8,5 @@ if [ $# = 3 ] && [ -e $1 ]; then
         echo "INFO: ibcn-f5x-tos-bsl -c $SERIAL_DEV -5 -R --invert-reset --swap-reset-test -r -e -I -p ./test_$NODE_ID.ihex &"
         ./ibcn-f5x-tos-bsl -c $SERIAL_DEV -5 -R --invert-reset --swap-reset-test -r -e -I -p ./test_$NODE_ID.ihex &      
 else
-        echo "Wrong arguments: $BINARY,$NODE_ID,$SERIAL_DEV or PATH $PATH"
+        echo "Wrong arguments: $BINARY,$NODE_ID,$SERIAL_DEV or MSP430 not in PATH $PATH"
 fi
