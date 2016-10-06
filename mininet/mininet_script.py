@@ -22,7 +22,7 @@ __version__ = "0.1.0"
 __email__ = "{zubow}@tkn.tu-berlin.de"
 
 # enable mininet cli
-MN_CLI = True
+MN_CLI = False
 # enable GUI
 GUI = False
 # enable mobility
@@ -41,10 +41,10 @@ def topology():
     net = Mininet( controller=Controller, link=TCLink, switch=OVSKernelSwitch )
 
     print("*** Creating nodes")
-    sta1 = net.addStation( 'sta1', mac='00:00:00:00:00:02', ip='10.0.0.2/8', position='5,40,0' )
-    sta2 = net.addStation( 'sta2', mac='00:00:00:00:00:03', ip='10.0.0.3/8', position='30,20,0' )
-    ap1 = net.addBaseStation( 'ap1', ssid= 'new-ssid1', mode= 'g', channel= '1', position='15,50,0' )
-    ap2 = net.addBaseStation( 'ap2', ssid= 'new-ssid2', mode= 'g', channel= '6', position='25,30,0' )
+    sta1 = net.addStation( 'sta1', mac='00:00:00:00:00:02', ip='10.0.0.2/8', position='12,10,0' )
+    sta2 = net.addStation( 'sta2', mac='00:00:00:00:00:03', ip='10.0.0.3/8', position='18,10,0' )
+    ap1 = net.addBaseStation( 'ap1', ssid= 'new-ssid1', mode= 'g', channel= '1', position='10,10,0' )
+    ap2 = net.addBaseStation( 'ap2', ssid= 'new-ssid2', mode= 'g', channel= '6', position='20,10,0' )
     c1 = net.addController( 'c1', controller=Controller )
 
     print("*** Creating links")
@@ -95,7 +95,7 @@ def topology():
     time.sleep(2)
 
     print("*** perform ping")
-    sta1.cmd('ping -c1 %s' % sta2.IP())
+    sta1.cmd('ping -c20 %s' % sta2.IP())
 
     if MN_CLI:
         print("*** Running CLI")
