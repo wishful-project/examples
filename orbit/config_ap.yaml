@@ -1,0 +1,18 @@
+## WiSHFUL Agent config file
+
+agent_config:
+  name: 'local_wifi_device'
+  info: 'Just local device'
+  type: 'slave'
+  iface: 'eth1'
+
+modules:
+  discovery:
+      module : wishful_module_discovery_pyre
+      class_name : PyreDiscoveryAgentModule
+      kwargs: {"iface":"eth1", "groupName":"wishful_1234"}
+
+  wifi:
+      module : wishful_module_wifi
+      class_name : WifiModule
+      devices : ['phy0']

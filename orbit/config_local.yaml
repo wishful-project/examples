@@ -1,0 +1,19 @@
+## WiSHFUL Agent config file
+
+agent_config:
+  name: 'Local_Controller'
+  info: 'local test of wifi module'
+  type: 'local'
+  iface: 'lo'
+
+controllers:
+  myController:
+      file : local_test.py
+      class_name : WifiTestController
+      kwargs : {}
+
+modules:
+  wifi:
+      module : wishful_module_wifi
+      class_name : WifiModule
+      devices : ['phy0']

@@ -1,0 +1,29 @@
+## WiSHFUL Agent config file of the BigAP controller
+
+agent_config:
+  name: "WiFi_Controller"
+  info: 'global WiFi controller'
+  type: 'master'
+  iface: 'eth1'
+  sub: "tcp://10.10.1.8:8990"
+  pub: "tcp://10.10.1.8:8989"
+
+broker:
+  xpub: "tcp://10.10.1.8:8990"
+  xsub: "tcp://10.10.1.8:8989"
+
+controllers:
+  wificontroller:
+      file : wifi_control.py
+      class_name : WiFiController
+      kwargs : {"mode": "GLOBAL"}
+
+modules:
+  discovery:
+        module : wishful_module_discovery_pyre
+        class_name : PyreDiscoveryControllerModule
+        kwargs: {"iface":"eth1",
+                 "groupName":"wishful_1234",
+                 "sub":"tcp://10.10.1.8:8990",
+                 "pub":"tcp://10.10.1.8:8989"
+                }
