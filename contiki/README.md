@@ -1,6 +1,6 @@
 # WiSHFUL Contiki Examples
 
-The examples grouped in this folder illustrate how to use the WiSHFUL Unified Programming Interfaces (UPIs) on Contiki nodes. Please find instructions in the README-EXAMPLES for any prerequisites.
+The examples grouped in this folder illustrate how to use the WiSHFUL Unified Programming Interfaces (UPIs) on Contiki nodes. Please find instructions in the README-EXAMPLES for configuring the nodes and WiSHFUL system correctly.
 
 ## Acknowledgement
 
