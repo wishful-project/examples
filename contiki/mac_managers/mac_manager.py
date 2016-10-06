@@ -154,7 +154,7 @@ class LocalMACManager(MACManager):
         Returns:
             Dict[str, int]: This function returs a dictionary containing parameter key-error_codes pairs.
         """
-        return self.__execute_local_upi_func("set_parameters", mac_address_list, param_key_values_dict)
+        return self.__execute_local_upi_func("set_parameters_radio", mac_address_list, param_key_values_dict)
 
     def read_macconfiguration(self, param_key_list, mac_address_list=None):
         """Update the current MAC configuration.
@@ -168,7 +168,7 @@ class LocalMACManager(MACManager):
         Returns:
             Dict[str,Any]: a dictionary containing parameter key-value pairs.
         """
-        return self.__execute_local_upi_func("get_parameters", mac_address_list, param_key_list)
+        return self.__execute_local_upi_func("get_parameters_radio", mac_address_list, param_key_list)
 
     def get_measurements(self, measurement_key_list, mac_address_list=None):
         """Monitor the current MAC behaviour in a pull based manner.
@@ -182,7 +182,7 @@ class LocalMACManager(MACManager):
         Returns:
             Dict[str,Any]: a dictionary containing measurement key-value pairs.
         """
-        return self.__execute_local_upi_func("get_measurements", mac_address_list, measurement_key_list)
+        return self.__execute_local_upi_func("get_measurements_radio", mac_address_list, measurement_key_list)
 
     def get_measurements_periodic(self, measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list=None):
         """Monitor the current MAC behaviour periodically in a pull based manner.
@@ -200,7 +200,7 @@ class LocalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        return self.__execute_local_upi_func("get_measurements_periodic", mac_address_list, measurement_key_list, collect_period, report_period, num_iterations, report_callback)
+        return self.__execute_local_upi_func("get_measurements_periodic_radio", mac_address_list, measurement_key_list, collect_period, report_period, num_iterations, report_callback)
 
     def subscribe_events(self, event_key_list, event_callback, event_duration, mac_address_list=None):
         """Monitor the MAC behaviour asynchroniously in a push based manner by registering for events.
@@ -215,7 +215,7 @@ class LocalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        return self.__execute_local_upi_func("subscribe_events", mac_address_list, event_key_list, event_callback, event_duration)
+        return self.__execute_local_upi_func("subscribe_events_radio", mac_address_list, event_key_list, event_callback, event_duration)
 
     def activate_radio_program(self, name, mac_address_list=None):
         """Activate a MAC radio program.
@@ -313,7 +313,7 @@ class GlobalMACManager(MACManager):
         Returns:
             Dict[str, int]: This function returs a dictionary containing parameter key-error_codes pairs.
         """
-        return self.__execute_global_upi_func("set_parameters", mac_address_list, param_key_values_dict)
+        return self.__execute_global_upi_func("set_parameters_radio", mac_address_list, param_key_values_dict)
 
     def read_macconfiguration(self, param_key_list, mac_address_list=None):
         """Update the current MAC configuration.
@@ -328,7 +328,7 @@ class GlobalMACManager(MACManager):
         Returns:
             Dict[str,Any]: a dictionary containing parameter key-value pairs.
         """
-        return self.__execute_global_upi_func("get_parameters", mac_address_list, param_key_list)
+        return self.__execute_global_upi_func("get_parameters_radio", mac_address_list, param_key_list)
 
     def get_measurements(self, measurement_key_list, mac_address_list=None):
         """Monitor the current MAC behaviour in a pull based manner.
@@ -343,7 +343,7 @@ class GlobalMACManager(MACManager):
         Returns:
             Dict[str,Any]: a dictionary containing measurement key-value pairs.
         """
-        return self.__execute_global_upi_func("get_measurements", mac_address_list, measurement_key_list)
+        return self.__execute_global_upi_func("get_measurements_radio", mac_address_list, measurement_key_list)
 
     def get_measurements_periodic(self, measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list=None):
         """Monitor the current MAC behaviour periodically in a pull based manner.
@@ -362,7 +362,7 @@ class GlobalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        return self.__execute_global_upi_func("get_measurements_periodic", mac_address_list, measurement_key_list, collect_period, report_period, num_iterations, report_callback)
+        return self.__execute_global_upi_func("get_measurements_periodic_radio", mac_address_list, measurement_key_list, collect_period, report_period, num_iterations, report_callback)
 
     def subscribe_events(self, event_keys, event_callback, event_duration, mac_address_list=None):
         """Monitor the MAC behaviour asynchroniously in a push based manner by registering for events.
@@ -378,7 +378,7 @@ class GlobalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        return self.__execute_global_upi_func("subscribe_events", mac_address_list, event_keys, event_callback, event_duration)
+        return self.__execute_global_upi_func("subscribe_events_radio", mac_address_list, event_keys, event_callback, event_duration)
 
     def get_radio_info(self, mac_address_list=None):
         """Returns a radio_info_t object containing all parameter, measurement and event keys as well as the available radio programs.
