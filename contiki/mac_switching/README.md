@@ -14,3 +14,27 @@ cd binaries/
 ```
 
 ## Example execution
+On all Linux hosts, start the WiSHFUL agent:
+```
+# Localhost:
+python mac_switching/agent.py --config config/localhost/agent_config.yaml 
+
+# Portable testbed
+python mac_switching/agent.py --config config/portable/agent_config.yaml
+
+# Wilab2 testbed
+python mac_switching/agent.py --config config/wilab2/agent_config.yaml 
+```
+
+On the global controller start the global control program:
+```
+# Localhost:
+python mac_switching/global_cp.py --config config/localhost/global_cp_config.yaml 
+
+# Portable testbed
+python mac_switching/global_cp.py --config config/portable/global_cp_config.yaml
+
+# Wilab2 testbed
+python mac_switching/global_cp.py --config config/wilab2/global_cp_config.yaml 
+```
+
