@@ -22,10 +22,10 @@ cd examples/contiki
 The UPIs are currently implemented only on RM-090 sensors with a modified Contiki image.
 ### RM-090
 Make shure the correct image is flashed on each of the RM-090. 
-The `flash_nodes_<TESTBED>.sh` script is used for assigning flashing the sensor nodes and asigning the node id.
+The `flash_nodes.sh` script is used for assigning flashing the sensor nodes and asigning the node id.
 ```
 cd binaries/
-./flash_nodes 1 <BINARY>
+./flash_nodes <BINARY> <SHORT_ADDR> <SERIAL_DEV>
 ```
 Known caveats:
  - ensure that your linux user is member of the dialout group
