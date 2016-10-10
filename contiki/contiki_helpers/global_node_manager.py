@@ -102,7 +102,7 @@ class GlobalNodeManager(NodeManager):
     @control_engine.new_node_callback()
     def new_node(node):
         GlobalNodeManager.connected_nodes[node.id] = node
-        threading.Timer(2,GlobalNodeManager.__update_mac_address_list,node.id).start()
+        threading.Timer(2,GlobalNodeManager.__update_mac_address_list,args=(node.id,)).start()
         print("New node appeared:")
         print(node)
 

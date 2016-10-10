@@ -42,7 +42,7 @@ class NodeManager():
         with open(config_file_path, 'r') as f:
             self.config = yaml.load(f)
 
-    def get_mac_address_list():
+    def get_mac_address_list(self):
         return NodeManager.mac_address_list
 
     def create_group(self, group_name, mac_address_list=None):
