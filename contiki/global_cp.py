@@ -70,8 +70,8 @@ def main(args):
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
     
-	global_node_manager = GlobalNodeManager(config)
-	global_node_manager.set_default_callback(default_callback)
+    global_node_manager = GlobalNodeManager(config)
+    global_node_manager.set_default_callback(default_callback)
     contiki_nodes = []
 
     #control loop

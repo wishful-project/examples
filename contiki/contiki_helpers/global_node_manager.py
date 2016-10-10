@@ -12,7 +12,7 @@ class GlobalNodeManager(NodeManager):
         super(GlobalNodeManager, self).__init__("global")
         self.control_engine = wishful_controller.Controller()
         self.control_engine.load_config(config)
-        self.control_engine.nodeManager.add_new_node_callback(self.add_node
+        self.control_engine.nodeManager.add_new_node_callback(self.add_node)
         self.control_engine.nodeManager.add_node_exit_callback(self.remove_node)
         self.control_engine.start()
         self.connected_nodes = {}
