@@ -20,7 +20,9 @@ class GlobalNodeManager(NodeManager):
         self.mac_address_to_node_id = {}
         self.mac_address_to_event_cb = {}
         self.mac_address_to_report_cb = {}
-        self.mac_address_to_hc_connector = {}
+        self.mac_address_to_local_monitoring_cp = {}
+        self.mac_address_to_custom_local_cp = {}
+        self.mac_address_to_custom_local_cp_callback = {}
 
 
     #~ def __get_macaddress_by_nodeid_iface(self,node_id, iface):
@@ -29,9 +31,9 @@ class GlobalNodeManager(NodeManager):
                 #~ return addr
         #~ return -1
 
-    def __hc_message_handler(self, hc_connector, mac_address, node_id, iface):
+    def __local_monitoring_cp_message_handler(self, local_monitoring_cp, mac_address, node_id, iface):
         while True:
-            msg = hc_connector.recv(block=False, timeout=1)
+            msg = local_monitoring_cp.recv(block=False, timeout=1)
             while msg is not None:
                 if type(msg) is dict and "msg_type" in msg:
                     msg_type = msg["msg_type"]
@@ -56,7 +58,7 @@ class GlobalNodeManager(NodeManager):
                         print("{} Global Manager received unknown msgtype {} from local CP {}".format(datetime.datetime.now(), msg, agent_id))
                 else:
                     print("{} Global Manager received unknown msg {} from local CP {}".format(datetime.datetime.now(), msg, agent_id))
-                msg = hc_connector.recv(block=False, timeout=1)
+                msg = local_monitoring_cp.recv(block=False, timeout=1)
             gevent.sleep(1)
         pass
 
@@ -64,16 +66,40 @@ class GlobalNodeManager(NodeManager):
         if mac_address_list is None:
             mac_address_list = self.mac_address_list
         for mac_address in mac_address_list:
-            if mac_address not in self.mac_address_to_hc_connector:
+            if mac_address not in self.mac_address_to_local_monitoring_cp:
                 node_id = self.mac_address_to_node_id[mac_address]
                 iface = self.mac_address_to_interface[mac_address]
                 self.mac_address_to_event_cb[mac_address] = None
                 self.mac_address_to_report_cb[mac_address] = None
-                hc_connector = self.control_engine.node(node_id).hc.start_local_control_program(program=local_monitoring_program)
-                self.mac_address_to_hc_connector[mac_address] = hc_connector
-                _thread.start_new_thread(self.__hc_message_handler, (hc_connector,mac_address,node_id,iface))
+                local_monitoring_cp = self.control_engine.node(node_id).hc.start_local_control_program(program=local_monitoring_program)
+                self.mac_address_to_local_monitoring_cp[mac_address] = local_monitoring_cp
+                _thread.start_new_thread(self.__local_monitoring_cp_message_handler, (local_monitoring_cp,mac_address,node_id,iface))
             else:
                 self.log.debug("Local monitoring program already started for {}".format(mac_address))
+
+    def __custom_local_cp_message_handler(self, custom_local_cp, mac_address, node_id, iface):
+        while True:
+            msg = custom_local_cp.recv(block=False, timeout=1)
+            while msg is not None:
+                gevent.spawn(self.mac_address_to_custom_local_cp_callback[mac_address][custom_local_cp.id],mac_address,msg)
+                msg = local_monitoring_cp.recv(block=False, timeout=1)
+            gevent.sleep(1)
+        pass
+
+    def start_custom_local_cp(self, custom_local_control_program, callback, mac_address_list=None):
+        if mac_address_list is None:
+            mac_address_list = self.mac_address_list
+        for mac_address in mac_address_list:
+            if mac_address not in self.mac_address_to_local_monitoring_cp:
+                self.mac_address_to_custom_local_cp[mac_address] = {}
+                self.mac_address_to_custom_local_cp_callback[mac_address] = {}
+            node_id = self.mac_address_to_node_id[mac_address]
+            iface = self.mac_address_to_interface[mac_address]
+            custom_local_cp = self.control_engine.node(node_id).hc.start_local_control_program(program=custom_local_control_program)
+            self.mac_address_to_custom_local_cp[mac_address][custom_local_cp.id] = custom_local_cp
+            self.mac_address_to_custom_local_cp_callback[mac_address][custom_local_cp.id] = callback
+            _thread.start_new_thread(self.__custom_local_cp_message_handler, (custom_local_cp,mac_address,node_id,iface))
+        return custom_local_cp
 
     def subscribe_events(self, upi_type, event_key_list, event_callback, event_duration, mac_address_list=None):
         if mac_address_list is None:
@@ -81,7 +107,7 @@ class GlobalNodeManager(NodeManager):
         for mac_address in mac_address_list:
             self.mac_address_to_event_cb[mac_address] = event_callback
             msg = {'interface': [self.mac_address_to_interface[mac_address]], 'command': 'SUBSCRIBE_EVENT', 'upi_type': upi_type, 'event_key_list': event_key_list, 'event_duration': event_duration}
-            self.mac_address_to_hc_connector[mac_address].send(msg)
+            self.mac_address_to_local_monitoring_cp[mac_address].send(msg)
 
 
     def get_measurements_periodic(self, upi_type, measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list=None):
@@ -90,7 +116,7 @@ class GlobalNodeManager(NodeManager):
         for mac_address in mac_address_list:
             self.mac_address_to_report_cb[mac_address] = report_callback
             msg = {'interface': [self.mac_address_to_interface[mac_address]], 'command': 'GET_MEASUREMENTS_PERIODIC', 'upi_type': upi_type, 'measurement_key_list': measurement_key_list, 'collect_period': collect_period, 'report_period': report_period, 'num_iterations': num_iterations}
-            self.mac_address_to_hc_connector[mac_address].send(msg)
+            self.mac_address_to_local_monitoring_cp[mac_address].send(msg)
 
     def __update_mac_address_list(self,node_id):
         #~ node_id = args[1]
@@ -123,8 +149,8 @@ class GlobalNodeManager(NodeManager):
                         del self.mac_address_to_event_cb[mac_address]
                     if mac_address in self.mac_address_to_report_cb:
                         del self.mac_address_to_report_cb[mac_address]
-                    if mac_address in self.mac_address_to_hc_connector:
-                        del self.mac_address_to_hc_connector[mac_address]
+                    if mac_address in self.mac_address_to_local_monitoring_cp:
+                        del self.mac_address_to_local_monitoring_cp[mac_address]
                     self.mac_address_list.remove(mac_address)
                     for group_name in self.groups:
                         self.group[group_name].remove_node(mac_address)
