@@ -1,7 +1,7 @@
 
-# TAISC mac switching example
+# TAISC mac Contention Window Optimization example
 
-In this example a global control program (`global_cp.py`) switches the MAC protocol on all nodes every X seconds.
+In this example a global control program (`global_cp.py`) optimizes the Contention Window of the CSMA MAC protocol based on the number of active nodes.
 The application RX events are captured by a local control program (`local_cp.py`).
 This local CP is installed and started on all Linux host PCs using hierarchical control (HC) engine.
 Also the locally observed events are forwared from the local CPs to the global CP using the HC engine.
@@ -14,6 +14,7 @@ cd binaries/
 ```
 
 ## Example execution
+
 On all Linux hosts, start the WiSHFUL agent:
 ```
 cd <WISHFUL-ROOT-DIR>/examples/contiki
