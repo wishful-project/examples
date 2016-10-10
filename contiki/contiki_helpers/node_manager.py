@@ -51,13 +51,13 @@ class NodeManager():
         if group_name in self.groups:
             del self.groups[group_name]
         pass
-    
+
     def set_default_callback(self, callback):
         self.control_engine.default_callback = callback
-    
+
     def add_callback(self, function, callback):
-		self.control_engine.callbacks[function.__name__] = callback
-    
+        self.control_engine.callbacks[function.__name__] = callback
+
     @abc.abstractmethod
     def execute_upi_function(self, upi_type, upi_fname, mac_address_list=None, *args, **kwargs):
         pass
@@ -69,7 +69,7 @@ class NodeManager():
     @abc.abstractmethod
     def delay_upi_function(self, upi_type, upi_fname, delay, mac_address_list=None, callback=None, *args, **kwargs):
         pass
-    
+
     @abc.abstractmethod
     def stop(self):
-		pass
+        pass
