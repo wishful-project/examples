@@ -35,35 +35,33 @@ __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
-control_engine = wishful_controller.Controller()
-global_node_manager = GlobalNodeManager(control_engine)
-nodes = {}
 
-@control_engine.new_node_callback()
-def new_node(node):
-    nodes[node.id] = node
-    print("New node appeared:")
-    print(node)
 
-@control_engine.node_exit_callback()
-def node_exit(node, reason):
-    global_node_manager.remove_node(node)
-    print("NodeExit : NodeID : {} MAC_ADDR : {} Reason : {}".format(node.id,mac_address_exit_list, reason))
-
-@control_engine.set_default_callback()
+#~ @control_engine.new_node_callback()
+#~ def new_node(node):
+    #~ nodes[node.id] = node
+    #~ print("New node appeared:")
+    #~ print(node)
+#~ 
+#~ @control_engine.node_exit_callback()
+#~ def node_exit(node, reason):
+    #~ global_node_manager.remove_node(node)
+    #~ print("NodeExit : NodeID : {} MAC_ADDR : {} Reason : {}".format(node.id,mac_address_exit_list, reason))
+#~ 
+#~ @control_engine.set_default_callback()
 def default_callback(group, node, cmd, data):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
-
-@control_engine.add_callback(upis.radio.set_rxchannel)
-def set_channel_reponse(group, node, data):
-    print("{} set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
-
-@control_engine.add_callback(upis.radio.get_rxchannel)
-def get_channel_reponse(group, node, data):
-    print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
-
-def print_response(group, node, data):
-    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
+#~ 
+#~ @control_engine.add_callback(upis.radio.set_rxchannel)
+#~ def set_channel_reponse(group, node, data):
+    #~ print("{} set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+#~ 
+#~ @control_engine.add_callback(upis.radio.get_rxchannel)
+#~ def get_channel_reponse(group, node, data):
+    #~ print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+#~ 
+#~ def print_response(group, node, data):
+    #~ print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
 
 def main(args):
 
@@ -71,18 +69,20 @@ def main(args):
     config = None
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
-    control_engine.load_config(config)
-    control_engine.start()
+    
+	global_node_manager = GlobalNodeManager(config)
+	global_node_manager.set_default_callback(default_callback)
     contiki_nodes = []
 
     #control loop
     while True:
         gevent.sleep(10)
-        if len(nodes) > 0:
-            keys = nodes.keys()
-            for node_id in keys:
-                global_node_manager.add_node(nodes[node_id])
-                del nodes[node_id]
+        #~ if len(nodes) > 0:
+            #~ t_dict = nodes.
+            #~ for node_id in keys:
+                #~ global_node_manager.add_node(nodes[node_id])
+               #~ 
+                #~ del nodes[node_id]
             
         contiki_nodes = global_node_manager.get_mac_address_list()
         print("\n")

@@ -8,8 +8,13 @@ from contiki_helpers.node_manager import NodeManager
 
 class GlobalNodeManager(NodeManager):
 
-    def __init__(self, control_engine):
-        super(GlobalNodeManager, self).__init__(control_engine, "global")
+    def __init__(self, config):
+        super(GlobalNodeManager, self).__init__("global")
+        self.control_engine = wishful_controller.Controller()
+        self.control_engine.load_config(config)
+        self.control_engine.nodeManager.add_new_node_callback(self.add_node
+        self.control_engine.nodeManager.add_node_exit_callback(self.remove_node)
+        self.control_engine.start()
         self.connected_nodes = {}
         self.mac_address_to_node_id = {}
         self.mac_address_to_event_cb = {}
@@ -23,6 +28,9 @@ class GlobalNodeManager(NodeManager):
                 #~ return addr
         #~ return -1
 
+    def set_default_callback(self, callback):
+		self.control_engine.default_callback = callback
+    
     def __hc_message_handler(hc_connector, mac_address, node_id, iface):
         while True:
             msg = hc_connector.recv(block=False, timeout=1)
@@ -88,6 +96,8 @@ class GlobalNodeManager(NodeManager):
     def __update_mac_address_list(self,node_id):
         #~ node_id = args[1]
         #~ print(args)
+        gevent.sleep(1)
+        print("Updating mac address list")
         radio_platforms = self.control_engine.node(node_id).blocking(True).iface("lowpan0").radio.get_radio_platforms()
         for radio_platform in radio_platforms:
             mac_addr = self.control_engine.node(self.connected_nodes[node_id]).blocking(True).iface(radio_platform).radio.get_hwaddr()
@@ -97,7 +107,8 @@ class GlobalNodeManager(NodeManager):
 
     def add_node(self, node):
         self.connected_nodes[node.id] = node
-        threading.Timer(10,self.__update_mac_address_list,args=(node.id,)).start()
+        t = threading.Thread(target=self.__update_mac_address_list,args=(node.id,),daemon=False)
+        t.start()
         print("New node appeared:")
         print(node)
 
