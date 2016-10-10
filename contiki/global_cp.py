@@ -60,8 +60,8 @@ def default_callback(group, node, cmd, data):
 #~ def get_channel_reponse(group, node, data):
     #~ print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 #~ 
-#~ def print_response(group, node, data):
-    #~ print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
+def print_response(group, node, data):
+    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
 
 def main(args):
     contiki_nodes = []
@@ -81,10 +81,10 @@ def main(args):
 
             #schedule non-blocking UPI function with specific callback
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            global_node_manager.schedule_upi_function("radio","set_parameters",exec_time, contiki_nodes, print_response, {'IEEE802154_phyCurrentChannel':12})
+            global_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, print_response, ['IEEE802154_phyCurrentChannel'])
 
             #delayed UPI function call with default callback
-            global_node_manager.delay_upi_function("radio","set_parameters",3, contiki_nodes, {'IEEE802154_phyCurrentChannel':12})
+            global_node_manager.delay_upi_function("radio","set_parameters",3, contiki_nodes, {'IEEE802154_phyCurrentChannel':13})
 
 if __name__ == "__main__":
     try:
