@@ -1,15 +1,15 @@
 """
-contiki_local_controller.py: Example implementation of local control program for Contiki
+local_cp.py: Example implementation of local control program for Contiki
 
 Usage:
-   contiki_local_controller.py [options] [-q | -v]
+   local_cp.py [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./contiki_local_controller -v --config ./config.yaml
+   python local_cp.py --config config/portable/local_cp_config.yaml
 
 Other options:
    -h, --help          show this help message and exit

@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
-contiki_control_program_global.py: Example Contiki global control program
+global_cp.py: Example Contiki global control program
 
 Usage:
-   contiki_control_program_global.py [options] [-q | -v]
+   global_cp.py [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
+   --nodes nodesFile   Config file with node info
 
 Example:
-   ./contiki_control_program_global -v --config ./config/localhost/control_program_global.yaml
+   python mac_switching/global_cp.py --config config/portable/global_cp_config.yaml --nodes config/portable/nodes.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -33,7 +34,7 @@ import wishful_controller
 import yaml
 
 __author__ = "Peter Ruckebusch"
-__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
+__copyright__ = "Copyright (c) 2016, imec"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
@@ -126,7 +127,11 @@ if __name__ == "__main__":
 
     global_node_manager = GlobalNodeManager(config)
     global_node_manager.set_default_callback(default_callback)
-    global_node_manager.wait_for_agents(["172.16.16.1"])
+
+    nodes_file_path = args['--nodes']
+    with open(nodes_file_path, 'r') as f:
+        node_config = yaml.load(f)
+    global_node_manager.wait_for_agents(node_config['ip_address_list'])
 
     try:
         main(args)

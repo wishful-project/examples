@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
-contiki_control_program_global.py: Example Contiki global control program
+global_cp.py: Example Contiki global control program
 
 Usage:
-   contiki_control_program_global.py [options] [-q | -v]
+   global_cp.py [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
+   --nodes nodesFile   Config file with node info
 
 Example:
-   ./contiki_control_program_global -v --config ./config/localhost/control_program_global.yaml
+   python global_cp.py --config config/portable/global_cp_config.yaml --nodes config/portable/nodes.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -45,7 +46,7 @@ def print_response(group, node, data):
 def main(args):
     contiki_nodes = []
     #control loop
-    while True:            
+    while True:
         contiki_nodes = global_node_manager.get_mac_address_list()
         print("\n")
         print("Connected nodes", [str(node) for node in contiki_nodes])
@@ -89,15 +90,19 @@ if __name__ == "__main__":
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
     log.debug(args)
-    
+
     config_file_path = args['--config']
     config = None
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
-    
+
     global_node_manager = GlobalNodeManager(config)
     global_node_manager.set_default_callback(default_callback)
-    global_node_manager.wait_for_agents(["172.16.16.1"])
+
+    nodes_file_path = args['--nodes']
+    with open(nodes_file_path, 'r') as f:
+        node_config = yaml.load(f)
+    global_node_manager.wait_for_agents(node_config['ip_address_list'])
 
     try:
         main(args)
