@@ -227,6 +227,9 @@ def default_callback(group, node, cmd, data):
 def print_response(group, node, data):
     print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
 
+def event_cb(mac_address, event_name, event_value):
+	print("{} Node {} Event {}: {} ".format(datetime.datetime.now(), mac_address, event_name, event_value))
+
 def main(args):
 	contiki_nodes = global_node_manager.get_mac_address_list()
 	print("Connected nodes", [str(node) for node in contiki_nodes])
@@ -234,7 +237,9 @@ def main(args):
 	app_manager = AppManager(global_node_manager)
     ret = taisc_manager.update_slotframe('./contiki_helpers/default_taisc_slotframe.csv')
     log.info(ret)
+    global_node_manager.start_local_monitoring_cp()
     gevent.sleep(10)
+    app_manager.subscribe_events(["RIME_appPerPacket_rxstats"],event_cb, 0)
     parameters = {"RIME_exampleUnicastActivateApplication": 1}
     #control loop
     while True:
