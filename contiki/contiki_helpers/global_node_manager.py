@@ -116,11 +116,11 @@ class GlobalNodeManager(NodeManager):
                     del GlobalNodeManager.mac_address_to_node_id[mac_address]
                     del GlobalNodeManager.mac_address_to_interface[mac_address]
                     if mac_address in GlobalNodeManager.mac_address_to_event_cb:
-						del GlobalNodeManager.mac_address_to_event_cb[mac_address]
-					if mac_address in GlobalNodeManager.mac_address_to_report_cb:
-						del GlobalNodeManager.mac_address_to_report_cb[mac_address]
-					if mac_address in GlobalNodeManager.mac_address_to_hc_connector:
-						del GlobalNodeManager.mac_address_to_hc_connector[mac_address]
+                        del GlobalNodeManager.mac_address_to_event_cb[mac_address]
+                    if mac_address in GlobalNodeManager.mac_address_to_report_cb:
+                        del GlobalNodeManager.mac_address_to_report_cb[mac_address]
+                    if mac_address in GlobalNodeManager.mac_address_to_hc_connector:
+                        del GlobalNodeManager.mac_address_to_hc_connector[mac_address]
                     GlobalNodeManager.mac_address_list.remove(mac_address)
                     for group_name in GlobalNodeManager.groups:
                         self.group[group_name].remove_node(mac_address)
