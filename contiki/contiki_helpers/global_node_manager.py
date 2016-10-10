@@ -72,8 +72,8 @@ class GlobalNodeManager(NodeManager):
                 _thread.start_new_thread(hc_message_handler, (hc_connector,mac_address,node_id,iface))
             else:
                 self.log.debug("Local monitoring program already started for {}".format(mac_address))
-    
-    def subscribe_events(self, upi_type, mac_address_list=None, event_key_list, event_callback, event_duration):
+
+    def subscribe_events(self, upi_type, event_key_list, event_callback, event_duration, mac_address_list=None):
         if mac_address_list is None:
             mac_address_list = self.mac_address_list
         for mac_address in mac_address_list:
@@ -82,7 +82,7 @@ class GlobalNodeManager(NodeManager):
             self.mac_address_to_hc_connector[mac_address].send(msg)
             
     
-    def get_measurements_periodic(self, upi_type, mac_address_list=None, measurement_key_list, collect_period, report_period, num_iterations, report_callback=None):
+    def get_measurements_periodic(self, upi_type, measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list=None):
         if mac_address_list is None:
             mac_address_list = self.mac_address_list
         for mac_address in mac_address_list:
