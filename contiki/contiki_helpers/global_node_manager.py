@@ -88,7 +88,7 @@ class GlobalNodeManager(NodeManager):
     def __update_mac_address_list(self,node_id):
         #~ node_id = args[1]
         #~ print(args)
-        radio_platforms = self.control_engine.node(node_id).exec_time(None).delay(None).timeout(None).callback(None).blocking(True).iface("lowpan0").radio.get_radio_platforms()
+        radio_platforms = self.control_engine.node(node_id).blocking(True).iface("lowpan0").radio.get_radio_platforms()
         for radio_platform in radio_platforms:
             mac_addr = self.control_engine.node(self.connected_nodes[node_id]).blocking(True).iface(radio_platform).radio.get_hwaddr()
             self.mac_address_list.append(mac_addr)
