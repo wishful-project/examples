@@ -44,7 +44,8 @@ class NodeManager():
 
     def create_group(self, group_name, mac_address_list=None):
         if group_name not in self.groups:
-            return self.groups[group_name] = Group(group_name,self,mac_address_list)
+            self.groups[group_name] = Group(group_name,self,mac_address_list)
+            return self.groups[group_name]
         return None
 
     def destroy_group(self, group_name):
