@@ -145,7 +145,7 @@ class GlobalNodeManager(NodeManager):
                         break
                 if num_matches == len(ip_address_list):
                     self.log.info("All nodes are active we can start the local control programs")
-                    self.log.info("Connected nodes: %s", nodes)
+                    self.log.info("Connected nodes: %s", self.mac_address_list)
                     return True
             self.log.info("Still waiting for %d nodes", len(ip_address_list) - num_matches)
             gevent.sleep(1)

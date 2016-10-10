@@ -64,14 +64,6 @@ def default_callback(group, node, cmd, data):
     #~ print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
 
 def main(args):
-
-    config_file_path = args['--config']
-    config = None
-    with open(config_file_path, 'r') as f:
-        config = yaml.load(f)
-    
-    global_node_manager = GlobalNodeManager(config)
-    global_node_manager.set_default_callback(default_callback)
     contiki_nodes = []
     
     gevent.sleep(10)
@@ -79,15 +71,7 @@ def main(args):
     global_node_manager.wait_for_agents(["172.16.16.1"])
 
     #control loop
-    while True:
-        #~ gevent.sleep(10)
-        #~ if len(nodes) > 0:
-            #~ t_dict = nodes.
-            #~ for node_id in keys:
-                #~ global_node_manager.add_node(nodes[node_id])
-               #~ 
-                #~ del nodes[node_id]
-            
+    while True:            
         contiki_nodes = global_node_manager.get_mac_address_list()
         print("\n")
         print("Connected nodes", [str(node) for node in contiki_nodes])
@@ -130,6 +114,14 @@ if __name__ == "__main__":
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
     log.debug(args)
+    
+    config_file_path = args['--config']
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+    
+    global_node_manager = GlobalNodeManager(config)
+    global_node_manager.set_default_callback(default_callback)
 
     try:
         main(args)
