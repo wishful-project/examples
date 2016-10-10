@@ -99,7 +99,8 @@ class GlobalNodeManager(NodeManager):
         #~ print(args)
         gevent.sleep(1)
         print("Updating mac address list")
-        radio_platforms = self.control_engine.node(node_id).blocking(True).radio.iface("lowpan0").get_radio_platforms()
+        self.control_engine._clear_call_context()
+        radio_platforms = self.control_engine.node(self.connected_nodes[node_id]).blocking(True).radio.iface("lowpan0").get_radio_platforms()
         for radio_platform in radio_platforms:
             mac_addr = self.control_engine.node(self.connected_nodes[node_id]).blocking(True).radio.iface(radio_platform).radio.get_hwaddr()
             self.mac_address_list.append(mac_addr)
