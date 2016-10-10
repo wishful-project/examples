@@ -53,14 +53,14 @@ class NodeManager():
             del self.groups[group_name]
         pass
 
-     @abc.abstractmethod
+    @abc.abstractmethod
     def execute_upi_function(self, upi_type, upi_fname, mac_address_list=None, *args, **kwargs):
         pass
 
-     @abc.abstractmethod
+    @abc.abstractmethod
     def schedule_upi_function(self, upi_type, upi_fname, exec_time, mac_address_list=None, callback=None, *args, **kwargs):
         pass
 
-     @abc.abstractmethod
+    @abc.abstractmethod
     def delay_upi_function(self, upi_type, upi_fname, delay, mac_address_list=None, callback=None, *args, **kwargs):
     pass
