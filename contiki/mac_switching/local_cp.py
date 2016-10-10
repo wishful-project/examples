@@ -13,12 +13,12 @@ def my_local_control_program(control_engine):
 
     @control_engine.set_default_callback()
     def default_callback(cmd, data):
-        #print(("{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)))
+        print(("{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)))
         control_engine.send_upstream({"cmd": cmd, "result": data})
 
     def event_handler(event_name, event_value):
         control_engine.send_upstream({"event_name": event_name, "event_value": event_value})
-        #print(("{} Forwarding event {} with value: {}".format(datetime.datetime.now(), event_name, event_handler)))
+        print(("{} Forwarding event {} with value: {}".format(datetime.datetime.now(), event_name, event_value)))
         pass
 
     radio_platforms = control_engine.blocking(True).radio.iface("lowpan0").get_radio_platforms()
