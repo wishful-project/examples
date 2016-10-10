@@ -65,11 +65,6 @@ def print_response(group, node, data):
 
 def main(args):
     contiki_nodes = []
-    
-    gevent.sleep(10)
-    
-    global_node_manager.wait_for_agents(["172.16.16.1"])
-
     #control loop
     while True:            
         contiki_nodes = global_node_manager.get_mac_address_list()
@@ -123,6 +118,7 @@ if __name__ == "__main__":
     
     global_node_manager = GlobalNodeManager(config)
     global_node_manager.set_default_callback(default_callback)
+    global_node_manager.wait_for_agents(["172.16.16.1"])
 
     try:
         main(args)
