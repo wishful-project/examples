@@ -9,6 +9,8 @@ from contiki_helpers.node_manager import NodeManager
     
 
 class GlobalNodeManager(NodeManager):
+	
+	control_engine = wishful_controller.Controller()
     
     def __init__(self, config_file_path):
         super(GlobalNodeManager, self).__init__(config_file_path, "global")
@@ -18,9 +20,8 @@ class GlobalNodeManager(NodeManager):
         self.mac_address_to_report_cb = {}
         self.mac_address_to_hc_connector = {}
 
-        self.control_engine = wishful_controller.Controller()
-        self.control_engine.load_config(self.config)
-        self.control_engine.start()
+        control_engine.load_config(self.config)
+        control_engine.start()
     
     #~ def __get_macaddress_by_nodeid_iface(self,node_id, iface):
         #~ for addr in self.mac_address_list:
@@ -35,8 +36,8 @@ class GlobalNodeManager(NodeManager):
                 if type(msg) is dict and "msg_type" in msg:
                     msg_type = msg["msg_type"]
                     if msg_type == "cmd_result":
-                        if self.control_engine.default_callback is not None:
-                            gevent.spawn(self.control_engine.fire_callback, self.control_engine.default_callback, "all", node_id, msg["cmd"], msg["result"])
+                        if GlobalNodeManager.control_engine.default_callback is not None:
+                            gevent.spawn(GlobalNodeManager.control_engine.fire_callback, GlobalNodeManager.control_engine.default_callback, "all", node_id, msg["cmd"], msg["result"])
                         else:
                             self.log.debug("No default callback defined in CP for command results dropping msg {}".format(msg))
                     elif msg_type == "report":
@@ -67,7 +68,7 @@ class GlobalNodeManager(NodeManager):
                 node_id = self.mac_address_to_node_id[mac_address]
                 self.mac_address_to_event_cb[mac_address] = None
                 self.mac_address_to_report_cb[mac_address] = None
-                hc_connector = self.control_engine.node(node_id).hc.start_local_control_program(program=local_monitoring_program)
+                hc_connector = GlobalNodeManager.control_engine.node(node_id).hc.start_local_control_program(program=local_monitoring_program)
                 self.mac_address_to_hc_connector[mac_address] = hc_connector
                 _thread.start_new_thread(hc_message_handler, (hc_connector,mac_address,node_id,iface))
             else:
@@ -91,21 +92,21 @@ class GlobalNodeManager(NodeManager):
             self.mac_address_to_hc_connector[mac_address].send(msg)
     
     def __update_mac_address_list(self, node_id):
-        radio_platforms = self.control_engine.node(node_id).blocking(True).iface("lowpan0").radio.get_radio_platforms()
+        radio_platforms = GlobalNodeManager.control_engine.node(node_id).blocking(True).iface("lowpan0").radio.get_radio_platforms()
         for radio_platform in radio_platforms:
-            mac_addr = self.control_engine.node(self.connected_nodes[node_id]).blocking(True).iface(radio_platform).radio.get_hwaddr()
+            mac_addr = GlobalNodeManager.control_engine.node(self.connected_nodes[node_id]).blocking(True).iface(radio_platform).radio.get_hwaddr()
             self.mac_address_list.append(mac_addr)
             self.mac_address_to_node_id[mac_addr] = node_id
             self.mac_address_to_interface[mac_addr] = radio_platform
     
-    @self.control_engine.new_node_callback()
+    @GlobalNodeManager.control_engine.new_node_callback()
     def new_node(node):
         self.connected_nodes[node.id] = node
         threading.Timer(2,self.__update_mac_address_list,node.id).start()
         print("New node appeared:")
         print(node)
 
-    @self.control_engine.node_exit_callback()
+    @GlobalNodeManager.control_engine.node_exit_callback()
     def node_exit(node, reason):
         mac_address_exit_list = []
         if node.id in self.connected_nodes:
@@ -146,7 +147,7 @@ class GlobalNodeManager(NodeManager):
             if mac_address in self.mac_address_list:
                 node = self.mac_address_to_node_id[mac_address]
                 iface = self.self.mac_address_to_interface[mac_address]
-                ret[mac_address] = self.control_engine.blocking(True).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
+                ret[mac_address] = GlobalNodeManager.control_engine.blocking(True).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
     
     def schedule_upi_function(self, upi_type, upi_fname, exec_time, mac_address_list=None, callback=None, *args, **kwargs):
@@ -159,7 +160,7 @@ class GlobalNodeManager(NodeManager):
             if mac_address in self.mac_address_list:
                 node = self.mac_address_to_node_id[mac_address]
                 iface = self.self.mac_address_to_interface[mac_address]
-                ret[mac_address] = self.control_engine.blocking(False).exec_time(exec_time).callback(callback).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
+                ret[mac_address] = GlobalNodeManager.control_engine.blocking(False).exec_time(exec_time).callback(callback).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
     
     def delay_upi_function(self, upi_type, upi_fname, delay, mac_address_list=None, callback=None, *args, **kwargs):
@@ -172,5 +173,5 @@ class GlobalNodeManager(NodeManager):
             if mac_address in self.mac_address_list:
                 node = self.mac_address_to_node_id[mac_address]
                 iface = self.self.mac_address_to_interface[mac_address]
-                ret[mac_address] = self.control_engine.blocking(False).delay(delay).callback(callback).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
+                ret[mac_address] = GlobalNodeManager.control_engine.blocking(False).delay(delay).callback(callback).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
