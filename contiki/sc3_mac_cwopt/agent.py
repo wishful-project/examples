@@ -1,5 +1,5 @@
 """
-contiki_control_agent.py: Implementation of WiSHFUL control agent for Contiki
+sc3_mac_cwopt/agent.py: Implementation of WiSHFUL control agent for Contiki
 
 Usage:
    contiki_control_agent.py [options] [-q | -v]
@@ -9,7 +9,7 @@ Options:
    --config configFile Config file path
 
 Example:
-   ./contiki_control_agent -v --config ./control_agent_config.yaml
+   python sc3_mac_cwopt/agent.py --config config/localhost/agent_config.yaml
 
 Other options:
    -h, --help          show this help message and exit

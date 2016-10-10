@@ -10,7 +10,7 @@ Also the locally observed events are forwared from the local CPs to the global C
 On all Linux hosts, flash the RM-090 nodes. For each sensor modify the `SHORT_ADDR` and `SERIAL_DEV` arguments.
 ```
 cd binaries/
-./flash_nodes Wishful-application.rm090 <START_ADDR> <SERIAL_DEV>
+./flash_nodes Wishful-cwopt.rm090 <START_ADDR> <SERIAL_DEV>
 ```
 
 ## Example execution
@@ -20,13 +20,13 @@ On all Linux hosts, start the WiSHFUL agent:
 cd <WISHFUL-ROOT-DIR>/examples/contiki
 
 # Localhost:
-python mac_switching/agent.py --config config/localhost/agent_config.yaml 
+python sc3_mac_cwopt/agent.py --config config/localhost/agent_config.yaml 
 
 # Portable testbed
-python mac_switching/agent.py --config config/portable/agent_config.yaml
+python sc3_mac_cwopt/agent.py --config config/portable/agent_config.yaml
 
 # Wilab2 testbed
-python mac_switching/agent.py --config config/wilab2/agent_config.yaml 
+python sc3_mac_cwopt/agent.py --config config/wilab2/agent_config.yaml 
 ```
 
 On the global controller start the global control program:
@@ -34,12 +34,12 @@ On the global controller start the global control program:
 cd <WISHFUL-ROOT-DIR>/examples/contiki
 
 # Localhost:
-python mac_switching/global_cp.py --config config/localhost/global_cp_config.yaml 
+python sc3_mac_cwopt/global_cp.py --config config/localhost/global_cp_config.yaml --num-agents 10 --receiver-address 1
 
 # Portable testbed
-python mac_switching/global_cp.py --config config/portable/global_cp_config.yaml
+python sc3_mac_cwopt/global_cp.py --config config/portable/global_cp_config.yaml --num-agents 10 --receiver-address 1
 
 # Wilab2 testbed
-python mac_switching/global_cp.py --config config/wilab2/global_cp_config.yaml 
+python sc3_mac_cwopt/global_cp.py --config config/wilab2/global_cp_config.yaml --num-agents 10 --receiver-address 1
 ```
 
