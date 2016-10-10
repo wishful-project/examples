@@ -20,15 +20,6 @@ def measurement_collector(control_engine):
     def collector_thread(interfaces, upi_type, measurement_key_list, collect_period, report_period, num_iterations, report_callback):
         if collect_period < report_period:
             report_period = collect_period
-        for i in range(0,num_iterations):
-
-        for iface in interfaces:
-            if msg['upi_type'] == 'net':
-                control_engine.blocking(True).net.iface(platform).subscribe_events_net(msg['event_key_list'], msg['event_name'], event_handler, msg['event_duration'])
-            elif msg['upi_type'] == 'radio':
-                control_engine.blocking(True).radio.iface(platform).subscribe_events([msg['event_name'],event_handler,msg['event_duration'])
-            else:
-                print("local event listener unsupported upi_type {}".format(msg['upi_type']))
 
 
     def report_callback(report_name, event_value):

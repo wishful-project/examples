@@ -76,7 +76,7 @@ class AppManager(object):
         """
         if self.node_manager.scope == "local":
             return self.node_manager.execute_upi_function("net", "get_measurements_periodic_net", measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list)
-        else
+        else:
             return self.node_manager.get_measurements_periodic("net", measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list)
 
     def subscribe_events(self, event_key_list, event_callback, event_duration, mac_address_list=None):
