@@ -29,7 +29,7 @@ class LocalNodeManager(NodeManager):
             mac_address_list = [mac_address_list]
         for mac_address in mac_address_list:
             if mac_address in self.mac_address_list:
-                iface = self.self.mac_address_to_interface[mac_address]
+                iface = self.mac_address_to_interface[mac_address]
                 ret[mac_address] = self.control_engine.blocking(True).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
 
@@ -41,7 +41,7 @@ class LocalNodeManager(NodeManager):
             mac_address_list = [mac_address_list]
         for mac_address in mac_address_list:
             if mac_address in self.mac_address_list:
-                iface = self.self.mac_address_to_interface[mac_address]
+                iface = self.mac_address_to_interface[mac_address]
                 ret[mac_address] = self.control_engine.blocking(False).exec_time(exec_time).callback(callback).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
 
@@ -53,7 +53,7 @@ class LocalNodeManager(NodeManager):
             mac_address_list = [mac_address_list]
         for mac_address in mac_address_list:
             if mac_address in self.mac_address_list:
-                iface = self.self.mac_address_to_interface[mac_address]
+                iface = self.mac_address_to_interface[mac_address]
                 ret[mac_address] = self.control_engine.blocking(False).delay(delay).callback(callback).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
 
