@@ -27,6 +27,7 @@ import logging
 from contiki.contiki_helpers.global_node_manager import *
 import gevent
 import wishful_upis as upis
+import wishful_controller
 
 __author__ = "Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
@@ -66,8 +67,25 @@ if __name__ == "__main__":
     def main(args):
 
         config_file_path = args['--config']
-        global_node_manager = GlobalNodeManager(config_file_path)
+        config = None
+        with open(config_file_path, 'r') as f:
+            config = yaml.load(f)
+        control_engine = wishful_controller.Controller()
+        control_engine.load_config(self.config)
+        control_engine.start()
+        global_node_manager = GlobalNodeManager(control_engine)
         contiki_nodes = []
+
+        @control_engine.new_node_callback()
+        def new_node(node):
+            global_node_manager.add_node(node)
+            print("New node appeared:")
+            print(node)
+
+        @control_engine.node_exit_callback()
+        def node_exit(node, reason):
+			global_node_manager.remove_node(node)
+            print("NodeExit : NodeID : {} MAC_ADDR : {} Reason : {}".format(node.id,mac_address_exit_list, reason))
 
         @global_node_manager.control_engine.set_default_callback()
         def default_callback(group, node, cmd, data):

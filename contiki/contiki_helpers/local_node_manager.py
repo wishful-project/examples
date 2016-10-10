@@ -4,12 +4,8 @@ from manager import NodeManager
 
 class LocalNodeManager(NodeManager):
     
-    def __init__(self, config_file_paths):
-        super(LocalNodeManager, self).__init__(config_file_path, "local")
-        self.agent = wishful_agent.Agent(local=True)
-        self.control_engine = agent.get_local_controller()
-        self.control_engine.load_config(self.config)
-        self.control_engine.run()
+    def __init__(self, control_engine):
+        super(LocalNodeManager, self).__init__(control_engine, "local")
         threading.Timer(15,self.__update_mac_address_list).start()
     
     def __update_mac_address_list(self):

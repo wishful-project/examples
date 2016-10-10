@@ -6,54 +6,51 @@ class Group(object):
 
     def __init__(self,name, manager, mac_address_list=None):
         self.name = named
-        NodeManager.mac_address_list = []
+        self.mac_address_list = []
         self.manager = manager
         if mac_address_list is not None and type(mac_address_list) is list:
-            NodeManager.mac_address_list = mac_address_list
+            self.mac_address_list = mac_address_list
 
     def remove_node(self, mac_address):
-        if mac_address in NodeManager.mac_address_list:
-            NodeManager.mac_address_list.remove(mac_address)
+        if mac_address in self.mac_address_list:
+            self.mac_address_list.remove(mac_address)
 
     def add_node(self, mac_address):
-        if mac_address not in NodeManager.mac_address_list:
-            NodeManager.mac_address_list.append(mac_address)
+        if mac_address not in self.mac_address_list:
+            self.mac_address_list.append(mac_address)
 
     def blocking_group_call(self, upi_type, upi_fname, *args, **kwargs):
-        return self.manager.execute_upi_function(upi_type, upi_fname, NodeManager.mac_address_list, args=args, kwargs=kwargs)
+        return self.manager.execute_upi_function(upi_type, upi_fname, self.mac_address_list, args=args, kwargs=kwargs)
 
     def scheduled_group_call(self, upi_type, upi_fname, exec_time, *args, **kwargs):
-        return self.manager.schedule_upi_function(upi_type, upi_fname, exec_time, NodeManager.mac_address_list, args=args, kwargs=kwargs)
+        return self.manager.schedule_upi_function(upi_type, upi_fname, exec_time, self.mac_address_list, args=args, kwargs=kwargs)
 
     def delayed_group_call(self, upi_type, upi_fname, delay, *args, **kwargs):
-        return self.manager.schedule_upi_function(upi_type, upi_fname, delay, NodeManager.mac_address_list, args=args, kwargs=kwargs)
+        return self.manager.schedule_upi_function(upi_type, upi_fname, delay, self.mac_address_list, args=args, kwargs=kwargs)
 
 class NodeManager():
     __metaclass__ = abc.ABCMeta
-    
-    groups = {}
-    mac_address_list = []
-    mac_address_to_interface = {}
 
-    def __init__(self,config_file_path,scope):
+    def __init__(self,control_engine,scope):
         self.log = logging.getLogger("Contiki Node Manager: ")
+        self.control_engine = control_engine
         self.scope = scope
-        self.config = None
-        with open(config_file_path, 'r') as f:
-            self.config = yaml.load(f)
+        groups = {}
+		mac_address_list = []
+		mac_address_to_interface = {}
 
     def get_mac_address_list(self):
-        return NodeManager.mac_address_list
+        return self.mac_address_list
 
     def create_group(self, group_name, mac_address_list=None):
-        if group_name not in NodeManager.groups:
-            NodeManager.groups[group_name] = Group(group_name,self,mac_address_list)
-            return NodeManager.groups[group_name]
+        if group_name not in self.groups:
+            self.groups[group_name] = Group(group_name,self,mac_address_list)
+            return self.groups[group_name]
         return None
 
     def destroy_group(self, group_name):
-        if group_name in NodeManager.groups:
-            del NodeManager.groups[group_name]
+        if group_name in self.groups:
+            del self.groups[group_name]
         pass
 
     @abc.abstractmethod
