@@ -1,4 +1,4 @@
-import threading.Timer
+import threading
 import wishful_agent
 import wishful_controller
 from manager import NodeManager
@@ -10,7 +10,8 @@ class LocalNodeManager(NodeManager):
         self.agent = wishful_agent.Agent(local=True)
         self.control_engine = agent.get_local_controller()
         self.control_engine.load_config(config)
-        threading.Timer(15,self.__update_mac_address_list).start()
+        t = threading.Thread(15,self.__update_mac_address_list)
+        t.start()
 
     def __update_mac_address_list(self):
         radio_platforms = self.control_engine.blocking(True).iface("lowpan0").radio.get_radio_platforms()
