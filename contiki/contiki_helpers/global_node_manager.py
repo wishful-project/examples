@@ -1,6 +1,7 @@
 import gevent
 import threading
 import _thread
+import wishful_controller
 
 from contiki_helpers.local_monitoring_cp import local_monitoring_program
 from contiki_helpers.node_manager import NodeManager
