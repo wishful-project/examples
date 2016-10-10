@@ -134,7 +134,7 @@ class GlobalNodeManager(NodeManager):
             del self.connected_nodes[node.id]
         print("NodeExit : NodeID : {} MAC_ADDR : {} Reason : {}".format(node.id,mac_address_exit_list, reason))
 
-    def wait_for_agents(ip_address_list, timeout=60):
+    def wait_for_agents(self, ip_address_list, timeout=60):
         for i in range(0, timeout):
             num_matches = 0
             if len(self.connected_nodes) == len(ip_address_list):
