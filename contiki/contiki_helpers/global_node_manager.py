@@ -19,7 +19,7 @@ class GlobalNodeManager(NodeManager):
         self.mac_address_to_hc_connector = {}
 
         self.control_engine = wishful_controller.Controller()
-        self.control_engine.load_config(config)
+        self.control_engine.load_config(self.config)
         self.control_engine.start()
     
     #~ def __get_macaddress_by_nodeid_iface(self,node_id, iface):
