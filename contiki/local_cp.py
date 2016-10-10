@@ -49,7 +49,7 @@ def main(args):
     contiki_nodes = []
     #control loop
     while True:
-        contiki_nodes = global_node_manager.get_mac_address_list()
+        contiki_nodes = local_node_manager.get_mac_address_list()
         print("\n")
         print("Connected nodes", [str(node) for node in contiki_nodes])
         if contiki_nodes:
@@ -58,14 +58,14 @@ def main(args):
 
             #schedule non-blocking UPI function with specific callback
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            global_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, None, ['IEEE802154_phyCurrentChannel'])
+            local_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, None, ['IEEE802154_phyCurrentChannel'])
             gevent.sleep(5)
             #delayed UPI function call with default callback
-            global_node_manager.delay_upi_function("radio","set_parameters",3, contiki_nodes, None,{'IEEE802154_phyCurrentChannel':13})
+            local_node_manager.delay_upi_function("radio","set_parameters",3, contiki_nodes, None,{'IEEE802154_phyCurrentChannel':13})
             gevent.sleep(5)
             #schedule non-blocking UPI function with specific callback
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            global_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, print_response, ['IEEE802154_phyCurrentChannel'])
+            local_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, print_response, ['IEEE802154_phyCurrentChannel'])
             
         gevent.sleep(10)
 
