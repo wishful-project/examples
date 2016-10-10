@@ -73,7 +73,7 @@ class GlobalNodeManager(NodeManager):
                 self.mac_address_to_report_cb[mac_address] = None
                 hc_connector = self.control_engine.node(node_id).hc.start_local_control_program(program=local_monitoring_program)
                 self.mac_address_to_hc_connector[mac_address] = hc_connector
-                _thread.start_new_thread(__hc_message_handler, (hc_connector,mac_address,node_id,iface))
+                _thread.start_new_thread(self.__hc_message_handler, (hc_connector,mac_address,node_id,iface))
             else:
                 self.log.debug("Local monitoring program already started for {}".format(mac_address))
 
