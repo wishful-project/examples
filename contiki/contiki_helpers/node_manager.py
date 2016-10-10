@@ -36,8 +36,8 @@ class NodeManager():
         self.control_engine = control_engine
         self.scope = scope
         groups = {}
-		mac_address_list = []
-		mac_address_to_interface = {}
+        mac_address_list = []
+        mac_address_to_interface = {}
 
     def get_mac_address_list(self):
         return self.mac_address_list

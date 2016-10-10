@@ -11,11 +11,11 @@ class GlobalNodeManager(NodeManager):
     def __init__(self, control_engine):
         super(GlobalNodeManager, self).__init__(control_engine, "global")
         connected_nodes = {}
-		mac_address_to_node_id = {}
-		mac_address_to_event_cb = {}
-		mac_address_to_report_cb = {}
-		mac_address_to_hc_connector = {}
-        
+        mac_address_to_node_id = {}
+        mac_address_to_event_cb = {}
+        mac_address_to_report_cb = {}
+        mac_address_to_hc_connector = {}
+
 
     #~ def __get_macaddress_by_nodeid_iface(self,node_id, iface):
         #~ for addr in self.mac_address_list:

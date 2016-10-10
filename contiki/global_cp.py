@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
         @control_engine.node_exit_callback()
         def node_exit(node, reason):
-			global_node_manager.remove_node(node)
+            global_node_manager.remove_node(node)
             print("NodeExit : NodeID : {} MAC_ADDR : {} Reason : {}".format(node.id,mac_address_exit_list, reason))
 
         @global_node_manager.control_engine.set_default_callback()
