@@ -144,10 +144,10 @@ class GlobalNodeManager(NodeManager):
                         num_matches+=1
                         break
                 if num_matches == len(ip_address_list):
-                    log.info("All nodes are active we can start the local control programs")
-                    log.info("Connected nodes: %s", nodes)
+                    self.log.info("All nodes are active we can start the local control programs")
+                    self.log.info("Connected nodes: %s", nodes)
                     return True
-            log.info("Still waiting for %d nodes", len(ip_address_list) - num_matches)
+            self.log.info("Still waiting for %d nodes", len(ip_address_list) - num_matches)
             gevent.sleep(1)
         return False
 

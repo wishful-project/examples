@@ -35,7 +35,7 @@ __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
-
+log = logging.getLogger('contiki_global_control_program')
 
 #~ @control_engine.new_node_callback()
 #~ def new_node(node):
@@ -128,7 +128,6 @@ if __name__ == "__main__":
 
     logging.basicConfig(filename=logfile, level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
-    log = logging.getLogger('contiki_global_control_program')
 
     log.debug(args)
 
