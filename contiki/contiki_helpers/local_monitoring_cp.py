@@ -52,7 +52,7 @@ def local_monitoring_program(control_engine):
                         print("periodic measurement collector unsupported upi_type {}".format(msg['upi_type']))
             else:
                 print("local monitoring unknown command {}".format(msg['command']))
-        else:
+        elif type(msg) is dict:
             print("local monitoring unknown msg type {}".format(msg))
 
         gevent.sleep(1)

@@ -114,7 +114,7 @@ class GlobalNodeManager(NodeManager):
         print("New node appeared:")
         print(node)
 
-    def remove_node(self, node):
+    def remove_node(self, node, reason):
         mac_address_exit_list = []
         if node.id in self.connected_nodes:
             for mac_address in self.mac_address_list[:]:
