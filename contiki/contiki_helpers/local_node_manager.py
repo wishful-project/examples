@@ -1,7 +1,7 @@
 import threading
 import wishful_agent
 import wishful_controller
-from manager import NodeManager
+from contiki.contiki_helpers.node_manager import NodeManager
 
 class LocalNodeManager(NodeManager):
 
