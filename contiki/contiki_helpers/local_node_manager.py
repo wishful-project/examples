@@ -8,8 +8,8 @@ class LocalNodeManager(NodeManager):
     def __init__(self, config):
         super(LocalNodeManager, self).__init__("local")
         self.agent = wishful_agent.Agent(local=True)
-        self.control_engine = agent.get_local_controller()
-        self.control_engine.load_config(config)
+        self.control_engine = self.agent.get_local_controller()
+        self.agent.load_config(config)
         t = threading.Thread(15,self.__update_mac_address_list)
         t.start()
 
