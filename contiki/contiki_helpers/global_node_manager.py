@@ -85,9 +85,9 @@ class GlobalNodeManager(NodeManager):
             msg = {'interface': [self.mac_address_to_interface[mac_address]], 'command': 'GET_MEASUREMENTS_PERIODIC', 'upi_type': upi_type, 'measurement_key_list': measurement_key_list, 'collect_period': collect_period, 'report_period': report_period, 'num_iterations': num_iterations}
             self.mac_address_to_hc_connector[mac_address].send(msg)
 
-    def __update_mac_address_list(*args, **kwargs):
-        node_id = args[1]
-        print(args)
+    def __update_mac_address_list(self,node_id):
+        #~ node_id = args[1]
+        #~ print(args)
         radio_platforms = self.control_engine.node(node_id).exec_time(None).delay(None).timeout(None).callback(None).blocking(True).iface("lowpan0").radio.get_radio_platforms()
         for radio_platform in radio_platforms:
             mac_addr = self.control_engine.node(self.connected_nodes[node_id]).blocking(True).iface(radio_platform).radio.get_hwaddr()
