@@ -10,7 +10,8 @@ class LocalNodeManager(NodeManager):
         self.agent = wishful_agent.Agent(local=True)
         self.control_engine = self.agent.get_local_controller()
         self.agent.load_config(config)
-        t = threading.Thread(15,self.__update_mac_address_list)
+        self.agent.run()
+        t = threading.Timer(10,self.__update_mac_address_list)
         t.start()
 
     def __update_mac_address_list(self):
