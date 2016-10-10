@@ -56,10 +56,15 @@ def main(args):
 
             #schedule non-blocking UPI function with specific callback
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            global_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, print_response, ['IEEE802154_phyCurrentChannel'])
+            global_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, None, ['IEEE802154_phyCurrentChannel'])
             gevent.sleep(5)
             #delayed UPI function call with default callback
             global_node_manager.delay_upi_function("radio","set_parameters",3, contiki_nodes, None,{'IEEE802154_phyCurrentChannel':13})
+            gevent.sleep(5)
+            #schedule non-blocking UPI function with specific callback
+            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
+            global_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, print_response, ['IEEE802154_phyCurrentChannel'])
+            
         gevent.sleep(10)
 
 if __name__ == "__main__":
@@ -98,6 +103,7 @@ if __name__ == "__main__":
 
     global_node_manager = GlobalNodeManager(config)
     global_node_manager.set_default_callback(default_callback)
+    global_node_manager.add_callback(upis.radio.get_parameters,get_parameters)
 
     nodes_file_path = args['--nodes']
     with open(nodes_file_path, 'r') as f:
