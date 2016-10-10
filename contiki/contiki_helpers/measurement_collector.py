@@ -32,14 +32,6 @@ def measurement_collector(control_engine):
 
     while not control_engine.is_stopped():
         msg = control_engine.recv(block=False)
-        if msg is not None and type(msg) is dict and msg['command'] == 'GET_MEASUREMENTS_PERIODIC':
-            radio_platforms = []
-
-            else:
-                print("local event listener unknown command {}".format(msg['command']))
-        else:
-            print("local event listener unknown msg type {}".format(msg))
-
         gevent.sleep(5)
 
     print(("local event listener - Name: {}, Id: {} - STOPPED".format(control_engine.name, control_engine.id)))
