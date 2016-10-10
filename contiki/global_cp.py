@@ -85,6 +85,7 @@ def main(args):
 
             #delayed UPI function call with default callback
             global_node_manager.delay_upi_function("radio","set_parameters",3, contiki_nodes, {'IEEE802154_phyCurrentChannel':13})
+        gevent.sleep(10)
 
 if __name__ == "__main__":
     try:
