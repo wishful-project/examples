@@ -40,19 +40,19 @@ class GlobalNodeManager(NodeManager):
                     msg_type = msg["msg_type"]
                     if msg_type == "cmd_result":
                         if self.control_engine.default_callback is not None:
-                            gevent.spawn(self.control_engine.fire_callback, self.control_engine.default_callback, "all", node_id, msg["cmd"], msg["result"])
+                            gevent.spawn(self.control_engine.fire_callback, self.control_engine.default_callback, "all", self.connected_nodes[node_id], msg["cmd"], msg["result"])
                         else:
                             self.log.debug("No default callback defined in CP for command results dropping msg {}".format(msg))
                     elif msg_type == "report":
                         #~ mac_address = self.__get_macaddress_by_nodeid_iface(agent_id, msg["interface"])
                         if mac_address in self.mac_address_to_report_cb:
-                            geven.spawn(self.mac_address_to_report_cb[mac_address],mac_address,msg["report"])
+                            gevent.spawn(self.mac_address_to_report_cb[mac_address],mac_address,msg["report"])
                         else:
                             self.log.debug("No report callback defined in CP for report {}".format(msg))
                     elif msg_type == "event":
                         #~ mac_address = self.__get_macaddress_by_nodeid_iface(agent_id, msg["interface"])
                         if mac_address in self.mac_address_to_event_cb:
-                            geven.spawn(self.mac_address_to_event_cb[mac_address],mac_address,msg["event_name"],msg["event_value"])
+                            gevent.spawn(self.mac_address_to_event_cb[mac_address],mac_address,msg["event_name"],msg["event_value"])
                         else:
                             self.log.debug("No report callback defined in CP for report {}".format(msg))
                     else:
