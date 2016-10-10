@@ -69,6 +69,7 @@ class GlobalNodeManager(NodeManager):
         for mac_address in mac_address_list:
             if mac_address not in self.mac_address_to_hc_connector:
                 node_id = self.mac_address_to_node_id[mac_address]
+                iface = self.mac_address_to_interface[mac_address]
                 self.mac_address_to_event_cb[mac_address] = None
                 self.mac_address_to_report_cb[mac_address] = None
                 hc_connector = self.control_engine.node(node_id).hc.start_local_control_program(program=local_monitoring_program)
