@@ -37,29 +37,9 @@ __email__ = "peter.ruckebusch@intec.ugent.be"
 
 log = logging.getLogger('contiki_global_control_program')
 
-#~ @control_engine.new_node_callback()
-#~ def new_node(node):
-    #~ nodes[node.id] = node
-    #~ print("New node appeared:")
-    #~ print(node)
-#~ 
-#~ @control_engine.node_exit_callback()
-#~ def node_exit(node, reason):
-    #~ global_node_manager.remove_node(node)
-    #~ print("NodeExit : NodeID : {} MAC_ADDR : {} Reason : {}".format(node.id,mac_address_exit_list, reason))
-#~ 
-#~ @control_engine.set_default_callback()
 def default_callback(group, node, cmd, data):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
-#~ 
-#~ @control_engine.add_callback(upis.radio.set_rxchannel)
-#~ def set_channel_reponse(group, node, data):
-    #~ print("{} set_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
-#~ 
-#~ @control_engine.add_callback(upis.radio.get_rxchannel)
-#~ def get_channel_reponse(group, node, data):
-    #~ print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
-#~ 
+
 def print_response(group, node, data):
     print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
 

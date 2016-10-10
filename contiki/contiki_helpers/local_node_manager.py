@@ -4,7 +4,7 @@ from manager import NodeManager
 
 class LocalNodeManager(NodeManager):
     
-    def __init__(self, control_engine):
+    def __init__(self, config):
         super(LocalNodeManager, self).__init__(control_engine, "local")
         threading.Timer(15,self.__update_mac_address_list).start()
     
