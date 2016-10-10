@@ -97,7 +97,7 @@ class GlobalNodeManager(NodeManager):
     def __update_mac_address_list(self,node_id):
         #~ node_id = args[1]
         #~ print(args)
-        gevent.sleep(1)
+        gevent.sleep(2)
         print("Updating mac address list")
         self.control_engine._clear_call_context()
         radio_platforms = self.control_engine.node(self.connected_nodes[node_id]).timeout(1).blocking(True).radio.iface("lowpan0").get_radio_platforms()
@@ -109,8 +109,8 @@ class GlobalNodeManager(NodeManager):
 
     def add_node(self, node):
         self.connected_nodes[node.id] = node
-        t = threading.Thread(target=self.__update_mac_address_list,args=(node.id,),daemon=True)
-        t.start()
+        #t = threading.Thread(target=self.__update_mac_address_list,args=(node.id,),daemon=True)
+        #t.start()
         print("New node appeared:")
         print(node)
 
@@ -137,9 +137,10 @@ class GlobalNodeManager(NodeManager):
     def wait_for_agents(ip_address_list, timeout=60):
         for i in range(0, timeout):
             num_matches = 0
-            if len(nodes) == len(ip_address_list):
-                for node_id in nodes:
-                    if nodes[node_id].ip in ip_address_list:
+            if len(self.connected_nodes) == len(ip_address_list):
+                for node_id in self.connected_nodes:
+                    if self.connected_nodes[node_id].ip in ip_address_list:
+						self.__update_mac_address_list(node_id)
                         num_matches+=1
                         break
                 if num_matches == len(ip_address_list):
