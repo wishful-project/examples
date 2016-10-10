@@ -74,7 +74,7 @@ def main(args):
     global_node_manager.set_default_callback(default_callback)
     contiki_nodes = []
     
-    gevent.sleep(10
+    gevent.sleep(10)
     
     global_node_manager.wait_for_agents(["172.16.16.1"])
 
