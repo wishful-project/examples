@@ -108,7 +108,7 @@ class GlobalNodeManager(NodeManager):
 
     def add_node(self, node):
         self.connected_nodes[node.id] = node
-        t = threading.Thread(target=self.__update_mac_address_list,args=(node.id,),daemon=False)
+        t = threading.Thread(target=self.__update_mac_address_list,args=(node.id,),daemon=True)
         t.start()
         print("New node appeared:")
         print(node)
