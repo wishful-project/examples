@@ -60,7 +60,7 @@ class GlobalNodeManager(NodeManager):
         pass
 
     def start_local_monitoring_cp(self, mac_address_list=None):
-        if mac_address_list is None=
+        if mac_address_list is None:
             mac_address_list = self.mac_address_list
         for mac_address in mac_address_list:
             if mac_address not in self.mac_address_to_hc_connector:

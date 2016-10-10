@@ -33,17 +33,17 @@ def local_event_listener(control_engine):
             if msg['command'] == 'SUBSCRIBE_EVENT':
                 for iface in ifaces:
                     if msg['upi_type'] == 'net':
-                        control_engine.blocking(False).net.iface(iface).subscribe_events_net([msg['event_key_list'],event_handler,msg['event_duration'])
+                        control_engine.blocking(False).net.iface(iface).subscribe_events_net(msg['event_key_list'],event_handler,msg['event_duration'])
                     elif msg['upi_type'] == 'radio':
-                        control_engine.blocking(False).radio.iface(iface).subscribe_events([msg['event_key_list'],event_handler,msg['event_duration'])
+                        control_engine.blocking(False).radio.iface(iface).subscribe_events(msg['event_key_list'],event_handler,msg['event_duration'])
                     else:
                         print("async event listener unsupported upi_type {}".format(msg['upi_type']))
             elif msg['command'] == 'GET_MEASUREMENTS_PERIODIC':
                 for iface in ifaces:
                     if msg['upi_type'] == 'net':
-                        control_engine.blocking(False).iface(iface).net.get_measurements_periodic_net([msg['measurement_key_list'], msg['collect_period'], msg['report_period'], msg['num_iterations'], report_handler)
+                        control_engine.blocking(False).iface(iface).net.get_measurements_periodic_net(msg['measurement_key_list'], msg['collect_period'], msg['report_period'], msg['num_iterations'], report_handler)
                     elif msg['upi_type'] == 'radio':
-                        control_engine.blocking(False).iface(iface).radio.get_measurements_periodic([msg['measurement_key_list'], msg['collect_period'], msg['report_period'], msg['num_iterations'], report_handler)
+                        control_engine.blocking(False).iface(iface).radio.get_measurements_periodic(msg['measurement_key_list'], msg['collect_period'], msg['report_period'], msg['num_iterations'], report_handler)
                     else:
                         print("periodic measurement collector unsupported upi_type {}".format(msg['upi_type']))
             else:
