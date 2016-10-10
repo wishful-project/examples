@@ -17,7 +17,7 @@ class LocalNodeManager(NodeManager):
     def __update_mac_address_list(self):
         radio_platforms = self.control_engine.blocking(True).iface("lowpan0").radio.get_radio_platforms()
         for radio_platform in radio_platforms:
-            mac_addr = self.control_engine.radio.blocking(True).iface(radio_platform).get_hwaddr()
+            mac_addr = self.control_engine.blocking(True).iface(radio_platform).radio.get_hwaddr()
             self.mac_address_list.append(mac_addr)
             self.mac_address_to_interface[mac_addr] = radio_platform
 
