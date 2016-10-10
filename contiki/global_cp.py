@@ -79,7 +79,8 @@ def main(args):
     while True:
         gevent.sleep(10)
         if len(nodes) > 0:
-            for node_id in nodes.keys[:]:
+			keys = nodes.keys()
+            for node_id in keys:
                 global_node_manager.add_node(nodes[node_id])
                 del nodes[node_id]
             
