@@ -78,9 +78,9 @@ class MACManager(object):
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
         if self.node_manager.scope == "local":
-			return self.node_manager.execute_upi_function("radio", "get_measurements_periodic", measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list)
-		else:
-			return self.node_manager.get_measurements_periodic("radio", measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list)
+            return self.node_manager.execute_upi_function("radio", "get_measurements_periodic", measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list)
+        else:
+            return self.node_manager.get_measurements_periodic("radio", measurement_key_list, collect_period, report_period, num_iterations, report_callback, mac_address_list)
 
     def subscribe_events(self, event_key_list, event_callback, event_duration, mac_address_list=None):
         """Monitor the MAC behaviour asynchroniously in a push based manner by registering for events.
@@ -96,9 +96,9 @@ class MACManager(object):
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
         if self.node_manager.scope == "local":
-			return self.node_manager.execute_upi_function("radio", "subscribe_events", event_key_list, event_callback, event_duration, mac_address_list)
+            return self.node_manager.execute_upi_function("radio", "subscribe_events", event_key_list, event_callback, event_duration, mac_address_list)
         else:
-			return self.node_manager.subscribe_events("radio", event_key_list, event_callback, event_duration, mac_address_list)
+            return self.node_manager.subscribe_events("radio", event_key_list, event_callback, event_duration, mac_address_list)
 
     def activate_radio_program(self, name, mac_address_list=None):
         """Activate a MAC radio program.
@@ -123,11 +123,11 @@ class MACManager(object):
             UPI_R.radio_info_t: a radio_info_t object containing all parameter, measurement and event keys as well as the available radio programs.
         """
         return self.node_manager.execute_upi_function("radio", "get_radio_info", mac_address_list)
- 
+
     def get_radio_platforms(self, mac_address_list=None):
         radio_platforms = []
         if mac_address_list is None:
-			mac_address_list = self.node_manager.mac_address_list
+            mac_address_list = self.node_manager.mac_address_list
         for mac_address in mac_address_list:
             radio_platforms.append(self.node_manager.mac_address_to_interface[mac_address])
         return radio_platforms
