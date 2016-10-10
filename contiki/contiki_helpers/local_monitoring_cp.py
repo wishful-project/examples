@@ -27,7 +27,7 @@ def local_monitoring_program(control_engine):
 
     # control loop
     while not control_engine.is_stopped():
-        msg = controller.recv(block=False)
+        msg = control_engine.recv(block=False)
         if msg is not None and type(msg) is dict and 'command' in msg:
             radio_platforms = []
             if 'interface' in msg:
