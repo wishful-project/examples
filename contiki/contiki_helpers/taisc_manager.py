@@ -46,7 +46,7 @@ class TAISCMACManager(MACManager):
                 slotlist_tpl = taisc_slotlist.to_tuple(current_offset, MAX_MSG_SIZE)
                 param_key_values_dict = {'taiscSlotList': slotlist_tpl}
                 ret = self.update_macconfiguration(param_key_values_dict, mac_address)
-                 if type(ret[mac_address]) is dict:
+                if type(ret[mac_address]) is dict:
                     ret_val+=ret[mac_address]['taiscSlotList']
                 else:
                     ret_val+=ret[mac_address]
