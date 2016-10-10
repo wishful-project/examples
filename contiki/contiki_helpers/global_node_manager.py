@@ -99,14 +99,14 @@ class GlobalNodeManager(NodeManager):
             self.mac_address_to_node_id[mac_addr] = node_id
             self.mac_address_to_interface[mac_addr] = radio_platform
 
-    @GlobalNodeManager.control_engine.new_node_callback()
+    @control_engine.new_node_callback()
     def new_node(node):
         self.connected_nodes[node.id] = node
         threading.Timer(2,self.__update_mac_address_list,node.id).start()
         print("New node appeared:")
         print(node)
 
-    @GlobalNodeManager.control_engine.node_exit_callback()
+    @control_engine.node_exit_callback()
     def node_exit(node, reason):
         mac_address_exit_list = []
         if node.id in self.connected_nodes:
