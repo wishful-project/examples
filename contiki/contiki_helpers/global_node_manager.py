@@ -91,7 +91,8 @@ class GlobalNodeManager(NodeManager):
             GlobalNodeManager.mac_address_to_hc_connector[mac_address].send(msg)
 
     @classmethod
-    def __update_mac_address_list(node_id):
+    def __update_mac_address_list(*args, **kwargs):
+		node_id = args[0]
         radio_platforms = GlobalNodeManager.control_engine.node(node_id).blocking(True).iface("lowpan0").radio.get_radio_platforms()
         for radio_platform in radio_platforms:
             mac_addr = GlobalNodeManager.control_engine.node(GlobalNodeManager.connected_nodes[node_id]).blocking(True).iface(radio_platform).radio.get_hwaddr()
