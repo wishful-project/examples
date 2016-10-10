@@ -65,10 +65,6 @@ if __name__ == "__main__":
     def main(args):
 
         config_file_path = args['--config']
-        config = None
-        with open(config_file_path, 'r') as f:
-            config = yaml.load(f)
-
         global_node_manager = GlobalNodeManager(config_file_path)
         contiki_nodes = []
 
