@@ -37,10 +37,11 @@ __email__ = "peter.ruckebusch@intec.ugent.be"
 
 control_engine = wishful_controller.Controller()
 global_node_manager = GlobalNodeManager(control_engine)
+nodes = {}
 
 @control_engine.new_node_callback()
 def new_node(node):
-    global_node_manager.add_node(node)
+    nodes[node.id] = node
     print("New node appeared:")
     print(node)
 
@@ -77,6 +78,11 @@ def main(args):
     #control loop
     while True:
         gevent.sleep(10)
+        if len(nodes) > 0:
+			for node_id in nodes:
+				global_node_manager.add_node(nodes[node_id])
+				del nodes[node_id]
+			
         contiki_nodes = global_node_manager.get_mac_address_list()
         print("\n")
         print("Connected nodes", [str(node) for node in contiki_nodes])
