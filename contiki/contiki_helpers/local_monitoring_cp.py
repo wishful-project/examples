@@ -55,6 +55,6 @@ def local_monitoring_program(control_engine):
         else:
             print("local monitoring unknown msg type {}".format(msg))
 
-        gevent.sleep(5)
+        gevent.sleep(1)
 
     print(("local monitor cp  - Name: {}, Id: {} - STOPPED".format(control_engine.name, control_engine.id)))

@@ -56,8 +56,9 @@ def main(args):
     ret = taisc_manager.update_slotframe('./contiki_helpers/default_taisc_slotframe.csv')
     log.info(ret)
     global_node_manager.start_local_monitoring_cp()
-    gevent.sleep(10)
+    gevent.sleep(5)
     app_manager.subscribe_events(["RIME_appPerPacket_rxstats"],event_cb, 0)
+    gevent.sleep(5)
     parameters = {"RIME_exampleUnicastActivateApplication": 1}
     #control loop
     while True:
