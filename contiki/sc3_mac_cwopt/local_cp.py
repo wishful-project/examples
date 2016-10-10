@@ -16,8 +16,8 @@ def my_local_control_program(control_engine):
         #print(("{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)))
         control_engine.send_upstream({"cmd": cmd, "result": data})
 
-    def event_handler(event_name, event_value):
-        control_engine.send_upstream({"event_name": event_name, "event_value": event_value})
+    def event_handler(interface, event_name, event_value):
+        control_engine.send_upstream({"interface": interface, "event_name": event_name, "event_value": event_value})
         #print(("{} Forwarding event {} with value: {}".format(datetime.datetime.now(), event_name, event_handler)))
         pass
 
