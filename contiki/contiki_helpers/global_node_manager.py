@@ -140,7 +140,7 @@ class GlobalNodeManager(NodeManager):
             if len(self.connected_nodes) == len(ip_address_list):
                 for node_id in self.connected_nodes:
                     if self.connected_nodes[node_id].ip in ip_address_list:
-						self.__update_mac_address_list(node_id)
+                        self.__update_mac_address_list(node_id)
                         num_matches+=1
                         break
                 if num_matches == len(ip_address_list):
