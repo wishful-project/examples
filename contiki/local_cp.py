@@ -9,7 +9,7 @@ Options:
    --config configFile Config file path
 
 Example:
-   ./contiki_local_controller -v --config ./config.yaml 
+   ./contiki_local_controller -v --config ./config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -17,8 +17,7 @@ Other options:
    -v, --verbose       print more text
    --version           show version and exit
 """
-
-import wishful_agent
+from contiki.contiki_helpers.local_node_manager import *
 import wishful_upis as upis
 
 import sys
@@ -33,20 +32,13 @@ __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
 log = logging.getLogger('wishful_agent.main')
-agent = wishful_agent.Agent(local=True)
-control_engine = agent.get_local_controller()
 
+def get_parameters(data):
+    print("{} get_parameters_reponse : {}".format(datetime.datetime.now(), data))
 
-@control_engine.add_callback(upis.radio.set_rxchannel)
-def set_rxchannel_reponse(data):
-    print("{} set_channel_reponse : {}".format(datetime.datetime.now(), data))
-
-
-@control_engine.set_default_callback()
 def default_callback(cmd, data):
     print("{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(
         datetime.datetime.now(), cmd, data))
-
 
 def print_response(data):
     print("{} Specific callback for function call; Print response : {}".format(
@@ -54,39 +46,28 @@ def print_response(data):
 
 
 def main(args):
-    log.debug(args)
-
-    config_file_path = args['--config']
-    config = None
-    with open(config_file_path, 'r') as f:
-        config = yaml.load(f)
-
-    agent.load_config(config)
-    agent.run()
-
-    # control loop
+    contiki_nodes = []
+    #control loop
     while True:
-        print("\nNext iteration:")
-        # execute non-blocking function immediately
-        control_engine.blocking(False).radio.iface("lowpan0").set_rxchannel(26)
+        contiki_nodes = global_node_manager.get_mac_address_list()
+        print("\n")
+        print("Connected nodes", [str(node) for node in contiki_nodes])
+        if contiki_nodes:
+            #execute UPI function blocking
+            local_node_manager.execute_upi_function("radio","set_parameters",contiki_nodes,{'IEEE802154_phyCurrentChannel':12})
 
-        # execute non-blocking function immediately, with specific callback
-        control_engine.callback(print_response).radio.iface(
-            "lowpan0").get_rxchannel()
-
-        # schedule non-blocking function delay
-        control_engine.delay(3).radio.iface("lowpan0").set_rxchannel(11)
-
-        # schedule non-blocking function exec time with default callback
-        exec_time = datetime.datetime.now() + datetime.timedelta(seconds=6)
-        control_engine.exec_time(exec_time).radio.iface(
-            "lowpan0").get_rxchannel()
-
-        # execute blocking function immediately
-        result = control_engine.radio.iface("lowpan0").get_rxchannel()
-        print("{} Channel is: {}".format(datetime.datetime.now(), result))
-
-        time.sleep(15)
+            #schedule non-blocking UPI function with specific callback
+            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
+            global_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, None, ['IEEE802154_phyCurrentChannel'])
+            gevent.sleep(5)
+            #delayed UPI function call with default callback
+            global_node_manager.delay_upi_function("radio","set_parameters",3, contiki_nodes, None,{'IEEE802154_phyCurrentChannel':13})
+            gevent.sleep(5)
+            #schedule non-blocking UPI function with specific callback
+            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
+            global_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, print_response, ['IEEE802154_phyCurrentChannel'])
+            
+        gevent.sleep(10)
 
 
 if __name__ == "__main__":
@@ -115,6 +96,16 @@ if __name__ == "__main__":
 
     logging.basicConfig(filename=logfile, level=log_level,
                         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+    log.debug(args)
+
+    config_file_path = args['--config']
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+
+    local_node_manager = LocalNodeManager(config)
+    local_node_manager.set_default_callback(default_callback)
+    local_node_manager.add_callback(upis.radio.get_parameters,get_parameters)
 
     try:
         main(args)
@@ -122,4 +113,4 @@ if __name__ == "__main__":
         log.debug("Controller exits")
     finally:
         log.debug("Exit")
-        agent.stop()
+        local_node_manager.stop()

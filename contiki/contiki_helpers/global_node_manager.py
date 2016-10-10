@@ -29,9 +29,6 @@ class GlobalNodeManager(NodeManager):
                 #~ return addr
         #~ return -1
 
-    def set_default_callback(self, callback):
-        self.control_engine.default_callback = callback
-
     def __hc_message_handler(self, hc_connector, mac_address, node_id, iface):
         while True:
             msg = hc_connector.recv(block=False, timeout=1)
@@ -189,3 +186,6 @@ class GlobalNodeManager(NodeManager):
                 iface = self.mac_address_to_interface[mac_address]
                 ret[mac_address] = self.control_engine.blocking(False).delay(delay).callback(callback).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
+
+    def stop(self):
+        self.control_engine.stop()

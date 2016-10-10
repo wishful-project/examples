@@ -1,11 +1,15 @@
 import threading.Timer
 import wishful_agent
+import wishful_controller
 from manager import NodeManager
 
 class LocalNodeManager(NodeManager):
     
     def __init__(self, config):
-        super(LocalNodeManager, self).__init__(control_engine, "local")
+        super(LocalNodeManager, self).__init__("local")
+        self.agent = wishful_agent.Agent(local=True)
+        self.control_engine = agent.get_local_controller()
+        self.control_engine.load_config(config)
         threading.Timer(15,self.__update_mac_address_list).start()
     
     def __update_mac_address_list(self):
@@ -50,3 +54,6 @@ class LocalNodeManager(NodeManager):
                 iface = self.self.mac_address_to_interface[mac_address]
                 ret[mac_address] = self.control_engine.blocking(False).delay(delay).callback(callback).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
+    
+    def stop(self):
+		self.agent.stop()
