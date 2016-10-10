@@ -33,7 +33,7 @@ class NodeManager():
 		self.groups = {}
 		self.mac_address_list = []
 		self.mac_address_to_interface = {}
-		self.log = logging,get_logger("Contiki Node Manager: "
+		self.log = logging,get_logger("Contiki Node Manager: ")
 		self.scope = scope
 		config = None
 		with open(config_file_path, 'r') as f:
