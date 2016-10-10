@@ -24,7 +24,7 @@ Other options:
 import sys
 import datetime
 import logging
-import wishful_controller
+from contiki.contiki_helpers.global_node_manager import *
 import gevent
 
 __author__ = "Peter Ruckebusch"

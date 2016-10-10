@@ -1,2 +1,2 @@
 __author__ = 'pruckebusch'
-from .contiki_helpers import *
+from contiki.contiki_helpers import *
