@@ -29,8 +29,8 @@ class GlobalNodeManager(NodeManager):
         #~ return -1
 
     def set_default_callback(self, callback):
-		self.control_engine.default_callback = callback
-    
+        self.control_engine.default_callback = callback
+
     def __hc_message_handler(hc_connector, mac_address, node_id, iface):
         while True:
             msg = hc_connector.recv(block=False, timeout=1)
