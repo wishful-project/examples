@@ -10,11 +10,11 @@ class GlobalNodeManager(NodeManager):
 
     def __init__(self, control_engine):
         super(GlobalNodeManager, self).__init__(control_engine, "global")
-        connected_nodes = {}
-        mac_address_to_node_id = {}
-        mac_address_to_event_cb = {}
-        mac_address_to_report_cb = {}
-        mac_address_to_hc_connector = {}
+        self.connected_nodes = {}
+        self.mac_address_to_node_id = {}
+        self.mac_address_to_event_cb = {}
+        self.mac_address_to_report_cb = {}
+        self.mac_address_to_hc_connector = {}
 
 
     #~ def __get_macaddress_by_nodeid_iface(self,node_id, iface):
@@ -85,7 +85,6 @@ class GlobalNodeManager(NodeManager):
             msg = {'interface': [self.mac_address_to_interface[mac_address]], 'command': 'GET_MEASUREMENTS_PERIODIC', 'upi_type': upi_type, 'measurement_key_list': measurement_key_list, 'collect_period': collect_period, 'report_period': report_period, 'num_iterations': num_iterations}
             self.mac_address_to_hc_connector[mac_address].send(msg)
 
-    @classmethod
     def __update_mac_address_list(*args, **kwargs):
         node_id = args[1]
         print(args)
