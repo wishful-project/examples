@@ -70,7 +70,7 @@ def main(args):
     config = None
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
-    control_engine.load_config(self.config)
+    control_engine.load_config(config)
     control_engine.start()
     contiki_nodes = []
 
