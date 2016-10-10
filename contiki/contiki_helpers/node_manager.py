@@ -31,9 +31,8 @@ class Group(object):
 class NodeManager():
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self,control_engine,scope):
+    def __init__(self,scope):
         self.log = logging.getLogger("Contiki Node Manager: ")
-        self.control_engine = control_engine
         self.scope = scope
         self.groups = {}
         self.mac_address_list = []
