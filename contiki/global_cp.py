@@ -26,6 +26,7 @@ import datetime
 import logging
 from contiki.contiki_helpers.global_node_manager import *
 import gevent
+import wishful_upis as upis
 
 __author__ = "Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
@@ -107,4 +108,4 @@ if __name__ == "__main__":
         log.debug("Controller exits")
     finally:
         log.debug("Exit")
-        global_node_manager.control_engine.stop()
+        GlobalNodeManager.control_engine.stop()

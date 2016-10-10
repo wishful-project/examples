@@ -11,17 +11,17 @@ from contiki_helpers.node_manager import NodeManager
 class GlobalNodeManager(NodeManager):
 
     control_engine = wishful_controller.Controller()
+    connected_nodes = {}
 
     def __init__(self, config_file_path):
         super(GlobalNodeManager, self).__init__(config_file_path, "global")
-        self.connected_nodes = {}
         self.mac_address_to_node_id = {}
         self.mac_address_to_event_cb = {}
         self.mac_address_to_report_cb = {}
         self.mac_address_to_hc_connector = {}
 
-        control_engine.load_config(self.config)
-        control_engine.start()
+        GlobalNodeManager.control_engine.load_config(self.config)
+        GlobalNodeManager.control_engine.start()
 
     #~ def __get_macaddress_by_nodeid_iface(self,node_id, iface):
         #~ for addr in self.mac_address_list:
@@ -94,14 +94,14 @@ class GlobalNodeManager(NodeManager):
     def __update_mac_address_list(self, node_id):
         radio_platforms = GlobalNodeManager.control_engine.node(node_id).blocking(True).iface("lowpan0").radio.get_radio_platforms()
         for radio_platform in radio_platforms:
-            mac_addr = GlobalNodeManager.control_engine.node(self.connected_nodes[node_id]).blocking(True).iface(radio_platform).radio.get_hwaddr()
+            mac_addr = GlobalNodeManager.control_engine.node(GlobalNodeManager.connected_nodes[node_id]).blocking(True).iface(radio_platform).radio.get_hwaddr()
             self.mac_address_list.append(mac_addr)
             self.mac_address_to_node_id[mac_addr] = node_id
             self.mac_address_to_interface[mac_addr] = radio_platform
 
     @control_engine.new_node_callback()
     def new_node(node):
-        self.connected_nodes[node.id] = node
+        GlobalNodeManager.connected_nodes[node.id] = node
         threading.Timer(2,self.__update_mac_address_list,node.id).start()
         print("New node appeared:")
         print(node)
@@ -109,7 +109,7 @@ class GlobalNodeManager(NodeManager):
     @control_engine.node_exit_callback()
     def node_exit(node, reason):
         mac_address_exit_list = []
-        if node.id in self.connected_nodes:
+        if node.id in GlobalNodeManager.connected_nodes:
             for mac_address in self.mac_address_list[:]:
                 if self.mac_address_to_node_id[mac_address] == node.id:
                     mac_address_exit_list.append(mac_address)
@@ -118,7 +118,7 @@ class GlobalNodeManager(NodeManager):
                     self.mac_address_list.remove(mac_address)
                     for group_name in self.groups:
                         self.group[group_name].remove_node(mac_address)
-            del self.connected_nodes[node.id]
+            del GlobalNodeManager.connected_nodes[node.id]
         print("NodeExit : NodeID : {} MAC_ADDR : {} Reason : {}".format(node.id,mac_address_exit_list, reason))
 
     def wait_for_agents(ip_address_list, timeout=60):
