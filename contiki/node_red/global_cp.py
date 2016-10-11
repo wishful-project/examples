@@ -11,8 +11,8 @@ Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
    --nodes nodesFile   Config file with node info
-   --nr-ip-address     Node Red IP address
-   --nr-port           Node Red port
+   --nr-ip-address nrIP Node Red IP address
+   --nr-port nrPort     Node Red port
 
 Example:
    python global_cp.py --config config/portable/global_cp_config.yaml --nodes config/portable/nodes.yaml --nr-ip-address 172.16.16.1 --nr-port 55555
@@ -54,7 +54,7 @@ def parse_node_red_command(json_client, nr_command, node_manager):
 
 def main(args):
     contiki_nodes = []
-    json_client = jsonSocket.JsonClient(args['--nr-ip-address'], args['--nr-port'])
+    json_client = jsonSocket.JsonClient(args['--nr-ip-address'], int(args['--nr-port']))
     if json_client.connect():
         try:
             node_red_command = json_client.read_obj()
