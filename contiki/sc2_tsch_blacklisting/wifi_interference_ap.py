@@ -10,21 +10,21 @@ def wifi_interference_ap(control_engine):
     import gevent
     import subprocess
     started = False
-    print(("local monitor cp  - Name: {}, Id: {} - Started".format(control_engine.name, control_engine.id)))
+    print(("local ap  - Name: {}, Id: {} - Started".format(control_engine.name, control_engine.id)))
     while control_engine.is_stopped():
-		msg = control_engine.recv(block=False)
+        msg = control_engine.recv(block=False)
         if msg is not None and type(msg) is dict:
-			if msg['command'] == "start_wifi_interference":
-				subprocess.call(['sudo','bash','./contiki_helpers/startAP.sh',msg['wifi_channel']])
-				gevent.sleep(5)
-				subprocess.call(['/usr/bin/screen','-h','1000','-dmS','80211acIPerf','/usr/bin/iperf','-s','-i','1','-u'])
-				started = True
-			elif msg['command'] == "stop_wifi_interference":
-				subprocess.call(['sudo','killall','iperf'])
-				subprocess.call(['sudo','killall','hostapd'])
-				started = False
-		gevent.sleep(1)
-	if started:
-		subprocess.call(['sudo','killall','iperf'])
-		subprocess.call(['sudo','killall','hostapd'])
-    print(("local monitor cp  - Name: {}, Id: {} - Started".format(control_engine.name, control_engine.id)))
+            if msg['command'] == "start_wifi_interference":
+                subprocess.call(['sudo','bash','./contiki_helpers/startAP.sh',msg['wifi_channel']])
+                gevent.sleep(5)
+                subprocess.call(['/usr/bin/screen','-h','1000','-dmS','80211acIPerf','/usr/bin/iperf','-s','-i','1','-u'])
+                started = True
+            elif msg['command'] == "stop_wifi_interference":
+                subprocess.call(['sudo','killall','iperf'])
+                subprocess.call(['sudo','killall','hostapd'])
+                started = False
+        gevent.sleep(1)
+    if started:
+        subprocess.call(['sudo','killall','iperf'])
+        subprocess.call(['sudo','killall','hostapd'])
+    print(("local ap - Name: {}, Id: {} - Started".format(control_engine.name, control_engine.id)))
