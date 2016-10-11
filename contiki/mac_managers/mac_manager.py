@@ -227,8 +227,8 @@ class LocalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        if self.mac_mode == name:
-            return 0
+        #~ if self.mac_mode == name:
+            #~ return 0
         return self.__execute_local_upi_func("activate_radio_program", mac_address_list, name)
 
     def get_radio_info(self, mac_address_list=None):
@@ -402,8 +402,10 @@ class GlobalMACManager(MACManager):
         Returns:
             int: error code (0 = success, -1 = fail, >=1 errno value)
         """
-        if self.mac_mode == name:
-            return 0
+        #~ if self.mac_mode == name:
+            #~ print("NO NEED TO EXECUTE")
+            #~ return 0
+		
         return self.__execute_global_upi_func("activate_radio_program", mac_address_list, name)
 
     def get_hwaddr_list(self):

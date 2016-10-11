@@ -29,6 +29,10 @@ import wishful_controller
 import gevent
 import yaml
 import _thread
+from measurement_logger.stdout.std_measurement_logger import *
+from measurement_logger.file.file_measurement_logger import *
+from measurement_logger.MySQL.mysql_measurement_logger import *
+from measurement_logger.OML.oml_measurement_logger import *
 from contiki.mac_managers.taisc_manager import *
 from contiki.app_managers.app_manager import *
 from local_cp import my_local_control_program
@@ -44,7 +48,19 @@ global_control_engine = wishful_controller.Controller()
 global_taisc_manager = GlobalTAISCMACManager(global_control_engine, "CSMA")
 global_app_manager = GlobalAppManager(global_control_engine, global_taisc_manager)
 nodes = []
+measurement_logger = None
 
+def configure_measurement_logger(config):
+    global measurement_logger
+    ml_config = config["measurement_logger"]
+    if "stdout" in ml_config["type"]:
+        measurement_logger = STDOUTMeasurementLogger("Facility", "Global_cp", "group_name")
+    elif "file" in ml_config["type"]:
+        measurement_logger = FileMeasurementLogger("Facility", "Global_cp", "group_name", ml_config["filename"] )
+    elif "mysql" in ml_config["type"]:
+        measurement_logger = MySQLMeasurementLogger("Facility", "Global_cp", "group_name", ml_config["db_host"],\
+            ml_config["db_name"], ml_config["db_username"], ml_config["db_password"], ml_config["measurement_defs"])
+    
 
 @global_control_engine.new_node_callback()
 def new_node(node):
@@ -71,7 +87,8 @@ def hc_message_handler(hc_connector):
     while True:
         msg = hc_connector.recv(block=False, timeout=1)
         while msg is not None:
-            print("{} Global CP received msg {} from local CP".format(datetime.datetime.now(), msg))
+            #~ print("{} Global CP received msg {} from local CP".format(datetime.datetime.now(), msg))
+            measurement_logger.log_measurement(msg["event_name"],msg["event_value"])
             msg = hc_connector.recv(block=False, timeout=1)
         gevent.sleep(1)
     pass
@@ -84,6 +101,8 @@ def main(args):
     config = None
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
+        
+    configure_measurement_logger(config)
 
     global_control_engine.load_config(config)
     global_control_engine.start()
@@ -116,16 +135,17 @@ def main(args):
     parameters = {"RIME_exampleUnicastActivateApplication": 1}
 
     # control loop
+    measurement_logger.start_logging()
     while True:
-        #~ log.info("Activating CSMA MAC!")
-        #~ parameters["RIME_exampleUnicastActivateApplication"] = 0
-        #~ err1 = global_app_manager.update_configuration(parameters)
-        #~ err2 = global_taisc_manager.activate_radio_program("CSMA")
-        #~ gevent.sleep(5)
-        #~ parameters["RIME_exampleUnicastActivateApplication"] = 1
-        #~ err3 = global_app_manager.update_configuration(parameters)
-        #~ log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
-        #~ gevent.sleep(20)
+        log.info("Activating CSMA MAC!")
+        parameters["RIME_exampleUnicastActivateApplication"] = 0
+        err1 = global_app_manager.update_configuration(parameters)
+        err2 = global_taisc_manager.activate_radio_program("CSMA")
+        gevent.sleep(5)
+        parameters["RIME_exampleUnicastActivateApplication"] = 1
+        err3 = global_app_manager.update_configuration(parameters)
+        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
+        gevent.sleep(10)
         log.info("Activating TDMA MAC!")
         parameters["RIME_exampleUnicastActivateApplication"] = 0
         err1 = global_app_manager.update_configuration(parameters)
@@ -134,16 +154,18 @@ def main(args):
         parameters["RIME_exampleUnicastActivateApplication"] = 1
         err3 = global_app_manager.update_configuration(parameters)
         log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
-        gevent.sleep(200)
-        #~ log.info("Activating TSCH MAC!")
-        #~ parameters["RIME_exampleUnicastActivateApplication"] = 0
-        #~ err1 = global_app_manager.update_configuration(parameters)
-        #~ err2 = global_taisc_manager.activate_radio_program("TSCH")
-        #~ gevent.sleep(5)
-        #~ parameters["RIME_exampleUnicastActivateApplication"] = 1
-        #~ err3 = global_app_manager.update_configuration(parameters)
-        #~ log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
-        #~ gevent.sleep(20)
+        gevent.sleep(10)
+        log.info("Activating TSCH MAC!")
+        parameters["RIME_exampleUnicastActivateApplication"] = 0
+        err1 = global_app_manager.update_configuration(parameters)
+        err2 = global_taisc_manager.activate_radio_program("TSCH")
+        gevent.sleep(5)
+        parameters["RIME_exampleUnicastActivateApplication"] = 1
+        err3 = global_app_manager.update_configuration(parameters)
+        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
+        gevent.sleep(10)
+    measurement_logger.stop_logging()
+       
 
 if __name__ == "__main__":
     try:

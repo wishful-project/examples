@@ -11,3 +11,15 @@ modules:
         module : wishful_module_discovery_pyre
         class_name : PyreDiscoveryControllerModule
         kwargs: {"iface":"lo", "groupName":"wishful_contiki", "downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"}
+
+measurement_logger: 
+    type: "mysql"
+    filename: "/tmp/wishful_log.txt"
+    db_name: "wishful"
+    db_host: "localhost"
+    db_username: "demo"
+    db_password: "demo"
+    measurement_defs: >
+        {"IEEE802154_MACSTATS":"timestamp:int32 nodeID:int32 packetSize:int32 activeRadioprogram:string timeDiff:int32 numTxRequest:int32 numTxRequestFail:int32 numTxAttempt:int32 numTxSuccess:int32 numTxFail:int32 numTxBusy:int32 numTxNoAck:int32 numTxCollision:int32 numRx:int32 avgBackoffExponent:int32",
+        "RIME_appPerPacket_rxstats":"appID:TEXT senderID:TEXT timestamp:TEXT IPD:TEXT IPJ:TEXT SEQ:TEXT packetLoss:TEXT RSSI:TEXT LQI:TEXT"}
+
