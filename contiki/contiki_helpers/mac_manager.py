@@ -112,6 +112,7 @@ class MACManager(object):
         """
         if self.mac_mode == name:
             return 0
+        self.mac_mode = name
         return self.node_manager.execute_upi_function("radio", "activate_radio_program", mac_address_list, name)
 
     def get_radio_info(self, mac_address_list=None):
