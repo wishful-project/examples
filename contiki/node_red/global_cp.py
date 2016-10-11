@@ -11,9 +11,11 @@ Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
    --nodes nodesFile   Config file with node info
+   --nr-ip-address     Node Red IP address
+   --nr-port           Node Red port
 
 Example:
-   python global_cp.py --config config/portable/global_cp_config.yaml --nodes config/portable/nodes.yaml
+   python global_cp.py --config config/portable/global_cp_config.yaml --nodes config/portable/nodes.yaml --nr-ip-address 172.16.16.1 --nr-port 55555
 
 Other options:
    -h, --help          show this help message and exit
