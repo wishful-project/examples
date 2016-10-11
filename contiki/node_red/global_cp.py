@@ -39,30 +39,30 @@ __email__ = "peter.ruckebusch@intec.ugent.be"
 log = logging.getLogger('contiki_global_control_program')
 
 def parse_node_red_command(json_client, nr_command, node_manager):
-	if 'execute_upi_function' in nr_command:
-		nr_exec_upi_func = nr_command['execute_upi_function']
-		upi_type = nr_exec_upi_func['upi_type']
-		upi_func = nr_exec_upi_func['upi_func']
-		node_list = nr_exec_upi_func['node_list']
-		upi_func_args = nr_exec_upi_func['args']
-		ret_val = node_manager.execute_upi_function(upi_type, upi_func, node_list,args=upi_func_args)
-		json_ret = { 'execute_upi_function' : {'upi_type': upi_type, "upi_func": upi_func, "node_list": node_list, 'ret_val' : ret_val}}
-		json_client.send_obj(json_ret)
-	
+    if 'execute_upi_function' in nr_command:
+        nr_exec_upi_func = nr_command['execute_upi_function']
+        upi_type = nr_exec_upi_func['upi_type']
+        upi_func = nr_exec_upi_func['upi_func']
+        node_list = nr_exec_upi_func['node_list']
+        upi_func_args = nr_exec_upi_func['args']
+        ret_val = node_manager.execute_upi_function(upi_type, upi_func, node_list,args=upi_func_args)
+        json_ret = { 'execute_upi_function' : {'upi_type': upi_type, "upi_func": upi_func, "node_list": node_list, 'ret_val' : ret_val}}
+        json_client.send_obj(json_ret)
+
 
 def main(args):
     contiki_nodes = []
     json_client = jsonSocket.JsonClient(args['--nr-ip-address'], args['--nr-port'])
     if json_client.connect():
-		try:
-			node_red_command = json_client.read_obj()
-			while type(node_red_command) is dict:
-				parse_node_red_command(node_red_command, global_node_manager)
-				node_red_command = json_client.read_obj()
-		except Exception as e:
-			print(e)
-		finally:
-			json_client.close()
+        try:
+            node_red_command = json_client.read_obj()
+            while type(node_red_command) is dict:
+                parse_node_red_command(node_red_command, global_node_manager)
+                node_red_command = json_client.read_obj()
+        except Exception as e:
+            print(e)
+        finally:
+            json_client.close()
 
 if __name__ == "__main__":
     try:
