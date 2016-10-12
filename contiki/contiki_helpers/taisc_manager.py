@@ -64,13 +64,13 @@ class TAISCMACManager(MACManager):
         """
         if self.mac_mode == "TSCH":
             param_keys = ["IEEE802154e_macHoppingSequenceList"]
-            ret = self.read_macconfiguration(param_keys, self.node_manager.mac_address_list[0])
+            ret = self.read_macconfiguration(param_keys, [self.node_manager.mac_address_list[0]])
             if ret == -1:
                 return -1
             hopping_sequence = TAISCHoppingSequence.from_tuple(
-                ret["IEEE802154e_macHoppingSequenceList"])
+                ret[self.node_manager.mac_address_list[0]]["IEEE802154e_macHoppingSequenceList"])
             new_hopping_sequence = []
-            for channel in hopping_sequence.TAISCHoppingSequence:
+            for channel in hopping_sequence.hopping_sequence_list:
                 if channel not in channel_lst:
                     new_hopping_sequence.append(channel)
             for channel in channel_lst:
@@ -82,11 +82,12 @@ class TAISCMACManager(MACManager):
             if ret == -1:
                 return -1
             # now change the hopping sequence
+            self.log.info("New hopping scheme: {}".format(str(new_hopping_sequence)))
             param_key_values = {
                 "IEEE802154e_macHoppingSequenceList": tuple(new_hopping_sequence)}
             ret = self.update_macconfiguration(param_key_values)
-            if ret == -1:
-                return -1
+            #~ if ret == -1:
+                #~ return -1
             return ret
         else:
             return -1

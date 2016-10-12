@@ -4,25 +4,24 @@ agent_info:
     name: 'contiki_control_agent'
     info: 'WiSHFUL example Contiki control agent'
     iface: 'lo'
-    type: 'local'
 
 modules:
     discovery:
-        module : wishful_module_static_discovery
-        class_name : StaticDiscoveryModule
-        kwargs: {"downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"}
+        module : wishful_module_discovery_pyre
+        class_name : PyreDiscoveryAgentModule
+        kwargs: {"iface":lo, "groupName":"wishful_contiki"}
     gitar_engine:
         module : wishful_module_gitar
         class_name : GitarEngine
-        interfaces : ['lowpan0']
-        kwargs : {'GitarConfig' : './config/localhost/gitar.ini','SupportedInterfaces' : ['lowpan0'],'ControlExtensions' : {'taisc' : './taisc_control_extensions.csv', 'rime' : './rime_control_extensions.csv'}}
+        interfaces : ['lowpan0','lowpan1']
+        kwargs : {'GitarConfig' : './config/localhost/gitar.ini','SupportedInterfaces' : ['lowpan0','lowpan1'],'ControlExtensions' : {'taisc' : './taisc_control_extensions.csv', 'rime' : './rime_control_extensions.csv'}}
     taisc_connector:
         module : wishful_module_taisc
         class_name : TAISCConnector
-        interfaces : ['lowpan0']
-        kwargs : {'RadioPrograms' : {"CSMA":0,"TDMA":2,"TSCH":1}, 'SupportedInterfaces' : ['lowpan0']}
+        interfaces : ['lowpan0','lowpan1']
+        kwargs : {'RadioPrograms' : {"CSMA":0,"TDMA":2,"TSCH":1}, 'SupportedInterfaces' : ['lowpan0','lowpan1']}
     rime_connector:
         module : wishful_module_rime
         class_name : RIMEConnector
-        interfaces : ['lowpan0']
-        kwargs : {'SupportedInterfaces' : ['lowpan0']}
+        interfaces : ['lowpan0','lowpan1']
+        kwargs : {'SupportedInterfaces' : ['lowpan0','lowpan1']}

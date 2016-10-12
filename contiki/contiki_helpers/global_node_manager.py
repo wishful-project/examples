@@ -90,7 +90,7 @@ class GlobalNodeManager(NodeManager):
         if mac_address_list is None:
             mac_address_list = self.mac_address_list
         for mac_address in mac_address_list:
-            if mac_address not in self.mac_address_to_local_monitoring_cp:
+            if mac_address not in self.mac_address_to_custom_local_cp:
                 self.mac_address_to_custom_local_cp[mac_address] = {}
                 self.mac_address_to_custom_local_cp_callback[mac_address] = {}
             node_id = self.mac_address_to_node_id[mac_address]
