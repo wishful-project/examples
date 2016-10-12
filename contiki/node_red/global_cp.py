@@ -40,7 +40,7 @@ __email__ = "peter.ruckebusch@intec.ugent.be"
 
 log = logging.getLogger('contiki_global_control_program')
 
-def parse_node_red_command(json_client, nr_command, node_manager):
+def parse_node_red_command(json_server, nr_command, node_manager):
     if 'execute_upi_function' in nr_command:
         nr_exec_upi_func = nr_command['execute_upi_function']
         upi_type = nr_exec_upi_func['upi_type']
@@ -49,22 +49,28 @@ def parse_node_red_command(json_client, nr_command, node_manager):
         upi_func_args = nr_exec_upi_func['args']
         ret_val = node_manager.execute_upi_function(upi_type, upi_func, node_list,args=upi_func_args)
         json_ret = { 'execute_upi_function' : {'upi_type': upi_type, "upi_func": upi_func, "node_list": node_list, 'ret_val' : ret_val}}
-        json_client.send_obj(json_ret)
+        json_server.send_obj({'payload': json_ret})
 
+class MyFactoryThread(jsonSocket.ServerFactoryThread):
+    # This is an example factory thread, which the server factory will
+    # instantiate for each new connection.
+    def __init__(self):
+        super(MyFactoryThread, self).__init__()
+        self.timeout = 2.0
+
+    def _process_message(self, obj):
+        # virtual method - Implementer must define protocol
+        if obj != '' and type(obj) is dict:
+            parse_node_red_command(self, obj['payload'], global_node_manager)
 
 def main(args):
     contiki_nodes = []
-    json_client = jsonSocket.JsonClient(args['--nr-ip-address'], int(args['--nr-port']))
-    if json_client.connect():
-        try:
-            node_red_command = json_client.read_obj()
-            while type(node_red_command) is dict:
-                parse_node_red_command(node_red_command, global_node_manager)
-                node_red_command = json_client.read_obj()
-        except Exception as e:
-            print(e)
-        finally:
-            json_client.close()
+    #~ jsocket_server = jsonSocket.JsonServer(args['--nr-ip-address'], int(args['--nr-port']))
+    jsocket_server = jsonSocket.ServerFactory(MyFactoryThread, address=args['--nr-ip-address'], port=int(args['--nr-port']))
+    jsocket_server.timeout = 2.0
+    jsocket_server.start()
+    while True:
+        time.sleep()
 
 if __name__ == "__main__":
     try:
