@@ -34,7 +34,7 @@ FORMAT = '[%(asctime)-15s][%(levelname)s][%(module)s][%(funcName)s] %(message)s'
 logging.basicConfig(format=FORMAT)
 
 class JsonSocket(object):
-	def __init__(self, address='127.0.0.1', port=5489):
+	def __init__(self, address='172.16.16.1', port=55555):
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.conn = self.socket
 		self._timeout = None
@@ -45,10 +45,10 @@ class JsonSocket(object):
 		msg = json.dumps(obj)
 		if self.socket:
 			frmt = "=%ds" % len(msg)
-			packed_msg = struct.pack(frmt, msg)
-			packed_hdr = struct.pack('=I', len(packed_msg))
+			packed_msg = struct.pack(frmt, msg.encode('utf8'))
+			#packed_hdr = struct.pack('=I', len(packed_msg))
 			
-			self._send(packed_hdr)
+			#self._send(packed_hdr)
 			self._send(packed_msg)
 			
 	def _send(self, msg):
@@ -56,11 +56,12 @@ class JsonSocket(object):
 		while sent < len(msg):
 			sent += self.conn.send(msg[sent:])
 			
-	def _read(self, size):
-		data = ''
-		while len(data) < size:
-			data_tmp = self.conn.recv(size-len(data))
+	def _read(self):
+		data = b''
+		while data == b'':
+			data_tmp = self.conn.recv(1024)
 			data += data_tmp
+			print("{} {}".format(data_tmp, data))
 			if data_tmp == '':
 				raise RuntimeError("socket connection broken")
 		return data
@@ -71,11 +72,12 @@ class JsonSocket(object):
 		return s[0]
 	
 	def read_obj(self):
-		size = self._msg_length()
-		data = self._read(size)
-		frmt = "=%ds" % size
+		#size = self._msg_length()
+		data = self._read()
+		frmt = "=%ds" % len(data)
 		msg = struct.unpack(frmt, data)
-		return json.loads(msg[0])
+		print("{}".format(msg[0].decode('utf8')))
+		return json.loads(msg[0].decode('utf8'))
 	
 	def close(self):
 		self._close_socket()
@@ -115,7 +117,7 @@ class JsonSocket(object):
 
 	
 class JsonServer(JsonSocket):
-	def __init__(self, address='127.0.0.1', port=5489):
+	def __init__(self, address='172.16.16.1', port=55555):
 		super(JsonServer, self).__init__(address, port)
 		self._bind()
 	

@@ -115,7 +115,7 @@ class ServerFactoryThread(threading.Thread, jsocket_base.JsonSocket):
 				logger.debug("socket.timeout: %s" % e)
 				continue
 			except Exception as e:
-				logger.info("client connection broken, closing socket")
+				logger.info("client connection broken, closing socket %s", e)
 				self._close_connection()
 				break
 		self.close()

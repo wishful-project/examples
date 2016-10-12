@@ -53,28 +53,30 @@ def parse_node_red_command(json_server, nr_command, node_manager):
         upi_func_args = nr_exec_upi_func['args']
         ret_val = node_manager.execute_upi_function(upi_type, upi_func, node_list,args=upi_func_args)
         json_ret = { 'execute_upi_function' : {'upi_type': upi_type, "upi_func": upi_func, "node_list": node_list, 'ret_val' : ret_val}}
-        json_server.send_obj({'payload': json_ret})
+        json_server.send_obj(json_ret)
 
 class MyFactoryThread(ServerFactoryThread):
     # This is an example factory thread, which the server factory will
     # instantiate for each new connection.
     def __init__(self):
         super(MyFactoryThread, self).__init__()
-        self.timeout = 2.0
+        self._address = "172.16.16.1"
+        self._port = "55555" 
+        #self.timeout = 2.0
 
     def _process_message(self, obj):
         # virtual method - Implementer must define protocol
         if obj != '' and type(obj) is dict:
-            parse_node_red_command(self, obj['payload'], global_node_manager)
+            parse_node_red_command(self, obj, global_node_manager)
 
 def main(args):
     contiki_nodes = []
     #~ jsocket_server = jsonSocket.JsonServer(args['--nr-ip-address'], int(args['--nr-port']))
     jsocket_server = ServerFactory(MyFactoryThread, address=args['--nr-ip-address'], port=int(args['--nr-port']))
-    jsocket_server.timeout = 2.0
+    #jsocket_server.timeout = 2.0
     jsocket_server.start()
     while True:
-        time.sleep()
+        time.sleep(1)
 
 if __name__ == "__main__":
     try:
