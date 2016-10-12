@@ -64,7 +64,7 @@ def parse_node_red_command(json_server, nr_command, node_manager):
 class MyFactoryThread(ServerFactoryThread):
     # This is an example factory thread, which the server factory will
     # instantiate for each new connection.
-    my_cmd = ''
+    my_cmd = []
     def __init__(self):
         super(MyFactoryThread, self).__init__()
         self._address = "172.16.16.1"
@@ -75,7 +75,7 @@ class MyFactoryThread(ServerFactoryThread):
     def _process_message(self, obj):
         # virtual method - Implementer must define protocol
         if obj != '' and type(obj) is dict:
-            MyFactoryThread.my_cmd = obj
+            MyFactoryThread.my_cmd.append(obj)
             #parse_node_red_command(self, obj, global_node_manager)
 
 def main(args):
@@ -85,9 +85,9 @@ def main(args):
     jsocket_server.timeout = 10.0
     jsocket_server.start()
     while True:
-        if MyFactoryThread.my_cmd != '':
-            parse_node_red_command(jsocket_server, MyFactoryThread.my_cmd, global_node_manager)
-            MyFactoryThread.my_cmd = ''
+        if len(MyFactoryThread.my_cmd) > 0:
+            parse_node_red_command(jsocket_server, MyFactoryThread.my_cmd[0], global_node_manager)
+            del MyFactoryThread.my_cmd[0]
         gevent.sleep(1)
 
 if __name__ == "__main__":
@@ -132,7 +132,6 @@ if __name__ == "__main__":
         node_config = yaml.load(f)
     print("{}".format(node_config['ip_address_list']))
     global_node_manager.wait_for_agents(node_config['ip_address_list'])
-    my_cmd = ''
 
     try:
         main(args)
