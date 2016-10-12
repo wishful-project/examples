@@ -31,7 +31,11 @@ from contiki.contiki_helpers.global_node_manager import *
 import gevent
 import wishful_upis as upis
 import yaml
-import jsonSocket
+
+#import jsocket_base
+#import tserver
+from contiki.node_red.jsocket_base import *
+from contiki.node_red.tserver import *
 
 __author__ = "Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
@@ -51,7 +55,7 @@ def parse_node_red_command(json_server, nr_command, node_manager):
         json_ret = { 'execute_upi_function' : {'upi_type': upi_type, "upi_func": upi_func, "node_list": node_list, 'ret_val' : ret_val}}
         json_server.send_obj({'payload': json_ret})
 
-class MyFactoryThread(jsonSocket.ServerFactoryThread):
+class MyFactoryThread(ServerFactoryThread):
     # This is an example factory thread, which the server factory will
     # instantiate for each new connection.
     def __init__(self):
@@ -66,7 +70,7 @@ class MyFactoryThread(jsonSocket.ServerFactoryThread):
 def main(args):
     contiki_nodes = []
     #~ jsocket_server = jsonSocket.JsonServer(args['--nr-ip-address'], int(args['--nr-port']))
-    jsocket_server = jsonSocket.ServerFactory(MyFactoryThread, address=args['--nr-ip-address'], port=int(args['--nr-port']))
+    jsocket_server = ServerFactory(MyFactoryThread, address=args['--nr-ip-address'], port=int(args['--nr-port']))
     jsocket_server.timeout = 2.0
     jsocket_server.start()
     while True:
