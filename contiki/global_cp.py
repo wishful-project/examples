@@ -52,8 +52,8 @@ def main(args):
         print("Connected nodes", [str(node) for node in contiki_nodes])
         if contiki_nodes:
             #execute UPI function blocking
-            global_node_manager.execute_upi_function("radio","set_parameters",contiki_nodes,{'IEEE802154_phyCurrentChannel':12})
-
+            ret = global_node_manager.execute_upi_function("radio","set_parameters",contiki_nodes,{'IEEE802154_phyCurrentChannel':12})
+            print("{}".format(ret))
             #schedule non-blocking UPI function with specific callback
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
             global_node_manager.schedule_upi_function("radio","get_parameters",exec_time, contiki_nodes, None, ['IEEE802154_phyCurrentChannel'])
@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
     global_node_manager = GlobalNodeManager(config)
     global_node_manager.set_default_callback(default_callback)
-    global_node_manager.add_callback(upis.radio.get_parameters,get_parameters)
+    global_node_manager.add_callback(upis.radio.get_parameters,print_response)
 
     nodes_file_path = args['--nodes']
     with open(nodes_file_path, 'r') as f:

@@ -28,10 +28,10 @@ import struct
 import logging
 import time
 
-logger = logging.getLogger("jsocket")
-logger.setLevel(logging.DEBUG)
-FORMAT = '[%(asctime)-15s][%(levelname)s][%(module)s][%(funcName)s] %(message)s'
-logging.basicConfig(format=FORMAT)
+#logger = logging.getLogger("jsocket")
+#logger.setLevel(logging.DEBUG)
+#FORMAT = '[%(asctime)-15s][%(levelname)s][%(module)s][%(funcName)s] %(message)s'
+#logging.basicConfig(format=FORMAT)
 
 class JsonSocket(object):
 	def __init__(self, address='172.16.16.1', port=55555):
@@ -40,6 +40,7 @@ class JsonSocket(object):
 		self._timeout = None
 		self._address = address
 		self._port = port
+		self.logger = logging.getLogger("jsocket")
 	
 	def send_obj(self, obj):
 		msg = json.dumps(obj)
@@ -61,7 +62,7 @@ class JsonSocket(object):
 		while data == b'':
 			data_tmp = self.conn.recv(1024)
 			data += data_tmp
-			print("{} {}".format(data_tmp, data))
+			#print("{} {}".format(data_tmp, data))
 			if data_tmp == '':
 				raise RuntimeError("socket connection broken")
 		return data
@@ -85,11 +86,11 @@ class JsonSocket(object):
 			self._close_connection()
 			
 	def _close_socket(self):
-		logger.debug("closing main socket")
+		self.logger.debug("closing main socket")
 		self.socket.close()
 		
 	def _close_connection(self):
-		logger.debug("closing the connection socket")
+		self.logger.debug("closing the connection socket")
 		self.conn.close()
 	
 	def _get_timeout(self):
@@ -134,7 +135,7 @@ class JsonServer(JsonSocket):
 		self._listen()
 		self.conn, addr = self._accept()
 		self.conn.settimeout(self.timeout)
-		logger.debug("connection accepted, conn socket (%s,%d)" % (addr[0],addr[1]))
+		self.logger.debug("connection accepted, conn socket (%s,%d)" % (addr[0],addr[1]))
 	
 	def _is_connected(self):
 		return True if not self.conn else False
@@ -154,7 +155,7 @@ class JsonClient(JsonSocket):
 				logger.error("SockThread Error: %s" % msg)
 				time.sleep(3)
 				continue
-			logger.info("...Socket Connected")
+			self.logger.info("...Socket Connected")
 			return True
 		return False
 

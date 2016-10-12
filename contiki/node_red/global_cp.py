@@ -31,6 +31,7 @@ from contiki.contiki_helpers.global_node_manager import *
 import gevent
 import wishful_upis as upis
 import yaml
+import json
 
 #import jsocket_base
 #import tserver
@@ -42,41 +43,52 @@ __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
-log = logging.getLogger('contiki_global_control_program')
+#global my_cmd
+#my_cmd = ''
 
 def parse_node_red_command(json_server, nr_command, node_manager):
     if 'execute_upi_function' in nr_command:
         nr_exec_upi_func = nr_command['execute_upi_function']
         upi_type = nr_exec_upi_func['upi_type']
         upi_func = nr_exec_upi_func['upi_func']
+        #node_list = json.loads(nr_exec_upi_func['node_list'])
         node_list = nr_exec_upi_func['node_list']
+        #upi_func_args = json.loads(nr_exec_upi_func['args'])
         upi_func_args = nr_exec_upi_func['args']
-        ret_val = node_manager.execute_upi_function(upi_type, upi_func, node_list,args=upi_func_args)
+        print("{}".format(upi_func_args))
+        ret_val = node_manager.execute_upi_function(upi_type, upi_func, node_list, upi_func_args)
+        print("executed UPI function {} on {}, ret {}".format(upi_func, type(node_list), type(ret_val[1]["IEEE802154_phyCurrentChannel"])))
         json_ret = { 'execute_upi_function' : {'upi_type': upi_type, "upi_func": upi_func, "node_list": node_list, 'ret_val' : ret_val}}
         json_server.send_obj(json_ret)
 
 class MyFactoryThread(ServerFactoryThread):
     # This is an example factory thread, which the server factory will
     # instantiate for each new connection.
+    my_cmd = ''
     def __init__(self):
         super(MyFactoryThread, self).__init__()
         self._address = "172.16.16.1"
         self._port = "55555" 
-        #self.timeout = 2.0
+        self.timeout = 10.0
+        #self.my_cmd = ''
 
     def _process_message(self, obj):
         # virtual method - Implementer must define protocol
         if obj != '' and type(obj) is dict:
-            parse_node_red_command(self, obj, global_node_manager)
+            MyFactoryThread.my_cmd = obj
+            #parse_node_red_command(self, obj, global_node_manager)
 
 def main(args):
     contiki_nodes = []
     #~ jsocket_server = jsonSocket.JsonServer(args['--nr-ip-address'], int(args['--nr-port']))
     jsocket_server = ServerFactory(MyFactoryThread, address=args['--nr-ip-address'], port=int(args['--nr-port']))
-    #jsocket_server.timeout = 2.0
+    jsocket_server.timeout = 10.0
     jsocket_server.start()
     while True:
-        time.sleep(1)
+        if MyFactoryThread.my_cmd != '':
+            parse_node_red_command(jsocket_server, MyFactoryThread.my_cmd, global_node_manager)
+            MyFactoryThread.my_cmd = ''
+        gevent.sleep(1)
 
 if __name__ == "__main__":
     try:
@@ -104,6 +116,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(filename=logfile, level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+    log = logging.getLogger('contiki_global_control_program')
 
     log.debug(args)
 
@@ -117,7 +130,9 @@ if __name__ == "__main__":
     nodes_file_path = args['--nodes']
     with open(nodes_file_path, 'r') as f:
         node_config = yaml.load(f)
+    print("{}".format(node_config['ip_address_list']))
     global_node_manager.wait_for_agents(node_config['ip_address_list'])
+    my_cmd = ''
 
     try:
         main(args)

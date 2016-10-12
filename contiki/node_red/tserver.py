@@ -30,8 +30,6 @@ import socket
 import time
 import logging
 
-logger = logging.getLogger("jsocket.tserver")
-
 class ThreadedServer(threading.Thread, jsocket_base.JsonServer):
 	def __init__(self, **kwargs):
 		threading.Thread.__init__(self)
@@ -53,10 +51,10 @@ class ThreadedServer(threading.Thread, jsocket_base.JsonServer):
 			try:
 				self.accept_connection()
 			except socket.timeout as e:
-				logger.debug("socket.timeout: %s" % e)
+				self.logger.debug("socket.timeout: %s" % e)
 				continue
 			except Exception as e:
-				logger.exception(e)
+				self.logger.exception(e)
 				continue
 			
 			while self._isAlive:
@@ -64,10 +62,10 @@ class ThreadedServer(threading.Thread, jsocket_base.JsonServer):
 					obj = self.read_obj()
 					self._process_message(obj)
 				except socket.timeout as e:
-					logger.debug("socket.timeout: %s" % e)
+					self.logger.debug("socket.timeout: %s" % e)
 					continue
 				except Exception as e:
-					logger.exception(e)
+					self.logger.exception(e)
 					self._close_connection()
 					break
 			self.close()
@@ -80,7 +78,7 @@ class ThreadedServer(threading.Thread, jsocket_base.JsonServer):
 		"""
 		self._isAlive = True
 		super(ThreadedServer, self).start()
-		logger.debug("Threaded Server has been started.")
+		self.logger.debug("Threaded Server has been started.")
 		
 	def stop(self):
 		""" Stops the threaded server.
@@ -89,7 +87,7 @@ class ThreadedServer(threading.Thread, jsocket_base.JsonServer):
 			@retval None	
 		"""
 		self._isAlive = False
-		logger.debug("Threaded Server has been stopped.")
+		self.logger.debug("Threaded Server has been stopped.")
 
 class ServerFactoryThread(threading.Thread, jsocket_base.JsonSocket):
 	def __init__(self, **kwargs):
@@ -112,10 +110,10 @@ class ServerFactoryThread(threading.Thread, jsocket_base.JsonSocket):
 				obj = self.read_obj()
 				self._process_message(obj)
 			except socket.timeout as e:
-				logger.debug("socket.timeout: %s" % e)
+				self.logger.debug("socket.timeout: %s" % e)
 				continue
 			except Exception as e:
-				logger.info("client connection broken, closing socket %s", e)
+				self.logger.info("client connection broken, closing socket %s", e)
 				self._close_connection()
 				break
 		self.close()
@@ -137,10 +135,10 @@ class ServerFactory(ThreadedServer):
 				try:
 					self.accept_connection()
 				except socket.timeout as e:
-					logger.debug("socket.timeout: %s" % e)
+					self.logger.debug("socket.timeout: %s" % e)
 					continue
 				except Exception as e:
-					logger.exception(e)
+					self.logger.exception(e)
 					continue
 				else:
 					tmp.swap_socket(self.conn)
