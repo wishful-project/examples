@@ -158,20 +158,21 @@ class GlobalNodeManager(NodeManager):
         print("NodeExit : NodeID : {} MAC_ADDR : {} Reason : {}".format(node.id,mac_address_exit_list, reason))
 
     def wait_for_agents(self, ip_address_list, timeout=60):
+        print("wait for nodes")
         for i in range(0, timeout):
             num_matches = 0
-            if len(self.connected_nodes) == len(ip_address_list):
+            if len(self.connected_nodes) >= len(ip_address_list):
                 for node_id in self.connected_nodes:
                     if self.connected_nodes[node_id].ip in ip_address_list:
                         self.__update_mac_address_list(node_id)
                         num_matches+=1
-                        break
-                if num_matches == len(ip_address_list):
-                    self.log.info("All nodes are active we can start the local control programs")
-                    self.log.info("Connected nodes: %s", self.mac_address_list)
+                if num_matches >= len(ip_address_list):
+                    print("All nodes are active we can start the local control programs")
+                    print("Connected nodes: {}".format(self.mac_address_list))
                     return True
-            self.log.info("Still waiting for %d nodes", len(ip_address_list) - num_matches)
+            print("Still waiting for {} nodes".format(len(ip_address_list) - num_matches))
             gevent.sleep(1)
+        print("nodes not found")
         return False
 
     def execute_upi_function(self, upi_type, upi_fname, mac_address_list=None, *args, **kwargs):
@@ -184,6 +185,7 @@ class GlobalNodeManager(NodeManager):
             if mac_address in self.mac_address_list:
                 node = self.mac_address_to_node_id[mac_address]
                 iface = self.mac_address_to_interface[mac_address]
+                self.control_engine._clear_call_context()
                 ret[mac_address] = self.control_engine.blocking(True).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
 
