@@ -131,10 +131,10 @@ if __name__ == "__main__":
     global_node_manager = GlobalNodeManager(config)
     global_node_manager.set_default_callback(default_callback)
 
-    # nodes_file_path = args['--nodes']
-    # with open(nodes_file_path, 'r') as f:
-    #     node_config = yaml.load(f)
-    # global_node_manager.wait_for_agents(node_config['ip_address_list'])
+    nodes_file_path = args['--nodes']
+    with open(nodes_file_path, 'r') as f:
+        node_config = yaml.load(f)
+    global_node_manager.wait_for_agents(node_config['ip_address_list'])
 
     measurements_file_path = args['--measurements']
     with open(measurements_file_path, 'r') as f:
