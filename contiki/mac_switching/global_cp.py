@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-global_cp.py: Example Contiki global control program
+global_cp.py: Example Contiki global control program for mac switching.
 
 Usage:
    global_cp.py [options] [-q | -v]
@@ -14,7 +14,7 @@ Options:
    --measurements measurementsConfig Config file with measurement info
 
 Example:
-   python mac_switching/global_cp.py --config config/portable/global_cp_config.yaml --nodes config/portable/nodes.yaml --measurements config/localhost/measurement_config.yaml
+   python mac_switching/global_cp.py --config config/portable/global_cp_config.yaml --nodes config/portable/nodes.yaml --measurements config/portable/measurement_config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -59,6 +59,8 @@ def main(args):
     taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
     app_manager = AppManager(global_node_manager)
     ret = taisc_manager.update_slotframe('./contiki_helpers/default_taisc_slotframe.csv')
+    log.info(ret)
+    ret = taisc_manager.update_macconfiguration({'IEEE802154e_macSlotframeSize': len(contiki_nodes)})
     log.info(ret)
     global_node_manager.start_local_monitoring_cp()
     gevent.sleep(5)
