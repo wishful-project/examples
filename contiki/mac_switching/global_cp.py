@@ -66,34 +66,28 @@ def main(args):
     gevent.sleep(5)
     app_manager.subscribe_events(["RIME_appPerPacket_rxstats"], event_cb, 0)
     gevent.sleep(5)
-    parameters = {"RIME_exampleUnicastActivateApplication": 1}
+
     # control loop
     while True:
         log.info("Activating CSMA MAC!")
-        parameters["RIME_exampleUnicastActivateApplication"] = 0
-        err1 = app_manager.update_configuration(parameters)
+        err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
         err2 = taisc_manager.activate_radio_program("CSMA")
         gevent.sleep(5)
-        parameters["RIME_exampleUnicastActivateApplication"] = 1
-        err3 = app_manager.update_configuration(parameters)
+        err3 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
         log.info("Error: MAC {} APP {},{}".format(err2, err1, err3))
         gevent.sleep(10)
         log.info("Activating TDMA MAC!")
-        parameters["RIME_exampleUnicastActivateApplication"] = 0
-        err1 = app_manager.update_configuration(parameters)
+        err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
         err2 = taisc_manager.activate_radio_program("TDMA")
         gevent.sleep(5)
-        parameters["RIME_exampleUnicastActivateApplication"] = 1
-        err3 = app_manager.update_configuration(parameters)
+        err3 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
         log.info("Error: MAC {} APP {},{}".format(err2, err1, err3))
         gevent.sleep(10)
         log.info("Activating TSCH MAC!")
-        parameters["RIME_exampleUnicastActivateApplication"] = 0
-        err1 = app_manager.update_configuration(parameters)
+        err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
         err2 = taisc_manager.activate_radio_program("TSCH")
         gevent.sleep(5)
-        parameters["RIME_exampleUnicastActivateApplication"] = 1
-        err3 = app_manager.update_configuration(parameters)
+        err3 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
         log.info("Error: MAC {} APP {},{}".format(err2, err1, err3))
         gevent.sleep(10)
 
