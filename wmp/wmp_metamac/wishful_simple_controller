@@ -56,7 +56,7 @@ __email__ = "{domenico.garlisi@cnit.it"
 
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller()
-mytestbed = TestbedTopology("wmp_radio_program", log)
+mytestbed = TestbedTopology("showcase-metamac", log)
 nodes = []
 
 @controller.new_node_callback()
@@ -94,6 +94,8 @@ def main(args):
 
     controller.load_config(config)
     controller.start()
+    num_testbed_nodes = mytestbed.getExperimentNodesNumber()
+
 
     nodes_platform_info = []
     #control loop
@@ -101,7 +103,14 @@ def main(args):
         gevent.sleep(10)
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
-        if len(nodes) > 0:
+        if len(nodes) == num_testbed_nodes:
+
+            #find node rules
+            mytestbed.initializeTestbedTopology()
+
+            #get node capabilities, get capabilities from the first detected node, all nodes are the same
+            nodes_platform_info.append(get_platform_information( nodes[0], log, controller))
+
 
             UPIargs_1 = { 'interface' : 'wlan0', 'parameters' : [UPI_R.CSMA_CW, UPI_R.CSMA_CW_MIN, UPI_R.CSMA_CW_MAX] }
             # node_parameters = controller.nodes(nodes[0]).radio.get_parameters(UPIargs_1)
@@ -113,25 +122,25 @@ def main(args):
 
             print("Start upi remote call")
             #execute non-blocking function immediately
-            controller.blocking(False).nodes(nodes[0]).radio.set_parameters(UPIargs_2)
+            controller.blocking(False).nodes(mytestbed.wmp_nodes).radio.set_parameters(UPIargs_2)
 
             #execute non-blocking function immediately, with specific callback
-            controller.callback(print_response).nodes(nodes[0]).radio.get_parameters(UPIargs_1)
+            controller.callback(print_response).nodes(mytestbed.wmp_nodes).radio.get_parameters(UPIargs_1)
 
-            #schedule non-blocking function delay
-            controller.delay(3).nodes(nodes[0]).radio.get_parameters(UPIargs_1)
-
-            #schedule non-blocking function exec time
-            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=6)
-            controller.exec_time(exec_time).nodes(nodes[0]).radio.get_parameters(UPIargs_1)
-
-            #execute blocking function immediately
-            result = controller.nodes(nodes[0]).radio.set_parameters(UPIargs_2)
-            print("{} setting (0 for SUCCESS) : {}".format(datetime.datetime.now(), result))
+            # #schedule non-blocking function delay
+            # controller.delay(3).nodes(nodes[0]).radio.get_parameters(UPIargs_1)
+            #
+            # #schedule non-blocking function exec time
+            # exec_time = datetime.datetime.now() + datetime.timedelta(seconds=6)
+            # controller.exec_time(exec_time).nodes(nodes[0]).radio.get_parameters(UPIargs_1)
+            #
+            # #execute blocking function immediately
+            # result = controller.nodes(nodes[0]).radio.set_parameters(UPIargs_2)
+            # print("{} setting (0 for SUCCESS) : {}".format(datetime.datetime.now(), result))
 
 
             print("Deploy local control program on a remote node")
-            lcpDescriptor = controller.node(nodes[0]).hc.start_local_control_program(program=my_local_control_program)
+            lcpDescriptor = controller.node(mytestbed.wmp_nodes).hc.start_local_control_program(program=my_local_control_program)
             msgNum = 5
             while msgNum:
                 newCh = random.randint(1, 30)
