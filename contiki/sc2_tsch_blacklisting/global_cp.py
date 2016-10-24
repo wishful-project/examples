@@ -24,6 +24,7 @@ Other options:
 """
 
 import datetime
+import time
 import logging
 from contiki.contiki_helpers.global_node_manager import *
 from contiki.contiki_helpers.taisc_manager import *
@@ -92,48 +93,77 @@ def main(args, interferer_ap, interferer_sta):
     log.info(ret)
     ret = taisc_manager.update_macconfiguration({'IEEE802154e_macSlotframeSize': len(contiki_nodes)})
     log.info(ret)
-    global_node_manager.start_local_monitoring_cp()
-    gevent.sleep(5)
-    app_manager.subscribe_events(["RIME_appPerPacket_rxstats"], event_cb, 0)
-    gevent.sleep(5)
+    ret = taisc_manager.activate_radio_program("TSCH")
+    log.info(ret)
+    #global_node_manager.start_local_monitoring_cp()
+    #gevent.sleep(5)
+    #app_manager.subscribe_events(["RIME_appPerPacket_rxstats"], event_cb, 0)
+    #gevent.sleep(5)
+    ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 37})
+    log.info(ret)
     ap_local_cp = global_node_manager.start_custom_local_cp(wifi_interference_ap, ap_callback, [interferer_ap])
     sta_local_cp = global_node_manager.start_custom_local_cp(wifi_interference_sta, sta_callback, [interferer_sta])
-
+    prev_stats = [0,0,0,0,0,0,0,0,0,0,0]
 
     # control loop
     while True:
         # without interference
-        log.info("Activating TSCH MAC (without interference)!")
-        err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
-        err2 = taisc_manager.activate_radio_program("TSCH")
-        gevent.sleep(5)
-        err3 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
-        log.info("Error: MAC {} APP {},{}".format(err2, err1, err3))
-        gevent.sleep(20)
+        log.info("TSCH MAC without interference!")
+        err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
+        for i in range(0,30):
+            stats = taisc_manager.get_measurements(["IEEE802154_MACSTATS"],1)[1]["IEEE802154_MACSTATS"]
+            measurement = [int(time.time()), 1, 107, "TSCH", stats[0]]
+            for j in range(1,len(prev_stats)):
+                measurement.append(stats[j] - prev_stats[j])
+            prev_stats = stats
+            measurement_logger.log_measurement("IEEE802154_MACSTATS", measurement)
+            gevent.sleep(1)
+        err2 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
+        log.info("Activate APP {}, deactivate APP{}".format(err1,err2))
 
         # with interference
+        log.info("TSCH MAC with interference!")
         ap_local_cp.send({'command': 'start_wifi_interference'})
         gevent.sleep(5)
         sta_local_cp.send({'command': 'start_wifi_interference'})
-        log.info("TSCH MAC with interference!")
-        gevent.sleep(20)
+        err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
+        for i in range(0,30):
+            stats = taisc_manager.get_measurements(["IEEE802154_MACSTATS"],1)[1]["IEEE802154_MACSTATS"]
+            measurement = [int(time.time()), 1, 107, "TSCH", stats[0]]
+            for j in range(1,len(prev_stats)):
+                measurement.append(stats[j] - prev_stats[j])
+            prev_stats = stats
+            measurement_logger.log_measurement("IEEE802154_MACSTATS", measurement)
+            gevent.sleep(1)
+        err2 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
+        log.info("Activate APP {}, deactivate APP{}".format(err1,err2))
 
         # with interference + blacklisting
         # Blacklist channels
+        log.info("TSCH MAC with interference, but blacklisted channels 15.4!")
         blacklisted_channels = wifi_to_tsch_channels_dct[6]
-        log.info("Blacklist TSCH channels {}".format(blacklisted_channels))
         ret = taisc_manager.blacklist_channels(blacklisted_channels)
-        log.info(ret)
-        log.info("Activating TSCH MAC (with interference, but blacklisted channels (err {})!".format(ret))
-        gevent.sleep(20)
+        log.info("Blacklist TSCH channels {}, error {}".format(blacklisted_channels,ret))
+        err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
+        for i in range(0,30):
+            stats = taisc_manager.get_measurements(["IEEE802154_MACSTATS"],1)[1]["IEEE802154_MACSTATS"]
+            measurement = [int(time.time()), 1, 107, "TSCH", stats[0]]
+            for j in range(1,len(prev_stats)):
+                measurement.append(stats[j] - prev_stats[j])
+            prev_stats = stats
+            measurement_logger.log_measurement("IEEE802154_MACSTATS", measurement)
+            gevent.sleep(1)
+        err2 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
+        log.info("Activate APP {}, deactivate APP{}".format(err1,err2))
 
         # Resetting state for next run
-        log.info('resetting state for next run')
+        err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
         ap_local_cp.send({'command': 'stop_wifi_interference'})
         gevent.sleep(5)
         sta_local_cp.send({'command': 'stop_wifi_interference'})
-        taisc_manager.update_macconfiguration({'IEEE802154e_macHoppingSequenceList': [16, 18, 17, 23, 26, 15, 25, 22, 19, 11, 12, 13, 24, 14, 20, 21] })
-        taisc_manager.update_macconfiguration({'IEEE802154e_macHoppingSequenceLength': 16})
+        err2 = taisc_manager.update_macconfiguration({'IEEE802154e_macHoppingSequenceList': [16, 18, 17, 23, 26, 15, 25, 22, 19, 11, 12, 13, 24, 14, 20, 21] })
+        err3 = taisc_manager.update_macconfiguration({'IEEE802154e_macHoppingSequenceLength': 16})
+        log.info('resetting state for next run {} {} {}'.format(err1, err2, err3))
 
 
 if __name__ == "__main__":
