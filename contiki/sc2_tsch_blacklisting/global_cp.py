@@ -96,6 +96,9 @@ def main(args, interferer_ap, interferer_sta):
     gevent.sleep(5)
     app_manager.subscribe_events(["RIME_appPerPacket_rxstats"], event_cb, 0)
     gevent.sleep(5)
+    ap_local_cp = global_node_manager.start_custom_local_cp(wifi_interference_ap, ap_callback, [interferer_ap])
+    sta_local_cp = global_node_manager.start_custom_local_cp(wifi_interference_sta, sta_callback, [interferer_sta])
+
 
     # control loop
     while True:
@@ -109,19 +112,28 @@ def main(args, interferer_ap, interferer_sta):
         gevent.sleep(20)
 
         # with interference
-        global_node_manager.start_custom_local_cp(wifi_interference_ap, ap_callback, [interferer_ap])
-        global_node_manager.start_custom_local_cp(wifi_interference_sta, sta_callback, [interferer_sta])
+        ap_local_cp.send({'command': 'start_wifi_interference'})
+        gevent.sleep(5)
+        sta_local_cp.send({'command': 'start_wifi_interference'})
         log.info("TSCH MAC with interference!")
         gevent.sleep(20)
 
         # with interference + blacklisting
         # Blacklist channels
-        blacklisted_channels = wifi_to_tsch_channels_dct[1]
+        blacklisted_channels = wifi_to_tsch_channels_dct[6]
         log.info("Blacklist TSCH channels {}".format(blacklisted_channels))
         ret = taisc_manager.blacklist_channels(blacklisted_channels)
         log.info(ret)
         log.info("Activating TSCH MAC (with interference, but blacklisted channels (err {})!".format(ret))
         gevent.sleep(20)
+
+        # Resetting state for next run
+        log.info('resetting state for next run')
+        ap_local_cp.send({'command': 'stop_wifi_interference'})
+        gevent.sleep(5)
+        sta_local_cp.send({'command': 'stop_wifi_interference'})
+        taisc_manager.update_macconfiguration({'IEEE802154e_macHoppingSequenceList': [16, 18, 17, 23, 26, 15, 25, 22, 19, 11, 12, 13, 24, 14, 20, 21] })
+        taisc_manager.update_macconfiguration({'IEEE802154e_macHoppingSequenceLength': 16})
 
 
 if __name__ == "__main__":
@@ -170,7 +182,7 @@ if __name__ == "__main__":
     measurement_logger = MeasurementLogger.load_config(measurement_config)
 
     try:
-        main(args)
+        main(args,1,5)
     except KeyboardInterrupt:
         log.debug("Controller exits")
     finally:

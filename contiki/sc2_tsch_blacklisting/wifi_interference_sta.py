@@ -11,13 +11,13 @@ def wifi_interference_sta(control_engine):
     import subprocess
     started = False
     print(("local monitor cp  - Name: {}, Id: {} - Started".format(control_engine.name, control_engine.id)))
-    while control_engine.is_stopped():
+    while not control_engine.is_stopped():
         msg = control_engine.recv(block=False)
         if msg is not None and type(msg) is dict:
             if msg['command'] == "start_wifi_interference":
-                subprocess.call(['sudo','bash','/groups/portable-ilabt-iminds-be/wishful/conf/startStation.sh'])
+                subprocess.call(['sudo','bash','/share/80211n/scripts/start80211nStation.sh'])
                 gevent.sleep(5)
-                subprocess.call(['/usr/bin/screen','-h','1000','-dmS','80211acIPerf','/usr/bin/iperf','-c','172.22.22.1','-i','1','-t','1000000','-b','650M'])
+                subprocess.call(['/usr/bin/screen','-h','1000','-dmS','80211acIPerf','/usr/bin/iperf','-c','172.23.23.1','-i','1','-t','1000000','-b','650M'])
                 started = True
             elif msg['command'] == "stop_wifi_interference":
                 subprocess.call(['sudo','killall','iperf'])

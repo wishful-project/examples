@@ -82,7 +82,7 @@ class GlobalNodeManager(NodeManager):
             msg = custom_local_cp.recv(block=False, timeout=1)
             while msg is not None:
                 gevent.spawn(self.mac_address_to_custom_local_cp_callback[mac_address][custom_local_cp.id],mac_address,msg)
-                msg = local_monitoring_cp.recv(block=False, timeout=1)
+                msg = custom_local_cp.recv(block=False, timeout=1)
             gevent.sleep(1)
         pass
 
