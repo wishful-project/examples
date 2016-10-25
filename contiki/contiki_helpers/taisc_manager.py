@@ -77,7 +77,7 @@ class TAISCMACManager(MACManager):
                 new_hopping_sequence.append(0)
             # first change the length of the hopping sequence
             param_key_values = {
-                "IEEE802154e_macHoppingSequenceLength": len(channel_lst)}
+                "IEEE802154e_macHoppingSequenceLength": len(new_hopping_sequence) - len(channel_lst)}
             ret = self.update_macconfiguration(param_key_values)
             if ret == -1:
                 return -1
