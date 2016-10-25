@@ -5,5 +5,6 @@ measurement_config:
         measurement_db_name: "sc2_blacklisting"
         measurement_definitions:
             IEEE802154_MACSTATS: "timestamp:int32 nodeID:int32 packetSize:int32 activeRadioprogram:string timeDiff:int32 numTxRequest:int32 numTxRequestFail:int32 numTxAttempt:int32 numTxSuccess:int32 numTxFail:int32 numTxBusy:int32 numTxNoAck:int32 numTxCollision:int32 numRx:int32 avgBackoffExponent:int32"
+            IEEE802154_event_macStats: "timestamp:int32 nodeID:int32 packetSize:int32 activeRadioprogram:string timeDiff:int32 numTxRequest:int32 numTxRequestFail:int32 numTxAttempt:int32 numTxSuccess:int32 numTxFail:int32 numTxBusy:int32 numTxNoAck:int32 numTxCollision:int32 numRx:int32 avgBackoffExponent:int32"
             RIME_appPerPacket_rxstats: "applicationID:int32 sender:int32 timestamp:int32 inter_packet_delay:string inter_packet_jitter:int32 sequencenumber:int32 numpacketloss:int32 rssi:int32 lqi:int32"
         facility: "portable"
