@@ -41,6 +41,7 @@ __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be & jan.bauwens@intec.ugent.be"
 
 log = logging.getLogger('contiki_global_control_program')
+prev_stats = {}
 
 
 def mapWifiOnZigbeeChannels(log, channel_mapping):
@@ -80,17 +81,21 @@ def print_response(group, node, data):
 
 
 def event_cb(mac_address, event_name, event_value):
+    global prev_stats
     mac_stats_event = [int(time.time()), mac_address, 107, "TSCH", event_value[0]]
-    for j in range(1, len(prev_stats)):
-        mac_stats_event.append(event_value[j] - prev_stats[j])
-    prev_stats = event_value
+    for j in range(1, len(prev_stats[mac_address])):
+        mac_stats_event.append(event_value[j] - prev_stats[mac_address][j])
+    prev_stats[mac_address] = event_value
     measurement_logger.log_measurement(event_name, mac_stats_event)
 
 
 def main(args, interferer_ap, interferer_sta):
+    global prev_stats
     contiki_nodes = global_node_manager.get_mac_address_list()
     contiki_nodes.sort()
     print("Connected nodes", [str(node) for node in contiki_nodes])
+    for node in contiki_nodes:
+        prev_stats[node] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
     app_manager = AppManager(global_node_manager)
 
@@ -106,8 +111,7 @@ def main(args, interferer_ap, interferer_sta):
     log.info(ret)
     global_node_manager.start_local_monitoring_cp()
     gevent.sleep(5)
-    app_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
-    gevent.sleep(5)
+    taisc_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
     ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 37}, contiki_nodes)
     log.info(ret)
     ap_local_cp = global_node_manager.start_custom_local_cp(wifi_interference_ap, ap_callback, [interferer_ap])
@@ -119,14 +123,14 @@ def main(args, interferer_ap, interferer_sta):
     while True:
         # without interference
         log.info("TSCH MAC without interference!")
-        gevent.sleep(30)
+        gevent.sleep(55)
 
         # with interference
         log.info("TSCH MAC with interference!")
         ap_local_cp.send({'command': 'start_wifi_interference'})
         gevent.sleep(5)
         sta_local_cp.send({'command': 'start_wifi_interference'})
-        gevent.sleep(30)
+        gevent.sleep(60)
 
         # with interference + blacklisting
         # Blacklist channels
@@ -134,7 +138,7 @@ def main(args, interferer_ap, interferer_sta):
         blacklisted_channels = wifi_to_tsch_channels_dct[6]
         ret = taisc_manager.blacklist_channels(blacklisted_channels, contiki_nodes)
         log.info("Blacklist TSCH channels {}, error {}".format(blacklisted_channels, ret))
-        gevent.sleep(30)
+        gevent.sleep(60)
 
         # Resetting state for next run
         ap_local_cp.send({'command': 'stop_wifi_interference'})
@@ -189,7 +193,6 @@ if __name__ == "__main__":
     with open(measurements_file_path, 'r') as f:
         measurement_config = yaml.load(f)
     measurement_logger = MeasurementLogger.load_config(measurement_config)
-    prev_stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     try:
         main(args, 1, 5)
