@@ -80,7 +80,11 @@ def print_response(group, node, data):
 
 
 def event_cb(mac_address, event_name, event_value):
-    measurement_logger.log_measurement(event_name, event_value)
+    mac_stats_event = [int(time.time()), mac_address, 107, "TSCH", event_value[0]]
+    for j in range(1, len(prev_stats)):
+        mac_stats_event.append(event_value[j] - prev_stats[j])
+    prev_stats = event_value
+    measurement_logger.log_measurement(event_name, mac_stats_event)
 
 
 def main(args, interferer_ap, interferer_sta):
@@ -100,15 +104,14 @@ def main(args, interferer_ap, interferer_sta):
     log.info(ret)
     ret = taisc_manager.activate_radio_program("TSCH", contiki_nodes)
     log.info(ret)
-    # global_node_manager.start_local_monitoring_cp()
-    # gevent.sleep(5)
-    # app_manager.subscribe_events(["RIME_appPerPacket_rxstats"], event_cb, 0)
-    # gevent.sleep(5)
+    global_node_manager.start_local_monitoring_cp()
+    gevent.sleep(5)
+    app_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
+    gevent.sleep(5)
     ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 37}, contiki_nodes)
     log.info(ret)
     ap_local_cp = global_node_manager.start_custom_local_cp(wifi_interference_ap, ap_callback, [interferer_ap])
     sta_local_cp = global_node_manager.start_custom_local_cp(wifi_interference_sta, sta_callback, [interferer_sta])
-    prev_stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ret = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1}, contiki_nodes)
     log.info("Activate APP {}".format(ret))
 
@@ -116,27 +119,14 @@ def main(args, interferer_ap, interferer_sta):
     while True:
         # without interference
         log.info("TSCH MAC without interference!")
-        for i in range(0, 30):
-            stats = taisc_manager.get_measurements(["IEEE802154_MACSTATS"], 1)[1]["IEEE802154_MACSTATS"]
-            measurement = [int(time.time()), 1, 107, "TSCH", stats[0]]
-            for j in range(1, len(prev_stats)):
-                measurement.append(stats[j] - prev_stats[j])
-            prev_stats = stats
-            measurement_logger.log_measurement("IEEE802154_MACSTATS", measurement)
-            gevent.sleep(1)
+        gevent.sleep(30)
 
         # with interference
         log.info("TSCH MAC with interference!")
         ap_local_cp.send({'command': 'start_wifi_interference'})
+        gevent.sleep(5)
         sta_local_cp.send({'command': 'start_wifi_interference'})
-        for i in range(0, 30):
-            stats = taisc_manager.get_measurements(["IEEE802154_MACSTATS"], 1)[1]["IEEE802154_MACSTATS"]
-            measurement = [int(time.time()), 1, 107, "TSCH", stats[0]]
-            for j in range(1, len(prev_stats)):
-                measurement.append(stats[j] - prev_stats[j])
-            prev_stats = stats
-            measurement_logger.log_measurement("IEEE802154_MACSTATS", measurement)
-            gevent.sleep(1)
+        gevent.sleep(30)
 
         # with interference + blacklisting
         # Blacklist channels
@@ -144,14 +134,7 @@ def main(args, interferer_ap, interferer_sta):
         blacklisted_channels = wifi_to_tsch_channels_dct[6]
         ret = taisc_manager.blacklist_channels(blacklisted_channels, contiki_nodes)
         log.info("Blacklist TSCH channels {}, error {}".format(blacklisted_channels, ret))
-        for i in range(0, 30):
-            stats = taisc_manager.get_measurements(["IEEE802154_MACSTATS"], 1)[1]["IEEE802154_MACSTATS"]
-            measurement = [int(time.time()), 1, 107, "TSCH", stats[0]]
-            for j in range(1, len(prev_stats)):
-                measurement.append(stats[j] - prev_stats[j])
-            prev_stats = stats
-            measurement_logger.log_measurement("IEEE802154_MACSTATS", measurement)
-            gevent.sleep(1)
+        gevent.sleep(30)
 
         # Resetting state for next run
         ap_local_cp.send({'command': 'stop_wifi_interference'})
@@ -206,6 +189,7 @@ if __name__ == "__main__":
     with open(measurements_file_path, 'r') as f:
         measurement_config = yaml.load(f)
     measurement_logger = MeasurementLogger.load_config(measurement_config)
+    prev_stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     try:
         main(args, 1, 5)
