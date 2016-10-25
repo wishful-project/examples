@@ -53,7 +53,7 @@ class TAISCMACManager(MACManager):
                 current_offset += slotlist_tpl[0]
         return ret_val
 
-    def blacklist_channels(self, channel_lst):
+    def blacklist_channels(self, channel_lst, mac_address_list=None):
         """This function allows to blacklist certain channels.
 
         Args:
@@ -63,12 +63,13 @@ class TAISCMACManager(MACManager):
             dict: error codes from each node
         """
         if self.mac_mode == "TSCH":
+            if mac_address_list is None:
+                mac_address_list = self.node_manager.mac_address_list
             param_keys = ["IEEE802154e_macHoppingSequenceList"]
-            ret = self.read_macconfiguration(param_keys, [self.node_manager.mac_address_list[0]])
+            ret = self.read_macconfiguration(param_keys, [mac_address_list[0]])
             if ret == -1:
                 return -1
-            hopping_sequence = TAISCHoppingSequence.from_tuple(
-                ret[self.node_manager.mac_address_list[0]]["IEEE802154e_macHoppingSequenceList"])
+            hopping_sequence = TAISCHoppingSequence.from_tuple(ret[mac_address_list[0]]["IEEE802154e_macHoppingSequenceList"])
             new_hopping_sequence = []
             for channel in hopping_sequence.hopping_sequence_list:
                 if channel not in channel_lst:
@@ -76,16 +77,14 @@ class TAISCMACManager(MACManager):
             for channel in channel_lst:
                 new_hopping_sequence.append(0)
             # first change the length of the hopping sequence
-            param_key_values = {
-                "IEEE802154e_macHoppingSequenceLength": len(new_hopping_sequence) - len(channel_lst)}
-            ret = self.update_macconfiguration(param_key_values)
+            param_key_values = {"IEEE802154e_macHoppingSequenceLength": len(new_hopping_sequence) - len(channel_lst)}
+            ret = self.update_macconfiguration(param_key_values, mac_address_list)
             if ret == -1:
                 return -1
             # now change the hopping sequence
             self.log.info("New hopping scheme: {} blacklisted {}, new len {}".format(str(new_hopping_sequence), str(channel_lst), len(new_hopping_sequence) - len(channel_lst)))
-            param_key_values = {
-                "IEEE802154e_macHoppingSequenceList": tuple(new_hopping_sequence)}
-            ret = self.update_macconfiguration(param_key_values)
+            param_key_values = {"IEEE802154e_macHoppingSequenceList": tuple(new_hopping_sequence)}
+            ret = self.update_macconfiguration(param_key_values, mac_address_list)
             #~ if ret == -1:
                 #~ return -1
             return ret
