@@ -159,9 +159,9 @@ class GlobalNodeManager(NodeManager):
 
     def wait_for_agents(self, ip_address_list, timeout=60):
         print("wait for nodes")
-        num_matches = 0
         for i in range(0, timeout):
             if len(self.connected_nodes) >= len(ip_address_list):
+                num_matches = 0
                 for node_id in self.connected_nodes:
                     if self.connected_nodes[node_id].ip in ip_address_list:
                         self.__update_mac_address_list(node_id)
@@ -170,7 +170,7 @@ class GlobalNodeManager(NodeManager):
                     print("All nodes are active we can start the local control programs")
                     print("Connected nodes: {}".format(self.mac_address_list))
                     return True
-            print("Still waiting for {} nodes".format(len(ip_address_list) - num_matches))
+            print("Still waiting for {} nodes".format(len(ip_address_list) - len(self.connected_nodes)))
             gevent.sleep(1)
         print("nodes not found")
         return False
