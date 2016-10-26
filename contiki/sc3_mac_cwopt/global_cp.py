@@ -152,7 +152,8 @@ def main(args):
 
         err1 = taisc_manager.activate_radio_program("TDMA")
         log.info("Activated TDMA: ERROR {}".format(err1))
-        ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 37}, contiki_nodes)
+        send_interval = 128 / (1000 / (len(contiki_nodes) * 9))
+        ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": send_interval}, contiki_nodes)
         log.info(ret)
 
         err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
