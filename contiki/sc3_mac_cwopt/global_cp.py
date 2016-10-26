@@ -24,6 +24,8 @@ Other options:
 """
 
 import datetime
+import time
+import math
 import logging
 from contiki.contiki_helpers.global_node_manager import *
 from contiki.contiki_helpers.taisc_manager import *
@@ -75,6 +77,8 @@ def calculateCWOpt(num_tx_nodes):
 
 
 log = logging.getLogger('contiki_global_cp')
+prev_stats = {}
+current_mac = "CSMA"
 
 
 def default_callback(group, node, cmd, data):
@@ -86,13 +90,22 @@ def print_response(group, node, data):
 
 
 def event_cb(mac_address, event_name, event_value):
-    measurement_logger.log_measurement(event_name, event_value)
-    # print("{} Node {} Event {}: {} ".format(datetime.datetime.now(), mac_address, event_name, event_value))
+    global prev_stats
+    global current_mac
+    mac_stats_event = [int(time.time()), mac_address, 107, current_mac, event_value[0]]
+    for j in range(1, len(prev_stats[mac_address])):
+        mac_stats_event.append(event_value[j] - prev_stats[mac_address][j])
+    prev_stats[mac_address] = event_value
+    measurement_logger.log_measurement(event_name, mac_stats_event)
 
 
 def main(args):
+    global prev_stats
     contiki_nodes = global_node_manager.get_mac_address_list()
+    contiki_nodes.sort()
     print("Connected nodes", [str(node) for node in contiki_nodes])
+    for node in contiki_nodes:
+        prev_stats[node] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
     app_manager = AppManager(global_node_manager)
     ret = taisc_manager.update_slotframe('./contiki_helpers/default_taisc_slotframe.csv')
@@ -101,8 +114,9 @@ def main(args):
     log.info(ret)
     global_node_manager.start_local_monitoring_cp()
     gevent.sleep(5)
-    app_manager.subscribe_events(["RIME_appPerPacket_rxstats"], event_cb, 0)
-    gevent.sleep(5)
+    taisc_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
+    ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 1}, contiki_nodes)
+    log.info(ret)
 
     while True:
         # activate receiver
@@ -138,12 +152,13 @@ def main(args):
 
         err1 = taisc_manager.activate_radio_program("TDMA")
         log.info("Activated TDMA: ERROR {}".format(err1))
-        gevent.sleep(5)
+        ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 37}, contiki_nodes)
+        log.info(ret)
 
         err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
         log.info("Starting APP: ERROR {}".format(err1))
 
-        log.info("Switching all nodes to TDMA dones!")
+        log.info("Switching all nodes to TDMA!")
         gevent.sleep(30)
 
         err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
