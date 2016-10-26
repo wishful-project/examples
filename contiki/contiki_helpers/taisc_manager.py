@@ -82,7 +82,7 @@ class TAISCMACManager(MACManager):
             if ret == -1:
                 return -1
             # now change the hopping sequence
-            self.log.info("New hopping scheme: {}".format(str(new_hopping_sequence)))
+            self.log.info("New hopping scheme: {} blacklisted {}, new len {}".format(str(new_hopping_sequence), str(channel_lst), len(new_hopping_sequence) - len(channel_lst)))
             param_key_values = {"IEEE802154e_macHoppingSequenceList": tuple(new_hopping_sequence)}
             ret = self.update_macconfiguration(param_key_values, mac_address_list)
             #~ if ret == -1:

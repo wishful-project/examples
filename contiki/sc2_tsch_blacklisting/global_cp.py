@@ -136,7 +136,7 @@ def main(args, interferer_ap, interferer_sta):
             measurement_logger.log_measurement("IEEE802154_MACSTATS", measurement)
             gevent.sleep(1)
         err2 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
-        log.info("Activate APP {}, deactivate APP{}".format(err1, err2))
+        log.info("Activate APP {}\n deactivate APP{}".format(err1, err2))
 
         # with interference + blacklisting
         # Blacklist channels
@@ -154,10 +154,9 @@ def main(args, interferer_ap, interferer_sta):
             measurement_logger.log_measurement("IEEE802154_MACSTATS", measurement)
             gevent.sleep(1)
         err2 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
-        log.info("Activate APP {}, deactivate APP{}".format(err1, err2))
-
-        # Resetting state for next run
-        err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 0})
+        log.info("Activate APP {}\n deactivate APP{}".format(err1, err2))
+ 
+       # Resetting state for next run
         ap_local_cp.send({'command': 'stop_wifi_interference'})
         gevent.sleep(5)
         sta_local_cp.send({'command': 'stop_wifi_interference'})

@@ -159,8 +159,8 @@ class GlobalNodeManager(NodeManager):
 
     def wait_for_agents(self, ip_address_list, timeout=60):
         print("wait for nodes")
+        num_matches = 0
         for i in range(0, timeout):
-            num_matches = 0
             if len(self.connected_nodes) >= len(ip_address_list):
                 for node_id in self.connected_nodes:
                     if self.connected_nodes[node_id].ip in ip_address_list:
