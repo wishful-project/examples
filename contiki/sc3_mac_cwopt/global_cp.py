@@ -121,7 +121,7 @@ def main(args):
         err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1}, [1])
         log.info("Activate receiver: ERROR {}".format(err1))
         gevent.sleep(1)
-        cw = cwold = calculateCWOpt(1)
+        cw = cwold = calculateCWOpt(2) * 320
         active_sender_address_list = []
 
         # add nodes
@@ -132,7 +132,7 @@ def main(args):
 
                 # update contention window
                 cwold = cw
-                cw = calculateCWOpt(len(active_sender_address_list))
+                cw = calculateCWOpt(len(active_sender_address_list) + 1) * 320
                 err1 = taisc_manager.update_macconfiguration({'IEEE802154_macCW': cw}, active_sender_address_list)
                 log.info("Changed CW from {} to {}: ERROR {}!".format(cwold, cw, err1))
 
