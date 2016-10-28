@@ -123,7 +123,7 @@ def main(args):
         err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1}, [1])
         log.info("Activate receiver: ERROR {}".format(err1))
         gevent.sleep(1)
-        cw = cwold = calculateCWOpt(1)
+        cw = cwold = calculateCWOpt(2) * 320
         active_sender_address_list = []
 
         # add nodes
@@ -134,7 +134,7 @@ def main(args):
 
                 # update contention window
                 cwold = cw
-                cw = calculateCWOpt(len(active_sender_address_list))
+                cw = calculateCWOpt(len(active_sender_address_list) + 1) * 320
                 err1 = taisc_manager.update_macconfiguration({'IEEE802154_macCW': cw}, active_sender_address_list)
                 log.info("Changed CW from {} to {}: ERROR {}!".format(cwold, cw, err1))
 
@@ -152,7 +152,8 @@ def main(args):
 
         err1 = taisc_manager.activate_radio_program("TDMA")
         log.info("Activated TDMA: ERROR {}".format(err1))
-        ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 37}, contiki_nodes)
+        send_interval = 128 / (1000 / (len(contiki_nodes) * 9))
+        ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": send_interval}, contiki_nodes)
         log.info(ret)
 
         err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
