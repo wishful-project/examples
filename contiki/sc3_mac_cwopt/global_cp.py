@@ -116,8 +116,10 @@ def main(args):
     gevent.sleep(1)
     ret = app_manager.update_configuration({"RIME_exampleUnicastMsgSize": 100})
     log.info(ret)
-    #ret = taisc_manager.update_macconfiguration({'IEEE802154e_macTsTimeslotLength': 9000})
-    #log.info(ret)
+    ret = taisc_manager.update_macconfiguration({'IEEE802154e_macTsTimeslotLength': 9000})
+    log.info(ret)
+    ret = taisc_manager.update_macconfiguration({'IEEE802154e_macSlotframeSize': len(contiki_nodes)})
+    log.info(ret)
 
     while True:
         # activate receiver
