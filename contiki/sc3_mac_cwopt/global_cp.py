@@ -101,6 +101,7 @@ def event_cb(mac_address, event_name, event_value):
 
 def main(args):
     global prev_stats
+    global current_mac
     contiki_nodes = global_node_manager.get_mac_address_list()
     contiki_nodes.sort()
     print("Connected nodes", [str(node) for node in contiki_nodes])
@@ -116,7 +117,7 @@ def main(args):
     gevent.sleep(1)
     ret = app_manager.update_configuration({"RIME_exampleUnicastMsgSize": 100})
     log.info(ret)
-    ret = taisc_manager.update_macconfiguration({'IEEE802154e_macTsTimeslotLength': 9000})
+    ret = taisc_manager.update_macconfiguration({'IEEE802154e_macTsTimeslotLength': 8000})
     log.info(ret)
     ret = taisc_manager.update_macconfiguration({'IEEE802154e_macSlotframeSize': len(contiki_nodes)})
     log.info(ret)
@@ -156,6 +157,7 @@ def main(args):
         gevent.sleep(1)
 
         err1 = taisc_manager.activate_radio_program("TDMA")
+        current_mac = "TDMA"
         log.info("Activated TDMA: ERROR {}".format(err1))
         send_interval = int(math.ceil(128 / (1000 / (len(contiki_nodes) * 8))))
         ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": send_interval})
@@ -172,6 +174,7 @@ def main(args):
         gevent.sleep(1)
 
         err1 = taisc_manager.activate_radio_program("CSMA")
+        current_mac = "CSMA"
         log.info("Activated CSMA: ERROR {}".format(err1))
         gevent.sleep(5)
 
