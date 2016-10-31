@@ -121,11 +121,13 @@ def main(args):
     log.info(ret)
     ret = taisc_manager.update_macconfiguration({'IEEE802154e_macSlotframeSize': len(contiki_nodes)})
     log.info(ret)
+    ret = app_manager.update_configuration({"RIME_exampleUnicastSendIntervalBoundaries": (32,48)})
+    log.info(ret)
+
 
     while True:
         # activate receiver
-        ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 10})
-        log.info(ret)
+        # ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 10})
         err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1}, [1])
         log.info("Activate receiver: ERROR {}".format(err1))
         gevent.sleep(1)
@@ -159,9 +161,9 @@ def main(args):
         err1 = taisc_manager.activate_radio_program("TDMA")
         current_mac = "TDMA"
         log.info("Activated TDMA: ERROR {}".format(err1))
-        send_interval = int(math.ceil(128 / (1000 / (len(contiki_nodes) * 8))))
-        ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": send_interval})
-        log.info(ret)
+        #send_interval = int(math.ceil(128 / (1000 / (len(contiki_nodes) * 8))))
+        #ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": send_interval})
+        #log.info(ret)
 
         err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
         log.info("Starting APP: ERROR {}".format(err1))
