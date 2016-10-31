@@ -128,7 +128,7 @@ def main(args):
     ret = app_manager.update_configuration({"RIME_exampleUnicastSendIntervalBoundaries": (16,32)})
     log.info(ret)
     for pair in receiver_sender_pairs:
-		ret = app_manager.update_configuration({"RIME_exampleUnicastReceiver": pair[0]},pair)
+        ret = app_manager.update_configuration({"RIME_exampleUnicastReceiver": pair[0]},pair)
 
     while True:
         # add receiver sender pairs
@@ -136,15 +136,15 @@ def main(args):
         cw = calculateCWOpt(num_active_senders + 1) * 320
         active_nodes = []
         for pair in receiver_sender_pairs:
-			num_active_senders = num_active_senders + 1
-			active_nodes = active_nodes + pair
-			cwold = cw
+            num_active_senders = num_active_senders + 1
+            active_nodes = active_nodes + pair
+            cwold = cw
             cw = calculateCWOpt(num_active_senders + 1) * 320
-			ret = taisc_manager.update_macconfiguration({'IEEE802154_macCW': cw}, active_nodes)
+            ret = taisc_manager.update_macconfiguration({'IEEE802154_macCW': cw}, active_nodes)
             log.info("Changed CW from {} to {}: ERROR {}!".format(cwold, cw, ret))
             ret = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1}, pair)
             log.info("Activated application on {}: ERROR {}!".format(pair, ret))
-			gevent.sleep(10)
+            gevent.sleep(10)
 
         log.info("Switching all nodes to TDMA!")
 
