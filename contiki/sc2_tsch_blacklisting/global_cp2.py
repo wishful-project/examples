@@ -85,6 +85,7 @@ def event_cb(mac_address, event_name, event_value):
     mac_stats_event = [int(time.time()), mac_address, 107, "TSCH", event_value[0]]
     for j in range(1, len(prev_stats[mac_address])):
         mac_stats_event.append(event_value[j] - prev_stats[mac_address][j])
+    mac_stats_event.append(event_value[len(prev_stats[mac_address])])
     prev_stats[mac_address] = event_value
     measurement_logger.log_measurement(event_name, mac_stats_event)
 
@@ -95,7 +96,7 @@ def main(args, interferer_ap, interferer_sta):
     contiki_nodes.sort()
     print("Connected nodes", [str(node) for node in contiki_nodes])
     for node in contiki_nodes:
-        prev_stats[node] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        prev_stats[node] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
     app_manager = AppManager(global_node_manager)
 

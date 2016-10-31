@@ -93,8 +93,9 @@ def event_cb(mac_address, event_name, event_value):
     global prev_stats
     global current_mac
     mac_stats_event = [int(time.time()), mac_address, 107, current_mac, event_value[0]]
-    for j in range(1, len(prev_stats[mac_address])):
+    for j in range(1, len(prev_stats[mac_address])-1):
         mac_stats_event.append(event_value[j] - prev_stats[mac_address][j])
+    mac_stats_event.append(event_value[len(prev_stats[mac_address])])
     prev_stats[mac_address] = event_value
     measurement_logger.log_measurement(event_name, mac_stats_event)
 
@@ -106,7 +107,7 @@ def main(args):
     contiki_nodes.sort()
     print("Connected nodes", [str(node) for node in contiki_nodes])
     for node in contiki_nodes:
-        prev_stats[node] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        prev_stats[node] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
     app_manager = AppManager(global_node_manager)
     ret = taisc_manager.update_slotframe('./contiki_helpers/default_taisc_slotframe.csv')
