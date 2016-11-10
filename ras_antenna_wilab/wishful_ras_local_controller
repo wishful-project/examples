@@ -60,42 +60,25 @@ try:
     #Start agent
     agent.run()
 
+    #set default antenna configuration
+    ant1_configuration = 0
+    ant2_configuration = 0
+
+
     #control loop
-    while True:
+    for ii in range(0,9):
         print("\nNext iteration:")
 
-        # #execute non-blocking function immediately
-        # controller.blocking(False).radio.iface("wlan0").set_power(12)
-        #
-        # #execute non-blocking function immediately, with specific callback
-        # controller.callback(print_response).radio.iface("wlan0").get_power()
-        #
-        # #schedule non-blocking function delay
-        # controller.delay(3).net.create_packetflow_sink(port=1234)
-        #
-        # #schedule non-blocking function exec time
-        # exec_time = datetime.datetime.now() + datetime.timedelta(seconds=6)
-        # controller.exec_time(exec_time).radio.iface("wlan1").set_channel(4)
-        #
-        # #execute blocking function immediately
-        # result = controller.radio.iface("wlan1").get_channel()
-        # print("{} Channel is: {}".format(datetime.datetime.now(), result))
+        #change antenna configuration
+        log.info('Set configuration %d - %d ' % (ant1_configuration, ant2_configuration) )
+        #execute blocking function immediately
+        controller.blocking(True).radio.set_sas_conf(5, ant1_configuration, ant2_configuration, 0, 0)
 
+        time.sleep(2)
 
+        ant1_configuration += 1
+        ant2_configuration += 1
 
-
-        control = smartantenna.Controller()
-
-        #control.set_sas_conf(2, 0, 0, 0, 0)
-        #execute non-blocking function immediately
-        controller.blocking(False).radio.set_sas_conf(2, 0, 0, 0, 0)
-
-        time.sleep(15)
-
-        #control.test_leds()
-        controller.blocking(False).radio.test_leds()
-
-        time.sleep(15)
 
 except KeyboardInterrupt:
     print("Local Controller exits")
