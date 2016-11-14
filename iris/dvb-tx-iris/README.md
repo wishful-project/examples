@@ -83,34 +83,34 @@ and is currently managed by Software Radio Systems (http://www.softwareradiosyst
 Since DVB-TX-IRIS extends Iris functionalities, there are shared requirements
 that should be satisfied from the software point of view. In particular, they are:
 
-*	Essential SW
-**	Ubuntu Linux OS 32/64 bit (http://www.ubuntu.org), release 14.04 or later
-**	CMake 2.6 or later (http://www.cmake.org/), an automated software build and test environment for C/C++
-**	Boost 1.46 or later (http://www.boost.org/), an extensive collection of C++ libraries for accelerating common software tasks
-**	Iris_Core (http://www.hostedredmine.com/projects/iris_software_radio/wiki), the core system of the Iris framework
-**	Iris_Modules (http://www.hostedredmine.com/projects/iris_software_radio/wiki), additional modules for the Iris framework
-**	FFTW (http://www.fftw.org/), a powerful C/C++ library for FFT transforms
-**	UHD (http://code.ettus.com/redmine/ettus/projects/uhd/wiki), needed for the connection to USRP hardware
-*	Optional SW
-**	Qt 4.8 (http://qt-project.org/), used for building graphical widgets
-**	Qwt 6 (http://qwt.sourceforge.net/), used for building graphical widgets
-**	Liquid-DSP (https://github.com/jgaeddert/liquid-dsp), for some PHY components
-**	Google Protocol Buffers (https://developers.google.com/protocol-buffers/), for some Stack components
-**	Python (http://www.python.org/), for the PythonPlotter widget
-**	Octave (http://www.octave.org/), for recreating the test vectors used during the testing phase of the build, and for running complete TX/RX simulations
-**	Matlab (http://www.mathworks.com/), for the MatlabTemplate PHY component and MatlabPlotter widget
-**	Doxygen (http://www.doxygen.org/), for the documentation
-**	tzap (dvb-apps package) and w_scan (w-scan package), used for real-time stream quality testing with DVB-T USB receivers
+* Essential SW
+  * Ubuntu Linux OS 32/64 bit (http://www.ubuntu.org), release 14.04 or later
+  * CMake 2.6 or later (http://www.cmake.org/), an automated software build and test environment for C/C++
+  * Boost 1.46 or later (http://www.boost.org/), an extensive collection of C++ libraries for accelerating common software tasks
+  * Iris_Core (http://www.hostedredmine.com/projects/iris_software_radio/wiki), the core system of the Iris framework
+  * Iris_Modules (http://www.hostedredmine.com/projects/iris_software_radio/wiki), additional modules for the Iris framework
+  * FFTW (http://www.fftw.org/), a powerful C/C++ library for FFT transforms
+  * UHD (http://code.ettus.com/redmine/ettus/projects/uhd/wiki), needed for the connection to USRP hardware
+* Optional SW
+  * Qt 4.8 (http://qt-project.org/), used for building graphical widgets
+  * Qwt 6 (http://qwt.sourceforge.net/), used for building graphical widgets
+  * Liquid-DSP (https://github.com/jgaeddert/liquid-dsp), for some PHY components
+  * Google Protocol Buffers (https://developers.google.com/protocol-buffers/), for some Stack components
+  * Python (http://www.python.org/), for the PythonPlotter widget
+  * Octave (http://www.octave.org/), for recreating the test vectors used during the testing phase of the build, and for running complete TX/RX simulations
+  * Matlab (http://www.mathworks.com/), for the MatlabTemplate PHY component and MatlabPlotter widget
+  * Doxygen (http://www.doxygen.org/), for the documentation
+  * tzap (dvb-apps package) and w_scan (w-scan package), used for real-time stream quality testing with DVB-T USB receivers
 
 From the hardware point of view, the following items are required:
 
-*	Essential HW
-**	A workstation or laptop PC equipped with a multicore CPU clocked at 2 GHz or more, 4 GB of RAM, 20 GB of free disk space, and a free Gigabit Ethernet connection
-**	An Ettus USRP N210 equipped with an UHF/VHF capable daughterboard (such as the SBX or SBX120)
-**	A UHF/VHF antenna (preferably directional antenna for longer communication range)
-**	A DVB-T capable receiver (such as a TV set, a set-top box, or an USB dongle, provided with indoor reception antenna)
-*	Optional HW
-**	A spectrum analyzer for verifying the spectrum of the emitted DVB-T signal
+* Essential HW
+  * A workstation or laptop PC equipped with a multicore CPU clocked at 2 GHz or more, 4 GB of RAM, 20 GB of free disk space, and a free Gigabit Ethernet connection
+  * An Ettus USRP N210 equipped with an UHF/VHF capable daughterboard (such as the SBX or SBX120)
+  * A UHF/VHF antenna (preferably directional antenna for longer communication range)
+  * A DVB-T capable receiver (such as a TV set, a set-top box, or an USB dongle, provided with indoor reception antenna)
+* Optional HW
+  * A spectrum analyzer for verifying the spectrum of the emitted DVB-T signal
 
 ## Compilation and installation
 
@@ -143,47 +143,47 @@ Provided that the essential SW requirements are satisfied, the following steps a
 <code>doxygen</code>
 
 
-* @section choosing Choosing a bit rate and the transmission parameters
-*
-* The DVB-T system is designed to convey a constant bit rate payload. Thus, if 
-* the video and audio sources, after compression, have a bit rate higher or lower
-* than the expected value, the SDR modulator will fail in delivering an high quality 
-* stream to the receivers. The connection among bit rates and transmission parameters
-* is shown in Table III. There, for any combination of modulation, cyclic prefix,
-* and code rate, there is a corresponding value that should be used to generate 
-* the TS. We also highlight that the OFDM mode (2K, 8K) does not influence the 
-* bit rate. Summarizing, the transmission parameters could be chosen according 
-* to the following guidelines:
-*
-*	* Cyclic prefix: this parameter determines the ruggedness of the DVB-T signal 
-* with respect to RF channel impairments such as multipath and echoes. Choose a 
-* large value (1/4) if delayed signal echoes are expected, especially when 
-* covering large areas (width on the order of kms). Differently, the smallest 
-* value (1/32) is sufficient for a localized transmission covering a range of 
-* few hundreds of metres.
-*	* OFDM mode: as explained before, this parameter does not impact on the payload 
-* bit rate. However, a 2K OFDM mode is to be preferred if the receivers are 
-* preferentially of nomadic or mobile type, since in this case the harmful effect 
-* of the Doppler spread (due to the relative motion of the transmitter and 
-* receiver) on OFDM carriers orthogonality is minimized. Moreover, 2K is preferred 
-* for covering relatively small areas. On the other side, 8K can be used when 
-* covering large areas and the receivers are expected to be of a static, fixed type.
-*	* Modulation order: this parameter selects the spectral efficiency of the system,
-* thus larger modulation orders (64-QAM) will allow higher bit rate payloads to 
-* be delivered. Concurrently, higher modulation orders also require important 
-* values of S/N ratio at the receivers, in order to have a successful reception 
-* of the TV signal. On the other side, smaller modulation orders (4-QAM, 16-QAM) 
-* have lower requests in terms of S/N ratio, but they are not as spectrally efficient.
-*	* Code rate: this is the other parameter that concurs to determine the spectral 
-* efficiency of the system. High values of code rate (e.g., 7/8) allow very high 
-* bit rate payloads, but protect less the signal from unwanted interferences. 
-* Lower code rates (such as 1/2) protect the signal very well from noise and 
-* other disruptive impairments, but they also lower the spectral efficiency.
-*
-* We conclude this subsection by recalling that, anyway, the choice of the bit 
-* rate depends also on the quality and quantity of the TV programs that will be 
-* included in the multiplexed TS.
-*
+## Choosing a bit rate and the transmission parameters
+
+The DVB-T system is designed to convey a constant bit rate payload. Thus, if 
+the video and audio sources, after compression, have a bit rate higher or lower
+than the expected value, the SDR modulator will fail in delivering an high quality 
+stream to the receivers. The connection among bit rates and transmission parameters
+is shown in Table III. There, for any combination of modulation, cyclic prefix,
+and code rate, there is a corresponding value that should be used to generate 
+the TS. We also highlight that the OFDM mode (2K, 8K) does not influence the 
+bit rate. Summarizing, the transmission parameters could be chosen according 
+to the following guidelines:
+
+* Cyclic prefix: this parameter determines the ruggedness of the DVB-T signal 
+with respect to RF channel impairments such as multipath and echoes. Choose a 
+large value (1/4) if delayed signal echoes are expected, especially when 
+covering large areas (width on the order of kms). Differently, the smallest 
+value (1/32) is sufficient for a localized transmission covering a range of 
+few hundreds of metres.
+* OFDM mode: as explained before, this parameter does not impact on the payload 
+bit rate. However, a 2K OFDM mode is to be preferred if the receivers are 
+preferentially of nomadic or mobile type, since in this case the harmful effect 
+of the Doppler spread (due to the relative motion of the transmitter and 
+receiver) on OFDM carriers orthogonality is minimized. Moreover, 2K is preferred 
+for covering relatively small areas. On the other side, 8K can be used when 
+covering large areas and the receivers are expected to be of a static, fixed type.
+* Modulation order: this parameter selects the spectral efficiency of the system,
+thus larger modulation orders (64-QAM) will allow higher bit rate payloads to 
+be delivered. Concurrently, higher modulation orders also require important 
+values of S/N ratio at the receivers, in order to have a successful reception 
+of the TV signal. On the other side, smaller modulation orders (4-QAM, 16-QAM) 
+have lower requests in terms of S/N ratio, but they are not as spectrally efficient.
+* Code rate: this is the other parameter that concurs to determine the spectral 
+efficiency of the system. High values of code rate (e.g., 7/8) allow very high 
+bit rate payloads, but protect less the signal from unwanted interferences. 
+Lower code rates (such as 1/2) protect the signal very well from noise and 
+other disruptive impairments, but they also lower the spectral efficiency.
+
+We conclude this subsection by recalling that, anyway, the choice of the bit 
+rate depends also on the quality and quantity of the TV programs that will be 
+included in the multiplexed TS.
+
 * @section choosef Choosing frequency, power, gain
 * These three parameters do not concur in the modification of the payload bit 
 * rate, but they are important as well.
