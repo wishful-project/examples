@@ -23,14 +23,14 @@ transported over each carrier is given by _c<sub>m,l,k</sub>_ and it is a QAM (q
 amplitude modulation) mapped constellation symbol, carrying _ν_ bits per symbol; 
 _G<sub>k</sub>_ is a carrier amplitude weighting factor that can be used to precompensate
 linear distortions introduced by the transmitter (_G<sub>k</sub>_ = 1 in case of no
-distortions), and _z<sub>m,l</sub>[_n_] is the OFDM symbol in time. The modulation is performed
+distortions), and _z<sub>m,l</sub>_[_n_] is the OFDM symbol in time. The modulation is performed
 using _K_ out of _N<sub>FFT</sub>_ orthogonal carriers _ψ<sub>m,l,k</sub>_[_n_], expressed as
 
 ![alt text](doc/images/eq02.png "")
 
-where \f$K_2 = K/2\f$, \f$N_G\f$ is the number of samples of the guard interval, 
-\f$N_S = N_{\rm FFT} + N_G\f$ is the total number of samples of the OFDM symbol, and \f$\Pi_{N_s}[n]\f$ 
-is the boxcar window, which is equal to 1 in \f$\left[0, N_S - 1\right]\f$ and to 0 elsewhere.
+where _K<sub>2</sub>_ = _K_/2, _N<sub>G</sub>_ is the number of samples of the guard interval, 
+_N<sub>S</sub>_ = _N<sub>FFT</sub>_ + _N<sub>G</sub>_ is the total number of samples of the OFDM symbol, and _Π<sub>Ns</sub>_[_n_] 
+is the boxcar window, which is equal to 1 in [0, _N<sub>S</sub> - 1] and to 0 elsewhere.
 The BB samples are then converted into the analog domain using a sample time 
 \f$T_{s,\rm DVBT}\f$ that depends on the bandwidth of the DVB-T configuration. The sample
 rate \f$f_{s,\rm DVBT} = 1/T_{s,\rm DVBT}\f$, can be replaced by the DAC sample rate
