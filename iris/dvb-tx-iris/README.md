@@ -116,38 +116,33 @@ From the hardware point of view, the following items are required:
 
 Provided that the essential SW requirements are satisfied, the following steps are needed to successfully compile DVB-TX-IRIS:
 
-* The DVB-TX-IRIS code can be downloaded using SVN or GIT from the official GitHub page of the WiSHFUL project, https://github.com/wishful-project. For instance, using subversion, the command is	
+* The DVB-TX-IRIS code can be downloaded using SVN or GIT from the official GitHub page of the WiSHFUL project, https://github.com/wishful-project. For instance, using subversion, the command is  
 <code>svn checkout http://url.iris.repository/dti_wishful</code>
 
-* Now cd into the project directory, and create a folder named "build", where the extension will be compiled	
-<code>cd dti_wishful</code>
-
-<code>mkdir build</code>
-	
+* Now cd into the project directory, and create a folder named "build", where the extension will be compiled  
+<code>cd dti_wishful</code>  
+<code>mkdir build</code>  	
 <code>cd build</code>
 
-* Invoke cmake to prepare the build environment	
+* Invoke cmake to prepare the build environment  
 <code>cmake ..</code>
 
-* Invoke make to build the extension	
+* Invoke make to build the extension  
 <code>make</code>
 
-* Optionally, you can benchmark the speed of the extension components and test their correct operation with	
-<code>make benchmark</code>	
-
+* Optionally, you can benchmark the speed of the extension components and test their correct operation with  
+<code>make benchmark</code>  
 <code>make test</code>
 
-* If the previous steps ended with success, now you can install the extension by typing	
-<code>sudo make install</code>	
+* If the previous steps ended with success, now you can install the extension by typing  
+<code>sudo make install</code>
 
-* If you want to build also the documentation HTML manual, then you must execute doxygen in the "doc" folder	
-<code>cd ..</code>	
-
-<code>cd doc</code>	
-
+* If you want to build also the documentation HTML manual, then you must execute doxygen in the "doc" folder  	
+<code>cd ..</code>  
+<code>cd doc</code>  
 <code>doxygen</code>
-*
-*
+
+
 * @section choosing Choosing a bit rate and the transmission parameters
 *
 * The DVB-T system is designed to convey a constant bit rate payload. Thus, if 
