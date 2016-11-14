@@ -14,12 +14,7 @@ transport stream (TS) packets, which constitute the payload of DVB-T and carry
 compressed video and audio streams. The base-band (BB) signal samples can be
 expressed as
 
-\f[
-\tilde s\left[ n \right] = \sum\limits_{m = 0}^{ + \infty } {\sum\limits_{l = 0}^{{N_F} - 1} 
-{{z_{m,l}}\left[ n \right]} }  = \sum\limits_{m = 0}^{ + \infty } 
-{\sum\limits_{l = 0}^{{N_F} - 1} {\sum\limits_{k = 0}^{K - 1} 
-{{c_{m,l,k}}{G_k}{\psi _{m,l,k}}\left[ n \right]} } } 
-\f]
+![alt text](doc/images/eq01.png "")  
 
 where \f$m\f$ represents the frame index, \f$l\f$ is the OFDM symbol index, \f$k\f$ is the 
 subcarrier index, \f$K\f$ is the number of active carriers (depending on the
