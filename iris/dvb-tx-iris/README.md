@@ -30,11 +30,11 @@ using _K_ out of _N<sub>FFT</sub>_ orthogonal carriers _ψ<sub>m,l,k</sub>_[_n_]
 
 where _K<sub>2</sub>_ = _K_/2, _N<sub>G</sub>_ is the number of samples of the guard interval, 
 _N<sub>S</sub>_ = _N<sub>FFT</sub>_ + _N<sub>G</sub>_ is the total number of samples of the OFDM symbol, and _Π<sub>Ns</sub>_[_n_] 
-is the boxcar window, which is equal to 1 in [0, _N<sub>S</sub> - 1] and to 0 elsewhere.
+is the boxcar window, which is equal to 1 in [0, _N<sub>S</sub>_ - 1] and to 0 elsewhere.
 The BB samples are then converted into the analog domain using a sample time 
-\f$T_{s,\rm DVBT}\f$ that depends on the bandwidth of the DVB-T configuration. The sample
-rate \f$f_{s,\rm DVBT} = 1/T_{s,\rm DVBT}\f$, can be replaced by the DAC sample rate
-\f$f_{s,\rm DAC} = 1/T_{s,\rm DAC}\f$, as expressed by
+_T<sub>s,DVBT</sub>_ that depends on the bandwidth of the DVB-T configuration. The sample
+rate _f<sub>s,DVBT</sub>_ = 1/_T<sub>s,DVBT</sub>_, can be replaced by the DAC sample rate
+_f<sub>s,DAC</sub>_ = 1/_T<sub>s,DAC</sub>_, as expressed by
 
 ![alt text](doc/images/eq03.png "")
 
