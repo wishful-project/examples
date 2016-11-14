@@ -449,55 +449,46 @@ actually processed bit rate: this value should match the theoretical payload bit
 \image html cmd_line.png Output of the Iris command line during correct operation. 
 \image latex cmd_line.png Output of the Iris command line during correct operation. 
 
-* @section receive Receive and validate
-* Any standard compliant DVB-T receiver that is in the range covered by the 
-* transmitting hardware should be able to pick-up and decode the signal. To 
-* this purpose, a full channel scan should be performed in the receiver's setup 
-* menu, and one or more TV channels from the WiSHFUL transmission network should 
-* be now present in the receiver channel list. The same thing can also be carried 
-* out using a DVB-T USB dongle: by this means, it can be possible also to analyze 
-* the quality and validate the received signal by a number of parameters such as 
-* the signal power, the residual bit error rate, the number of uncorrected packets, 
-* etc.
-*
-* Power loading can also be tested: the "examples/dvbt" folder already contains 
-* a demonstration XML configuration file, demo_typical_8K_PL_USRP.xml, as well 
-* as a pre-computed power profile file, logo_profile.txt. Additionally, each user 
-* can recreate a logo-resembling power profile by running the MATLB/Octave script
-* powerload_logo.m, which is saved in the "scripts/dvbt/MATLAB" folder
-*
-* @section offline Off-line validation
-*
-* This step is not generally required, since if the TV signal is correctly 
-* received on a TV set, this should be more than sufficient. Anyway, during the 
-* compilation step, it is possible to carry out a validation of the DVB-TX-IRIS 
-* module C++ components against a MATLAB/Octave implementation of the same 
-* component. For every component, there is an associated M-script that can be 
-* used to generate random input and output test vectors for the specified component 
-* (the M-script and already generated test vectors are present in the "test" folder 
-* inside the main component folder). During the build process, the ctest command 
-* triggered during the invocation of "make test" executes an automated check of 
-* the components correct operation: the input test vector is loaded by the 
-* component and transformed into the respective output vector (as per the 
-* processing performed by the block); then, the MATLAB output test vector and 
-* the Iris output test vector are compared. The test passes or fails depending 
-* on the correspondence between these two test vectors.
-*
-* @section biblio Bibliography
-* -# G. Baruffa, L. Rugini, and P. Banelli, _Design and validation of a Software
-*    Defined Radio testbed for DVB-T transmission_, Radioengineering, vol. 23, 
-*    no. 1, pp. 387–398, Apr. 2014.
-* -# DVB PROJECT. _Digital Video Broadcasting (DVB); Framing structure, channel 
-*    coding and modulation for digital terrestrial television_, ETSI EN 300 744 
-     V1.6.1 (2009-01). 2009. Available at: http://www.dvb.org. 
-*
-* \example dvbt1chain_ofdmmod_filter_spectrum.xml
-* This is an example of how to use the DVB-TX-IRIS modules to show the spectrum
-* of the generated DVB-T signal.
-*
+## Receive and validate
+Any standard compliant DVB-T receiver that is in the range covered by the 
+transmitting hardware should be able to pick-up and decode the signal. To 
+this purpose, a full channel scan should be performed in the receiver's setup 
+menu, and one or more TV channels from the WiSHFUL transmission network should 
+be now present in the receiver channel list. The same thing can also be carried 
+out using a DVB-T USB dongle: by this means, it can be possible also to analyze 
+the quality and validate the received signal by a number of parameters such as 
+the signal power, the residual bit error rate, the number of uncorrected packets, 
+etc.
+
+Power loading can also be tested: the "examples/dvbt" folder already contains 
+a demonstration XML configuration file, demo_typical_8K_PL_USRP.xml, as well 
+as a pre-computed power profile file, logo_profile.txt. Additionally, each user 
+can recreate a logo-resembling power profile by running the MATLB/Octave script
+powerload_logo.m, which is saved in the "scripts/dvbt/MATLAB" folder
+
+## Off-line validation
+This step is not generally required, since if the TV signal is correctly 
+received on a TV set, this should be more than sufficient. Anyway, during the 
+compilation step, it is possible to carry out a validation of the DVB-TX-IRIS 
+module C++ components against a MATLAB/Octave implementation of the same 
+component. For every component, there is an associated M-script that can be 
+used to generate random input and output test vectors for the specified component 
+(the M-script and already generated test vectors are present in the "test" folder 
+inside the main component folder). During the build process, the ctest command 
+triggered during the invocation of "make test" executes an automated check of 
+the components correct operation: the input test vector is loaded by the 
+component and transformed into the respective output vector (as per the 
+processing performed by the block); then, the MATLAB output test vector and 
+the Iris output test vector are compared. The test passes or fails depending 
+on the correspondence between these two test vectors.
+
+## Bibliography
+1. G. Baruffa, L. Rugini, and P. Banelli, _Design and validation of a Software
+Defined Radio testbed for DVB-T transmission_, Radioengineering, vol. 23, 
+no. 1, pp. 387–398, Apr. 2014.
+2. DVB PROJECT. _Digital Video Broadcasting (DVB); Framing structure, channel 
+coding and modulation for digital terrestrial television_, ETSI EN 300 744 
+V1.6.1 (2009-01). 2009. Available at: http://www.dvb.org. 
+
 * \image html spectrum.png Spectrum of the generated DVB-T signal.
 * \image latex spectrum.png Spectrum of the generated DVB-T signal.
-*
-* The transmission chain has been split among several physical engines (i.e., separate
-* threads), so as to have the maximum parallelized performance.
-*/
