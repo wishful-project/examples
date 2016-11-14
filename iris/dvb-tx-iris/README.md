@@ -245,7 +245,7 @@ the same parameters could have to be modified inside of several components/engin
 The following configuration is excerpted from the XML file used to configure 
 DVB-TX-IRIS for performing the transmission of the typical TS, "demo_typical_8K.xml".
 
-<pre>
+<code>
 001 <?xml version="1.0" encoding="utf-8" ?> 
 002 
 003 <softwareradio name="Radio1">
@@ -422,7 +422,7 @@ DVB-TX-IRIS for performing the transmission of the typical TS, "demo_typical_8K.
 174  <link source="dvbt1filter1.output1" sink="usrptx1.input1" />
 175
 176</softwareradio>
-</pre>
+</code>
 
 ## USRP setup
 The USRP device must be connected via Gigabit Ethernet to the host PC where 
