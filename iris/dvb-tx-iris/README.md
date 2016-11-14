@@ -7,7 +7,7 @@ DVB-T radios with the IRIS software radio framework.
 ### The DVB-T waveform
 DVB-T uses orthogonal frequency division multiplexing (OFDM) symbols with
 cyclic prefix in order to deliver the transmitted data over the communication
-channel. OFDM symbols are grouped in frames (composed of \f$N_F = 68\f$ OFDM symbols)
+channel. OFDM symbols are grouped in frames (composed of _N<sub>F</sub>_ = 68 OFDM symbols)
 and superframes (composed of 4 frames): the superframe can be considered to
 represent a basic group of data, as it always carries an integer number of 
 transport stream (TS) packets, which constitute the payload of DVB-T and carry
@@ -16,9 +16,9 @@ expressed as
 
 ![alt text](doc/images/eq01.png "")  
 
-where \f$m\f$ represents the frame index, \f$l\f$ is the OFDM symbol index, \f$k\f$ is the 
-subcarrier index, \f$K\f$ is the number of active carriers (depending on the
-transmission mode), and \f$N_F\f$ is the number of OFDM symbols per frame; the data
+where _m_ represents the frame index, _l_ is the OFDM symbol index, _k_ is the 
+subcarrier index, _K_ is the number of active carriers (depending on the
+transmission mode), and _N<sub>F</sub>_ is the number of OFDM symbols per frame; the data
 transported over each carrier is given by \f$c_{m,l,k}\f$ and it is a QAM (quadrature
 amplitude modulation) mapped constellation symbol, carrying \f$\nu\f$ bits per symbol; 
 \f$G_k\f$ is a carrier amplitude weighting factor that can be used to precompensate
