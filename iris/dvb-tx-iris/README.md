@@ -446,8 +446,11 @@ typically happening when BB digital samples are not being fed sufficiently fast
 to the USRP) and the SDR modulator should print, periodically, a report of the 
 actually processed bit rate: this value should match the theoretical payload bit rate.
 
-\image html cmd_line.png Output of the Iris command line during correct operation. 
-\image latex cmd_line.png Output of the Iris command line during correct operation. 
+![alt text](doc/images/cmd_line.png "Output of the Iris command line during correct operation.")  
+__Fig. 2. Output of the Iris command line during correct operation.__
+
+![alt text](doc/images/spectrum.png "Spectrum of the generated DVB-T signal.")  
+__Fig. 3. Spectrum of the generated DVB-T signal.__
 
 ## Receive and validate
 Any standard compliant DVB-T receiver that is in the range covered by the 
@@ -490,5 +493,4 @@ no. 1, pp. 387–398, Apr. 2014.
 coding and modulation for digital terrestrial television_, ETSI EN 300 744 
 V1.6.1 (2009-01). 2009. Available at: http://www.dvb.org. 
 
-* \image html spectrum.png Spectrum of the generated DVB-T signal.
-* \image latex spectrum.png Spectrum of the generated DVB-T signal.
+
