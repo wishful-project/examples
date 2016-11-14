@@ -121,7 +121,9 @@ Provided that the essential SW requirements are satisfied, the following steps a
 
 * Now cd into the project directory, and create a folder named "build", where the extension will be compiled	
 <code>cd dti_wishful</code>
-<code>mkdir build</code>	
+
+<code>mkdir build</code>
+	
 <code>cd build</code>
 
 * Invoke cmake to prepare the build environment	
@@ -132,19 +134,18 @@ Provided that the essential SW requirements are satisfied, the following steps a
 
 * Optionally, you can benchmark the speed of the extension components and test their correct operation with	
 <code>make benchmark</code>	
+
 <code>make test</code>
 
 * If the previous steps ended with success, now you can install the extension by typing	
-*
-* <code>sudo make install</code>	
-*
-* •	If you want to build also the documentation HTML manual, then you must execute doxygen in the "doc" folder	
-*
-* <code>cd ..</code>	
-*
-* <code>cd doc</code>	
-*
-* <code>doxygen</code>
+<code>sudo make install</code>	
+
+* If you want to build also the documentation HTML manual, then you must execute doxygen in the "doc" folder	
+<code>cd ..</code>	
+
+<code>cd doc</code>	
+
+<code>doxygen</code>
 *
 *
 * @section choosing Choosing a bit rate and the transmission parameters
