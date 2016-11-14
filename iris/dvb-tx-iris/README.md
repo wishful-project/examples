@@ -19,8 +19,8 @@ expressed as
 where _m_ represents the frame index, _l_ is the OFDM symbol index, _k_ is the 
 subcarrier index, _K_ is the number of active carriers (depending on the
 transmission mode), and _N<sub>F</sub>_ is the number of OFDM symbols per frame; the data
-transported over each carrier is given by \f$c_{m,l,k}\f$ and it is a QAM (quadrature
-amplitude modulation) mapped constellation symbol, carrying \f$\nu\f$ bits per symbol; 
+transported over each carrier is given by _c<sub>m,l,k</sub>_ and it is a QAM (quadrature
+amplitude modulation) mapped constellation symbol, carrying ν bits per symbol; 
 \f$G_k\f$ is a carrier amplitude weighting factor that can be used to precompensate
 linear distortions introduced by the transmitter (\f$G_k = 1\f$ in case of no
 distortions), and \f$z_{m,l}\left[n\right]\f$ is the OFDM symbol in time. The modulation is performed
