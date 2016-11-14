@@ -59,7 +59,8 @@ to the RF carrier frequency, \f$f_c\f$, as
 s\left( t \right) = {\mathop{\rm Re}\nolimits} \left\{ {\tilde s\left( t \right){e^{j2\pi {f_c}t}}} \right\}
 \f]
 
-![alt text](doc/images/scheme.png "DVB-T transmission scheme.")
+![alt text](doc/images/scheme.png "DVB-T transmission scheme.")  
+__Fig. 1. DVB-T transmission scheme.__
 
 ### IRIS
 
