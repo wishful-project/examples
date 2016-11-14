@@ -38,11 +38,11 @@ _f<sub>s,DAC</sub>_ = 1/_T<sub>s,DAC</sub>_, as expressed by
 
 ![alt text](doc/images/eq03.png "")
 
-where \f$h\left(t\right) = T_{s,\rm DVBT} \textrm{sinc}\left(\Pi t/T_{s,\rm DVBT}\right)\f$ is the ideal BB reconstruction filter,
-\f$h_I\left(t\right)\f$ is the DAC output filter, and \f$\tilde{y}\left[n\right]\f$ is the signal \f$\tilde{s}\left[n\right]\f$ resampled to
+where _h_(_t_) = _T<sub>s,DVBT</sub>_, sinc(_πt_/_T<sub>s,DVBT</sub>_) is the ideal BB reconstruction filter,
+h<sub>I</sub>(_t_) is the DAC output filter, and _ỹ_[_n_] is the signal _s~_[_n_] resampled to
 the DAC sample rate.
 Eventually, the analog signal is up-converted, using a quadrature modulator,
-to the RF carrier frequency, \f$f_c\f$, as
+to the RF carrier frequency, _f<sub>c</sub>_, as
 
 ![alt text](doc/images/eq04.png "")
 
