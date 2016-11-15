@@ -108,7 +108,7 @@ From the hardware point of view, the following items are required:
 Provided that the essential SW requirements are satisfied, the following steps are needed to successfully compile DVB-TX-IRIS:
 
 * The DVB-TX-IRIS code can be downloaded using SVN or GIT from the official GitHub page of the WiSHFUL project, https://github.com/wishful-project. For instance, using subversion, the command is  
-<code>svn checkout http://url.iris.repository/dti_wishful</code>
+<code>svn checkout http://url.to.iris.repository.in.wishful/dvb-tx-iris</code>
 
 * Now cd into the project directory, and create a folder named "build", where the extension will be compiled  
 <code>cd dvb-tx-iris</code>  
