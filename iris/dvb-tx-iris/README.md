@@ -111,7 +111,7 @@ Provided that the essential SW requirements are satisfied, the following steps a
 <code>svn checkout http://url.iris.repository/dti_wishful</code>
 
 * Now cd into the project directory, and create a folder named "build", where the extension will be compiled  
-<code>cd dti_wishful</code>  
+<code>cd dvb-tx-iris</code>  
 <code>mkdir build</code>  	
 <code>cd build</code>
 
