@@ -545,16 +545,20 @@ IP: 127.0.0.1
 Name: agent_123  
 Info: agent_info  
 Modules: {0: 'LocalControlModule', 1: 'IrisModule', 2: 'PyreDiscoveryAgentModule'}  
-Module_Functions: {0: ['stop_local_control_program', 'send_msg_to_local_control_program', 'start_local_control_program'], 1: ['set_outpower', 'set_frequency', 'set_rate', 'set_gain']}  
+Module_Functions: {0: ['stop_local_control_program', 'send_msg_to_local_control_program',
+'start_local_control_program'], 1: ['set_outpower', 'set_frequency', 'set_rate', 'set_gain']}  
 Module_Generators: {}  
 Interfaces: {0: 'iris'}  
 Iface_Modules: {0: [1]}  
 Modules_without_iface: [0, 2]  
 Sending parameters. . .  
 Waiting return. . .  
-2016-11-04 14:31:25.139233 DEFAULT CALLBACK : Group: all, NodeName: agent_123, Cmd: set_frequency, Returns: ok  
-2016-11-04 14:31:25.140457 DEFAULT CALLBACK : Group: all, NodeName: agent_123, Cmd: set_gain, Returns: ok  
-2016-11-04 14:31:25.141196 DEFAULT CALLBACK : Group: all, NodeName: agent_123, Cmd: set_outpower, Returns: ok  
+2016-11-04 14:31:25.139233 DEFAULT CALLBACK : Group: all, NodeName: agent_123,
+Cmd: set_frequency, Returns: ok  
+2016-11-04 14:31:25.140457 DEFAULT CALLBACK : Group: all, NodeName: agent_123,
+Cmd: set_gain, Returns: ok  
+2016-11-04 14:31:25.141196 DEFAULT CALLBACK : Group: all, NodeName: agent_123,
+Cmd: set_outpower, Returns: ok  
 ...  
 </pre>
 
