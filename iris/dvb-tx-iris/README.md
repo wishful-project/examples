@@ -135,7 +135,7 @@ The DVB-T system is designed to convey a constant bit rate payload. Thus, if
 the video and audio sources, after compression, have a bit rate higher or lower
 than the expected value, the SDR modulator will fail in delivering an high quality 
 stream to the receivers. The connection among bit rates and transmission parameters
-is shown in Table III. There, for any combination of modulation, cyclic prefix,
+is shown in Table I. There, for any combination of modulation, cyclic prefix,
 and code rate, there is a corresponding value that should be used to generate 
 the TS. We also highlight that the OFDM mode (2K, 8K) does not influence the 
 bit rate. Summarizing, the transmission parameters could be chosen according 
@@ -166,7 +166,11 @@ bit rate payloads, but protect less the signal from unwanted interferences.
 Lower code rates (such as 1/2) protect the signal very well from noise and 
 other disruptive impairments, but they also lower the spectral efficiency.
 
-We conclude this subsection by recalling that, anyway, the choice of the bit 
+![alt text](doc/images/bitrates.png "Bit rate of the selected parameters configurations.")  
+__Tab. 1. Bit rate of the selected parameters configurations for testing
+(8 MHz DVB-T system, 2K and 8K provide the same bit rate).__
+
+We conclude this section by recalling that, anyway, the choice of the bit 
 rate depends also on the quality and quantity of the TV programs that will be 
 included in the multiplexed TS.
 
@@ -450,7 +454,7 @@ etc.
 Power loading can also be tested: the "_examples/dvbt_" folder already contains 
 a demonstration XML configuration file, "*demo_typical_8K_PL_USRP.xml*", as well 
 as a pre-computed power profile file, *logo_profile.txt*. Additionally, each user 
-can recreate a logo-resembling power profile by running the MATLB/Octave script
+can recreate a logo-resembling power profile by running the MATLAB/Octave script
 powerload_logo.m, which is saved in the "_scripts/dvbt/MATLAB_" folder
 
 ## Off-line validation
@@ -460,7 +464,7 @@ compilation step, it is possible to carry out a validation of the DVB-TX-IRIS
 module C++ components against a MATLAB/Octave implementation of the same 
 component. For every component, there is an associated M-script that can be 
 used to generate random input and output test vectors for the specified component 
-(the M-script and already generated test vectors are present in the "test" folder 
+(the M-script and already generated test vectors are present in the "_test_" folder 
 inside the main component folder). During the build process, the _ctest_ command 
 triggered during the invocation of "_make test_" executes an automated check of 
 the components correct operation: the input test vector is loaded by the 
