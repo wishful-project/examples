@@ -1,8 +1,12 @@
 # DVB-TX-IRIS
 
 ## Introduction
-This package contains the components which may be used to create
-DVB-T radios with the IRIS software radio framework.
+This package contains the components which may be used to create a
+DVB-T broadcasting transmitter with the IRIS software radio framework.
+this transmitter can also be controlled by means of the WiSHFUL UPIs.
+In the following, we will briefly describe the DVB-T waveform, then we will show
+how to download, compile, assemble, operate, and control
+the software-defined DVB-T modulator.
 
 ### The DVB-T waveform
 DVB-T uses orthogonal frequency division multiplexing (OFDM) symbols with
@@ -452,6 +456,9 @@ out using a DVB-T USB dongle: by this means, it can be possible also to analyze
 the quality and validate the received signal by a number of parameters such as 
 the signal power, the residual bit error rate, the number of uncorrected packets, 
 etc.
+
+![alt text](doc/images/typical_TV.jpg "TV reception of the typical configuration (64-QAM, FEC 3/4, 2K ¼ or 8K ¼).")  
+__Fig. 4. TV reception of the typical configuration (64-QAM, FEC 3/4, 2K ¼ or 8K ¼).__
 
 Power loading can also be tested: the "_examples/dvbt_" folder already contains 
 a demonstration XML configuration file, "*demo_typical_8K_PL_USRP.xml*", as well 
