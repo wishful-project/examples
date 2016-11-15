@@ -512,7 +512,7 @@ Iris/WiSHFUL controller) can be loaded and run inside of Iris with the command
 The output of Iris now will contain also the pings emitted by the Iris
 controller in charge of talking with the WiSHFUL framework
 
-<code>
+<pre>
 ...  
 Events Received: 0  
 Events Received: 0  
@@ -523,13 +523,13 @@ Events Received: 0
 Events Received: 0  
 Events Received: 0  
 ...  
-</code>
+</pre>
 
 The controller will fire up when it receives an event from the
 WiSHFUL controller (via the WiSHFUL agent). In the controller window,
 we can enter the new transmission parameters
 
-<code>
+<pre>
 ************************ Wishful Controller  ************************  
 *                                                                   *  
 ************************  Iris Integration   ************************  
@@ -556,13 +556,13 @@ Waiting return. . .
 2016-11-04 14:31:25.140457 DEFAULT CALLBACK : Group: all, NodeName: agent_123, Cmd: set_gain, Returns: ok  
 2016-11-04 14:31:25.141196 DEFAULT CALLBACK : Group: all, NodeName: agent_123, Cmd: set_outpower, Returns: ok  
 ...  
-</code>
+</pre>
 
 After a while, the WiSHFUL controller has received a positive
 confirmation of the change of the transmission parameters. In the same time,
 in the Iris output window, the events are received, executed, and confirmed back
 
-<code>
+<pre>
 ...  
 Events Received: 0  
 Received cmd: set:phyengine14.usrptx1.frequency=666000000  
@@ -588,7 +588,7 @@ Events Received: 3
 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3485 Mbps  
 Events Received: 3  
 ...  
-</code>
+</pre>
 
 ## Bibliography
 1. G. Baruffa, L. Rugini, and P. Banelli, _Design and validation of a Software
