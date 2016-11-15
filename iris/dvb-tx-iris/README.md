@@ -166,9 +166,10 @@ bit rate payloads, but protect less the signal from unwanted interferences.
 Lower code rates (such as 1/2) protect the signal very well from noise and 
 other disruptive impairments, but they also lower the spectral efficiency.
 
-![alt text](doc/images/bitrates.png "Bit rate of the selected parameters configurations.")  
 __Tab. 1. Bit rate of the selected parameters configurations for testing
 (8 MHz DVB-T system, 2K and 8K provide the same bit rate).__
+![alt text](doc/images/bitrates.png "Bit rate of the selected parameters configurations.")  
+
 
 We conclude this section by recalling that, anyway, the choice of the bit 
 rate depends also on the quality and quantity of the TV programs that will be 
