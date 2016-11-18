@@ -32,10 +32,11 @@ import gevent
 import yaml
 import time
 import random
-import _thread
+import threading
 import zmq
 import csv
 import shutil
+import signal
 from tempfile import NamedTemporaryFile
 
 sys.path.append('../../../')
@@ -46,6 +47,8 @@ sys.path.append('../../../upis')
 sys.path.append('../../../framework')
 sys.path.append('../../../agent')
 sys.path.append('../../../controller')
+sys.path.append("../../../agent_modules/net_linux")
+
 
 
 import wishful_upis as upis
@@ -55,7 +58,8 @@ from examples.wmp.wmp_metamac.wmp_helper.controller_utils import *
 from examples.wmp.wmp_metamac.wmp_helper.TestbedTopology import TestbedTopology
 from examples.wmp.wmp_metamac.wmp_helper.MeasurementManager import MeasurementCollector
 from agent_modules.wifi_wmp.wmp_structure import UPI_R
-from local_control_program import *
+#from local_control_program import *
+from wishful_local_control_program import *
 
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller()
@@ -63,6 +67,7 @@ mytestbed = TestbedTopology("wmp_metamac", log, controller)
 meas_collector = MeasurementCollector(mytestbed, log)
 
 nodes = []
+do_run = None
 
 @controller.new_node_callback()
 def new_node(node):
@@ -84,6 +89,12 @@ def default_callback(group, node, cmd, data):
 
 def print_response(par_1, par_2, data):
     print("{} Specific callback for function call; Print response : {}".format(datetime.datetime.now(),data))
+
+def signal_handler(signal, frame):
+    global do_run
+    do_run = False
+
+signal.signal(signal.SIGINT, signal_handler)
 
 
 def get_traffic():
@@ -130,15 +141,11 @@ def register_traffic(station_index, value):
     return
 
 def start_visualizer_connection():
-    for node in mytestbed.wifinodes:
-        node.measurement_types.append('FREEZING_NUMBER')
-        node.measurement_types.append('CW')
-
     ''' SETUP PYTHON VISUALIZER '''
 
     ''' implement message zmq for realtime visualizer '''
     #global socket_visualizer
-    port = "12345"
+    port = "8400"
     context = zmq.Context()
     socket_visualizer = context.socket(zmq.PUB)
     socket_visualizer.bind("tcp://*:%s" % port)
@@ -152,33 +159,18 @@ def start_visualizer_connection():
     return socket_visualizer
 
 def collect_remote_messages(lcpDescriptor_node, socket_visualizer):
+    receive_thread = threading.currentThread()
+    while getattr(receive_thread, "do_run", True):
+        msg = lcpDescriptor_node.recv(timeout=0.1)
+        if msg:
+            log.info("Recv ctrl message from remote local control program : %s" % str(msg))
+            socket_visualizer.send_json(msg)
 
-    cycle = 0
-    while True:
-        #print('cycle % d' % cycle)
-        msg_data = lcpDescriptor_node.recv(timeout=0.1)
-        if msg_data:
-            log.debug("Recv ctrl message from remote local control program : %s" % str(msg_data))
-
-            #time_val = json_message['time']
-            #peer_node = json_message['peer']
-            #msg_data = json_message['msg']
-            remote_wlan_ipAddress = msg_data['ip_address']
-            measurement_types = 'MEASURE'
-            measurement = msg_data['measure']
-
-            # add measurement on nodes element
+            #add received measurements to the node measurements list
             for node in mytestbed.wifinodes:
-                if node.wlan_ipAddress == remote_wlan_ipAddress and measurement != False:
-                    node.last_bunch_measurement.append(measurement)
-                    #print('Append measurements at node %s : %s' % (str(remote_wlan_ipAddress), str(measurement) ))
-
-            msg_data['traffic'] = get_traffic()
-            socket_visualizer.send_json(msg_data)
-
-        cycle += 1
+                if msg['wlan_ip_address'] == node.wlan_ipAddress:
+                    node.add_measure(msg['measure'])
         gevent.sleep(1)
-
 
 
 
@@ -194,9 +186,12 @@ def main(args):
     controller.start()
     num_testbed_nodes = mytestbed.getExperimentNodesNumber()
 
+    global do_run
+    do_run = True
+
     nodes_platform_info = []
     #control loop
-    while True:
+    while do_run:
         gevent.sleep(10)
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
@@ -213,81 +208,86 @@ def main(args):
             slot_index = 0
             #superframesize in ms
             slot_size = 2200
-
             #num_stations_tdma = (num_testbed_nodes - 1)
             num_stations_tdma = (5 - 1)
 
             superframe_size_len = slot_size *  num_stations_tdma
             for node in mytestbed.wmp_nodes:
                 active_TDMA_radio_program(node, log, controller, nodes_platform_info[0])
-
                 slot_index = 1
                 tdma_params={'TDMA_SUPER_FRAME_SIZE' : superframe_size_len, 'TDMA_NUMBER_OF_SYNC_SLOT' : num_stations_tdma, 'TDMA_ALLOCATED_SLOT': slot_index}
-                #slot_index += 1
-
                 set_TDMA_parameters(node, log, controller, tdma_params)
 
-            # for node in mytestbed.wmp_nodes:
-            #     active_CSMA_radio_program_slot_1(node, log, controller)
+            for node in mytestbed.wmp_nodes:
+                 #active_CSMA_radio_program_slot_1(node, log, controller)
+                 active_ALOHA_radio_program(node, log, controller, nodes_platform_info[0])
 
+            for node in mytestbed.wifinodes:
+                node.measurements_types.append('TIME')
+                node.measurements_types.append('ACTIVE_PROTOCOL')
+                node.measurements_types.append('THROUGHPUT')
 
             # ''' start connection to visualizzer - Python or testbed DB '''
-            # socket_visualizer = start_visualizer_connection()
-            #
-            # ''' start local control program on AP node '''
-            # print("Deploy local control program on a remote nodes")
-            # lcpDescriptor_ap_node = controller.node(mytestbed.ap_node).hc.start_local_control_program(program=local_control_program)
-            # lcpDescriptor_ap_node.send( {'interface' : 'wlan0', 'tuning_enabler' : 2})
-            # #start thread for collect measurements from nodes
-            # _thread.start_new_thread( collect_remote_messages, (lcpDescriptor_ap_node, socket_visualizer, ) )
-            #
-            # ''' start local control program on WMP nodes '''
-            # lcpDescriptor_wmp_nodes = []
-            # for ii in range(0,len(mytestbed.wmp_nodes)):
-            #     lcpDescriptor_wmp_nodes.append(controller.node(mytestbed.wmp_nodes[ii]).hc.start_local_control_program(program=local_control_program))
-            #     lcpDescriptor_wmp_nodes[ii].send( {'interface' : 'wlan0', 'tuning_enabler' : 1})
-            #     #start thread for collect measurements from nodes
-            #     _thread.start_new_thread( collect_remote_messages, (lcpDescriptor_wmp_nodes[ii], socket_visualizer, ) )
+            socket_visualizer = start_visualizer_connection()
 
-            NUM_NODES = mytestbed.getExperimentNodesNumber()
-            EXPERIMENT_DURATION= 3 #(NUM_NODES-1)*30
-            traffic_number = 0
-            # t0=time.time()
-            # t1=t0;
-            # dt=t1-t0;
+            ''' start local control program on WMP nodes '''
+            lcpDescriptor_wmp_nodes = []
+            reading_thread = []
+            for ii in range(len(mytestbed.wmp_nodes)):
+                lcpDescriptor_wmp_nodes.append(controller.node(mytestbed.wmp_nodes[ii]).hc.start_local_control_program(program=my_local_control_program))
+                #start thread for collect measurements from nodes
+                reading_thread.append(threading.Thread(target=collect_remote_messages, args=(lcpDescriptor_wmp_nodes[ii], socket_visualizer,)))
+                reading_thread[ii].start()
+
+
+            EXPERIMENT_DURATION= 300
+            CHANGE_TRAFFIC = 50
             dt=0
-            number_nodes_threshold = 4
-            old_traffic_number = 0
-            current_radio_program = 0
-            changing_enabling = 0
-            index_traffic = 0
 
             #start server traffic
-            # controller.delay(2).nodes(mytestbed.ap_node).net.create_packetflow_sink(port='1234')
+            controller.delay(2).nodes(mytestbed.ap_node).net.create_packetflow_sink(port='1234')
+            for node in mytestbed.wmp_nodes:
+                print("START iperf on client %s" % str(node.ip))
+                controller.delay(4).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '500', '0.3M')
 
-            while True:
+            while do_run:
+                #need to keep alive the control program, if do not present the remote control program will been closed
+                lcpDescriptor_wmp_nodes[0].send({"alive": 1})
 
-
-                log.warning('waiting for node increase, traffic_number = %d (%d sec / %d)' % (traffic_number, dt, EXPERIMENT_DURATION) )
-                old_traffic_number = traffic_number
+                log.warning('waiting for ... (%d sec / %d)' % (dt, EXPERIMENT_DURATION) )
                 dt += 1
+
+                #gevent.sleep(1)
                 time.sleep(1)
+
+                if dt == CHANGE_TRAFFIC:
+                    controller.delay(2).nodes(mytestbed.ap_node).net.destroy_packetflow_sink()
+                    for node in mytestbed.wmp_nodes:
+                        controller.delay(2).nodes(node).net.stop_packetflow()
+
+                    controller.delay(4).nodes(mytestbed.ap_node).net.create_packetflow_sink(port='1234')
+                    for node in mytestbed.wmp_nodes:
+                        controller.delay(4).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '500', '1.5M')
 
                 if dt > EXPERIMENT_DURATION:
                     break
 
-            print("Terminate remote local control program")
-            # lcpDescriptor_ap_node.close()
-            # for ii in range(0,len(mytestbed.wmp_nodes)):
-            #     lcpDescriptor_wmp_nodes[ii].close()
+            controller.delay(2).nodes(mytestbed.ap_node).net.destroy_packetflow_sink()
+            controller.delay(3).nodes(mytestbed.wmp_nodes).net.stop_packetflow()
+
+            for ii in range(0,len(mytestbed.wmp_nodes)):
+                print("Terminate remote local control program")
+                lcpDescriptor_wmp_nodes[ii].close()
+
+                print("Terminate receive thread")
+                reading_thread[ii].do_run = False
+                reading_thread[ii].join()
+
 
             """
-            Plot collect measurement of phase 1
+            Plot/Save collect measurement of phase 1
             """
-            # meas_collector.plot_last_measurements(nodes=mytestbed.wifinodes, measurement_types=['FREEZING_NUMBER', 'CW', 'TSF', 'IPT'], plot_title="PLOT SC3", plot_directory="figs")
-            # meas_collector.clear_nodes_measurements(nodes=mytestbed.wifinodes)
-
-
+            meas_collector.save_measurements(nodes=mytestbed.wifinodes, directory="showcase_data")
             break
 
 

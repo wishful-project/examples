@@ -18,6 +18,8 @@ sys.path.append('../../../../upis')
 sys.path.append('../../../../framework')
 sys.path.append('../../../../agent')
 sys.path.append('../../../../controller')
+sys.path.append("../../../../agent_modules/net_linux")
+
 
 class WiFiNode():
     """
@@ -33,8 +35,8 @@ class WiFiNode():
         # eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node))
         # self.wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[3]
         self.wlan_ipAddress = '192.168.3.' + str(node.ip[7:10])
-        self.last_bunch_measurement = []
-        self.measurement_types = []
+        self.measurements = []
+        self.measurements_types = []
         self.role = None
         self.platform = None
 
@@ -42,13 +44,13 @@ class WiFiNode():
         """ Adds a measure or a list of measurable in the list of node measurement
         :param measure: list of measure to add at last_bunch_measurement object attribute
         """
-        self.last_bunch_measurement.append(measure)
+        self.measurements.append(measure)
 
     def get_available_measures(self):
         """ Gets the available measure of the node
         :return measure_list: the list of measure stored until now
         """
-        return self.last_bunch_measurement
+        return self.measurements
 
 
 class TestbedTopology:

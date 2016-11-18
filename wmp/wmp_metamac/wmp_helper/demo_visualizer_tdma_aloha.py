@@ -66,6 +66,8 @@ stations_dump = [["192.168.3.101", "alix01", 2.0, 1.0, 1, 1, 1 ,1, 1],
                 ["192.168.3.105", "alix05", 2.0, 1.0, 1, 1, 1 ,1, 1],
                 ["192.168.3.114", "alix14", 2.0, 1.0, 1, 1, 1 ,1, 1],
                 ["192.168.3.113", "alix13", 2.0, 1.0, 1, 1, 1 ,1, 1],
+                ["192.168.3.110", "alix10", 2.0, 1.0, 1, 1, 1 ,1, 1],
+                ["192.168.3.115", "alix15", 2.0, 1.0, 1, 1, 1 ,1, 1],
                 ["192.168.3.116", "alix16", 2.0, 1.0, 1, 1, 1 ,1, 1]
 				]
 
@@ -225,57 +227,8 @@ def main():
 				STA2_PROTOCOL.pop(0)
 				STA3_PROTOCOL.pop(0)
 				STA4_PROTOCOL.pop(0)
-				#RX_MATCH_LINE.pop(0)
-				#IPT_LINE.pop(0)
-				#HISTORY.pop(0)
-				#SWITCH.pop(0)
-				#PLOSS.pop(0)
 
-
-			#n = getPing(IP_ADDR)
-			# n = stations_dump[0][3]
-			# if n == 50.0 and len(HISTORY) >= 1:
-			# 	n = HISTORY[-1]
-			# 	PLOSS.append(27.0)
-			# 	#PLOSS.append(30.0)
-			# else:
-			# 	PLOSS.append(30.0)
-            #
-
-			# cumulative_tx_frame = 0
-			# cumulative_freezing = 0
-			# cumulative_ipt = 0
-			# cumulative_rx_frame = 0
-
-			# #print "RX FRAME"
-			# AP_index=0
-			# for row in stations_dump:
-			# 	#for col in row:
-			# 	if row[1] == "alix2":
-			# 		break
-			# 	AP_index += 1
-			# cumulative_rx_frame = stations_dump[AP_index][7]
-			# #print cumulative_rx_frame
-            #
-			# #print "TX FRAME"
-			# for ii in range(1, len(stations_dump), 1):
-			# 	#print "%s - %d" % (stations_dump[ii][1], stations_dump[ii][4])
-			# 	cumulative_tx_frame += stations_dump[ii][4]
-			# 	cumulative_freezing += stations_dump[ii][2]
-			# 	cumulative_ipt += stations_dump[ii][8]
-			# TX_FRAME_LINE_2.append( MAX_PING - 0.5 - (( cumulative_tx_frame/MAX_RX_MATCH_LINE)*MAX_PING ) )
-            #
-			# if num_active_traffic != 0:
-			# 	cumulative_freezing = cumulative_freezing / num_active_traffic
-			# 	#cumulative_ipt = cumulative_ipt / num_active_traffic
-			# else:
-			# 	cumulative_freezing = 0
-			# 	#cumulative_ipt = 0
-
-			# FREEZING.append( MAX_PING - 0.5 - (( cumulative_freezing / MAX_RX_MATCH_LINE) * MAX_PING ) )
-			# IPT_LINE.append( MAX_PING - cumulative_ipt )
-			# HISTORY.append( MAX_PING - stations_dump[2][3] ) #CW
-			STA1_PROTOCOL.append( MAX_PING - 1 + OFFSET_LINE - (( stations_dump[2][2]/MAX_STA1_PROTOCOL)*MAX_PING ) )
+			STA1_PROTOCOL.append( MAX_PING - 1 + OFFSET_LINE - (( stations_dump[7][2]/MAX_STA1_PROTOCOL)*MAX_PING ) )
 			STA2_PROTOCOL.append( MAX_PING - 2 + OFFSET_LINE - (( stations_dump[3][2]/MAX_STA2_PROTOCOL)*MAX_PING ) )
 			STA3_PROTOCOL.append( MAX_PING + 1 + OFFSET_LINE - (( stations_dump[4][2]/MAX_STA3_PROTOCOL)*MAX_PING ) )
 			STA4_PROTOCOL.append( MAX_PING + 2 + OFFSET_LINE - (( stations_dump[5][2]/MAX_STA4_PROTOCOL)*MAX_PING ) )
@@ -370,7 +323,7 @@ def ho_event(x):
 	global ZMQ_PORT
 	#global num_active_traffic
 
-	local_network = 1
+	local_network = 0
 	if local_network :
 
 		# Communication with c program
@@ -425,7 +378,7 @@ def ho_event(x):
 
 	else :
 		context = zmq.Context()
-		port1  = 8300
+		port1  = 8400
 		# Socket to talk to server
 		context = zmq.Context()
 		socket_zmq = context.socket(zmq.SUB)
@@ -433,18 +386,18 @@ def ho_event(x):
 		socket_zmq.setsockopt(zmq.SUBSCRIBE, '')
 		while True:
 			parsed_json = socket_zmq.recv_json()
-			#print('parsed_json : %s' % str(parsed_json))
+			print('parsed_json : %s' % str(parsed_json))
 
-			remote_ipAddress = parsed_json['node_ip_address'][0]
+			remote_ipAddress = parsed_json['wlan_ip_address']
+			measure = parsed_json['measure'][0]
 			len_station_dump = len(stations_dump)
 
 			# add measurement on nodes element
 			for i in range(0,len_station_dump):
 				#print 'stations_dump[i][0] (%s) == remote_wlan_ipAddress (%s)' % (str(stations_dump[i][0]), str(remote_ipAddress) )
 				if stations_dump[i][0] == remote_ipAddress :
-					stations_dump[i][2] = float(parsed_json['active'])+1	#active protocol
-				#	stations_dump[i][3] = float(parsed_json['0'][0])	#protocol 1 weigth
-				#	stations_dump[i][4] = parsed_json['0'][1]	#protocol 1 name
+					stations_dump[i][2] = float(measure[1])+1	#active protocol
+					stations_dump[i][3] = float(measure[2])	#THR
 
 
 

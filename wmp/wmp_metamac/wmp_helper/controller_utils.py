@@ -39,8 +39,6 @@ def get_platform_information(node, log, controller):
 
     current_platform_info = radio_info_t()
     current_platform_info.platform_info = radio_platform_t()
-    current_platform_info.execution_engine_list = [execution_engine_t() for i in range(2) ]
-    current_platform_info.radio_program_list = [ radio_program_t() for i in range(2) ]
 
     log.info("Platform information for %s " % str(node))
     wmp_platform_index = None
@@ -81,6 +79,8 @@ def get_platform_information(node, log, controller):
     execution_engine_list_name = execution_engine_list_name[0]
     execution_engine_list_pointer = current_platform_info_str['exec_engine_list_pointer']
     execution_engine_list_pointer = execution_engine_list_pointer[0]
+    current_platform_info.execution_engine_list = [execution_engine_t() for i in range(len(execution_engine_list_name)) ]
+
     for ii in range( len(execution_engine_list_name) ) :
         current_platform_info.execution_engine_list[ii].execution_engine_name = execution_engine_list_name[ii]
         current_platform_info.execution_engine_list[ii].execution_engine_pointer = execution_engine_list_pointer[ii]
@@ -90,6 +90,8 @@ def get_platform_information(node, log, controller):
     radio_prg_list_name = radio_prg_list_name [0]
     radio_prg_list_pointer = current_platform_info_str['radio_prg_list_pointer']
     radio_prg_list_pointer = radio_prg_list_pointer[0]
+    current_platform_info.radio_program_list = [ radio_program_t() for i in range(len(radio_prg_list_name)) ]
+
     for ii in range(len(radio_prg_list_name)):
         current_platform_info.radio_program_list[ii].radio_prg_name = radio_prg_list_name[ii]
         current_platform_info.radio_program_list[ii].radio_prg_pointer = radio_prg_list_pointer[ii]
@@ -97,7 +99,7 @@ def get_platform_information(node, log, controller):
     return current_platform_info
 
 
-def active_CSMA_radio_program(node, log, global_mgr, current_platform_info):
+def active_CSMA_radio_program(node, log, controller, current_platform_info):
     """ Active CSMA radio program to the node passed by argument parameter.
         To enable a radio program on WMP platform we need two different action, inject the radio program and activate it.
 
@@ -262,6 +264,45 @@ def set_TDMA_parameters(node, log, controller, tdma_params):
         log.warning('Radio program activation succesfull')
     else :
         log.debug('Error in radio program activation')
+        return False
+
+    return True
+
+
+def active_ALOHA_radio_program(node, log, controller, current_platform_info):
+    """ Active ALOHA radio program to the node passed by argument parameter.
+        To enable a radio program on WMP platform we need two different action, inject the radio program and activate it.
+
+    :param node: Node or Nodes list in which active CSMA radio program
+    :param log: experiment logging module attribute
+    :param global_mgr: experiment global manager attribute
+    :param current_platform_info: the radio capabilities of the NIC in Node
+    :return result: result of activation (True = successful, False = failure)
+    """
+    log.debug('***************** %s ***************' % active_CSMA_radio_program.__name__)
+
+    radio_program_pointer_ALOHA = ""
+    position = ""
+
+    # Find CSMA radio program pointer in current_platform_info capability list
+    for ii in range(len(current_platform_info.radio_program_list)):
+        if current_platform_info.radio_program_list[ii].radio_prg_name == "ALOHA" :
+            radio_program_pointer_ALOHA = current_platform_info.radio_program_list[ii].radio_prg_pointer
+            #force the radio memory slot position in which store the radio program description
+            #the WMP platform on broadcom vard has only two memory slot
+            position = '1'
+
+    if radio_program_pointer_ALOHA == "" :
+        log.debug("ALOHA radio program not found in node capabilities list")
+        return False
+
+    # Active CSMA radio program
+    UPIargs = {'position' : position, 'radio_program_name' : 'ALOHA', 'path' : radio_program_pointer_ALOHA, 'interface' : 'wlan0' }
+    rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)
+    if rvalue == SUCCESS:
+        log.warning('Radio program activation successful')
+    else :
+        log.warning('Error in radio program activation')
         return False
 
     return True

@@ -15,7 +15,7 @@ modules:
   wifi:
       module : wishful_module_wifi_wmp
       class_name : WmpModule
-      kwargs: {"executionEngine":"metamac"}
+      kwargs: {"executionEngine":"factory"}
 
   network:
       module : wishful_module_net_linux

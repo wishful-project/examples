@@ -6,7 +6,6 @@ __author__ = "Domenico Garlisi"
 __copyright__ = "Copyright (c) 2016, CNIT"
 __version__ = "0.2.0"
 
-
 # Definition of Local Control Program
 def my_local_control_program(controller):
     # do all needed imports here!!!

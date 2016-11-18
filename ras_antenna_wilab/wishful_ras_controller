@@ -100,12 +100,12 @@ controller_PC_name = "apuN4"
 controller_PC_ip_address = "10.11.16.104"
 controller_PC_interface = "eth0"
 
-# AP1 set in monitor on channel 40
+# AP1
 ap1_name = "apuT1"
 ap1_ip = "10.11.16.126"
 ap1_wlan_interface = "wlan0"
 
-# STA1 set in monitor on channel 40
+# STA1
 sta1_name = "apu04"
 sta1_ip = "10.11.16.108"
 sta1_wlan_interface = "wlan0"
@@ -376,13 +376,13 @@ def main(args):
                 #
                 log.info('(2) sniff traffic at %s' % str(ap2_node.ip))
                 controller.exec_time(exec_time).callback(csResultCollector2).node(ap2_node).net.sniff_layer2_traffic(mon_dev, 8, '192.168.3.' + str(ap1_node.ip[9:12]), '192.168.3.' + str(sta1_node.ip[9:12]))
-                #
+
 
                 """ INFRASTRUCTURE MODE STATIONS"""
                 log.info('(3) single server at %s' % str(ap1_node.ip))
                 exec_time = datetime.datetime.now() + datetime.timedelta(seconds=2)
                 controller.exec_time(exec_time).callback(csResultCollector3).nodes(ap1_node).net.create_packetflow_sink('5001')
-
+                #
                 log.info('(4) start server at %s' % str(sta1_node.ip))
                 exec_time = datetime.datetime.now() + datetime.timedelta(seconds=4)
                 controller.exec_time(exec_time).callback(csResultCollector4).node(sta1_node).net.start_packetflow( '192.168.3.'+str(ap1_node.ip[9:12]), '5001', '5')

@@ -721,7 +721,6 @@ def my_local_control_program():
 	protocols[3].parameter.frame_length = 4
 	protocols[3].parameter.slot_assignment = 3
 
-
 	#protocols suite INIT VALUES
 	suite.num_protocols = num_protocols
 

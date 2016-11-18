@@ -3,66 +3,67 @@ Local control program to be executed on remote nodes.
 """
 
 __author__ = "Domenico Garlisi"
-__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
+__copyright__ = "Copyright (c) 2016, CNIT"
 __version__ = "0.1.0"
-
-
-import time
-import datetime
-import sys
-from sys import stdout
-from ctypes import *
-import os
-import csv
-import signal
-import threading
-import math
-import zmq
-import netifaces as ni
-
-
-
-libc = CDLL('libc.so.6')
-usleep = lambda x: time.sleep(x/1000000.0)
-
-sys.path.append('../../../')
-sys.path.append("../../../agent_modules/wifi_ath")
-sys.path.append("../../../agent_modules/wifi_wmp")
-sys.path.append("../../../agent_modules/wifi")
-sys.path.append('../../../upis')
-sys.path.append('../../../framework')
-sys.path.append('../../../agent')
-# from agent_modules.wifi_wmp.wmp_structure import UPI_R
-from agent_modules.wifi_wmp.adaptation_module.libb43 import *
-
-# @controller.set_default_callback()
-# def default_callback(cmd, data):
-# 	print(("DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(cmd, data)))
-
-# manager = Manager()
-# story_channel = manager.list()
-
-
-story_file = None
-reading_thread = None
-
-def signal_handler(signal, frame):
-	story_file.close()
-	reading_thread.do_run = False
-	reading_thread.join()
-	time.sleep(2)
-	sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-
 
 # Definition of Local Control Program
 def my_local_control_program(controller):
+
+	#import
+	import time
+	import datetime
+	import sys
+	from sys import stdout
+	import ctypes
+	import os
+	import csv
+	import threading
+	import math
+	import zmq
+	import netifaces as ni
+	import logging
+	#import math
+	#references to Wishful framework
+	global upiHCImpl # interface used for communication with global controller and control runtime
+
+	sys.path.append('../../../')
+	sys.path.append("../../../agent_modules/wifi_ath")
+	sys.path.append("../../../agent_modules/wifi_wmp")
+	sys.path.append("../../../agent_modules/wifi")
+	sys.path.append("../../../agent_modules/net_linux")
+	sys.path.append('../../../upis')
+	sys.path.append('../../../framework')
+	sys.path.append('../../../agent')
+	from agent_modules.wifi_wmp.wmp_structure import UPI_R
+	#from agent_modules.wifi_wmp.adaptation_module.libb43 import *
+
+	libc = ctypes.CDLL('libc.so.6')
+	usleep = lambda x: time.sleep(x/1000000.0)
+
+	CLOCK_MONOTONIC_RAW = 4 # see <linux/time.h>
+	class timespec(ctypes.Structure):
+		_fields_ = [
+		('tv_sec', ctypes.c_long),
+		('tv_nsec', ctypes.c_long)
+		]
+
+	librt = ctypes.CDLL('librt.so.1', use_errno=True)
+	clock_gettime = librt.clock_gettime
+	clock_gettime.argtypes = [ctypes.c_int, ctypes.POINTER(timespec)]
+
+	def monotonic_time():
+		t = timespec()
+		if clock_gettime(CLOCK_MONOTONIC_RAW , ctypes.pointer(t)) != 0:
+			errno_ = ctypes.get_errno()
+			raise OSError(errno_, os.strerror(errno_))
+		#return t.tv_sec + t.tv_nsec * 1e-9\
+		return t
 
 	#Flags
 	FLAG_USE_BUSY = 0
 	FLAG_READONLY = 0
 	FLAG_VERBOSE = 1
+	FLAG_LOG_FILE = 0
 	read_interval = 7000 #12000 #(us)
 
 	PACKET_TO_TRANSMIT	=0x00F0
@@ -84,8 +85,8 @@ def my_local_control_program(controller):
 		_fields_= [
 			('frame_offset', ctypes.c_int),
 			('frame_length', ctypes.c_int),
-			('slot_assignment', ctypes.c_int)
-			('persistence', ctypes.c_int)
+			('slot_assignment', ctypes.c_int),
+			('persistence', ctypes.c_float)
 		]
 
 	class fsm_param(ctypes.Structure):
@@ -103,44 +104,18 @@ def my_local_control_program(controller):
 			#Unique identifier
 			('id', ctypes.c_int),
 			#Readable name, such as "TDMA (slot 1)"
-			('name', c_char_p),
+			('name', ctypes.c_char_p),
 			#Path to the compiled (.txt) FSM implementation
 			('fsm_path', ctypes.c_char_p),
 			#Parameters for the FSM
 			('fsm_params', fsm_param * 2),
 			#Protocol emulator for determining decisions of protocol locally
 			#protocol_emulator emulator;
+			('emulator', ctypes.c_char_p),
 			#Parameter for protocol emulator
 			#void *parameter;
 			('parameter', emulator_param)
 		]
-
-	# class metamac_slot(ctypes.Structure):
-	# 	_fields_ = [
-	# 		('slot_num', ctypes.c_ulong),
-	# 		('read_num', ctypes.c_ulong),
-	# 		('host_time', ctypes.c_uint64),
-	# 		('host_time', ctypes.c_uint64),
-	# 		('tsf_time', ctypes.c_uint64 ),
-	# 		('slot_index', ctypes.c_int),
-	# 		('slots_passed', ctypes.c_int),
-    #
-	# 		#Indicates if this slot was filled in because of a delay in	reading from the board.
-	# 		('filler', ctypes.c_char), #	uchar filler : 1;
-	# 		#Indicates that a packet was waiting to be transmitted in this slot.
-	# 		('packet_queued', ctypes.c_char), #uchar packet_queued : 1;
-	# 		#Indicates that a transmission was attempted in this slot.
-	# 		('transmitted', ctypes.c_char), #uchar transmitted : 1;
-	# 		#Indicates that a transmission was successful in this slot.
-	# 		('transmit_success', ctypes.c_char), #uchar transmit_success : 1;
-	# 		#Various measures for whether another node attempted to transmit.
-	# 		('transmit_other', ctypes.c_char), #uchar transmit_other : 1;
-	# 		('bad_reception', ctypes.c_char), #uchar bad_reception : 1;
-	# 		('busy_slot', ctypes.c_char), #uchar busy_slot : 1;
-	# 		#Indicates that either a transmission attempt was unsuccessful
-	# 		#in this slot or another node attempted a transmission.
-	# 		('channel_busy', ctypes.c_char) #uchar channel_busy : 1;
-	# 	]
 
 	class metamac_slot(ctypes.Structure):
 		_fields_ = [
@@ -182,9 +157,9 @@ def my_local_control_program(controller):
 			#Offset of slots numbering from read loop to slot numbering for TDMA.
 			('slot_offset', ctypes.c_int),
 			#Array of all protocols.
-			('protocols', protocol * 4),
+			('protocols', protocol * 5),
 			#Array of weights corresponding to protocols.
-			('weights', ctypes.c_double * 4),	#double *weights; !!!WARNING for *
+			('weights', ctypes.c_double * 5),	#double *weights; !!!WARNING for *
 			#Factor used in computing weights.
 			('eta', ctypes.c_double),
 			#Slot information for last to be emulated.
@@ -195,40 +170,15 @@ def my_local_control_program(controller):
 			('cycle', ctypes.c_int),
 		]
 
-	def set_parameter(b43, slot, num, value):
-
-		param_addr = 0
-		if num==10:
-			param_addr = 0x16*2
-		elif num==11:
-			param_addr = 0x21*2
-		elif num==12:
-			param_addr = 0x1F*2
-		elif num==13:
-			param_addr = 0x20*2
-		elif num==14:
-			param_addr = 0x11*2
-		elif num==15:
-			param_addr = 0x12*2
-		elif num==16:
-			param_addr = 0x13*2
-		elif num==17:
-			param_addr = 0x14*2
-		else:
-			return
-
-		if slot == 0 :
-			param_addr += b43.PARAMETER_ADDR_BYTECODE_1
-		else :
-			param_addr += b43.PARAMETER_ADDR_BYTECODE_2
-
-		b43.shmWrite16(b43.B43_SHM_SHARED, param_addr, value & 0xffff);
-
-
+	SUCCESS = 0
+	FAILURE = 2
 
 	def tdma_emulate(param, slot_num, offset):
 		slot_num += offset
 		tdma_params = param
+		#print('slot_num %d - tdma_params.frame_offset %d - tdma_params.frame_length %d - tdma_params.slot_assignment %d' \
+		#	  % ( slot_num, tdma_params.frame_offset, tdma_params.frame_length, tdma_params.slot_assignment))
+
 		if ((slot_num - tdma_params.frame_offset) % tdma_params.frame_length) == tdma_params.slot_assignment :
 			result = 1.0
 		else :
@@ -236,26 +186,30 @@ def my_local_control_program(controller):
 
 		return result
 
-	def aloha_emulate(param, slot_num, offset, metamac_slot, previous_slot):
+
+	def aloha_emulate(param, slot_num, offset):
 		aloha_params = param
-		return aloha_param.persistence
-
-	def configure_params(b43, slot, param):
-
-		#while (param != N) {
-		for i in range(2):
-			set_parameter(b43, slot, param[i].num, param[i].value)
+		return aloha_params.persistence
 
 
+	def configure_params(slot, param):
+		# for i in range(2):
+		# 	set_parameter(slot, param[i].num, param[i].value)
 
-	def load_protocol(b43, suite, protocol):
+		#print('param[1].value %d' % param[1].value)
 
-		"""
-		Update this function --> replace the shared memory write function with UPI for change parameter and load radio program
-		 set_parameters(param_key_values_dict):
-		 activate_radio_program(name)
-		"""
+		UPIargs = { 'interface' : 'wlan0', UPI_R.TDMA_ALLOCATED_SLOT : param[1].value }
+		rvalue = controller.radio.set_parameters(UPIargs)
+		if rvalue[0] == SUCCESS:
+			log.warning('Parameter writing successful')
+		else :
+			log.warning('Error in parameter writing')
 
+		#currently we set only the TDMA_ALLOCATED_SLOT, in case of other parameters we need active the radio program
+		#to initialize the radio program
+
+
+	def load_protocol(suite, protocol):
 
 		#struct options opt;
 		active = suite.active_slot # Always 0 or 1 since metamac_init will already have run.
@@ -263,68 +217,72 @@ def my_local_control_program(controller):
 
 		if (protocol == suite.slots[active]) :
 			#This protocol is already running.
+			#print('load protocol : no change')
 			pass
-		else :
+
+		elif (protocol < (suite.num_protocols - 1) and suite.slots[active] < (suite.num_protocols - 1)) :
+			#The protocol loading is TDMA and the protocol running is TDMA but they use different slot
 			#Protocol in active slot shares same FSM, but is not the same protocol
 			#(already checked). Write the parameters for this protocol.
-			configure_params(b43, active, suite.protocols[protocol].fsm_params)
+			configure_params(active, suite.protocols[protocol].fsm_params)
 			suite.slots[active] = protocol
+			#print('load protocol : change only tdma param')
 
-		# elif (protocol == suite.slots[inactive]):
-		# 	#Switch to other slot.
-		# 	opt.active = (inactive == 0) ? "1" : "2"
-		# 	writeAddressBytecode(df, &opt)
-		# 	suite.active_slot = inactive
-        #
-		# elif (suite.slots[active] >= 0 ) : #and strcmp(suite->protocols[protocol].fsm_path, suite->protocols[suite->slots[active]].fsm_path) == 0) :
-		# 	#Protocol in active slot shares same FSM, but is not the same protocol
-		# 	#(already checked). Write the parameters for this protocol.
-		# 	configure_params(b43, active, suite.protocols[protocol].fsm_params)
-		# 	suite.slots[active] = protocol
-        #
-		# elif (suite.slots[inactive] >= 0): #and strcmp(suite->protocols[protocol].fsm_path, suite->protocols[suite->slots[inactive]].fsm_path) == 0) :
-		# 	#Protocol in inactive slot shares same FSM, but is not the same protocol,
-		# 	#so write the parameters for this protocol and activate it.
-        #
-		# 	# configure_params(df, inactive, suite->protocols[protocol].fsm_params);
-		# 	# opt.active = (inactive == 0) ? "1" : "2";
-		# 	# writeAddressBytecode(df, &opt);
-        #
-		# 	suite.slots[inactive] = protocol
-		# 	suite.active_slot = inactive
-        #
-		# else:
-		# 	#Load into inactive slot.
-        #
-		# 	# opt.load = (inactive == 0) ? "1" : "2";
-		# 	# opt.name_file = suite->protocols[protocol].fsm_path;
-		# 	# bytecodeSharedWrite(df, &opt);
-		# 	# configure_params(df, inactive, suite->protocols[protocol].fsm_params);
-		# 	# opt.active = opt.load;
-		# 	# writeAddressBytecode(df, &opt);
-        #
-		# 	suite.slots[inactive] = protocol
-		# 	suite.active_slot = inactive
+		elif (protocol == suite.slots[inactive]):
+			#Switch to other slot.
+			if inactive == 0:
+				position = '1'
+			else:
+				position = '2'
+
+			UPIargs = {'position' : position, 'interface' : 'wlan0' }
+			rvalue = controller.radio.activate_radio_program(UPIargs)
+			if rvalue == SUCCESS:
+				log.warning('Radio program activation successful')
+			else :
+				log.warning('Error in radio program activation')
+			suite.active_slot = inactive
+			suite.slots[suite.active_slot] = protocol
+			#print('load protocol : change slot')
+
+		elif (protocol < (suite.num_protocols - 1)):
+			#Switch to other slot.
+			if inactive == 0:
+				position = '1'
+			else:
+				position = '2'
+
+			UPIargs = {'position' : position, 'interface' : 'wlan0' }
+			rvalue = controller.radio.activate_radio_program(UPIargs)
+			if rvalue == SUCCESS:
+				log.warning('Radio program activation successful')
+			else :
+				log.warning('Error in radio program activation')
+			suite.active_slot = inactive
+
+			configure_params(active, suite.protocols[protocol].fsm_params)
+			suite.slots[suite.active_slot] = protocol
+			#print('load protocol : change slot and TDMA param')
+
+		else:
+			#Load into inactive slot.
+			log.warning('Error in protocol activation or switching')
 
 		suite.active_protocol = protocol
 		suite.last_update = monotonic_time()
 
 
-	def metamac_evaluate(b43, suite):
+	def metamac_evaluate(suite):
 		#Identify the best protocol.
 		best = 0
 		for i in range(suite.num_protocols):
 			if (suite.weights[i] > suite.weights[best]) :
 				best = i
 
-		load_protocol(b43, suite, best)
+		load_protocol(suite, best)
 
 	#static void metamac_display(unsigned long loop, struct protocol_suite *suite)
 	def metamac_display(loop, suite):
-		# if (loop > 0):
-		# 	#Reset cursor upwards by the number of protocols we will be printing.
-		# 	print("\x1b[%dF", suite.num_protocols)
-
 		for i in range(0, suite.num_protocols):
 			active_string = ' '
 			if suite.active_protocol == i:
@@ -332,27 +290,14 @@ def my_local_control_program(controller):
 
 			#print("%c %5.3f %s\n" % (active_string, suite.weights[i], suite.protocols[i].name))
 			if i == 0 :
-				stdout.write("\r%c %5.3f %s -- " % (active_string, suite.weights[i], suite.protocols[i].name))
+				stdout.write("\r%c%5.3f%s--" % (active_string, suite.weights[i], suite.protocols[i].name))
+			elif i == suite.num_protocols-1 :
+				stdout.write("%c%5.3f%s\n" % (active_string, suite.weights[i], suite.protocols[i].name))
 			else:
-				stdout.write("%c %5.3f %s -- " % (active_string, suite.weights[i], suite.protocols[i].name))
+				stdout.write("%c%5.3f%s--" % (active_string, suite.weights[i], suite.protocols[i].name))
 			stdout.flush()
 
-		global socket_visualizer
-		#ip_address = controller.net.get_iface_ip_addr(interface)
-		iface = 'wlan0'
-		ip_address = [inetaddr['addr'] for inetaddr in ni.ifaddresses(iface)[ni.AF_INET]]
-		stock_data = {
-            'node_ip_address': ip_address,
-            'active': suite.active_protocol
-        }
 
-		#send information to visualizer outside the laboratory
-		#socket_visualizer.send(b'client message to server1')
-		socket_visualizer.send_json(stock_data)
-		message = socket_visualizer.recv()
-		#print("Received reply [" + str(message) + "]")
-
-	#void queue_multipush(struct metamac_queue *queue, struct metamac_slot *slots, size_t count)
 	def queue_multipush(story_channel, story_file, story_channel_len, story_channel_len_diff):
 
 		ai = story_channel_len - story_channel_len_diff
@@ -374,39 +319,9 @@ def my_local_control_program(controller):
 
 			ai += 1
 
-		# if (logfile != NULL) {
-		# 			fprintf(logfile, "%llu,%d,%llu,%llu,%llu,%d,%d,%01x,%01x,%01x,%01x,%01x,%01x,%01x,%01x,%s",
-		# 				(unsigned long long) slots[i].slot_num,
-		# 				suite->slot_offset,
-		# 				(unsigned long long) slots[i].read_num,
-		# 				(unsigned long long) slots[i].host_time,
-		# 				(unsigned long long) slots[i].tsf_time,
-		# 				slots[i].slot_index,
-		# 				slots[i].slots_passed,
-		# 				slots[i].filler,
-		# 				slots[i].packet_queued,
-		# 				slots[i].transmitted,
-		# 				slots[i].transmit_success,
-		# 				slots[i].transmit_other,
-		# 				slots[i].bad_reception,
-		# 				slots[i].busy_slot,
-		# 				slots[i].channel_busy,
-		# 				suite->protocols[suite->active_protocol].name);
-        #
-		# 			for (int i = 0; i < suite->num_protocols; i++) {
-		# 				fprintf(logfile, ",%e", suite->weights[i]);
-		# 			}
-        #
-		# 			fprintf(logfile, "\n");
-		# 		}
-
-
-
 
 	def acquire_slots_channel(story_channel):
 		reading_thread = threading.currentThread()
-		b43_phy = None
-		b43 = B43(b43_phy)
 		slot_time = 2200 #(us)
 
 		slot_num = 0
@@ -420,14 +335,15 @@ def my_local_control_program(controller):
 		start_time = monotonic_time() #(timespec)
 		loop_end = 0 #(uint64_t)
 
-		initial_tsf = b43.getTSFRegs()
+		UPI_myargs = {'interface' : 'wlan0', 'measurements' : [UPI_R.TSF, UPI_R.COUNT_SLOT] }
+		node_measures = controller.radio.get_measurements(UPI_myargs)
+
+		initial_tsf = node_measures[0]
 		tsf = initial_tsf
-		slot_index = b43.shmRead16(b43.B43_SHM_REGS, COUNT_SLOT) & 0x7
+		slot_index = node_measures[1] & 0x7
 		slot_num = (slot_index + 1) % 8
 
 		# metamac control loop
-		# while not controller.is_stopped() :
-		# 	msg = controller.recv(timeout=1)
 		collect_period = 2 #ms
 		report_period = 16 #ms
 		num_iterations = 1
@@ -439,8 +355,8 @@ def my_local_control_program(controller):
 			last_tsf = tsf
 			last_slot_index = slot_index
 
-			UPI_myargs = {'interface' : interface, 'measurements' : [UPI_R.TSF, UPI_R.COUNT_SLOT, UPI_R.PACKET_TO_TRANSMIT, UPI_R.MY_TRANSMISSION, UPI_R.SUCCES_TRANSMISSION, UPI_R.OTHER_TRANSMISSION, UPI_R.BAD_RECEPTION , UPI_R.BUSY_SLOT, UPI_R.COUNT_SLOT] }
-			node_measures = controller.radio.get_measurements(UPI_myargs, collect_period, report_period, num_iterations )
+			UPI_myargs = {'interface' : 'wlan0', 'measurements' : [UPI_R.TSF, UPI_R.COUNT_SLOT, UPI_R.PACKET_TO_TRANSMIT, UPI_R.MY_TRANSMISSION, UPI_R.SUCCES_TRANSMISSION, UPI_R.OTHER_TRANSMISSION, UPI_R.BAD_RECEPTION , UPI_R.BUSY_SLOT, UPI_R.COUNT_SLOT] }
+			node_measures = controller.radio.get_measurements_periodic(UPI_myargs, collect_period, report_period, num_iterations, None )
 
 			'''
 			last_tsf = tsf
@@ -543,93 +459,122 @@ def my_local_control_program(controller):
 		# 	(story_channel[ai].bad_reception), (story_channel[ai].busy_slot), (story_channel[ai].channel_busy) ))
 
 
-		#if (suite.protocols[suite.active_protocol].emulator == tdma_emulate && current_slot.transmitted):
-		if (current_slot.transmitted):
+		if (suite.protocols[suite.active_protocol].emulator == b'tdma' and current_slot.transmitted):
 			#Update slot_offset
 			params = suite.protocols[suite.active_protocol].parameter
 			neg_offset = (current_slot.slot_num - params.frame_offset - params.slot_assignment) % params.frame_length
 			suite.slot_offset = (params.frame_length - neg_offset) % params.frame_length
 
-			#If there is no packet queued for this slot, consider all protocols to be correct
-			#and thus the weights will not change
+		z = 0.0
+		uu = 0.0
+		d = 0.0
+
+		#If there is no packet queued for this slot, consider all protocols to be correct
+		#and thus the weights will not change
 		if (current_slot.packet_queued) :
 			#z represents the correct decision for this slot - transmit if the channel
 			#is idle (1.0) or defer if it is busy (0.0)
 
-			z=0.0
-			if (not current_slot.channel_busy):
-				z = 1.0
+			if (suite.protocols[suite.active_protocol].emulator == b'tdma') :
+				if (not current_slot.channel_busy):
+					z = 1.0
 
+			if (suite.protocols[suite.active_protocol].emulator == b'aloha'):
+				# // transmission AND success: GOOD
+				# // no trasmission AND slot busy - GOOD
+				# // trasmission AND NOT success - WRONG
+				# // trasmission  AND slot empty - WRONG
+				# //if GOOD
+				# //	z = p_current
+				# //else
+				# //	z = 1 - p_current
 
+				p_curr = suite.protocols[suite.active_protocol].parameter.persistence
+				# if (	(current_slot.transmitted and current_slot.transmit_success) or \
+				# 				(not current_slot.transmitted and (current_slot.transmit_other | current_slot.bad_reception)) ) :
+				# 	z = p_curr
+				# 	uu=1
+				# else:
+				# 	if ( (current_slot.transmitted and not current_slot.transmit_success) or \
+				# 					(not current_slot.transmitted and not( current_slot.transmit_other or current_slot.bad_reception)) ):
+				# 		z = 1.0 - p_curr;
+				# 		uu=0;
+				if (not current_slot.channel_busy):
+					z = p_curr
+				else :
+					z = 1-p_curr
+
+			#evaluate protocols weights
 			for p in range(suite.num_protocols) :
 				# d is the decision of this component protocol - between 0 and 1
-#				d = suite.protocols[p].emulator(suite->protocols[p].parameter,
-#					current_slot.slot_num, suite->slot_offset, suite->last_slot);
+				# d = suite.protocols[p].emulator(suite->protocols[p].parameter,
+				# 	current_slot.slot_num, suite->slot_offset, suite->last_slot);
 
-				d = tdma_emulate(suite.protocols[p].parameter, current_slot.slot_num, suite.slot_offset)
+				if (suite.protocols[p].emulator == b'tdma') :
+					d = tdma_emulate(suite.protocols[p].parameter, current_slot.slot_num, suite.slot_offset)
+				else :
+					d = aloha_emulate(suite.protocols[p].parameter, current_slot.slot_num, suite.slot_offset)
 
-#				stdout.write("[%d] d=%e, z=%e \n" % (p, d, z,))
+				# stdout.write("[%d] d=%e, z=%e \n" % (p, d, z,))
 
+				#evaluate weight
 				exponent = suite.eta * math.fabs(d - z)
 				suite.weights[p] *= math.exp(-exponent)
 
 				if suite.weights[p]<0.01:
 					suite.weights[p]=0.01
 
-
-
-			#Normalize the weights
+			# Normalize the weights
 			s = 0
 			for p in range(suite.num_protocols):
 				s += suite.weights[p]
 			for p in range(suite.num_protocols):
 				suite.weights[p] /= s
 
-
-#			for p in range(suite.num_protocols):
-#				stdout.write("%5.3f\n" % (suite.weights[p]))
+			# for p in range(suite.num_protocols):
+			# 	stdout.write("%5.3f\n" % (suite.weights[p]))
 
 		suite.last_slot = current_slot
 
-	socket_visualizer = None
+	#socket iperf pointer
+	iperf_socket = None
 
-	def socket_visualizer():
-		global socket_visualizer
-		port = "8300"
-
-		print('start socket visualizer')
-
+	def rcv_from_iperf_socket(iperf_througputh):
+		iperf_thread = threading.currentThread()
+		print('start socket iperf')
+		iperf_port = "8301"
+		iperf_server_ip_address = "10.8.8.102"
 		context = zmq.Context()
-		socket_visualizer = context.socket(zmq.REQ)
-		#socket_visualizer.connect("tcp://localhost:%s" % port)
-		socket_visualizer.connect("tcp://10.8.8.6:%s" % port)
+		iperf_socket = context.socket(zmq.SUB)
+		print("tcp://%s:%s" % (iperf_server_ip_address, iperf_port))
+		iperf_socket.connect("tcp://%s:%s" % (iperf_server_ip_address, iperf_port))
+		iperf_socket.setsockopt_string(zmq.SUBSCRIBE, '')
 
-	#MAIN PROGRAM
+		print('socket iperf started')
+		while getattr(iperf_thread, "do_run", True):
+			parsed_json = iperf_socket.recv_json()
+			print('my address %s - parsed_json : %s' % (str(wlan_ip_address), str(parsed_json)))
+			rcv_ip_address = parsed_json['ip_address']
+			if rcv_ip_address == wlan_ip_address:
+				print('parsed_json : %s' % str(parsed_json))
+				iperf_througputh[0] = float(parsed_json['throughput'])
 
-	# control loop
-    # print("Local ctrl program started: {}".format(controller.name))
-    # while not controller.is_stopped():
-    #     msg = controller.recv(timeout=1)
-    #     if msg:
-    #         ch = msg["new_channel"]
-    #         print("Schedule get monitor to {} in 5s:".format(ch))
-    #         UPI_myargs = {'interface' : 'wlan0', 'measurements' : [UPI_R.REGISTER_1, UPI_R.REGISTER_2, UPI_R.NUM_TX_DATA_FRAME, UPI_R.NUM_RX_ACK, UPI_R.NUM_RX_ACK_RAMATCH, UPI_R.BUSY_TYME , UPI_R.TSF, UPI_R.NUM_RX_MATCH] }
-    #         result = controller.delay(5).radio.get_monitor(UPI_myargs)
-    #         controller.send_upstream({"myResult": result})
 
-	if len(sys.argv) < 2:
-		sys.exit('Usage: %s eta_value' % sys.argv[0])
+	"""				************				"""
+	"""				MAIN PROGRAM				"""
+	"""				************				"""
+
+	log = logging.getLogger()
+	log.info('*********** WISHFUL SC4 *************')
+	log.info('*********** starting local WiSHFUL controller **********************')
 
 	suite = protocol_suite()
-	num_protocols = 4
-	#eta = 0.5
-	eta = float(sys.argv[1])
-	print('eta = %f' % eta)
-
-	#SET-UP socket visualizer to send information to demo visualizer
-	#socket_visualizer()
-
+	num_protocols = 5
+	eta = 0.5
 	protocols = [protocol() for i in range(num_protocols)]
+
+	#eta = float(arg)
+	log.info('eta = %f' % eta)
 
 	#setting TDMA 1 protocol
 	protocols[0].id = 1
@@ -659,7 +604,7 @@ def my_local_control_program(controller):
 
 	#setting TDMA 3 protocol
 	protocols[2].id = 3
-	protocols[2].name = b'TDMA  (slot 3)'
+	protocols[2].name = b'TDMA  (slot 2)'
 	protocols[2].fsm_path = b'tdma-4.txt'
 	protocols[2].fsm_params[0].num = 12
 	protocols[2].fsm_params[0].value = 4
@@ -672,7 +617,7 @@ def my_local_control_program(controller):
 
 	#setting TDMA 4 protocol
 	protocols[3].id = 4
-	protocols[3].name = b'TDMA  (slot 4)'
+	protocols[3].name = b'TDMA  (slot 3)'
 	protocols[3].fsm_path = b'tdma-4.txt'
 	protocols[3].fsm_params[0].num = 12
 	protocols[3].fsm_params[0].value = 4
@@ -696,23 +641,28 @@ def my_local_control_program(controller):
 	#protocols suite INIT VALUES
 	suite.num_protocols = num_protocols
 
-	#number of current active protocol from protocol structure
-	suite.active_protocol = 1
-
-	#number of protocol present in the specified slot
-	suite.slots[0] = 1
-	suite.slots[1] = 1
-
 	#number of current active slot
-	suite.active_slot = 1
+	suite.active_slot = 0
+	#number of current active protocol from protocol structure
+	suite.active_protocol = 4
+	#number of protocol present in the specified slot
+	suite.slots[0] = 4
+	suite.slots[1] = 0
 
 	suite.slot_offset = 0
 
+	#TDMA 1
 	suite.protocols[0] = protocols[0]
+	#TDMA 2
 	suite.protocols[1] = protocols[1]
+	#TDMA 3
 	suite.protocols[2] = protocols[2]
+	#TDMA 4
 	suite.protocols[3] = protocols[3]
-	for p in range(4) :
+	#ALOHA
+	suite.protocols[4] = protocols[4]
+
+	for p in range(num_protocols) :
 		suite.weights[p] = 1.0 / num_protocols
 
 	suite.eta = eta
@@ -722,24 +672,21 @@ def my_local_control_program(controller):
 	suite.last_slot.channel_busy = 0
 	suite.cycle = 0
 
-	story_channel = [] # [ metamac_slot() ]
-	global story_file
-	global reading_thread
-	# slots = [ metamac_slot() for i in range(8)]
-	# story_channel.append(slots[0])
-	# share_queue = Queue()
+	interface = 'wlan0'
+	wlan_ip_address = controller.net.get_iface_ip_addr(interface)
+	wlan_ip_address = wlan_ip_address[0]
 
+	story_channel = []
 	reading_thread = threading.Thread(target=acquire_slots_channel, args=(story_channel,))
 	reading_thread.start()
-	# p = Process(target=acquire_slots_channel, args=(share_queue,))
-	# p.start()
-	#p.join()
+
+	iperf_througputh = []
+	iperf_througputh.append(0.0)
+	iperf_thread = threading.Thread(target=rcv_from_iperf_socket, args=(iperf_througputh,))
+	iperf_thread.start()
 
 	time.sleep(2)
 
-
-	b43_phy = None
-	b43 = B43(b43_phy)
 
 	story_file = open("story.csv", "w")
 	story_file.write("slot_num, read_num, host_time, tsf_time, slot_index, slots_passed, \
@@ -747,15 +694,19 @@ def my_local_control_program(controller):
 	 bad_reception, busy_slot, channel_busy \n")
 
 	story_channel_len = 0
-	# metamac control loop
-	# while not controller.is_stopped() :
-	# 	msg = controller.recv(timeout=1)
 
-	#metamac_loop_break = 0
 	last_update_time = monotonic_time()
 	loop = 0
 
-	while True: #(metamac_loop_break == 0)
+	print("Local ctrl program started: {}".format(controller.name))
+	# metamac control loop
+	while not controller.is_stopped():
+
+
+		msg = controller.recv(timeout=1)
+		# if msg:
+		# 	print("Receive message %s" % str(msg))
+
 		#print("Main thread")
 		time.sleep(0.1)
 
@@ -770,22 +721,19 @@ def my_local_control_program(controller):
 
 		#store channel evolution on file
 		if story_channel_len_diff > 0 :
-		#
-        # 	# struct metamac_slot slots[16];
-        # 	# size_t count = queue_multipop(queue, slots, ARRAY_SIZE(slots));
-        #
-			queue_multipush(story_channel, story_file, story_channel_len, story_channel_len_diff)
+
+			if FLAG_LOG_FILE:
+				queue_multipush(story_channel, story_file, story_channel_len, story_channel_len_diff)
 
 			for i in range((story_channel_len - story_channel_len_diff), story_channel_len ):
 				#print('\n\n i %d -story_channel len %d - diff %d - last slot num %d' % (i, story_channel_len, story_channel_len_diff, story_channel[story_channel_len-1].slot_num))
 				update_weights(suite, story_channel[i], i)
 
-
 		#Update running protocol
-		#if (!(flags & FLAG_READONLY)) :
 		if (not FLAG_READONLY):
-			metamac_evaluate(b43, suite)
+			metamac_evaluate(suite)
 
+		#Print protocols weights
 		if FLAG_VERBOSE :
 			current_time =  monotonic_time() #(timespec)
 			timediff = (current_time.tv_sec - last_update_time.tv_sec) * 1000000 + (current_time.tv_nsec - last_update_time.tv_nsec) / 1000
@@ -795,7 +743,18 @@ def my_local_control_program(controller):
 				loop+=1
 				last_update_time = current_time
 
+		#Send information to global controller
+		# TIME (seconds) - ACTIVE_PROTOCOL - THR_STATION
+		current_time =  monotonic_time() #(timespec)
+		controller.send_upstream({ "measure" : [[current_time.tv_sec, suite.active_protocol, iperf_througputh[0]]], "wlan_ip_address" : (wlan_ip_address) })
 
-# if __name__ == "__main__":
-# 	my_local_control_program()
+
+	print("Local ctrl program stopping: {}".format(controller.name))
+	story_file.close()
+	reading_thread.do_run = False
+	reading_thread.join()
+	iperf_thread.do_run = False
+	iperf_thread.join()
+	time.sleep(2)
+
 
