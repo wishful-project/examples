@@ -125,7 +125,8 @@ def main(args):
     log.info(ret)
     ret = taisc_manager.update_macconfiguration({'IEEE802154e_macSlotframeSize': len(receiver_sender_pairs) + 1})
     log.info(ret)
-    ret = app_manager.update_configuration({"RIME_exampleUnicastSendIntervalBoundaries": (16,32)})
+    #ret = app_manager.update_configuration({"RIME_exampleUnicastSendIntervalBoundaries": (1,16)})
+    ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": 16})
     log.info(ret)
     for pair in receiver_sender_pairs:
         ret = app_manager.update_configuration({"RIME_exampleUnicastReceiver": pair[0]},pair)
