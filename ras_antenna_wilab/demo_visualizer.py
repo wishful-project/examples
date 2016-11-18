@@ -25,13 +25,13 @@ MAX_STA2_CONFIGURATION = MAX_DRAW_LINE
 MAX_STA3_CONFIGURATION = MAX_DRAW_LINE
 MAX_STA4_CONFIGURATION = MAX_DRAW_LINE
 
-MAX_DRAW_LINE = 50
+MAX_DRAW_LINE = 25000
 MAX_STA1_THR = MAX_DRAW_LINE
 MAX_STA2_THR = MAX_DRAW_LINE
 MAX_STA3_THR = MAX_DRAW_LINE
 MAX_STA4_THR = MAX_DRAW_LINE
 
-MAX_DRAW_LINE = 100
+MAX_DRAW_LINE = 80
 MAX_STA1_PWR = MAX_DRAW_LINE
 MAX_STA2_PWR = MAX_DRAW_LINE
 MAX_STA3_PWR = MAX_DRAW_LINE
@@ -256,8 +256,8 @@ def main():
                 #
 				screen.blit(font.render("RAS CONF : " + str(stations_dump[2][3]) + "", 1, WITHE_COLOR), (400, screen.get_height()-20))
 				# screen.blit(font.render("CONFIGURATION station 4 : " + str(stations_dump[3][3]) + "", 1, BLUE_COLOR), (400, screen.get_height()-40))
-				screen.blit(font.render("STATION THR : " + str(stations_dump[0][2]) + "Mbps", 1, RED_COLOR), (600, screen.get_height()-20))
-				screen.blit(font.render("STATION PWR : -" + str(stations_dump[1][4]) + "dBm", 1, YELLOW_COLOR), (900, screen.get_height()-20))
+				screen.blit(font.render("STATION THR : " + str(stations_dump[0][2]) + "Kbps", 1, RED_COLOR), (600, screen.get_height()-20))
+				screen.blit(font.render("STATION PWR : -" + str(stations_dump[0][4]) + "dBm", 1, YELLOW_COLOR), (900, screen.get_height()-20))
 
 
 				#PRINT IMAGES
@@ -290,8 +290,8 @@ def main():
 				#screen.blit(font1.render("RAS CONFIGURATION " + str(MAX_STA1_CONFIGURATION  - ((MAX_STA1_CONFIGURATION/(NUM_CONFIGURATION+1))*9) ) , 1, WITHE_COLOR), (screen.get_width() - 400, screen.get_height()/(NUM_CONFIGURATION+1)*9-20+OFFSET))
 				#pygame.draw.line(screen, GRID_COLOR, (5, (screen.get_height()/(NUM_CONFIGURATION+1)*9)+OFFSET), (screen.get_width()-(NUM_CONFIGURATION+1), (screen.get_height()/(NUM_CONFIGURATION+1)*9)+OFFSET))
 
-				screen.blit(font1.render(str(MAX_STA1_THR  - (MAX_STA1_THR/2)) + "Mbps" , 1, RED_COLOR), (screen.get_width() - 400, (screen.get_height()/2) -20 + OFFSET))
-				screen.blit(font1.render("-" + str(MAX_STA1_PWR  - (MAX_STA1_PWR/2)) + "dBm", 1, YELLOW_COLOR), (screen.get_width() - 200, (screen.get_height()/2) -20 + OFFSET))
+				screen.blit(font1.render(str(MAX_STA1_THR  - (MAX_STA1_THR/2)) + "Kbps" , 1, RED_COLOR), (screen.get_width() - 400, (screen.get_height()/2) -20 + OFFSET))
+				screen.blit(font1.render("-" + str(MAX_STA1_PWR  - (MAX_STA1_PWR/2) ) + "dBm", 1, YELLOW_COLOR), (screen.get_width() - 200, (screen.get_height()/2) -20 + OFFSET))
 				pygame.draw.line(screen, WITHE_COLOR, (5, (screen.get_height()/2)+OFFSET), (screen.get_width(), (screen.get_height()/2)+OFFSET))
 
 
@@ -302,7 +302,7 @@ def main():
 
 				pygame.draw.lines(screen, RED_COLOR, False, normalizePoints(STA1_THR), 5)
 
-				pygame.draw.lines(screen, YELLOW_COLOR, False, normalizePoints(STA2_PWR), 5)
+				pygame.draw.lines(screen, YELLOW_COLOR, False, normalizePoints(STA1_PWR), 5)
 
 
 				pygame.display.update()
@@ -313,39 +313,63 @@ def main():
 
 
 def ho_event(x):
+
+
+
+
 	global ZMQ_PORT
-	context = zmq.Context()
-	port1  = 8300
 	# Socket to talk to server
 	context = zmq.Context()
-	socket_zmq = context.socket(zmq.SUB)
-	socket_zmq.connect ("tcp://localhost:%s" % port1)
-	socket_zmq.setsockopt(zmq.SUBSCRIBE, '')
+	port1 = 8300
+	socket_zmq1 = context.socket(zmq.SUB)
+	socket_zmq1.connect ("tcp://localhost:%s" % port1)
+	socket_zmq1.setsockopt(zmq.SUBSCRIBE, '')
+	port2 = 8301
+	socket_zmq2 = context.socket(zmq.SUB)
+	socket_zmq2.connect ("tcp://localhost:%s" % port2)
+	socket_zmq2.setsockopt(zmq.SUBSCRIBE, '')
+	port3 = 8302
+	socket_zmq3 = context.socket(zmq.SUB)
+	socket_zmq3.connect ("tcp://localhost:%s" % port3)
+	socket_zmq3.setsockopt(zmq.SUBSCRIBE, '')
 
-	print('Server started wait for messages')
+	poller = zmq.Poller()
+	poller.register(socket_zmq1, flags=zmq.POLLIN)
+	poller.register(socket_zmq2, flags=zmq.POLLIN)
+	poller.register(socket_zmq3, flags=zmq.POLLIN)
 
+	print('Server started wait for messages (polling)')
 	while True:
-		parsed_json = socket_zmq.recv_json()
-		print('parsed_json : %s' % str(parsed_json))
+		#print('polling')
+		socket_list = poller.poll(1000)
+		if socket_list:
+			for socket_info in socket_list:
+				if socket_info[1] == zmq.POLLIN:
+					parsed_json = socket_info[0].recv_json()
+					# print('parsed_json : %s' % str(parsed_json))
 
-		remote_ipAddress = parsed_json['node_ip_address']
-		len_station_dump = len(stations_dump)
+					remote_ipAddress = parsed_json['node_ip_address']
+					len_station_dump = len(stations_dump)
 
-		# add measurement on nodes element
-		for i in range(0,len_station_dump):
-			#print 'stations_dump[i][0] (%s) == remote_wlan_ipAddress (%s)' % (str(stations_dump[i][0]), str(remote_ipAddress) )
-			if stations_dump[i][0] == remote_ipAddress :
-				#parsed_json : {u'throughput': u'27.4 Mbits/sec', u'node_ip_address': u'10.11.16.104'}
-				if 'throughput' in parsed_json:
-					end_thr = parsed_json['throughput'].find('Mbits/sec')
-					thr = parsed_json['throughput'][0:end_thr-1]
-					stations_dump[i][2] = float(thr)	#active CONFIGURATION
-				if 'ras_configuration' in parsed_json:
-					stations_dump[i][3] = float(parsed_json['ras_configuration'])
-				#parsed_json : {u'avg_power': -72.64256619144602, u'num': 982, u'node_ip_address': u'10.11.16.130'}
-				if 'avg_power' in parsed_json:
-					stations_dump[i][4] = float(parsed_json['avg_power'])*-1
+					# add measurement on nodes element
+					for i in range(0,len_station_dump):
+						#print 'stations_dump[i][0] (%s) == remote_wlan_ipAddress (%s)' % (str(stations_dump[i][0]), str(remote_ipAddress) )
+						if stations_dump[i][0] == remote_ipAddress :
+							#parsed_json : {u'throughput': 7867.0, u'node_ip_address': u'10.11.16.126', u'delta': 1.0}
+							if 'throughput' in parsed_json:
+								delta = parsed_json['delta']
+								# end_thr = parsed_json['throughput'].find('Mbits/sec')
+								# thr = parsed_json['throughput'][0:end_thr-1]
+								#stations_dump[i][2] = float(thr)	#active CONFIGURATION
+								stations_dump[i][2] = float(parsed_json['throughput'])	#active CONFIGURATION
 
+							#parsed_json : {u'ras_configuration': 8, u'node_ip_address': u'10.11.16.108'}
+							if 'ras_configuration' in parsed_json:
+								stations_dump[i][3] = float(parsed_json['ras_configuration'])
+
+							#parsed_json : {u'avgpower': -72.47540983606558, u'node_ip_address': u'10.11.16.126'}
+							if 'avg_power' in parsed_json:
+								stations_dump[i][4] = (float(parsed_json['avg_power'])*-1)
 
 
 start_new_thread(ho_event,(99,))

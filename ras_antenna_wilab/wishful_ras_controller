@@ -24,10 +24,17 @@ Other options:
 """
 DEMO visualizer START
 
+    #to get configuration
     ssh -L 8300:"pc controlle node":8300 dgarlisi@ops.wilab2.ilabt.iminds.be -v
-
     eg. ssh -L 8300:apuN4:8300 dgarlisi@ops.wilab2.ilabt.iminds.be -v
 
+    #to get thr
+    ssh -L 8301:"ap node":8301 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+    eg. ssh -L 8301:apuT1:8301 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+
+    #to get power
+    ssh -L 8302:"ap node":8302 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+    eg. ssh -L 8302:apuT1:8302 dgarlisi@ops.wilab2.ilabt.iminds.be -v
 
     on local pc
         python demo_visualizer.py
@@ -100,12 +107,12 @@ controller_PC_name = "apuN4"
 controller_PC_ip_address = "10.11.16.104"
 controller_PC_interface = "eth0"
 
-# AP1
+# AP1 set in monitor on channel 40
 ap1_name = "apuT1"
 ap1_ip = "10.11.16.126"
 ap1_wlan_interface = "wlan0"
 
-# STA1
+# STA1 set in monitor on channel 40
 sta1_name = "apu04"
 sta1_ip = "10.11.16.108"
 sta1_wlan_interface = "wlan0"
@@ -122,7 +129,7 @@ sta2_wlan_interface = "wlan0"
 
 
 #Nodes number
-nodes_number=4
+nodes_number=2
 ap_wlan_interface = "wlan0"
 sta_wlan_interface = "wlan0"
 
@@ -329,12 +336,9 @@ def main(args):
                         ap1_node = nodes[ii]
                     if nodes[ii].ip == sta1_ip:
                         sta1_node = nodes[ii]
-                    if nodes[ii].ip == ap2_ip:
-                        ap2_node = nodes[ii]
-                    if nodes[ii].ip == sta2_ip:
-                        sta2_node = nodes[ii]
 
-            if ap1_node == None and sta1_node == None and ap2_node == None and sta2_node == None:
+            # GRINGO we should exit when at least one is not fount! change
+            if ap1_node == None and sta1_node == None:
                 print("Experiment nodes found, however the reported ip address do not match, please check the setting ip address, the interface and the group name")
                 break
 
@@ -358,7 +362,22 @@ def main(args):
             ant1_configuration = 0
             ant2_configuration = 0
 
-            mon_dev = "wlan0"
+            mon_dev = "fish0"
+            log.info('(2) sniff traffic at %s' % str(ap1_node.ip))
+            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=2)
+            forever = 8000
+            controller.exec_time(exec_time).callback(csResultCollector2).node(ap1_node).net.sniff_layer2_traffic(mon_dev, forever, '192.168.3.' + str(ap1_node.ip[9:12]), '192.168.3.' + str(sta1_node.ip[9:12]))
+
+            log.info('(3) single server at %s' % str(ap1_node.ip))
+            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=2)
+            controller.exec_time(exec_time).callback(csResultCollector3).nodes(ap1_node).net.create_packetflow_sink('5001')
+
+            log.info('(4) start server at %s' % str(sta1_node.ip))
+            exec_time = datetime.datetime.now() + datetime.timedelta(seconds=4)
+            controller.exec_time(exec_time).callback(csResultCollector4).node(sta1_node).net.start_packetflow( '192.168.3.'+str(ap1_node.ip[9:12]), '5001', str(forever))
+
+            gevent.sleep(8)
+
             for ii in range(0,9):
 
                 #change antenna configuration
@@ -366,36 +385,14 @@ def main(args):
                 controller.blocking(True).node(sta1_node).radio.set_sas_conf(5, ant1_configuration, ant2_configuration, 0, 0)
 
                 configuration_message_for_visualizzer['ras_configuration'] = ant1_configuration
-                # send_socket_visualizer(configuration_message_for_visualizzer, sta1_node.ip)
+                send_socket_visualizer(configuration_message_for_visualizzer, sta1_node.ip)
 
-
-                """ MONITOR MODE STATIONS"""
-                log.info('(1) sniff traffic at %s' % str(sta2_node.ip))
-                exec_time = datetime.datetime.now() + datetime.timedelta(seconds=2)
-                controller.exec_time(exec_time).callback(csResultCollector1).node(sta2_node).net.sniff_layer2_traffic(mon_dev, 8, '192.168.3.' + str(ap1_node.ip[9:12]), '192.168.3.' + str(sta1_node.ip[9:12]))
-                #
-                log.info('(2) sniff traffic at %s' % str(ap2_node.ip))
-                controller.exec_time(exec_time).callback(csResultCollector2).node(ap2_node).net.sniff_layer2_traffic(mon_dev, 8, '192.168.3.' + str(ap1_node.ip[9:12]), '192.168.3.' + str(sta1_node.ip[9:12]))
-
-
-                """ INFRASTRUCTURE MODE STATIONS"""
-                log.info('(3) single server at %s' % str(ap1_node.ip))
-                exec_time = datetime.datetime.now() + datetime.timedelta(seconds=2)
-                controller.exec_time(exec_time).callback(csResultCollector3).nodes(ap1_node).net.create_packetflow_sink('5001')
-                #
-                log.info('(4) start server at %s' % str(sta1_node.ip))
-                exec_time = datetime.datetime.now() + datetime.timedelta(seconds=4)
-                controller.exec_time(exec_time).callback(csResultCollector4).node(sta1_node).net.start_packetflow( '192.168.3.'+str(ap1_node.ip[9:12]), '5001', '5')
-
-                gevent.sleep(12)
+                gevent.sleep(5)
 
                 ant1_configuration += 1
                 ant2_configuration += 1
 
-
-
             break
-
 
 
 if __name__ == "__main__":
