@@ -32,6 +32,15 @@ Iris/WiSHFUL controller) can be loaded and run inside of Iris with the command
 
 <code>./start_iris</code>
 
+Before starting Iris, remember that you need to download a valid TS file that can
+be used as modulator input. For this example scenario, you can download the following file
+
+<code>wget http://dante.diei.unipg.it/~baruffa/WiSHFUL/HD3_64Q3414_22394118bps.ts</code>
+
+and rename it as
+
+<code>mv HD3_64Q3414_22394118bps.ts hd3typ.ts</code>
+
 The output of Iris now will contain also the pings emitted by the Iris
 controller in charge of talking with the WiSHFUL framework
 
