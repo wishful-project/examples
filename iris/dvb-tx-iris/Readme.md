@@ -27,11 +27,6 @@ In another terminal one can start the slave/agent, with the following commands
 <code>cd examples/iris/dvb-tx-iris</code>  
 <code>./start_agent.sh</code>
 
-Finally, the Iris radio configuration XML file (with the specialized
-Iris/WiSHFUL controller) can be loaded and run inside of Iris with the command
-
-<code>./start_iris</code>
-
 Before starting Iris, remember that you need to download a valid TS file that can
 be used as modulator input. For this example scenario, you can download the following file
 
@@ -40,6 +35,12 @@ be used as modulator input. For this example scenario, you can download the foll
 and rename it as
 
 <code>mv HD3_64Q3414_22394118bps.ts hd3typ.ts</code>
+
+Finally, the Iris radio configuration XML file (with the specialized
+Iris/WiSHFUL controller) can be loaded and run inside of Iris with the command
+
+<code>./start_iris</code>
+
 
 The output of Iris now will contain also the pings emitted by the Iris
 controller in charge of talking with the WiSHFUL framework
