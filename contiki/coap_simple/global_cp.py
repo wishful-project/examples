@@ -13,7 +13,7 @@ Options:
 
 Example:
    python global_cp.py --config config/localhost/global_cp_config.yaml
-
+   
 Other options:
    -h, --help          show this help message and exit
    -q, --quiet         print less text
@@ -57,10 +57,11 @@ if __name__ == "__main__":
     logfile = None
     if args['--logfile']:
         logfile = args['--logfile']
-    logging.basicConfig(filename=logfile, level=log_level,format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
-    
+    logging.basicConfig(filename=logfile, level=log_level, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
     controller = wishful_controller.Controller()
     nodes = []
+
     @controller.new_node_callback()
     def new_node(node):
         nodes.append(node)
@@ -75,7 +76,7 @@ if __name__ == "__main__":
 
         controller.load_config(config)
         controller.start()
-        
+
         while True:
             gevent.sleep(10)
             print("\n")
