@@ -1,0 +1,4 @@
+"unique_name","unique_id","format","endianness"
+"WRITE_ATTRIBUTE",0,"UINT8:UINT16_LE;OPAQUE",""
+"READ_ATTRIBUTE",1,"OPAQUE:UINT16_LE",""
+"SUBSCRIBE_ATTRIBUTE",2,"UINT8:UINT16_LE;UINT32_LE",""
