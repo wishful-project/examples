@@ -1,0 +1,1010 @@
+2016-Nov-19 12:15:22.275199 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Nov-19 12:15:22.275880 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Nov-19 12:15:22.275934 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Nov-19 12:15:22.275964 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Nov-19 12:15:22.276011 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Nov-19 12:15:22.276039 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Nov-19 12:15:22.276080 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Nov-19 12:15:22.276105 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Nov-19 12:15:22.276146 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Nov-19 12:15:22.276172 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Nov-19 12:15:22.276210 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Nov-19 12:15:22.276237 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Nov-19 12:15:22.276280 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Nov-19 12:15:22.276313 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Nov-19 12:15:22.276352 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Nov-19 12:15:22.276380 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Nov-19 12:15:22.276422 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Nov-19 12:15:22.276450 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Nov-19 12:15:22.276489 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Nov-19 12:15:22.276515 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Nov-19 12:15:22.276571 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Nov-19 12:15:22.276600 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Nov-19 12:15:22.276655 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Nov-19 12:15:22.276700 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Nov-19 12:15:22.276797 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Nov-19 12:15:22.276846 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Nov-19 12:15:22.276902 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Nov-19 12:15:22.276930 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Nov-19 12:15:22.276973 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Nov-19 12:15:22.277001 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Nov-19 12:15:22.277065 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Nov-19 12:15:22.277098 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Nov-19 12:15:22.277135 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Nov-19 12:15:22.277168 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Nov-19 12:15:22.277201 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Nov-19 12:15:22.277234 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Nov-19 12:15:22.277266 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Nov-19 12:15:22.277297 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Nov-19 12:15:22.277326 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Nov-19 12:15:22.277363 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Nov-19 12:15:22.277393 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Nov-19 12:15:22.277424 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Nov-19 12:15:22.277452 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Nov-19 12:15:22.284032 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Nov-19 12:15:22.284207 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Nov-19 12:20:52.364584 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Nov-19 12:20:52.365035 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Nov-19 12:20:52.365072 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Nov-19 12:20:52.365103 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Nov-19 12:20:52.365160 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Nov-19 12:20:52.365193 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Nov-19 12:20:52.365238 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Nov-19 12:20:52.365267 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Nov-19 12:20:52.365305 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Nov-19 12:20:52.365334 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Nov-19 12:20:52.365373 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Nov-19 12:20:52.365400 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Nov-19 12:20:52.365445 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Nov-19 12:20:52.365479 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Nov-19 12:20:52.365519 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Nov-19 12:20:52.365548 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Nov-19 12:20:52.365592 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Nov-19 12:20:52.365619 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Nov-19 12:20:52.365660 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Nov-19 12:20:52.365684 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Nov-19 12:20:52.365730 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Nov-19 12:20:52.365752 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Nov-19 12:20:52.365808 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Nov-19 12:20:52.365841 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Nov-19 12:20:52.365892 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Nov-19 12:20:52.365923 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Nov-19 12:20:52.365974 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Nov-19 12:20:52.366005 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Nov-19 12:20:52.366052 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Nov-19 12:20:52.366084 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Nov-19 12:20:52.366153 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Nov-19 12:20:52.366192 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Nov-19 12:20:52.366235 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Nov-19 12:20:52.366274 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Nov-19 12:20:52.366311 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Nov-19 12:20:52.366352 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Nov-19 12:20:52.366388 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Nov-19 12:20:52.366421 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Nov-19 12:20:52.366451 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Nov-19 12:20:52.366492 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Nov-19 12:20:52.366520 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Nov-19 12:20:52.366545 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Nov-19 12:20:52.366578 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Nov-19 12:20:52.372028 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Nov-19 12:20:52.372180 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Nov-19 12:22:52.243924 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Nov-19 12:22:52.244742 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Nov-19 12:22:52.244794 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Nov-19 12:22:52.244872 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Nov-19 12:22:52.244968 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Nov-19 12:22:52.245002 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Nov-19 12:22:52.245048 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Nov-19 12:22:52.245088 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Nov-19 12:22:52.245126 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Nov-19 12:22:52.245154 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Nov-19 12:22:52.245189 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Nov-19 12:22:52.245217 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Nov-19 12:22:52.245258 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Nov-19 12:22:52.245290 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Nov-19 12:22:52.245326 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Nov-19 12:22:52.245353 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Nov-19 12:22:52.245392 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Nov-19 12:22:52.245419 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Nov-19 12:22:52.245456 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Nov-19 12:22:52.245482 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Nov-19 12:22:52.245534 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Nov-19 12:22:52.245563 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Nov-19 12:22:52.245614 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Nov-19 12:22:52.245641 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Nov-19 12:22:52.245684 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Nov-19 12:22:52.245711 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Nov-19 12:22:52.245766 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Nov-19 12:22:52.245795 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Nov-19 12:22:52.245835 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Nov-19 12:22:52.245861 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Nov-19 12:22:52.245920 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Nov-19 12:22:52.245952 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Nov-19 12:22:52.245987 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Nov-19 12:22:52.246018 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Nov-19 12:22:52.246047 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Nov-19 12:22:52.246081 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Nov-19 12:22:52.246112 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Nov-19 12:22:52.246141 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Nov-19 12:22:52.246170 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Nov-19 12:22:52.246205 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Nov-19 12:22:52.246234 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Nov-19 12:22:52.246262 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Nov-19 12:22:52.246290 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Nov-19 12:22:52.766512 [INFO]    dvbt1interpolator1: Original sampling rate: 9.14286e+06 sps
+2016-Nov-19 12:22:52.766567 [INFO]    dvbt1interpolator1: Effective sampling rate (x175/128): 1.25e+07 sps
+2016-Nov-19 12:22:52.767559 [INFO]    dvbt1filter1: Symmetric filter, 23 taps
+2016-Nov-19 12:22:52.777828 [INFO]    usrptx1: Creating the usrp device with args: addr=192.168.10.3
+2016-Nov-19 12:22:52.979522 [FATAL]   System: Error loading radio: LookupError: KeyError: No devices found for ----->
+Device Address:
+    addr: 192.168.10.3
+
+2016-Nov-19 12:30:32.627997 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Nov-19 12:30:32.628861 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Nov-19 12:30:32.628919 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Nov-19 12:30:32.628965 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Nov-19 12:30:32.629019 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Nov-19 12:30:32.629049 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Nov-19 12:30:32.629132 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Nov-19 12:30:32.629166 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Nov-19 12:30:32.629223 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Nov-19 12:30:32.629292 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Nov-19 12:30:32.629363 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Nov-19 12:30:32.629418 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Nov-19 12:30:32.629502 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Nov-19 12:30:32.629566 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Nov-19 12:30:32.629651 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Nov-19 12:30:32.629721 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Nov-19 12:30:32.629798 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Nov-19 12:30:32.629861 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Nov-19 12:30:32.629895 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Nov-19 12:30:32.629942 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Nov-19 12:30:32.630044 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Nov-19 12:30:32.630113 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Nov-19 12:30:32.630210 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Nov-19 12:30:32.630276 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Nov-19 12:30:32.630363 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Nov-19 12:30:32.630429 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Nov-19 12:30:32.630520 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Nov-19 12:30:32.630584 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Nov-19 12:30:32.630669 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Nov-19 12:30:32.630734 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Nov-19 12:30:32.630890 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Nov-19 12:30:32.630939 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Nov-19 12:30:32.630982 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Nov-19 12:30:32.631019 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Nov-19 12:30:32.631057 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Nov-19 12:30:32.631096 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Nov-19 12:30:32.631135 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Nov-19 12:30:32.631170 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Nov-19 12:30:32.631205 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Nov-19 12:30:32.631248 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Nov-19 12:30:32.631284 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Nov-19 12:30:32.631320 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Nov-19 12:30:32.631367 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Nov-19 12:30:33.145910 [INFO]    dvbt1interpolator1: Original sampling rate: 9.14286e+06 sps
+2016-Nov-19 12:30:33.145964 [INFO]    dvbt1interpolator1: Effective sampling rate (x175/128): 1.25e+07 sps
+2016-Nov-19 12:30:33.146974 [INFO]    dvbt1filter1: Symmetric filter, 23 taps
+2016-Nov-19 12:30:33.157310 [INFO]    usrptx1: Creating the usrp device with args: addr=192.168.10.3
+2016-Nov-19 12:30:33.358985 [FATAL]   System: Error loading radio: LookupError: KeyError: No devices found for ----->
+Device Address:
+    addr: 192.168.10.3
+
+2016-Nov-19 12:34:46.690674 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Nov-19 12:34:46.691599 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Nov-19 12:34:46.691659 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Nov-19 12:34:46.691721 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Nov-19 12:34:46.691803 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Nov-19 12:34:46.691835 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Nov-19 12:34:46.691878 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Nov-19 12:34:46.691905 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Nov-19 12:34:46.691951 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Nov-19 12:34:46.691981 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Nov-19 12:34:46.692019 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Nov-19 12:34:46.692047 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Nov-19 12:34:46.692091 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Nov-19 12:34:46.692125 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Nov-19 12:34:46.692164 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Nov-19 12:34:46.692193 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Nov-19 12:34:46.692236 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Nov-19 12:34:46.692264 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Nov-19 12:34:46.692305 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Nov-19 12:34:46.692332 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Nov-19 12:34:46.692388 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Nov-19 12:34:46.692418 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Nov-19 12:34:46.692478 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Nov-19 12:34:46.692512 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Nov-19 12:34:46.692559 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Nov-19 12:34:46.692588 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Nov-19 12:34:46.692637 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Nov-19 12:34:46.692665 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Nov-19 12:34:46.692709 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Nov-19 12:34:46.692737 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Nov-19 12:34:46.692799 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Nov-19 12:34:46.692834 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Nov-19 12:34:46.692872 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Nov-19 12:34:46.692904 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Nov-19 12:34:46.692934 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Nov-19 12:34:46.692969 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Nov-19 12:34:46.693000 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Nov-19 12:34:46.693031 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Nov-19 12:34:46.693075 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Nov-19 12:34:46.693113 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Nov-19 12:34:46.693143 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Nov-19 12:34:46.693173 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Nov-19 12:34:46.693201 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Nov-19 12:34:47.207567 [INFO]    dvbt1interpolator1: Original sampling rate: 9.14286e+06 sps
+2016-Nov-19 12:34:47.207625 [INFO]    dvbt1interpolator1: Effective sampling rate (x175/128): 1.25e+07 sps
+2016-Nov-19 12:34:47.208628 [INFO]    dvbt1filter1: Symmetric filter, 23 taps
+2016-Nov-19 12:34:47.218603 [INFO]    usrptx1: Creating the usrp device with args: addr=192.168.10.3
+2016-Nov-19 12:34:47.420249 [FATAL]   System: Error loading radio: LookupError: KeyError: No devices found for ----->
+Device Address:
+    addr: 192.168.10.3
+
+2016-Nov-19 12:39:09.825573 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Nov-19 12:39:09.826454 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Nov-19 12:39:09.826558 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Nov-19 12:39:09.826615 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Nov-19 12:39:09.826671 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Nov-19 12:39:09.826726 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Nov-19 12:39:09.826773 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Nov-19 12:39:09.826849 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Nov-19 12:39:09.826910 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Nov-19 12:39:09.826954 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Nov-19 12:39:09.827003 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Nov-19 12:39:09.827041 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Nov-19 12:39:09.827096 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Nov-19 12:39:09.827139 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Nov-19 12:39:09.827188 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Nov-19 12:39:09.827227 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Nov-19 12:39:09.827278 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Nov-19 12:39:09.827316 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Nov-19 12:39:09.827374 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Nov-19 12:39:09.827411 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Nov-19 12:39:09.827479 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Nov-19 12:39:09.827520 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Nov-19 12:39:09.827584 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Nov-19 12:39:09.827623 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Nov-19 12:39:09.827679 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Nov-19 12:39:09.827719 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Nov-19 12:39:09.827778 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Nov-19 12:39:09.827815 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Nov-19 12:39:09.827869 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Nov-19 12:39:09.827908 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Nov-19 12:39:09.827980 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Nov-19 12:39:09.828024 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Nov-19 12:39:09.828070 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Nov-19 12:39:09.828112 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Nov-19 12:39:09.828155 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Nov-19 12:39:09.828200 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Nov-19 12:39:09.828255 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Nov-19 12:39:09.828297 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Nov-19 12:39:09.828337 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Nov-19 12:39:09.828385 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Nov-19 12:39:09.828426 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Nov-19 12:39:09.828773 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Nov-19 12:39:09.828819 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Nov-19 12:39:10.340469 [INFO]    dvbt1interpolator1: Original sampling rate: 9.14286e+06 sps
+2016-Nov-19 12:39:10.340517 [INFO]    dvbt1interpolator1: Effective sampling rate (x175/128): 1.25e+07 sps
+2016-Nov-19 12:39:10.341601 [INFO]    dvbt1filter1: Symmetric filter, 23 taps
+2016-Nov-19 12:39:10.351771 [INFO]    usrptx1: Creating the usrp device with args: addr=192.168.10.3
+2016-Nov-19 12:39:10.553653 [FATAL]   System: Error loading radio: LookupError: KeyError: No devices found for ----->
+Device Address:
+    addr: 192.168.10.3
+
+2016-Nov-19 12:43:29.974135 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Nov-19 12:43:29.974817 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Nov-19 12:43:29.974871 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Nov-19 12:43:29.974899 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Nov-19 12:43:29.974959 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Nov-19 12:43:29.974988 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Nov-19 12:43:29.975044 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Nov-19 12:43:29.975090 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Nov-19 12:43:29.975144 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Nov-19 12:43:29.975173 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Nov-19 12:43:29.975208 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Nov-19 12:43:29.975234 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Nov-19 12:43:29.975274 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Nov-19 12:43:29.975305 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Nov-19 12:43:29.975341 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Nov-19 12:43:29.975368 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Nov-19 12:43:29.975406 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Nov-19 12:43:29.975433 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Nov-19 12:43:29.975469 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Nov-19 12:43:29.975493 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Nov-19 12:43:29.975543 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Nov-19 12:43:29.975571 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Nov-19 12:43:29.975620 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Nov-19 12:43:29.975646 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Nov-19 12:43:29.975697 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Nov-19 12:43:29.975746 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Nov-19 12:43:29.975831 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Nov-19 12:43:29.975883 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Nov-19 12:43:29.975959 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Nov-19 12:43:29.975996 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Nov-19 12:43:29.976055 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Nov-19 12:43:29.976086 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Nov-19 12:43:29.976123 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Nov-19 12:43:29.976167 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Nov-19 12:43:29.976197 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Nov-19 12:43:29.976230 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Nov-19 12:43:29.976259 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Nov-19 12:43:29.976288 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Nov-19 12:43:29.976315 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Nov-19 12:43:29.976349 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Nov-19 12:43:29.976376 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Nov-19 12:43:29.976404 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Nov-19 12:43:29.976430 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Nov-19 12:43:30.489669 [INFO]    dvbt1interpolator1: Original sampling rate: 9.14286e+06 sps
+2016-Nov-19 12:43:30.489721 [INFO]    dvbt1interpolator1: Effective sampling rate (x175/128): 1.25e+07 sps
+2016-Nov-19 12:43:30.490709 [INFO]    dvbt1filter1: Symmetric filter, 23 taps
+2016-Nov-19 12:43:30.500871 [INFO]    usrptx1: Creating the usrp device with args: addr=192.168.10.3
+2016-Nov-19 12:43:30.703002 [FATAL]   System: Error loading radio: LookupError: KeyError: No devices found for ----->
+Device Address:
+    addr: 192.168.10.3
+
+2016-Nov-19 12:46:54.994187 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Nov-19 12:46:54.994663 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Nov-19 12:46:54.994695 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Nov-19 12:46:54.994716 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Nov-19 12:46:54.994758 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Nov-19 12:46:54.994785 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Nov-19 12:46:54.994846 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Nov-19 12:46:54.994875 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Nov-19 12:46:54.994912 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Nov-19 12:46:54.994942 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Nov-19 12:46:54.994974 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Nov-19 12:46:54.994998 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Nov-19 12:46:54.995034 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Nov-19 12:46:54.995063 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Nov-19 12:46:54.995094 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Nov-19 12:46:54.995118 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Nov-19 12:46:54.995152 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Nov-19 12:46:54.995176 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Nov-19 12:46:54.995208 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Nov-19 12:46:54.995231 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Nov-19 12:46:54.995273 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Nov-19 12:46:54.995298 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Nov-19 12:46:54.995340 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Nov-19 12:46:54.995363 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Nov-19 12:46:54.995399 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Nov-19 12:46:54.995429 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Nov-19 12:46:54.995469 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Nov-19 12:46:54.995492 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Nov-19 12:46:54.995525 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Nov-19 12:46:54.995559 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Nov-19 12:46:54.995608 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Nov-19 12:46:54.995636 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Nov-19 12:46:54.995665 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Nov-19 12:46:54.995692 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Nov-19 12:46:54.995719 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Nov-19 12:46:54.995746 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Nov-19 12:46:54.995772 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Nov-19 12:46:54.995797 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Nov-19 12:46:54.995821 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Nov-19 12:46:54.995851 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Nov-19 12:46:54.995877 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Nov-19 12:46:54.995902 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Nov-19 12:46:54.995926 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Nov-19 12:46:55.502411 [INFO]    dvbt1interpolator1: Original sampling rate: 9.14286e+06 sps
+2016-Nov-19 12:46:55.502462 [INFO]    dvbt1interpolator1: Effective sampling rate (x175/128): 1.25e+07 sps
+2016-Nov-19 12:46:55.503486 [INFO]    dvbt1filter1: Symmetric filter, 23 taps
+2016-Nov-19 12:46:55.513309 [INFO]    usrptx1: Creating the usrp device with args: addr=192.168.10.3
+2016-Nov-19 12:46:57.833140 [INFO]    usrptx1: Using Device: Single USRP:
+  Device: USRP2 / N-Series Device
+  Mboard 0: N210r4
+  RX Channel: 0
+    RX DSP: 0
+    RX Dboard: A
+    RX Subdev: SBXv3 RX
+  TX Channel: 0
+    TX DSP: 0
+    TX Dboard: A
+    TX Subdev: SBXv3 TX
+
+2016-Nov-19 12:46:57.833194 [INFO]    usrptx1: Setting TX Rate: 12.5Msps...
+2016-Nov-19 12:46:57.833348 [INFO]    usrptx1: Actual TX Rate: 12.5Msps...
+2016-Nov-19 12:46:57.833379 [INFO]    usrptx1: Setting TX Frequency: 666MHz...
+2016-Nov-19 12:46:57.833688 [INFO]    usrptx1: Actual TX Frequency: 666MHz
+2016-Nov-19 12:46:57.833718 [INFO]    usrptx1: RX LO offset: 5MHz...
+2016-Nov-19 12:46:57.833764 [INFO]    usrptx1: Setting device timestamp to 0...
+2016-Nov-19 12:46:57.833904 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 12:46:57.833943 [INFO]    usrptx1: Setting TX Gain: 10 dB...
+2016-Nov-19 12:46:57.834509 [INFO]    usrptx1: Actual TX Gain: 10 dB...
+2016-Nov-19 12:46:57.834570 [INFO]    usrptx1: Using TX Antenna: TX/RX
+2016-Nov-19 12:46:58.835351 [INFO]    usrptx1: Checking TX: LO: locked ...
+2016-Nov-19 12:46:58.846365 [INFO]    System: Starting radio
+2016-Nov-19 12:46:58.846474 [INFO]    ControllerManager: Controller forgecontroller started.
+2016-Nov-19 12:47:00.033047 [INFO]    dvbt1scrambler1: Current TS bitrate: 6.78653 Mbps
+2016-Nov-19 12:47:05.070024 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4243 Mbps
+2016-Nov-19 12:47:10.108666 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3869 Mbps
+2016-Nov-19 12:47:15.149813 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3759 Mbps
+2016-Nov-19 12:47:20.188775 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4154 Mbps
+2016-Nov-19 12:47:25.229844 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3762 Mbps
+2016-Nov-19 12:47:30.269133 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.414 Mbps
+2016-Nov-19 12:47:35.309983 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3772 Mbps
+2016-Nov-19 12:47:40.348935 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4155 Mbps
+2016-Nov-19 12:47:45.390150 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3756 Mbps
+2016-Nov-19 12:47:50.431853 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4032 Mbps
+2016-Nov-19 12:47:55.469949 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3894 Mbps
+2016-Nov-19 12:48:00.508596 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.387 Mbps
+2016-Nov-19 12:48:05.550263 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4034 Mbps
+2016-Nov-19 12:48:10.588352 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3895 Mbps
+2016-Nov-19 12:48:15.630106 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4029 Mbps
+2016-Nov-19 12:48:20.668360 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3888 Mbps
+2016-Nov-19 12:48:25.709670 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4049 Mbps
+2016-Nov-19 12:48:30.748149 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3877 Mbps
+2016-Nov-19 12:48:35.789707 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4039 Mbps
+2016-Nov-19 12:48:40.831472 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3731 Mbps
+2016-Nov-19 12:48:45.869903 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3879 Mbps
+2016-Nov-19 12:48:50.908471 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4172 Mbps
+2016-Nov-19 12:48:55.954302 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3551 Mbps
+2016-Nov-19 12:49:00.989277 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4333 Mbps
+2016-Nov-19 12:49:06.029760 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.379 Mbps
+2016-Nov-19 12:49:11.068557 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4159 Mbps
+2016-Nov-19 12:49:16.109474 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3769 Mbps
+2016-Nov-19 12:49:21.153301 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.364 Mbps
+2016-Nov-19 12:49:26.189225 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4289 Mbps
+2016-Nov-19 12:49:31.228296 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3852 Mbps
+2016-Nov-19 12:49:36.273691 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3868 Mbps
+2016-Nov-19 12:49:41.311194 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.392 Mbps
+2016-Nov-19 12:49:46.349248 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4195 Mbps
+2016-Nov-19 12:49:51.388533 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3841 Mbps
+2016-Nov-19 12:49:56.429124 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4082 Mbps
+2016-Nov-19 12:50:01.472255 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.367 Mbps
+2016-Nov-19 12:50:06.509185 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3946 Mbps
+2016-Nov-19 12:50:11.547864 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4167 Mbps
+2016-Nov-19 12:50:16.589309 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3745 Mbps
+2016-Nov-19 12:50:21.627986 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4167 Mbps
+2016-Nov-19 12:50:26.669219 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3755 Mbps
+2016-Nov-19 12:50:31.708345 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4147 Mbps
+2016-Nov-19 12:50:36.750843 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3701 Mbps
+2016-Nov-19 12:50:41.794208 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3957 Mbps
+2016-Nov-19 12:50:46.832558 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3883 Mbps
+2016-Nov-19 12:50:51.868195 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4003 Mbps
+2016-Nov-19 12:50:56.909028 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4071 Mbps
+2016-Nov-19 12:51:01.947994 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3855 Mbps
+2016-Nov-19 12:51:06.989019 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4062 Mbps
+2016-Nov-19 12:51:12.027666 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3869 Mbps
+2016-Nov-19 12:51:17.069471 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4028 Mbps
+2016-Nov-19 12:51:22.107988 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3875 Mbps
+2016-Nov-19 12:51:27.148950 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4065 Mbps
+2016-Nov-19 12:51:32.188277 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3839 Mbps
+2016-Nov-19 12:51:37.228816 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3786 Mbps
+2016-Nov-19 12:51:42.267546 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4164 Mbps
+2016-Nov-19 12:51:47.308695 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3759 Mbps
+2016-Nov-19 12:51:52.352614 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3934 Mbps
+2016-Nov-19 12:51:57.389542 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3946 Mbps
+2016-Nov-19 12:52:02.428666 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4146 Mbps
+2016-Nov-19 12:52:07.469697 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3764 Mbps
+2016-Nov-19 12:52:12.508725 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3853 Mbps
+2016-Nov-19 12:52:17.550169 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4045 Mbps
+2016-Nov-19 12:52:22.588870 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3866 Mbps
+2016-Nov-19 12:52:27.630396 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.404 Mbps
+2016-Nov-19 12:52:32.669333 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3857 Mbps
+2016-Nov-19 12:52:37.713530 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3922 Mbps
+2016-Nov-19 12:52:42.749782 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3975 Mbps
+2016-Nov-19 12:52:47.791101 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4049 Mbps
+2016-Nov-19 12:52:52.830148 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3852 Mbps
+2016-Nov-19 12:52:57.871702 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.374 Mbps
+2016-Nov-19 12:53:02.915376 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3945 Mbps
+2016-Nov-19 12:53:07.954756 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3837 Mbps
+2016-Nov-19 12:53:12.991259 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4263 Mbps
+2016-Nov-19 12:53:18.034824 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3652 Mbps
+2016-Nov-19 12:53:23.072357 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4217 Mbps
+2016-Nov-19 12:53:28.112703 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3794 Mbps
+2016-Nov-19 12:53:33.151503 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4161 Mbps
+2016-Nov-19 12:53:38.192956 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3745 Mbps
+2016-Nov-19 12:53:43.231904 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3856 Mbps
+2016-Nov-19 12:53:48.273000 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4059 Mbps
+2016-Nov-19 12:53:53.312341 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3839 Mbps
+2016-Nov-19 12:53:58.356766 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3912 Mbps
+2016-Nov-19 12:54:03.392527 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3998 Mbps
+2016-Nov-19 12:54:08.436066 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3956 Mbps
+2016-Nov-19 12:54:09.068055 [INFO]    usrptx1: Setting TX Frequency: 674MHz...
+2016-Nov-19 12:54:09.068361 [INFO]    usrptx1: LOG TX Frequency: 674MHz
+2016-Nov-19 12:54:09.068390 [INFO]    phyengine14: Reconfigured parameter frequency : 674000000
+2016-Nov-19 12:54:13.472702 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3953 Mbps
+2016-Nov-19 12:54:18.514453 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.403 Mbps
+2016-Nov-19 12:54:23.553412 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3856 Mbps
+2016-Nov-19 12:54:28.594550 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3759 Mbps
+2016-Nov-19 12:54:33.633812 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4141 Mbps
+2016-Nov-19 12:54:38.680573 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.351 Mbps
+2016-Nov-19 12:54:43.713571 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4419 Mbps
+2016-Nov-19 12:54:48.754828 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3755 Mbps
+2016-Nov-19 12:54:53.796101 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4052 Mbps
+2016-Nov-19 12:54:58.835444 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3838 Mbps
+2016-Nov-19 12:55:03.874581 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3847 Mbps
+2016-Nov-19 12:55:08.920996 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3831 Mbps
+2016-Nov-19 12:55:13.954220 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4103 Mbps
+2016-Nov-19 12:55:18.998173 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3933 Mbps
+2016-Nov-19 12:55:24.034896 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3955 Mbps
+2016-Nov-19 12:55:29.076107 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4054 Mbps
+2016-Nov-19 12:55:34.114898 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3864 Mbps
+2016-Nov-19 12:55:39.156587 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4033 Mbps
+2016-Nov-19 12:55:44.195506 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3858 Mbps
+2016-Nov-19 12:55:49.237019 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3742 Mbps
+2016-Nov-19 12:55:54.275697 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4167 Mbps
+2016-Nov-19 12:55:59.231403 [INFO]    phyengine11: Reconfigured parameter outpower : 0
+2016-Nov-19 12:55:59.276939 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.1334 Mbps
+2016-Nov-19 12:56:04.277621 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.6472 Mbps
+2016-Nov-19 12:56:09.316330 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3867 Mbps
+2016-Nov-19 12:56:14.357645 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4049 Mbps
+2016-Nov-19 12:56:19.400973 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3662 Mbps
+2016-Nov-19 12:56:24.442084 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4062 Mbps
+2016-Nov-19 12:56:29.476496 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4055 Mbps
+2016-Nov-19 12:56:32.269832 [INFO]    phyengine11: Reconfigured parameter outpower : 50
+2016-Nov-19 12:56:34.518235 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3732 Mbps
+2016-Nov-19 12:56:39.556826 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4171 Mbps
+2016-Nov-19 12:56:44.603306 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3522 Mbps
+2016-Nov-19 12:56:49.639438 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.428 Mbps
+2016-Nov-19 12:56:54.678386 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3856 Mbps
+2016-Nov-19 12:56:59.721628 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3964 Mbps
+2016-Nov-19 12:57:04.758338 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3955 Mbps
+2016-Nov-19 12:57:06.111753 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 12:57:06.111798 [INFO]    usrptx1: Setting TX Gain: 0 dB...
+2016-Nov-19 12:57:06.111967 [INFO]    usrptx1: Actual TX Gain: 0 dB...
+2016-Nov-19 12:57:06.111994 [INFO]    phyengine14: Reconfigured parameter gain : 0
+2016-Nov-19 12:57:09.797183 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3861 Mbps
+2016-Nov-19 12:57:14.839034 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4026 Mbps
+2016-Nov-19 12:57:19.880497 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3751 Mbps
+2016-Nov-19 12:57:24.922365 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4019 Mbps
+2016-Nov-19 12:57:29.962354 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.381 Mbps
+2016-Nov-19 12:57:34.999532 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4233 Mbps
+2016-Nov-19 12:57:40.037810 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3886 Mbps
+2016-Nov-19 12:57:45.079607 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4028 Mbps
+2016-Nov-19 12:57:50.118608 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3855 Mbps
+2016-Nov-19 12:57:55.159399 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3774 Mbps
+2016-Nov-19 12:57:57.071904 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 12:57:57.071970 [INFO]    usrptx1: Setting TX Gain: 8 dB...
+2016-Nov-19 12:57:57.072125 [INFO]    usrptx1: Actual TX Gain: 8 dB...
+2016-Nov-19 12:57:57.072150 [INFO]    phyengine14: Reconfigured parameter gain : 8
+2016-Nov-19 12:58:00.198327 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4156 Mbps
+2016-Nov-19 12:58:05.239542 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3756 Mbps
+2016-Nov-19 12:58:10.278558 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4151 Mbps
+2016-Nov-19 12:58:15.320061 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3743 Mbps
+2016-Nov-19 12:58:20.358610 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4172 Mbps
+2016-Nov-19 12:58:25.405020 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3526 Mbps
+2016-Nov-19 12:58:30.438918 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4379 Mbps
+2016-Nov-19 12:58:35.481308 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3704 Mbps
+2016-Nov-19 12:58:40.519242 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.39 Mbps
+2016-Nov-19 12:58:45.560513 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4052 Mbps
+2016-Nov-19 12:58:50.599438 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3857 Mbps
+2016-Nov-19 12:58:55.641097 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4035 Mbps
+2016-Nov-19 12:59:00.679446 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3882 Mbps
+2016-Nov-19 12:59:05.723533 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3927 Mbps
+2016-Nov-19 12:59:10.759800 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3976 Mbps
+2016-Nov-19 12:59:15.800798 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4064 Mbps
+2016-Nov-19 12:59:20.842369 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.374 Mbps
+2016-Nov-19 12:59:25.880950 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3876 Mbps
+2016-Nov-19 12:59:30.114210 [INFO]    usrptx1: Setting TX Frequency: 666MHz...
+2016-Nov-19 12:59:30.114735 [INFO]    usrptx1: LOG TX Frequency: 666MHz
+2016-Nov-19 12:59:30.114783 [INFO]    phyengine14: Reconfigured parameter frequency : 666000000
+2016-Nov-19 12:59:30.114982 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 12:59:30.115029 [INFO]    usrptx1: Setting TX Gain: 10 dB...
+2016-Nov-19 12:59:30.115294 [INFO]    usrptx1: Actual TX Gain: 10 dB...
+2016-Nov-19 12:59:30.115337 [INFO]    phyengine14: Reconfigured parameter gain : 10
+2016-Nov-19 12:59:30.278831 [INFO]    phyengine11: Reconfigured parameter outpower : 60
+2016-Nov-19 12:59:30.922441 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4038 Mbps
+2016-Nov-19 12:59:35.963593 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3759 Mbps
+2016-Nov-19 12:59:41.000562 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4243 Mbps
+2016-Nov-19 12:59:46.045969 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.357 Mbps
+2016-Nov-19 12:59:51.082765 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4249 Mbps
+2016-Nov-19 12:59:56.121457 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3868 Mbps
+2016-Nov-19 13:00:01.160493 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3852 Mbps
+2016-Nov-19 13:00:06.201842 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4048 Mbps
+2016-Nov-19 13:00:11.240717 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3859 Mbps
+2016-Nov-19 13:00:16.282070 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4048 Mbps
+2016-Nov-19 13:00:21.320611 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3874 Mbps
+2016-Nov-19 13:00:26.362163 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4039 Mbps
+2016-Nov-19 13:00:31.403344 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3757 Mbps
+2016-Nov-19 13:00:36.442024 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4167 Mbps
+2016-Nov-19 13:00:41.481272 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3847 Mbps
+2016-Nov-19 13:00:46.521948 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3776 Mbps
+2016-Nov-19 13:00:51.560867 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4156 Mbps
+2016-Nov-19 13:00:56.602366 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3744 Mbps
+2016-Nov-19 13:01:01.640993 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4168 Mbps
+2016-Nov-19 13:01:06.682217 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3755 Mbps
+2016-Nov-19 13:01:11.727918 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3855 Mbps
+2016-Nov-19 13:01:16.762566 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4049 Mbps
+2016-Nov-19 13:01:21.801358 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4159 Mbps
+2016-Nov-19 13:01:22.914661 [INFO]    System: Stopping radio
+2016-Nov-19 13:01:22.914764 [INFO]    ControllerManager: Controller forgecontroller stopped.
+2016-Nov-19 13:01:22.915002 [INFO]    forgecontroller: Controller thread in forgecontroller interrupted
+2016-Nov-19 13:01:22.915080 [INFO]    phyengine1: Thread in Engine phyengine1 interrupted
+2016-Nov-19 13:01:22.915298 [INFO]    phyengine2: Thread in Engine phyengine2 interrupted
+2016-Nov-19 13:01:22.915491 [INFO]    phyengine3: Thread in Engine phyengine3 interrupted
+2016-Nov-19 13:01:22.915631 [INFO]    phyengine4: Thread in Engine phyengine4 interrupted
+2016-Nov-19 13:01:22.916085 [INFO]    phyengine5: Thread in Engine phyengine5 interrupted
+2016-Nov-19 13:01:22.916282 [INFO]    phyengine6: Thread in Engine phyengine6 interrupted
+2016-Nov-19 13:01:22.916487 [INFO]    phyengine7: Thread in Engine phyengine7 interrupted
+2016-Nov-19 13:01:22.916721 [INFO]    phyengine8: Thread in Engine phyengine8 interrupted
+2016-Nov-19 13:01:22.917209 [INFO]    phyengine9: Thread in Engine phyengine9 interrupted
+2016-Nov-19 13:01:22.917393 [INFO]    phyengine10: Thread in Engine phyengine10 interrupted
+2016-Nov-19 13:01:22.917556 [INFO]    phyengine11: Thread in Engine phyengine11 interrupted
+2016-Nov-19 13:01:22.917958 [INFO]    phyengine12: Thread in Engine phyengine12 interrupted
+2016-Nov-19 13:01:22.921114 [INFO]    phyengine13: Thread in Engine phyengine13 interrupted
+2016-Nov-19 13:01:22.921312 [INFO]    phyengine14: Thread in Engine phyengine14 interrupted
+2016-Nov-19 13:01:22.921411 [INFO]    System: Unloading radio
+2016-Nov-19 13:01:22.921532 [INFO]    forgecontroller: Controller thread in forgecontroller interrupted
+2016-Nov-19 13:01:22.921646 [INFO]    ControllerManager: Controller forgecontroller unloaded.
+2016-Nov-19 13:01:22.921770 [INFO]    filerawreader1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.921829 [INFO]    dvbt1scrambler1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.921874 [INFO]    dvbt1rsencoder1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.921917 [INFO]    dvbt1convinterleaver1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.921960 [INFO]    dvbt1convencoder1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.922002 [INFO]    dvbt1puncturer1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.922046 [INFO]    dvbt1bitinterleaver1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.922091 [INFO]    dvbt1symbolinterleaver1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.922134 [INFO]    dvbt1mapper1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.922179 [INFO]    dvbt1framer1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.922262 [INFO]    dvbt1ofdmmod1: Average time taken per process() call = 00:00:00.006708
+2016-Nov-19 13:01:22.922312 [INFO]    dvbt1interpolator1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 13:01:22.922356 [INFO]    dvbt1filter1: Average time taken per process() call = 00:00:00.006712
+2016-Nov-19 13:01:23.021971 [INFO]    usrptx1: Average time taken per process() call = 00:00:00.006712
+2016-Nov-19 15:23:06.705643 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Nov-19 15:23:06.706537 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Nov-19 15:23:06.706601 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Nov-19 15:23:06.706674 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Nov-19 15:23:06.706731 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Nov-19 15:23:06.706762 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Nov-19 15:23:06.706820 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Nov-19 15:23:06.706850 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Nov-19 15:23:06.706893 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Nov-19 15:23:06.706925 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Nov-19 15:23:06.706990 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Nov-19 15:23:06.707021 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Nov-19 15:23:06.707094 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Nov-19 15:23:06.707145 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Nov-19 15:23:06.707191 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Nov-19 15:23:06.707236 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Nov-19 15:23:06.707292 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Nov-19 15:23:06.707322 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Nov-19 15:23:06.707363 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Nov-19 15:23:06.707390 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Nov-19 15:23:06.707503 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Nov-19 15:23:06.707552 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Nov-19 15:23:06.707613 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Nov-19 15:23:06.707641 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Nov-19 15:23:06.707686 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Nov-19 15:23:06.707713 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Nov-19 15:23:06.707762 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Nov-19 15:23:06.707812 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Nov-19 15:23:06.707867 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Nov-19 15:23:06.707912 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Nov-19 15:23:06.708151 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Nov-19 15:23:06.708232 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Nov-19 15:23:06.708312 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Nov-19 15:23:06.708386 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Nov-19 15:23:06.708459 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Nov-19 15:23:06.708519 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Nov-19 15:23:06.708557 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Nov-19 15:23:06.708593 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Nov-19 15:23:06.708627 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Nov-19 15:23:06.708672 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Nov-19 15:23:06.708706 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Nov-19 15:23:06.708741 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Nov-19 15:23:06.708773 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Nov-19 15:23:07.218622 [INFO]    dvbt1interpolator1: Original sampling rate: 9.14286e+06 sps
+2016-Nov-19 15:23:07.218674 [INFO]    dvbt1interpolator1: Effective sampling rate (x175/128): 1.25e+07 sps
+2016-Nov-19 15:23:07.219674 [INFO]    dvbt1filter1: Symmetric filter, 23 taps
+2016-Nov-19 15:23:07.229591 [INFO]    usrptx1: Creating the usrp device with args: addr=192.168.10.3
+2016-Nov-19 15:23:09.528903 [INFO]    usrptx1: Using Device: Single USRP:
+  Device: USRP2 / N-Series Device
+  Mboard 0: N210r4
+  RX Channel: 0
+    RX DSP: 0
+    RX Dboard: A
+    RX Subdev: SBXv3 RX
+  TX Channel: 0
+    TX DSP: 0
+    TX Dboard: A
+    TX Subdev: SBXv3 TX
+
+2016-Nov-19 15:23:09.528998 [INFO]    usrptx1: Setting TX Rate: 12.5Msps...
+2016-Nov-19 15:23:09.529179 [INFO]    usrptx1: Actual TX Rate: 12.5Msps...
+2016-Nov-19 15:23:09.529213 [INFO]    usrptx1: Setting TX Frequency: 666MHz...
+2016-Nov-19 15:23:09.529761 [INFO]    usrptx1: Actual TX Frequency: 666MHz
+2016-Nov-19 15:23:09.529796 [INFO]    usrptx1: RX LO offset: 5MHz...
+2016-Nov-19 15:23:09.529826 [INFO]    usrptx1: Setting device timestamp to 0...
+2016-Nov-19 15:23:09.529991 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 15:23:09.530021 [INFO]    usrptx1: Setting TX Gain: 10 dB...
+2016-Nov-19 15:23:09.530310 [INFO]    usrptx1: Actual TX Gain: 10 dB...
+2016-Nov-19 15:23:09.530362 [INFO]    usrptx1: Using TX Antenna: TX/RX
+2016-Nov-19 15:23:10.531062 [INFO]    usrptx1: Checking TX: LO: locked ...
+2016-Nov-19 15:23:10.542051 [INFO]    System: Starting radio
+2016-Nov-19 15:23:10.542187 [INFO]    ControllerManager: Controller forgecontroller started.
+2016-Nov-19 15:23:11.718843 [INFO]    dvbt1scrambler1: Current TS bitrate: 7.06588 Mbps
+2016-Nov-19 15:23:16.745084 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.2327 Mbps
+2016-Nov-19 15:23:21.781537 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3967 Mbps
+2016-Nov-19 15:23:26.822350 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3773 Mbps
+2016-Nov-19 15:23:31.866405 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3928 Mbps
+2016-Nov-19 15:23:36.902553 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3981 Mbps
+2016-Nov-19 15:23:41.941746 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4144 Mbps
+2016-Nov-19 15:23:46.982607 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3771 Mbps
+2016-Nov-19 15:23:49.776057 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 15:23:49.776106 [INFO]    usrptx1: Setting TX Gain: 8 dB...
+2016-Nov-19 15:23:49.776278 [INFO]    usrptx1: Actual TX Gain: 8 dB...
+2016-Nov-19 15:23:49.776306 [INFO]    phyengine14: Reconfigured parameter gain : 8
+2016-Nov-19 15:23:52.021764 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4145 Mbps
+2016-Nov-19 15:23:57.062670 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3769 Mbps
+2016-Nov-19 15:24:02.102057 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4136 Mbps
+2016-Nov-19 15:24:07.143188 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3759 Mbps
+2016-Nov-19 15:24:12.182079 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3859 Mbps
+2016-Nov-19 15:24:17.223195 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4059 Mbps
+2016-Nov-19 15:24:22.262132 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3857 Mbps
+2016-Nov-19 15:24:27.303239 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4059 Mbps
+2016-Nov-19 15:24:32.342638 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3837 Mbps
+2016-Nov-19 15:24:37.383705 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4061 Mbps
+2016-Nov-19 15:24:42.426472 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3686 Mbps
+2016-Nov-19 15:24:47.464260 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4205 Mbps
+2016-Nov-19 15:24:52.502680 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.388 Mbps
+2016-Nov-19 15:24:57.543733 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3763 Mbps
+2016-Nov-19 15:25:02.583087 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4137 Mbps
+2016-Nov-19 15:25:07.623800 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3778 Mbps
+2016-Nov-19 15:25:12.662832 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4151 Mbps
+2016-Nov-19 15:25:17.703716 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.377 Mbps
+2016-Nov-19 15:25:22.743183 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4132 Mbps
+2016-Nov-19 15:25:27.784219 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3763 Mbps
+2016-Nov-19 15:25:32.823016 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3863 Mbps
+2016-Nov-19 15:25:37.864339 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4049 Mbps
+2016-Nov-19 15:25:42.907247 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.368 Mbps
+2016-Nov-19 15:25:45.776960 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 15:25:45.777002 [INFO]    usrptx1: Setting TX Gain: 10 dB...
+2016-Nov-19 15:25:45.777179 [INFO]    usrptx1: Actual TX Gain: 10 dB...
+2016-Nov-19 15:25:45.777205 [INFO]    phyengine14: Reconfigured parameter gain : 10
+2016-Nov-19 15:25:47.944138 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4246 Mbps
+2016-Nov-19 15:25:52.983651 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3831 Mbps
+2016-Nov-19 15:25:58.024473 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4072 Mbps
+2016-Nov-19 15:26:03.063271 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3862 Mbps
+2016-Nov-19 15:26:08.105205 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4022 Mbps
+2016-Nov-19 15:26:13.143276 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3896 Mbps
+2016-Nov-19 15:26:18.184576 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3751 Mbps
+2016-Nov-19 15:26:23.223515 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4155 Mbps
+2016-Nov-19 15:26:28.265183 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3736 Mbps
+2016-Nov-19 15:26:33.303589 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4179 Mbps
+2016-Nov-19 15:26:38.344780 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3757 Mbps
+2016-Nov-19 15:26:43.383748 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4154 Mbps
+2016-Nov-19 15:26:48.430432 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3514 Mbps
+2016-Nov-19 15:26:53.470340 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4113 Mbps
+2016-Nov-19 15:26:58.507852 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3919 Mbps
+2016-Nov-19 15:27:03.543619 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3998 Mbps
+2016-Nov-19 15:27:08.584972 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4048 Mbps
+2016-Nov-19 15:27:13.623853 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3859 Mbps
+2016-Nov-19 15:27:18.665146 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.405 Mbps
+2016-Nov-19 15:27:23.704012 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3863 Mbps
+2016-Nov-19 15:27:28.747800 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3937 Mbps
+2016-Nov-19 15:27:33.784102 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3974 Mbps
+2016-Nov-19 15:27:38.824845 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4076 Mbps
+2016-Nov-19 15:27:43.864173 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3839 Mbps
+2016-Nov-19 15:27:48.904997 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3773 Mbps
+2016-Nov-19 15:27:53.944045 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.415 Mbps
+2016-Nov-19 15:27:58.985138 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3761 Mbps
+2016-Nov-19 15:28:04.024205 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.415 Mbps
+2016-Nov-19 15:28:09.066713 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3699 Mbps
+2016-Nov-19 15:28:14.104271 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4217 Mbps
+2016-Nov-19 15:28:19.145529 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3753 Mbps
+2016-Nov-19 15:28:24.184335 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3863 Mbps
+2016-Nov-19 15:28:29.225413 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.406 Mbps
+2016-Nov-19 15:28:34.264042 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.387 Mbps
+2016-Nov-19 15:28:39.305339 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4051 Mbps
+2016-Nov-19 15:28:44.344522 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3845 Mbps
+2016-Nov-19 15:28:49.385301 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4073 Mbps
+2016-Nov-19 15:28:54.426476 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3757 Mbps
+2016-Nov-19 15:28:59.465858 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4135 Mbps
+2016-Nov-19 15:29:04.504969 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3849 Mbps
+2016-Nov-19 15:29:09.545603 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3782 Mbps
+2016-Nov-19 15:29:14.584436 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.416 Mbps
+2016-Nov-19 15:29:17.779849 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 15:29:17.779903 [INFO]    usrptx1: Setting TX Gain: 15 dB...
+2016-Nov-19 15:29:17.780080 [INFO]    usrptx1: Actual TX Gain: 15 dB...
+2016-Nov-19 15:29:17.780106 [INFO]    phyengine14: Reconfigured parameter gain : 15
+2016-Nov-19 15:29:19.626100 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3736 Mbps
+2016-Nov-19 15:29:24.664666 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4172 Mbps
+2016-Nov-19 15:29:29.706216 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3741 Mbps
+2016-Nov-19 15:29:34.744860 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4168 Mbps
+2016-Nov-19 15:29:39.785898 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3764 Mbps
+2016-Nov-19 15:29:44.825212 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4138 Mbps
+2016-Nov-19 15:29:49.866299 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3761 Mbps
+2016-Nov-19 15:29:51.778542 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 15:29:51.778595 [INFO]    usrptx1: Setting TX Gain: 0 dB...
+2016-Nov-19 15:29:51.778839 [INFO]    usrptx1: Actual TX Gain: 0 dB...
+2016-Nov-19 15:29:51.778868 [INFO]    phyengine14: Reconfigured parameter gain : 0
+2016-Nov-19 15:29:54.904875 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3873 Mbps
+2016-Nov-19 15:29:59.945784 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4068 Mbps
+2016-Nov-19 15:30:04.984661 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3859 Mbps
+2016-Nov-19 15:30:10.025876 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4054 Mbps
+2016-Nov-19 15:30:15.064804 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3857 Mbps
+2016-Nov-19 15:30:20.106007 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4055 Mbps
+2016-Nov-19 15:30:25.147636 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.374 Mbps
+2016-Nov-19 15:30:30.186131 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4172 Mbps
+2016-Nov-19 15:30:35.225417 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3842 Mbps
+2016-Nov-19 15:30:40.266437 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3764 Mbps
+2016-Nov-19 15:30:45.304883 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4177 Mbps
+2016-Nov-19 15:30:50.345954 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3762 Mbps
+2016-Nov-19 15:30:55.386269 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4095 Mbps
+2016-Nov-19 15:31:00.434789 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3432 Mbps
+2016-Nov-19 15:31:05.468080 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4405 Mbps
+2016-Nov-19 15:31:10.512015 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3636 Mbps
+2016-Nov-19 15:31:15.545842 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4089 Mbps
+2016-Nov-19 15:31:20.586489 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4073 Mbps
+2016-Nov-19 15:31:25.625105 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3871 Mbps
+2016-Nov-19 15:31:30.666420 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.405 Mbps
+2016-Nov-19 15:31:35.705601 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3846 Mbps
+2016-Nov-19 15:31:40.746907 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4051 Mbps
+2016-Nov-19 15:31:45.787989 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3761 Mbps
+2016-Nov-19 15:31:50.827005 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4152 Mbps
+2016-Nov-19 15:31:55.867869 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3772 Mbps
+2016-Nov-19 15:32:00.906211 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3882 Mbps
+2016-Nov-19 15:32:01.778985 [INFO]    usrptx1: Setting TX Frequency: 674MHz...
+2016-Nov-19 15:32:01.779422 [INFO]    usrptx1: LOG TX Frequency: 674MHz
+2016-Nov-19 15:32:01.779490 [INFO]    phyengine14: Reconfigured parameter frequency : 674000000
+2016-Nov-19 15:32:05.945779 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4127 Mbps
+2016-Nov-19 15:32:10.988500 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.369 Mbps
+2016-Nov-19 15:32:16.025245 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4252 Mbps
+2016-Nov-19 15:32:21.066811 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.374 Mbps
+2016-Nov-19 15:32:26.107368 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4084 Mbps
+2016-Nov-19 15:32:31.149075 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3733 Mbps
+2016-Nov-19 15:32:36.185365 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4276 Mbps
+2016-Nov-19 15:32:41.226478 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3757 Mbps
+2016-Nov-19 15:32:44.819428 [INFO]    usrptx1: Setting TX Frequency: 666MHz...
+2016-Nov-19 15:32:44.820029 [INFO]    usrptx1: LOG TX Frequency: 666MHz
+2016-Nov-19 15:32:44.820071 [INFO]    phyengine14: Reconfigured parameter frequency : 666000000
+2016-Nov-19 15:32:46.265564 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.385 Mbps
+2016-Nov-19 15:32:51.306733 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4057 Mbps
+2016-Nov-19 15:32:56.345412 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3868 Mbps
+2016-Nov-19 15:33:01.386855 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4043 Mbps
+2016-Nov-19 15:33:06.431581 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3601 Mbps
+2016-Nov-19 15:33:11.467240 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.43 Mbps
+2016-Nov-19 15:33:16.505747 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3876 Mbps
+2016-Nov-19 15:33:21.546932 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4055 Mbps
+2016-Nov-19 15:33:26.585581 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.387 Mbps
+2016-Nov-19 15:33:31.626922 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3751 Mbps
+2016-Nov-19 15:33:36.666176 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.414 Mbps
+2016-Nov-19 15:33:41.706938 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3776 Mbps
+2016-Nov-19 15:33:42.982456 [INFO]    phyengine11: Reconfigured parameter outpower : 1
+2016-Nov-19 15:33:46.753089 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3835 Mbps
+2016-Nov-19 15:33:51.790431 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3928 Mbps
+2016-Nov-19 15:33:56.828134 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4211 Mbps
+2016-Nov-19 15:34:01.867241 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3848 Mbps
+2016-Nov-19 15:34:06.905570 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3884 Mbps
+2016-Nov-19 15:34:11.946897 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4049 Mbps
+2016-Nov-19 15:34:16.985637 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3866 Mbps
+2016-Nov-19 15:34:22.026894 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4052 Mbps
+2016-Nov-19 15:34:27.065895 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3854 Mbps
+2016-Nov-19 15:34:32.107189 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4052 Mbps
+2016-Nov-19 15:34:37.146187 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3853 Mbps
+2016-Nov-19 15:34:42.186830 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.408 Mbps
+2016-Nov-19 15:34:47.226068 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3843 Mbps
+2016-Nov-19 15:34:52.267032 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3767 Mbps
+2016-Nov-19 15:34:57.307363 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4095 Mbps
+2016-Nov-19 15:35:02.347052 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3821 Mbps
+2016-Nov-19 15:35:07.386080 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4151 Mbps
+2016-Nov-19 15:35:12.431640 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3564 Mbps
+2016-Nov-19 15:35:17.465990 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4362 Mbps
+2016-Nov-19 15:35:22.512730 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3508 Mbps
+2016-Nov-19 15:35:26.985175 [INFO]    phyengine11: Reconfigured parameter outpower : 0
+2016-Nov-19 15:35:27.545842 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4413 Mbps
+2016-Nov-19 15:35:32.587137 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3753 Mbps
+2016-Nov-19 15:35:37.626284 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3846 Mbps
+2016-Nov-19 15:35:42.670373 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3927 Mbps
+2016-Nov-19 15:35:47.705973 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4005 Mbps
+2016-Nov-19 15:35:52.751419 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3867 Mbps
+2016-Nov-19 15:35:57.786017 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4049 Mbps
+2016-Nov-19 15:35:58.977613 [INFO]    phyengine11: Reconfigured parameter outpower : 50
+2016-Nov-19 15:36:02.827041 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4062 Mbps
+2016-Nov-19 15:36:07.866045 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3854 Mbps
+2016-Nov-19 15:36:12.907251 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4054 Mbps
+2016-Nov-19 15:36:17.946045 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3863 Mbps
+2016-Nov-19 15:36:22.987099 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3762 Mbps
+2016-Nov-19 15:36:28.026309 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4143 Mbps
+2016-Nov-19 15:36:33.067162 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3772 Mbps
+2016-Nov-19 15:36:38.107415 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4097 Mbps
+2016-Nov-19 15:36:43.147098 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3823 Mbps
+2016-Nov-19 15:36:48.186446 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4137 Mbps
+2016-Nov-19 15:36:53.227224 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3775 Mbps
+2016-Nov-19 15:36:58.266145 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3857 Mbps
+2016-Nov-19 15:37:03.307229 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.406 Mbps
+2016-Nov-19 15:37:08.345945 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3866 Mbps
+2016-Nov-19 15:37:13.387891 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4021 Mbps
+2016-Nov-19 15:37:18.432894 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3588 Mbps
+2016-Nov-19 15:37:23.467285 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4357 Mbps
+2016-Nov-19 15:37:28.506281 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3854 Mbps
+2016-Nov-19 15:37:33.547555 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4051 Mbps
+2016-Nov-19 15:37:38.586051 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3877 Mbps
+2016-Nov-19 15:37:43.627615 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.374 Mbps
+2016-Nov-19 15:37:48.666064 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4177 Mbps
+2016-Nov-19 15:37:53.707357 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3753 Mbps
+2016-Nov-19 15:37:58.746442 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4147 Mbps
+2016-Nov-19 15:38:03.787323 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.377 Mbps
+2016-Nov-19 15:38:08.826144 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.416 Mbps
+2016-Nov-19 15:38:13.867113 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3767 Mbps
+2016-Nov-19 15:38:18.906602 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4131 Mbps
+2016-Nov-19 15:38:23.947319 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3778 Mbps
+2016-Nov-19 15:38:28.986198 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3859 Mbps
+2016-Nov-19 15:38:34.027485 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4051 Mbps
+2016-Nov-19 15:38:39.066022 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3874 Mbps
+2016-Nov-19 15:38:44.109730 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3943 Mbps
+2016-Nov-19 15:38:49.148300 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3873 Mbps
+2016-Nov-19 15:38:54.187401 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4148 Mbps
+2016-Nov-19 15:38:59.226493 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3849 Mbps
+2016-Nov-19 15:39:04.267271 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4074 Mbps
+2016-Nov-19 15:39:09.306197 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3857 Mbps
+2016-Nov-19 15:39:09.859559 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 15:39:09.859609 [INFO]    usrptx1: Setting TX Gain: 5 dB...
+2016-Nov-19 15:39:09.859789 [INFO]    usrptx1: Actual TX Gain: 5 dB...
+2016-Nov-19 15:39:09.859816 [INFO]    phyengine14: Reconfigured parameter gain : 5
+2016-Nov-19 15:39:14.347602 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3747 Mbps
+2016-Nov-19 15:39:19.391808 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3921 Mbps
+2016-Nov-19 15:39:24.427157 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4019 Mbps
+2016-Nov-19 15:39:29.466974 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4113 Mbps
+2016-Nov-19 15:39:34.507510 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3786 Mbps
+2016-Nov-19 15:39:39.546723 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4143 Mbps
+2016-Nov-19 15:39:44.593861 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3494 Mbps
+2016-Nov-19 15:39:49.626395 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4141 Mbps
+2016-Nov-19 15:39:54.667667 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4051 Mbps
+2016-Nov-19 15:39:59.705923 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3887 Mbps
+2016-Nov-19 15:40:04.747403 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4042 Mbps
+2016-Nov-19 15:40:09.786401 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3855 Mbps
+2016-Nov-19 15:40:14.827354 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4066 Mbps
+2016-Nov-19 15:40:19.866341 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3854 Mbps
+2016-Nov-19 15:40:24.908003 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4034 Mbps
+2016-Nov-19 15:40:29.946294 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3885 Mbps
+2016-Nov-19 15:40:34.987768 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3744 Mbps
+2016-Nov-19 15:40:40.026370 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.417 Mbps
+2016-Nov-19 15:40:45.067292 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3772 Mbps
+2016-Nov-19 15:40:50.110012 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3985 Mbps
+2016-Nov-19 15:40:50.821614 [INFO]    usrptx1: Gain range: (0, 31.5, 0.5)
+
+2016-Nov-19 15:40:50.821661 [INFO]    usrptx1: Setting TX Gain: 8 dB...
+2016-Nov-19 15:40:50.821879 [INFO]    usrptx1: Actual TX Gain: 8 dB...
+2016-Nov-19 15:40:50.821896 [INFO]    phyengine14: Reconfigured parameter gain : 8
+2016-Nov-19 15:40:55.148001 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.39 Mbps
+2016-Nov-19 15:41:00.193849 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.3853 Mbps
+2016-Nov-19 15:41:05.227667 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4078 Mbps
+2016-Nov-19 15:41:10.273495 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.385 Mbps
+2016-Nov-19 15:41:15.307553 [INFO]    dvbt1scrambler1: Current TS bitrate: 22.4072 Mbps
+2016-Nov-19 15:41:19.702439 [INFO]    System: Stopping radio
+2016-Nov-19 15:41:19.702488 [INFO]    ControllerManager: Controller forgecontroller stopped.
+2016-Nov-19 15:41:19.702559 [INFO]    forgecontroller: Controller thread in forgecontroller interrupted
+2016-Nov-19 15:41:19.702588 [INFO]    phyengine1: Thread in Engine phyengine1 interrupted
+2016-Nov-19 15:41:19.702685 [INFO]    phyengine2: Thread in Engine phyengine2 interrupted
+2016-Nov-19 15:41:19.702806 [INFO]    phyengine3: Thread in Engine phyengine3 interrupted
+2016-Nov-19 15:41:19.702872 [INFO]    phyengine4: Thread in Engine phyengine4 interrupted
+2016-Nov-19 15:41:19.702963 [INFO]    phyengine5: Thread in Engine phyengine5 interrupted
+2016-Nov-19 15:41:19.703145 [INFO]    phyengine6: Thread in Engine phyengine6 interrupted
+2016-Nov-19 15:41:19.703208 [INFO]    phyengine7: Thread in Engine phyengine7 interrupted
+2016-Nov-19 15:41:19.703281 [INFO]    phyengine8: Thread in Engine phyengine8 interrupted
+2016-Nov-19 15:41:19.703352 [INFO]    phyengine9: Thread in Engine phyengine9 interrupted
+2016-Nov-19 15:41:19.703415 [INFO]    phyengine10: Thread in Engine phyengine10 interrupted
+2016-Nov-19 15:41:19.703505 [INFO]    phyengine11: Thread in Engine phyengine11 interrupted
+2016-Nov-19 15:41:19.703581 [INFO]    phyengine12: Thread in Engine phyengine12 interrupted
+2016-Nov-19 15:41:19.704083 [INFO]    phyengine13: Thread in Engine phyengine13 interrupted
+2016-Nov-19 15:41:19.704242 [INFO]    phyengine14: Thread in Engine phyengine14 interrupted
+2016-Nov-19 15:41:19.704342 [INFO]    System: Unloading radio
+2016-Nov-19 15:41:19.704448 [INFO]    forgecontroller: Controller thread in forgecontroller interrupted
+2016-Nov-19 15:41:19.704521 [INFO]    ControllerManager: Controller forgecontroller unloaded.
+2016-Nov-19 15:41:19.704645 [INFO]    filerawreader1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 15:41:19.704732 [INFO]    dvbt1scrambler1: Average time taken per process() call = 00:00:00.006712
+2016-Nov-19 15:41:19.704809 [INFO]    dvbt1rsencoder1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 15:41:19.704874 [INFO]    dvbt1convinterleaver1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 15:41:19.704941 [INFO]    dvbt1convencoder1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 15:41:19.705006 [INFO]    dvbt1puncturer1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 15:41:19.705075 [INFO]    dvbt1bitinterleaver1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 15:41:19.705142 [INFO]    dvbt1symbolinterleaver1: Average time taken per process() call = 00:00:00.006712
+2016-Nov-19 15:41:19.705209 [INFO]    dvbt1mapper1: Average time taken per process() call = 00:00:00.006711
+2016-Nov-19 15:41:19.705290 [INFO]    dvbt1framer1: Average time taken per process() call = 00:00:00.006712
+2016-Nov-19 15:41:19.705389 [INFO]    dvbt1ofdmmod1: Average time taken per process() call = 00:00:00.006709
+2016-Nov-19 15:41:19.705459 [INFO]    dvbt1interpolator1: Average time taken per process() call = 00:00:00.006712
+2016-Nov-19 15:41:19.705526 [INFO]    dvbt1filter1: Average time taken per process() call = 00:00:00.006712
+2016-Nov-19 15:41:19.784233 [INFO]    usrptx1: Average time taken per process() call = 00:00:00.006712

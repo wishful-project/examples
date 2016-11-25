@@ -1,0 +1,4 @@
+engine,component,parameter,name
+phyengine14,usrptx1,frequency,frequency
+phyengine14,usrptx1,gain,gain
+phyengine11,dvbt1ofdmmod1,outpower,outpower
