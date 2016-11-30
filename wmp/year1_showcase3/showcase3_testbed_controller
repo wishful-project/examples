@@ -46,6 +46,7 @@ sys.path.append('../../../upis')
 sys.path.append('../../../framework')
 sys.path.append('../../../agent')
 sys.path.append('../../../controller')
+sys.path.append("../../../agent_modules/net_linux")
 
 
 import wishful_upis as upis
@@ -116,10 +117,10 @@ def main(args):
     nodes_platform_info = []
     #control loop
     while True:
-        gevent.sleep(10)
+        gevent.sleep(2)
         print("\n")
         print("Connected nodes ", [str(node.name) for node in nodes])
-        print("(we wait for %d nodes)" % num_testbed_nodes)
+        print("we wait for %d nodes, %d found" % (num_testbed_nodes, len(nodes)))
 
         if len(nodes) == num_testbed_nodes:
 

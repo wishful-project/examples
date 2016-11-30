@@ -32,6 +32,7 @@ MAX_STA3_THR = MAX_DRAW_LINE
 MAX_STA4_THR = MAX_DRAW_LINE
 
 MAX_DRAW_LINE = 80
+DRAW_LINE_ZOOM = 2
 MAX_STA1_PWR = MAX_DRAW_LINE
 MAX_STA2_PWR = MAX_DRAW_LINE
 MAX_STA3_PWR = MAX_DRAW_LINE
@@ -70,17 +71,15 @@ BLUE_COLOR	= (146, 146, 146)
 WITHE_COLOR = (255, 255, 255)
 GRID_COLOR = (100, 100, 100)
 
-LAG_THRESHOLD	= [ # You can define custom ping thresholds that will display lines across the screen
-			{"ping": 40,  "color": (0, 120, 0), "desc": "AP1"},
-			{"ping": 35, "color": (0, 120, 0), "desc": "AP2"}
-		]
 
 #TABLE node informations
 # ip_adderss, name, THR, configuration, power
-stations_dump = [["10.11.16.126", "apuT1", 25.0, 1.0, 50.0, 1, 1 ,1, 1],
-                ["10.11.16.130", "apuU1", 25.0, 1.0, 50.0, 1, 1 ,1, 1],
-                ["10.11.16.108", "apuO4", 25.0, 1.0, 50.0, 1, 1 ,1, 1],
-                ["10.11.16.112", "node4", 25.0, 1.0, 50.0, 1, 1 ,1, 1]]
+stations_dump = [["10.11.16.126", "apuT1", 25.0, 1.0, 70.0, 1, 1 ,1, 1],
+                ["10.11.16.130", "apuU1", 25.0, 1.0, 70.0, 1, 1 ,1, 1],
+                ["10.11.16.108", "apuO4", 25.0, 1.0, 70.0, 1, 1 ,1, 1],
+                ["10.11.16.112", "node4", 25.0, 1.0, 70.0, 1, 1 ,1, 1]]
+
+node_measurements = []
 
 #num_active_traffic = 0
 #old_num_active_traffic = 0
@@ -129,6 +128,21 @@ def normalizePoints(p):
 		i = i+1
 	return ret
 
+def save_measurements(node_wlan_ip_address, node_measurements, directory):
+		""" Uses matplotlib library to plot all the measurements stored in WiFiNode object.
+            The measurements are stored in the last_bunch_measurement attribute of WiFiNode class.
+
+        """
+		out_measure={}
+		print("node : %s - measurements : %s" % (str(node_wlan_ip_address), node_measurements))
+
+		file_path = directory + '/measure.json'
+		#save experiments log
+		with open(file_path, 'w') as outfile:
+			out_measure.update({node_wlan_ip_address : node_measurements})
+			json.dump(out_measure, outfile)
+
+		return
 
 def main():
 	global CLOCK_DELTA
@@ -201,6 +215,8 @@ def main():
 			if (e.type == pygame.KEYDOWN):
 				if ((e.key == pygame.K_q) or (e.key == 113)):
 					pygame.quit()
+					print('exit control key')
+					save_measurements('192.168.3.140', node_measurements, './')
 					exit()
 
 		if (time.clock() > (CLOCK + CLOCK_DELTA)):
@@ -233,12 +249,30 @@ def main():
 			# STA2_PWR.append( MAX_SCALE_VALUE - 2 + OFFSET_LINE - (( stations_dump[1][4]/MAX_STA2_PWR)*MAX_SCALE_VALUE ) )
 			# STA3_PWR.append( MAX_SCALE_VALUE + 1 + OFFSET_LINE - (( stations_dump[2][4]/MAX_STA3_PWR)*MAX_SCALE_VALUE ) )
 			# STA4_PWR.append( MAX_SCALE_VALUE + 2 + OFFSET_LINE - (( stations_dump[3][4]/MAX_STA4_PWR)*MAX_SCALE_VALUE ) )
-			STA1_PWR.append( (( stations_dump[0][4]/MAX_STA1_PWR)*MAX_SCALE_VALUE ) )
-			STA2_PWR.append( (( stations_dump[1][4]/MAX_STA2_PWR)*MAX_SCALE_VALUE ) )
-			STA3_PWR.append( (( stations_dump[2][4]/MAX_STA3_PWR)*MAX_SCALE_VALUE ) )
-			STA4_PWR.append( (( stations_dump[3][4]/MAX_STA4_PWR)*MAX_SCALE_VALUE ) )
 
+			if stations_dump[0][4] > 60:
+				STA1_PWR_CURRENT = (stations_dump[0][4] - 60)*4
+			else:
+				STA1_PWR_CURRENT = 0
+			if stations_dump[1][4] > 60:
+				STA2_PWR_CURRENT = (stations_dump[1][4] - 60)*4
+			else:
+				STA2_PWR_CURRENT = 0
+			if stations_dump[2][4] > 60:
+				STA3_PWR_CURRENT = (stations_dump[2][4] - 60)*4
+			else:
+				STA3_PWR_CURRENT = 0
+			if stations_dump[3][4] > 60:
+				STA4_PWR_CURRENT = (stations_dump[3][4] - 60)*4
+			else:
+				STA4_PWR_CURRENT = 0
+			STA1_PWR.append( (( STA1_PWR_CURRENT/MAX_STA1_PWR)*MAX_SCALE_VALUE ) )
+			STA2_PWR.append( (( STA2_PWR_CURRENT/MAX_STA2_PWR)*MAX_SCALE_VALUE ) )
+			STA3_PWR.append( (( STA3_PWR_CURRENT/MAX_STA3_PWR)*MAX_SCALE_VALUE ) )
+			STA4_PWR.append( (( STA4_PWR_CURRENT/MAX_STA4_PWR)*MAX_SCALE_VALUE ) )
 
+			#add received measurements to the node measurements list
+			node_measurements.append([[CLOCK, stations_dump[2][3], stations_dump[0][2], (stations_dump[0][4]*-1)]])
 
 
 			if (len(STA1_CONFIGURATION) > 1):
@@ -290,10 +324,13 @@ def main():
 				#screen.blit(font1.render("RAS CONFIGURATION " + str(MAX_STA1_CONFIGURATION  - ((MAX_STA1_CONFIGURATION/(NUM_CONFIGURATION+1))*9) ) , 1, WITHE_COLOR), (screen.get_width() - 400, screen.get_height()/(NUM_CONFIGURATION+1)*9-20+OFFSET))
 				#pygame.draw.line(screen, GRID_COLOR, (5, (screen.get_height()/(NUM_CONFIGURATION+1)*9)+OFFSET), (screen.get_width()-(NUM_CONFIGURATION+1), (screen.get_height()/(NUM_CONFIGURATION+1)*9)+OFFSET))
 
-				screen.blit(font1.render(str(MAX_STA1_THR  - (MAX_STA1_THR/2)) + "Kbps" , 1, RED_COLOR), (screen.get_width() - 400, (screen.get_height()/2) -20 + OFFSET))
-				screen.blit(font1.render("-" + str(MAX_STA1_PWR  - (MAX_STA1_PWR/2) ) + "dBm", 1, YELLOW_COLOR), (screen.get_width() - 200, (screen.get_height()/2) -20 + OFFSET))
-				pygame.draw.line(screen, WITHE_COLOR, (5, (screen.get_height()/2)+OFFSET), (screen.get_width(), (screen.get_height()/2)+OFFSET))
+				screen.blit(font1.render("-" + str(60) + "dBm", 1, YELLOW_COLOR), (screen.get_width() - 200, 10 + OFFSET))
+				pygame.draw.line(screen, WITHE_COLOR, (5, (10)+OFFSET), (screen.get_width(), (10)+OFFSET))
 
+				screen.blit(font1.render(str(MAX_STA1_THR  - (MAX_STA1_THR/2)) + "Kbps" , 1, RED_COLOR), (screen.get_width() - 400, (screen.get_height()/2) -20 + OFFSET))
+				#screen.blit(font1.render("-" + str(MAX_STA1_PWR  - (MAX_STA1_PWR/2) ) + "dBm", 1, YELLOW_COLOR), (screen.get_width() - 200, (screen.get_height()/2) -20 + OFFSET))
+				screen.blit(font1.render("-" + str(70) + "dBm", 1, YELLOW_COLOR), (screen.get_width() - 200, (screen.get_height()/2) -20 + OFFSET))
+				pygame.draw.line(screen, WITHE_COLOR, (5, (screen.get_height()/2)+OFFSET), (screen.get_width(), (screen.get_height()/2)+OFFSET))
 
 				#pygame.draw.lines(screen, BLUE_COLOR, False, normalizePoints(STA1_CONFIGURATION), 5)
 				#pygame.draw.lines(screen, YELLOW_COLOR, False, normalizePoints(STA2_CONFIGURATION), 5)

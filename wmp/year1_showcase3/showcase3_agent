@@ -34,6 +34,7 @@ sys.path.append("../../../agent_modules/iperf")
 sys.path.append('../../../upis')
 sys.path.append('../../../framework')
 sys.path.append('../../../agent')
+sys.path.append("../../../agent_modules/net_linux")
 
 import wishful_agent
 from agent_modules.wifi_wmp.wmp_structure import UPI_R

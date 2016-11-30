@@ -46,6 +46,8 @@ def local_control_program(controller):
     import time
     import datetime
     import sys
+    import threading
+
     sys.path.append('../../../')
     sys.path.append("../../../agent_modules/wifi_ath")
     sys.path.append("../../../agent_modules/wifi_wmp")
@@ -53,12 +55,33 @@ def local_control_program(controller):
     sys.path.append('../../../upis')
     sys.path.append('../../../framework')
     sys.path.append('../../../agent')
+    sys.path.append("../../../agent_modules/net_linux")
     from agent_modules.wifi_wmp.wmp_structure import UPI_R
 
+    #socket iperf pointer
+	iperf_socket = None
 
-    @controller.set_default_callback()
-    def default_callback(cmd, data):
-        print(("DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(cmd, data)))
+    def rcv_from_iperf_socket(iperf_througputh, controller, interface):
+        iperf_thread = threading.currentThread()
+        print('start socket iperf')
+        iperf_port = "8301"
+        iperf_server_ip_address = "10.8.8.102"
+        context = zmq.Context()
+        iperf_socket = context.socket(zmq.SUB)
+        print("tcp://%s:%s" % (iperf_server_ip_address, iperf_port))
+        iperf_socket.connect("tcp://%s:%s" % (iperf_server_ip_address, iperf_port))
+        iperf_socket.setsockopt_string(zmq.SUBSCRIBE, '')
+
+        wlan_ip_address = controller.net.get_iface_ip_addr(interface)
+
+        print('socket iperf started')
+        while getattr(iperf_thread, "do_run", True):
+            parsed_json = iperf_socket.recv_json()
+            print('my address %s - parsed_json : %s' % (str(wlan_ip_address), str(parsed_json)))
+            rcv_ip_address = parsed_json['ip_address']
+            if rcv_ip_address == wlan_ip_address:
+                print('parsed_json : %s' % str(parsed_json))
+                iperf_througputh[0] = float(parsed_json['throughput'])
 
     """
     Custom function used to implement local WiSHFUL controller
@@ -209,21 +232,21 @@ def local_control_program(controller):
             basic_rate=2; #Mbps
 
             #MAC
-            tslot=9;
-            SIFS=10;
-            AIFS=2;
-            DIFS=AIFS*tslot+SIFS;
+            tslot=9
+            SIFS=10
+            AIFS=2
+            DIFS=AIFS*tslot+SIFS
 
             #PKT SIZE
-            l_ack=14; #byte
-            data_size=200;
+            l_ack=14 #byte
+            data_size=200
 
             t_data= Tpre + Tsig + math.ceil(Tsym/2+(22+8*(data_size))/rate);
             t_ack=Tpre + Tsig+math.ceil(l_ack*8/basic_rate);
             EIFS= t_ack + SIFS + DIFS;
 
             #select algorithm to tune node CW
-            alg="CW_OPT"
+            alg="MEDCA"
 
             #MEDCA algorithm
             if alg == "MEDCA" :
@@ -232,12 +255,12 @@ def local_control_program(controller):
                 # ipt = ipt + a * (delta_freezing - ipt);
                 # targetcw = -0.0131 * ipt ** 2 + 3.2180 * ipt + 13.9265;  # determine the target CW for this IPT
                 """""""""""""""""""""""""""""""""""""""""""""
-                targetcw = -0.0106 * ipt ** 2 + 2.9933 * ipt + 18.5519;  # determine the target CW for this IPT
-                cw_f = cw_f + b * (targetcw - cw_f);
-                cw = round(cw_f);
+                targetcw = -0.0106 * ipt ** 2 + 2.9933 * ipt + 18.5519  # determine the target CW for this IPT
+                cw_f = cw_f + b * (targetcw - cw_f)
+                cw = round(cw_f)
                 cw = int(cw)
-                cw = max(cw,CWMIN);
-                cw = min(cw,CWMAX);
+                cw = max(cw,CWMIN)
+                cw = min(cw,CWMAX)
 
             #set fixed contention windows
             if alg == "FIXED":
@@ -254,7 +277,7 @@ def local_control_program(controller):
             #update CW
             if tuning_enabler == 1 and alg != "DCF" :
                 log.warning(' >>>>>>>> CW setting : ENABLED')
-                UPI_myargs = {'interface' : interface, UPI_R.CSMA_CW : cw, UPI_R.CSMA_CW_MIN : cw }
+                UPI_myargs = {'interface' : interface, UPI_R.CSMA_CW : cw, UPI_R.CSMA_CW_MIN : cw, UPI_R.CSMA_CW_MAX : cw }
                 controller.radio.set_parameters(UPI_myargs)
             else:
                 log.warning(' >>>>>>>> CW setting : DISABLED')
@@ -264,7 +287,7 @@ def local_control_program(controller):
             if not(cycle_update % 1):
                 #communicate with global controller by passing control message
                 log.warning('Sending result message to control program ');
-                controller.send_upstream({ "measure" : [[delta_freezing, tsf_reg, delta_ack_rx_ramatch, cw, ipt, delta_data_tx, delta_ack_rx,  delta_busytime, delta_tsf_reg, delta_num_rx_match]], "ip_address" : (ip_address) })
+                controller.send_upstream({ "measure" : [[delta_freezing, tsf_reg, delta_ack_rx_ramatch, cw, ipt, delta_data_tx, delta_ack_rx,  delta_busytime, delta_tsf_reg, delta_num_rx_match, iperf_througputh[0] ]], "ip_address" : (ip_address) })
 
              #receive message from controller
             msg = controller.recv(timeout=1)
@@ -288,5 +311,10 @@ def local_control_program(controller):
             interface = msg["interface"]
             tuning_enabler = msg["tuning_enabler"]
             #controller.send_upstream({"myResult": result})
-        customLocalCtrlFunction(controller, interface, tuning_enabler)
 
+        iperf_througputh = []
+        iperf_througputh.append(0.0)
+        iperf_thread = threading.Thread(target=rcv_from_iperf_socket, args=(iperf_througputh, controller, interface))
+        iperf_thread.start()
+
+        customLocalCtrlFunction(controller, interface, tuning_enabler, iperf_througputh)

@@ -7,7 +7,7 @@ __copyright__ = "Copyright (c) 2016, CNIT"
 __version__ = "0.1.0"
 
 # Definition of Local Control Program
-def my_local_control_program(controller):
+def metamac_local_control_program(controller):
 
 	#import
 	import time

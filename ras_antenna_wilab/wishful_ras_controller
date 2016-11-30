@@ -305,31 +305,32 @@ def main(args):
     global ap2_node
     global sta2_node
 
+    #select logging level
     log.debug(args)
 
+    #open and load configuration file
     config_file_path = args['--config']
     config = None
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
-
     controller.load_config(config)
 
     #Start controller
     controller.start()
 
-    #Setup socket visualizer to send information to demo visualizer
+    #Setup plotter visualizer
     setup_socket_visualizer()
 
     #control loop
     while True:
+        #wait for node discovery
         gevent.sleep(5)
         print("\nConnected nodes", [str(node.name) for node in nodes])
         if len(nodes) == nodes_number:
 
             """
-            This part of controller assigns the correct role for any experiment node finded
+            This part of controller assigns the correct role for any experiment node found
             """
-
             #Find experiment nodes role
             for ii in range(0, len(nodes)):
                     if nodes[ii].ip == ap1_ip:
@@ -337,58 +338,67 @@ def main(args):
                     if nodes[ii].ip == sta1_ip:
                         sta1_node = nodes[ii]
 
-            # GRINGO we should exit when at least one is not fount! change
+            # We should exit when at least one is not fount
             if ap1_node == None and sta1_node == None:
                 print("Experiment nodes found, however the reported ip address do not match, please check the setting ip address, the interface and the group name")
                 break
 
-
-            """ INFRASTRUCTURE MODE """
             """
             This part of the controller performs a IEEE 802.11 network
+                        INFRASTRUCTURE MODE NETWORK
             """
             #Create a IEEE 802.11 infrastructure network where the "ap_node" node is the network Access Point
-            setAP(controller, ap1_node, network_bssid+"1", './hostapd1.conf', 40)
+            setAP(controller, ap1_node, network_bssid, './hostapd1.conf', 40)
             #
             #Connect "sta_node" node to IEEE 802.11 infrastructure network
-            connected = setSTA(controller, sta1_node, network_bssid+"1")
+            connected = setSTA(controller, sta1_node, network_bssid)
             if not connected:
                 print('Station not connect, try again')
                 break
             print('Node [ %s - %s ] connected' % (str(sta1_node.name), str(sta1_node.ip) ))
-            #
 
-            #set default antenna configuration
-            ant1_configuration = 0
-            ant2_configuration = 0
-
+            """
+            Start sniffing on monitor interface
+            We get receive power level from every frames and evaluate average
+            """
             mon_dev = "fish0"
             log.info('(2) sniff traffic at %s' % str(ap1_node.ip))
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=2)
             forever = 8000
             controller.exec_time(exec_time).callback(csResultCollector2).node(ap1_node).net.sniff_layer2_traffic(mon_dev, forever, '192.168.3.' + str(ap1_node.ip[9:12]), '192.168.3.' + str(sta1_node.ip[9:12]))
 
+            """
+            Start network traffic
+            """
+            #start iperf server on AP node
             log.info('(3) single server at %s' % str(ap1_node.ip))
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=2)
             controller.exec_time(exec_time).callback(csResultCollector3).nodes(ap1_node).net.create_packetflow_sink('5001')
-
+            #start iperf client on STA node
             log.info('(4) start server at %s' % str(sta1_node.ip))
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=4)
             controller.exec_time(exec_time).callback(csResultCollector4).node(sta1_node).net.start_packetflow( '192.168.3.'+str(ap1_node.ip[9:12]), '5001', str(forever))
 
             gevent.sleep(8)
 
+            #set default antenna configuration
+            ant1_configuration = 0
+            ant2_configuration = 0
+            #antenna has one omnidirectiona (0) configuration and 8 directiona configuration (1,2,...8)
             for ii in range(0,9):
 
-                #change antenna configuration
+                #change antenna configuration (using UPI set_sas_conf)
                 log.info('Set configuration %d - %d ' % (ant1_configuration, ant2_configuration) )
                 controller.blocking(True).node(sta1_node).radio.set_sas_conf(5, ant1_configuration, ant2_configuration, 0, 0)
 
+                #send configuration to plotter
                 configuration_message_for_visualizzer['ras_configuration'] = ant1_configuration
                 send_socket_visualizer(configuration_message_for_visualizzer, sta1_node.ip)
 
+                #test configuration for 5 seconds
                 gevent.sleep(5)
 
+                #next antenna configuration
                 ant1_configuration += 1
                 ant2_configuration += 1
 

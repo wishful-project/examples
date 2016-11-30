@@ -8,6 +8,6 @@ stations=$nodes
 set -x
 for sta in $stations
 do
-	controller_time=$(date +%T); ssh root@$sta "date +%T -s ${controller_time};" > /dev/null
+	ssh root@alix02 "ping -c 2 192.168.3.1$sta"
 done
 set +x

@@ -69,20 +69,20 @@ class TestbedTopology:
         self.controller = controller
 
         #used to save specific information for WiFi node
-        #self.wifi_ap_wmp_nodes = []
         self.wifinodes = [] #
-        #self.athnodes = [] #
 
         #used to run UPI function on node
         self.nodes = []     #
         #self.ap_node
         self.wmp_nodes = []  #
         self.ath_nodes = []  #
+        self.legacy_nodes = []  #
 
         #used to save the total number of node present in the experiment
         self.experiment_nodes_number = 0
         self.wmp_nodes_number = 0
         self.ath_nodes_number = 0
+        self.legacy_nodes_number = 0
 
         self.iface = "wlan0"
 
@@ -124,12 +124,14 @@ class TestbedTopology:
                             self.ath_nodes.append(self.nodes[ii])
                             self.ath_nodes_number += 1
 
-                        if row['platform'] == 'ath' or row['platform'] == 'wmp' or row['role'] == 'AP':
-                            #self.wifinodes.append(self.nodes[ii])
+                        if row['platform'] == 'legacy' and row['role'] != 'AP':
+                            self.legacy_nodes.append(self.nodes[ii])
+                            self.legacy_nodes_number += 1
+
+                        if row['platform'] == 'ath' or row['platform'] == 'wmp' or row['platform'] == 'legacy' or row['role'] == 'AP':
                             self.wifinodes.append(WiFiNode(self.nodes[ii]))
 
-        #self.log.debug('ath_nodes_number : %s - wmp_nodes_number : %s' % (str(self.ath_nodes_number), str(self.wmp_nodes_number) ) )
-        self.log.debug('ath_nodes_number : %s - wmp_nodes_number : %s' % (str(len(self.ath_nodes)), str(len(self.wmp_nodes)) ) )
+        self.log.debug('ath_nodes_number : %s - wmp_nodes_number : %s - legacy_nodes_number : %s' % (str(len(self.ath_nodes)), str(len(self.wmp_nodes)), str(len(self.legacy_nodes)) ) )
         self.log.debug('len wifinodes : %s' % (str(len(self.wifinodes) ) ) )
 
 
@@ -148,11 +150,24 @@ class TestbedTopology:
         """
 
         self.setAP(self.ap_node, self.exp_group_name)
-        node_index = 0
-        while node_index < self.wmp_nodes_number :
-            connected = self.setSTA(self.wmp_nodes[node_index], self.exp_group_name)
-            print('Node %s connected %s' % (str( self.wmp_nodes[node_index].ip), str(connected) ))
-            node_index += 1
+
+        # node_index = 0
+        # while node_index < self.wmp_nodes_number :
+        #     connected = self.setSTA(self.wmp_nodes[node_index], self.exp_group_name)
+        #     print('Node %s connected %s' % (str( self.wmp_nodes[node_index].ip), str(connected) ))
+        #     node_index += 1
+
+        for node in self.wmp_nodes:
+            connected = self.setSTA(node, self.exp_group_name)
+            print('Node %s connected %s' % (str( node.ip), str(connected) ))
+
+        for node in self.legacy_nodes:
+            connected = self.setSTA(node, self.exp_group_name)
+            print('Node %s connected %s' % (str( node.ip), str(connected) ))
+
+        for node in self.ath_nodes:
+            connected = self.setSTA(node, self.exp_group_name)
+            print('Node %s connected %s' % (str( node.ip), str(connected) ))
 
         return True
 
@@ -176,7 +191,8 @@ class TestbedTopology:
         #set power
         rvalue = self.controller.nodes(node).radio.set_power(15)
         #set modulation rate
-        rvalue = self.controller.nodes(node).radio.set_modulation_rate(2)
+        #rvalue = self.controller.nodes(node).radio.set_modulation_rate(2)
+        rvalue = self.controller.nodes(node).radio.set_modulation_rate(24)
 
 
     def setSTA(self, node, essid):
@@ -195,7 +211,8 @@ class TestbedTopology:
         #set power
         rvalue = self.controller.nodes(node).radio.set_power(15)
         #set modulation rate
-        rvalue = self.controller.nodes(node).radio.set_modulation_rate(2)
+        #rvalue = self.controller.nodes(node).radio.set_modulation_rate(2)
+        rvalue = self.controller.nodes(node).radio.set_modulation_rate(24)
         connected = False
         for ii in range(10):
             #associate station
