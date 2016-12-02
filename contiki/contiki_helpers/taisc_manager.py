@@ -11,7 +11,7 @@ class TAISCMACManager(MACManager):
         super(TAISCMACManager, self).__init__(node_manager, mac_mode)
         pass
 
-    def update_slotframe(self, slotframe_csv):
+    def update_slotframe(self, slotframe_csv, protocol):
         if slotframe_csv == '':
             slotframe_csv = './mac_managers/default_taisc_slotframe.csv'
         taisc_slotframe = read_taisc_slotframe(slotframe_csv)
@@ -22,13 +22,13 @@ class TAISCMACManager(MACManager):
             ret_dict[mac_address] = 0
         while(current_offset < taisc_slotframe.slotframe_length):
             slotframe_tpl = taisc_slotframe.to_tuple(current_offset, MAX_MSG_SIZE)
-            param_key_values_dict = {'taiscSlotframe': slotframe_tpl}
+            param_key_values_dict = {protocol + '_taiscSlotframe': slotframe_tpl}
             print("UPDATE : %s"%(param_key_values_dict))
             ret = self.update_macconfiguration(param_key_values_dict)
             for mac_address in ret:
                 if type(ret[mac_address]) is dict:
-                    ret_dict[mac_address] += ret[mac_address]['taiscSlotframe']
-                    ret_val+=ret[mac_address]['taiscSlotframe']
+                    ret_dict[mac_address] += ret[mac_address][protocol+'_taiscSlotframe']
+                    ret_val+=ret[mac_address][protocol+'_taiscSlotframe']
                 else:
                     ret_dict[mac_address] += ret[mac_address]
                     ret_val+=ret[mac_address]
