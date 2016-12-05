@@ -55,17 +55,17 @@ __email__ = "domenico.garlisi@cnit.it"
 Setting of experiment nodes, ip address and name
 """
 #PC
-controller_PC_ip_address = "10.8.8.6"
-controller_PC_interface = "eth0"
+controller_PC_ip_address = "172.16.0.100"
+controller_PC_interface = "eth4"
 
 # AP
 ap_name = "node0"
-ap_ip = "10.8.8.102"
+ap_ip = "172.16.0.9"
 ap_wlan_interface = "wlan0"
 
 # STA
 sta_name = "node1"
-sta_ip = "10.8.8.103"
+sta_ip = "172.16.0.12"
 sta_wlan_interface = "wlan0"
 
 #Nodes number
@@ -145,15 +145,16 @@ def node_exit(node, reason):
     print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
 
 
-@controller.add_callback(upis.radio.get_power)
-def get_power_reponse(group, node, data):
-    """ This function implements a callback to print "get_power" UPI function calling result
+@controller.add_callback(upis.radio.get_tx_power)
+def get_tx_power_reponse(group, node, data):
+    """ This function implements a callback to print "get_tx_power" UPI function calling result
 
     :param group: Experiment group name
     :param node: Node used to execute the UPI
     :param data: Execution time
     """
-    print("\n{} get_power_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+    print("\n{} get_tx_power_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+    print("\n get_tx_power result {}dBm".format(data))
 
 
 def print_response(group, node, data):
@@ -191,13 +192,13 @@ def setAP(controller, node, essid):
     #This UPI function stops the hostpad daemon, if present on node
     rvalue = controller.nodes(node).net.stop_hostapd()
     #This UPI function sets the node ip address on a specific interface
-    rvalue = controller.nodes(node).net.set_ip_address(ap_wlan_interface, '192.168.3.' + str(node.ip[7:10]))
+    rvalue = controller.nodes(node).net.set_ip_address(ap_wlan_interface, '192.168.3.' + node.ip.split('.')[3] )
     #This UPI function sets the hostapd configuration (starting from a generic file set interface, channel and SSID )
     rvalue = controller.nodes(node).net.set_hostapd_conf(ap_wlan_interface, './hostapd.conf', 6, essid)
     #This UPI function starts the hostapd daemon (it uses a specific hostapd.conf file present in the experiment directory
     rvalue = controller.nodes(node).net.start_hostapd('./hostapd.conf')
     #This UPI function sets the node power (value in dBm)
-    rvalue = controller.nodes(node).radio.set_power(15)
+    rvalue = controller.nodes(node).radio.set_tx_power(15)
     #This UPI function sets the node modulation rate (value in Mbps)
     rvalue = controller.nodes(node).radio.set_modulation_rate(2)
 
@@ -216,9 +217,9 @@ def setSTA(controller, node, essid):
     #This UPI function stops the hostpad daemon, if present on node
     rvalue = controller.nodes(node).net.stop_hostapd()
     #This UPI function sets the node ip address on a specific interface
-    rvalue = controller.nodes(node).net.set_ip_address(sta_wlan_interface, '192.168.3.' + str(node.ip[7:10]))
+    rvalue = controller.nodes(node).net.set_ip_address(sta_wlan_interface, '192.168.3.' + node.ip.split('.')[3])
     #This UPI function sets the node power (value in dBm)
-    rvalue = controller.nodes(node).radio.set_power(15)
+    rvalue = controller.nodes(node).radio.set_tx_power(15)
     #This UPI function sets the node modulation rate (value in Mbps)
     rvalue = controller.nodes(node).radio.set_modulation_rate(2)
     connected = False
@@ -295,6 +296,7 @@ def get_platform_information(node, log, controller):
     execution_engine_list_name = execution_engine_list_name[0]
     execution_engine_list_pointer = current_platform_info_str['exec_engine_list_pointer']
     execution_engine_list_pointer = execution_engine_list_pointer[0]
+    current_platform_info.execution_engine_list = [execution_engine_t() for i in range(len(execution_engine_list_name)) ]
     for ii in range( len(execution_engine_list_name) ) :
         current_platform_info.execution_engine_list[ii].execution_engine_name = execution_engine_list_name[ii]
         current_platform_info.execution_engine_list[ii].execution_engine_pointer = execution_engine_list_pointer[ii]
@@ -304,6 +306,7 @@ def get_platform_information(node, log, controller):
     radio_prg_list_name = radio_prg_list_name [0]
     radio_prg_list_pointer = current_platform_info_str['radio_prg_list_pointer']
     radio_prg_list_pointer = radio_prg_list_pointer[0]
+    current_platform_info.radio_program_list = [ radio_program_t() for i in range(len(radio_prg_list_name)) ]
     for ii in range(len(radio_prg_list_name)):
         current_platform_info.radio_program_list[ii].radio_prg_name = radio_prg_list_name[ii]
         current_platform_info.radio_program_list[ii].radio_prg_pointer = radio_prg_list_pointer[ii]
@@ -408,28 +411,29 @@ def main(args):
             This part of the controller uses the UPI set_power function to show all the framework UPI calling type
             """
             #execute non-blocking function immediately
-            controller.blocking(False).node(sta_node).radio.set_power(20)
+            print("\n{} TX power setting".format(datetime.datetime.now()))
+            controller.blocking(False).node(sta_node).radio.set_tx_power(20)
             gevent.sleep(5)
 
             #execute blocking function immediately
-            result = controller.node(sta_node).radio.get_power()
-            print("\n{} Channel is: {}".format(datetime.datetime.now(), result))
+            result = controller.node(sta_node).radio.get_tx_power()
+            print("\n{} TX power reading result: {}dBm".format(datetime.datetime.now(), result))
             gevent.sleep(5)
 
             #schedule non-blocking function with delay
-            controller.delay(3).node(sta_node).radio.set_power(10)
+            controller.delay(3).node(sta_node).radio.set_tx_power(10)
             gevent.sleep(5)
 
             #execute non-blocking function immediately, with registered callback
-            controller.blocking(False).node(sta_node).radio.get_power()
+            controller.blocking(False).node(sta_node).radio.get_tx_power()
             gevent.sleep(5)
 
             #schedule non-blocking function with precise execution time
             exec_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-            controller.exec_time(exec_time).node(sta_node).radio.set_power(15)
+            controller.exec_time(exec_time).node(sta_node).radio.set_tx_power(15)
 
             #execute non-blocking function immediately, with specific callback
-            controller.callback(print_response).node(sta_node).radio.get_power()
+            controller.callback(print_response).node(sta_node).radio.get_tx_power()
             gevent.sleep(5)
 
 

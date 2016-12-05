@@ -17,6 +17,7 @@ if [ 1 -eq 1 ]; then
         rsync -avz  ../../agent_modules/iperf/  -e ssh root@$node:~/wishful-github-manifest/agent_modules/iperf/
         rsync -avz  ../../agent_modules/wifi_wmp/  -e ssh root@$node:~/wishful-github-manifest/agent_modules/wifi_wmp/
         rsync -avz  ../../agent_modules/wifi/  -e ssh root@$node:~/wishful-github-manifest/agent_modules/wifi/
+        rsync -avz  ../../agent_modules/net_linux/  -e ssh root@$node:~/wishful-github-manifest/agent_modules/net_linux/
         rsync -avz  ../../examples/example_tutorial/  -e ssh root@$node:~/wishful-github-manifest/examples/example_tutorial/
     done
 

@@ -176,7 +176,7 @@ class TestbedTopology:
         #start hostapd
         rvalue = self.controller.nodes(node).net.start_hostapd('./wmp_helper/hostapd.conf')
         #set power
-        rvalue = self.controller.nodes(node).radio.set_power(15)
+        rvalue = self.controller.nodes(node).radio.set_tx_power(15)
         #set modulation rate
         rvalue = self.controller.nodes(node).radio.set_modulation_rate(6)
 
@@ -195,7 +195,7 @@ class TestbedTopology:
         #set ip address
         rvalue = self.controller.nodes(node).net.set_ip_address(self.iface, wlan_ipAddress)
         #set power
-        rvalue = self.controller.nodes(node).radio.set_power(15)
+        rvalue = self.controller.nodes(node).radio.set_tx_power(15)
         #set modulation rate
         rvalue = self.controller.nodes(node).radio.set_modulation_rate(6)
         connected = False

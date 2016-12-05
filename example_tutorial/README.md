@@ -39,17 +39,17 @@ An example of configuration is reported below.
 Setting of experiment nodes, ip address and name
 """
 #PC
-controller_PC_ip_address = "10.8.8.6"
-controller_PC_interface = "eth0"
+controller_PC_ip_address = "172.16.0.100"
+controller_PC_interface = "eth4"
 
 # AP
 ap_name = "node0"
-ap_ip = "10.8.8.102"
+ap_ip = "172.16.0.9"
 ap_wlan_interface = "wlan0"
 
 # STA
 sta_name = "node1"
-sta_ip = "10.8.8.103"
+sta_ip = "172.16.0.12"
 sta_wlan_interface = "wlan0"
 
 #Nodes number
