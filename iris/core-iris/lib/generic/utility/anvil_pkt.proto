@@ -1,0 +1,60 @@
+// Copyright 2013 Andre Puschmann <andre.puschmann@tu-ilmenau.de>
+// Copyright 2012-2013 The Iris Project Developers. See the
+// COPYRIGHT file at the top-level directory of this distribution
+// and at http://www.softwareradiosystems.com/iris/copyright.html.
+//
+// This file is part of the Iris Project.
+//
+// Iris is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as
+// published by the Free Software Foundation, either version 3 of
+// the License, or (at your option) any later version.
+//
+// Iris is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// A copy of the GNU Lesser General Public License can be found in
+// the LICENSE file in the top-level directory of this distribution
+// and at http://www.gnu.org/licenses/.
+//
+
+enum AnvilTag {
+    DEMOD_FRAME = 0;
+    
+    DEMOD_PREAMBLE = 1;
+    DEMOD_EQUALIZER = 2;
+    DEMOD_SYMBOL = 3;
+    MOD_PREAMBLE = 4;
+    MOD_FRAME = 5;
+    MOD_BINS = 6;
+    
+    PSD_BINS = 7;
+    PSD_COMPRESSED_BINS = 8;
+
+    FRAME_DROP = 9;
+    RX_POWER_TIME = 10;
+    TR_POWER_TIME = 11;
+    ROTATION = 12;
+}
+
+message CplxNumber {
+    required float real = 1;
+    required float imag = 2;
+}
+
+message PSDHeader {
+    required uint32 nbins = 1;
+    required float freqmin = 2;
+    required float freqmax = 3;
+}
+
+message AnvilProtoPacket {
+    required AnvilTag tag = 1;
+    optional uint64 seqno = 2;
+    repeated float float_data = 3;
+    repeated CplxNumber cplx_data = 4;
+    optional PSDHeader header = 5;
+    repeated bytes bytes_data = 6;
+}
