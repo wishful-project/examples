@@ -1,0 +1,853 @@
+2016-Oct-13 10:46:58.379344 [INFO]    System: Loading radio: demo_highest_8K.xml
+2016-Oct-13 10:46:58.444240 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-13 10:46:58.444288 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-13 10:46:58.444321 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-13 10:46:58.444338 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-13 10:46:58.444363 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-13 10:46:58.444378 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-13 10:46:58.444401 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-13 10:46:58.444417 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-13 10:46:58.444441 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-13 10:46:58.444456 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-13 10:46:58.444480 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-13 10:46:58.444495 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-13 10:46:58.444517 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-13 10:46:58.444533 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-13 10:46:58.444559 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-13 10:46:58.444574 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-13 10:46:58.444596 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-13 10:46:58.444611 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-13 10:46:58.444643 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-13 10:46:58.444660 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-13 10:46:58.445470 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-13 10:46:58.445490 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-13 10:46:58.445521 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-13 10:46:58.445537 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-13 10:46:58.445562 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-13 10:46:58.445577 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-13 10:46:58.445604 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-13 10:46:58.445620 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-13 10:46:58.445659 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-13 10:46:58.445680 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-13 10:46:58.445698 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-13 10:46:58.445717 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-13 10:46:58.445734 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-13 10:46:58.445753 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-13 10:46:58.445770 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-13 10:46:58.445787 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-13 10:46:58.445803 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-13 10:46:58.445821 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-13 10:46:58.445838 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-13 10:46:58.445854 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-13 10:46:58.445870 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-13 10:46:58.685166 [FATAL]   filerawreader1: Could not open file hd4hi.ts for reading.
+2016-Oct-13 10:46:58.700590 [FATAL]   System: Error loading radio: Could not open file hd4hi.ts for reading.
+2016-Oct-13 12:40:52.153134 [INFO]    System: Loading radio: test-tcd.xml
+2016-Oct-13 12:40:52.153596 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-13 12:40:52.153655 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-13 12:40:52.163259 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-13 12:40:52.163360 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-13 12:40:52.163413 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-13 12:40:52.163473 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-13 12:40:52.163523 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-13 12:40:52.163579 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-13 12:40:52.163629 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-13 12:40:52.163686 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-13 12:40:52.163735 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-13 12:40:52.163793 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-13 12:40:52.163842 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-13 12:40:52.163898 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-13 12:40:52.163956 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-13 12:40:52.164014 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-13 12:40:52.164063 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-13 12:40:52.164118 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-13 12:40:52.164167 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-13 12:40:52.164232 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-13 12:40:52.164283 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-13 12:40:52.164347 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-13 12:40:52.164399 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-13 12:40:52.164574 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-13 12:40:52.164627 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-13 12:40:52.164679 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-13 12:40:52.164729 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-13 12:40:52.164790 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-13 12:40:52.164838 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-13 12:40:52.164910 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-13 12:40:52.164962 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-13 12:40:52.165015 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-13 12:40:52.165066 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-13 12:40:52.165116 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-13 12:40:52.165137 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-13 12:40:52.165138 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-13 12:40:52.165168 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-13 12:40:52.165244 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-13 12:40:52.165300 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-13 12:40:52.165386 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-13 12:40:52.166469 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-13 12:40:52.166538 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-13 12:40:52.197701 [FATAL]   filerawreader1: Could not open file hd4hi.ts for reading.
+2016-Oct-13 12:40:52.197893 [FATAL]   System: Error loading radio: Could not open file hd4hi.ts for reading.
+2016-Oct-13 12:41:17.031788 [INFO]    System: Loading radio: test-tcd.xml
+2016-Oct-13 12:41:17.032324 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-13 12:41:17.032385 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-13 12:41:17.032440 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-13 12:41:17.032506 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-13 12:41:17.032557 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-13 12:41:17.032615 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-13 12:41:17.032664 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-13 12:41:17.032721 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-13 12:41:17.032770 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-13 12:41:17.032826 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-13 12:41:17.032874 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-13 12:41:17.032931 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-13 12:41:17.032979 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-13 12:41:17.033035 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-13 12:41:17.033086 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-13 12:41:17.033144 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-13 12:41:17.033193 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-13 12:41:17.033249 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-13 12:41:17.033297 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-13 12:41:17.033362 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-13 12:41:17.033413 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-13 12:41:17.033478 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-13 12:41:17.033530 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-13 12:41:17.033590 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-13 12:41:17.033639 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-13 12:41:17.033697 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-13 12:41:17.033745 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-13 12:41:17.033811 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-13 12:41:17.033861 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-13 12:41:17.033930 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-13 12:41:17.037076 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-13 12:41:17.037221 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-13 12:41:17.037278 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-13 12:41:17.037331 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-13 12:41:17.037395 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-13 12:41:17.037450 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-13 12:41:17.037534 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-13 12:41:17.037618 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-13 12:41:17.037678 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-13 12:41:17.037735 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-13 12:41:17.037792 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-13 12:41:17.037892 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-13 12:41:17.058419 [FATAL]   filerawreader1: Could not open file hd4hi.ts for reading.
+2016-Oct-13 12:41:17.060604 [FATAL]   System: Error loading radio: Could not open file hd4hi.ts for reading.
+2016-Oct-13 12:44:16.375164 [INFO]    System: Loading radio: test-tcd.xml
+2016-Oct-13 12:44:16.375633 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-13 12:44:16.375694 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-13 12:44:16.375749 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-13 12:44:16.375813 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-13 12:44:16.375862 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-13 12:44:16.375920 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-13 12:44:16.375968 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-13 12:44:16.376024 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-13 12:44:16.376073 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-13 12:44:16.376127 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-13 12:44:16.376175 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-13 12:44:16.376231 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-13 12:44:16.376279 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-13 12:44:16.376334 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-13 12:44:16.376385 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-13 12:44:16.376445 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-13 12:44:16.376493 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-13 12:44:16.376549 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-13 12:44:16.376597 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-13 12:44:16.376661 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-13 12:44:16.376711 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-13 12:44:16.376777 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-13 12:44:16.376829 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-13 12:44:16.376889 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-13 12:44:16.376938 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-13 12:44:16.376996 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-13 12:44:16.377044 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-13 12:44:16.377104 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-13 12:44:16.377152 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-13 12:44:16.377220 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-13 12:44:16.377273 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-13 12:44:16.377327 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-13 12:44:16.377378 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-13 12:44:16.377429 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-13 12:44:16.377479 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-13 12:44:16.377530 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-13 12:44:16.377580 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-13 12:44:16.377629 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-13 12:44:16.377681 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-13 12:44:16.377731 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-13 12:44:16.377781 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-13 12:44:16.377831 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-13 12:44:16.384629 [FATAL]   filerawreader1: Could not open file hd4hi.ts for reading.
+2016-Oct-13 12:44:16.385963 [FATAL]   System: Error loading radio: Could not open file hd4hi.ts for reading.
+2016-Oct-13 16:34:45.123659 [INFO]    System: Loading radio: test-tcd.xml
+2016-Oct-13 16:34:45.249158 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-13 16:34:45.249241 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-13 16:34:45.249308 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-13 16:34:45.249379 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-13 16:34:45.249443 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-13 16:34:45.249499 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-13 16:34:45.249546 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-13 16:34:45.249600 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-13 16:34:45.249647 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-13 16:34:45.249699 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-13 16:34:45.249746 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-13 16:34:45.249801 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-13 16:34:45.249847 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-13 16:34:45.249900 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-13 16:34:45.249949 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-13 16:34:45.250003 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-13 16:34:45.250050 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-13 16:34:45.250102 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-13 16:34:45.250147 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-13 16:34:45.250212 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-13 16:34:45.250260 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-13 16:34:45.250321 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-13 16:34:45.250370 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-13 16:34:45.250430 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-13 16:34:45.250478 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-13 16:34:45.250533 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-13 16:34:45.250578 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-13 16:34:45.250635 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-13 16:34:45.250681 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-13 16:34:45.250747 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-13 16:34:45.250797 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-13 16:34:45.250849 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-13 16:34:45.250898 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-13 16:34:45.250946 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-13 16:34:45.251025 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-13 16:34:45.251093 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-13 16:34:45.251141 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-13 16:34:45.251188 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-13 16:34:45.251238 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-13 16:34:45.251285 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-13 16:34:45.251332 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-13 16:34:45.251379 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-13 16:34:45.461130 [FATAL]   filerawreader1: Could not open file hd4hi.ts for reading.
+2016-Oct-13 16:34:45.488131 [FATAL]   System: Error loading radio: Could not open file hd4hi.ts for reading.
+2016-Oct-13 16:36:58.610951 [INFO]    System: Loading radio: test-tcd.xml
+2016-Oct-13 16:36:58.612144 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-13 16:36:58.612923 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-13 16:36:58.619902 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-13 16:36:58.620101 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-13 16:36:58.620159 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-13 16:36:58.620360 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-13 16:36:58.620417 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-13 16:36:58.620474 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-13 16:36:58.620524 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-13 16:36:58.620804 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-13 16:36:58.620866 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-13 16:36:58.620925 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-13 16:36:58.620973 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-13 16:36:58.621028 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-13 16:36:58.621080 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-13 16:36:58.621253 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-13 16:36:58.621373 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-13 16:36:58.621850 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-13 16:36:58.622036 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-13 16:36:58.622352 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-13 16:36:58.622411 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-13 16:36:58.622478 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-13 16:36:58.622531 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-13 16:36:58.622589 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-13 16:36:58.622637 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-13 16:36:58.623810 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-13 16:36:58.623880 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-13 16:36:58.623947 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-13 16:36:58.623996 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-13 16:36:58.624065 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-13 16:36:58.624118 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-13 16:36:58.624171 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-13 16:36:58.624221 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-13 16:36:58.624271 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-13 16:36:58.624344 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-13 16:36:58.624404 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-13 16:36:58.624454 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-13 16:36:58.624502 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-13 16:36:58.624583 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-13 16:36:58.624672 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-13 16:36:58.624731 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-13 16:36:58.624780 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-13 16:36:58.637323 [FATAL]   filerawreader1: Could not open file hd4hi.ts for reading.
+2016-Oct-13 16:36:58.637520 [FATAL]   System: Error loading radio: Could not open file hd4hi.ts for reading.
+2016-Oct-17 11:09:24.783124 [INFO]    System: Loading radio: test-tcd.xml
+2016-Oct-17 11:09:24.898653 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 11:09:24.898744 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 11:09:24.898808 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 11:09:24.898877 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 11:09:24.898932 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 11:09:24.898952 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 11:09:24.899367 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 11:09:24.899448 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 11:09:24.899500 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 11:09:24.899557 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 11:09:24.899707 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 11:09:24.899772 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 11:09:24.899823 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 11:09:24.899880 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 11:09:24.899935 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 11:09:24.899992 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 11:09:24.900042 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 11:09:24.900121 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 11:09:24.900171 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 11:09:24.900236 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 11:09:24.900287 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 11:09:24.900351 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 11:09:24.900401 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 11:09:24.900461 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 11:09:24.900509 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 11:09:24.900567 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 11:09:24.900616 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 11:09:24.900676 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 11:09:24.900724 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 11:09:24.900794 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 11:09:24.900847 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 11:09:24.900901 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 11:09:24.900954 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 11:09:24.901004 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 11:09:24.901055 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 11:09:24.901105 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 11:09:24.901195 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 11:09:24.901245 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 11:09:24.901297 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 11:09:24.901347 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 11:09:24.901397 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 11:09:24.901447 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 11:09:25.160893 [FATAL]   filerawreader1: Could not open file hd4hi.ts for reading.
+2016-Oct-17 11:09:25.189638 [FATAL]   System: Error loading radio: Could not open file hd4hi.ts for reading.
+2016-Oct-17 11:22:17.061633 [INFO]    System: Loading radio: test-tcd.xml
+2016-Oct-17 11:22:17.062143 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 11:22:17.062224 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 11:22:17.062414 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 11:22:17.062586 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 11:22:17.062640 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 11:22:17.062698 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 11:22:17.062744 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 11:22:17.062796 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 11:22:17.062842 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 11:22:17.062894 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 11:22:17.062939 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 11:22:17.062992 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 11:22:17.067606 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 11:22:17.067831 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 11:22:17.067896 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 11:22:17.068714 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 11:22:17.068776 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 11:22:17.068836 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 11:22:17.068883 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 11:22:17.068948 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 11:22:17.068997 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 11:22:17.069059 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 11:22:17.069107 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 11:22:17.069164 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 11:22:17.069221 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 11:22:17.069288 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 11:22:17.069333 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 11:22:17.069389 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 11:22:17.069435 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 11:22:17.069501 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 11:22:17.069551 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 11:22:17.069602 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 11:22:17.069651 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 11:22:17.069698 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 11:22:17.069747 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 11:22:17.069794 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 11:22:17.069841 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 11:22:17.069888 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 11:22:17.069936 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 11:22:17.069984 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 11:22:17.070042 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 11:22:17.070101 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 11:22:17.086626 [FATAL]   filerawreader1: Could not open file hd4hi.ts for reading.
+2016-Oct-17 11:22:17.087032 [FATAL]   System: Error loading radio: Could not open file hd4hi.ts for reading.
+2016-Oct-17 14:51:52.918864 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 14:51:53.036740 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 14:51:53.036815 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 14:51:53.036882 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 14:51:53.036934 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 14:51:53.036994 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 14:51:53.037045 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 14:51:53.037103 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 14:51:53.037154 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 14:51:53.037212 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 14:51:53.037262 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 14:51:53.037363 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 14:51:53.037413 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 14:51:53.037470 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 14:51:53.037522 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 14:51:53.037592 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 14:51:53.037647 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 14:51:53.037704 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 14:51:53.037752 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 14:51:53.037818 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 14:51:53.037869 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 14:51:53.037950 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 14:51:53.038028 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 14:51:53.038141 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 14:51:53.038243 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 14:51:53.038786 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 14:51:53.038856 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 14:51:53.038919 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 14:51:53.038969 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 14:51:53.039043 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 14:51:53.039097 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 14:51:53.039152 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 14:51:53.039205 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 14:51:53.039256 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 14:51:53.039307 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 14:51:53.039344 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 14:51:53.039385 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 14:51:53.039449 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 14:51:53.039489 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 14:51:53.039525 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 14:51:53.039561 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 14:51:53.039596 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 14:51:53.238494 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 14:51:53.252278 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Oct-17 14:52:20.136490 [INFO]    System: Loading radio: test-tcd.xml
+2016-Oct-17 14:52:20.159721 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 14:52:20.159793 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 14:52:20.159849 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 14:52:20.159964 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 14:52:20.160014 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 14:52:20.160084 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 14:52:20.160143 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 14:52:20.160198 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 14:52:20.160246 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 14:52:20.160300 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 14:52:20.160348 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 14:52:20.160403 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 14:52:20.160451 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 14:52:20.160506 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 14:52:20.160558 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 14:52:20.160614 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 14:52:20.160661 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 14:52:20.160714 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 14:52:20.160762 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 14:52:20.160825 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 14:52:20.160875 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 14:52:20.160938 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 14:52:20.160989 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 14:52:20.161047 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 14:52:20.161108 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 14:52:20.161176 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 14:52:20.161223 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 14:52:20.161282 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 14:52:20.161330 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 14:52:20.161398 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 14:52:20.161451 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 14:52:20.161504 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 14:52:20.161556 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 14:52:20.161605 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 14:52:20.161657 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 14:52:20.161706 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 14:52:20.161756 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 14:52:20.161805 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 14:52:20.161856 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 14:52:20.161906 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 14:52:20.161955 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 14:52:20.162004 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 14:52:20.272466 [FATAL]   filerawreader1: Could not open file hd4hi.ts for reading.
+2016-Oct-17 14:52:20.273217 [FATAL]   System: Error loading radio: Could not open file hd4hi.ts for reading.
+2016-Oct-17 15:08:04.514413 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 15:08:04.569294 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 15:08:04.569368 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 15:08:04.569429 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 15:08:04.569497 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 15:08:04.569553 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 15:08:04.569618 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 15:08:04.569673 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 15:08:04.569735 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 15:08:04.569791 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 15:08:04.569835 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 15:08:04.569873 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 15:08:04.569921 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 15:08:04.569958 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 15:08:04.570003 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 15:08:04.570041 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 15:08:04.570086 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 15:08:04.570123 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 15:08:04.570166 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 15:08:04.570183 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 15:08:04.570258 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 15:08:04.570276 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 15:08:04.570343 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 15:08:04.570380 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 15:08:04.570427 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 15:08:04.570463 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 15:08:04.570509 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 15:08:04.570545 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 15:08:04.570591 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 15:08:04.570627 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 15:08:04.570703 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 15:08:04.570744 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 15:08:04.570784 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 15:08:04.570824 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 15:08:04.570900 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 15:08:04.570939 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 15:08:04.570977 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 15:08:04.571016 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 15:08:04.571053 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 15:08:04.571092 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 15:08:04.571134 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 15:08:04.571172 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 15:08:04.571190 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 15:08:04.810936 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:08:04.823523 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:10:39.888761 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 15:10:39.959803 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 15:10:39.959852 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 15:10:39.959924 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 15:10:39.960001 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 15:10:39.960064 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 15:10:39.960184 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 15:10:39.960469 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 15:10:39.960809 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 15:10:39.960995 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 15:10:39.961112 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 15:10:39.961175 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 15:10:39.961293 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 15:10:39.961394 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 15:10:39.961620 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 15:10:39.961753 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 15:10:39.961871 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 15:10:39.961966 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 15:10:39.962057 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 15:10:39.962113 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 15:10:39.962187 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 15:10:39.962245 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 15:10:39.962318 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 15:10:39.962375 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 15:10:39.962440 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 15:10:39.962497 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 15:10:39.962563 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 15:10:39.962619 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 15:10:39.962684 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 15:10:39.962746 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 15:10:39.962827 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 15:10:39.962914 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 15:10:39.962985 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 15:10:39.963044 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 15:10:39.963100 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 15:10:39.963157 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 15:10:39.963222 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 15:10:39.963277 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 15:10:39.963314 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 15:10:39.963353 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 15:10:39.963397 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 15:10:39.963434 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 15:10:39.963471 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 15:10:40.087462 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:10:40.087635 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:26:27.587807 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 15:26:27.609458 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 15:26:27.609581 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 15:26:27.609658 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 15:26:27.609741 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 15:26:27.609824 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 15:26:27.609912 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 15:26:27.609980 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 15:26:27.610454 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 15:26:27.610514 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 15:26:27.610576 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 15:26:27.610642 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 15:26:27.610870 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 15:26:27.610947 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 15:26:27.611020 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 15:26:27.611282 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 15:26:27.611356 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 15:26:27.611414 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 15:26:27.611480 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 15:26:27.611540 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 15:26:27.611590 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 15:26:27.611605 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 15:26:27.611691 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 15:26:27.611750 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 15:26:27.611820 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 15:26:27.611893 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 15:26:27.612208 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 15:26:27.612608 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 15:26:27.612761 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 15:26:27.612855 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 15:26:27.614599 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 15:26:27.614641 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 15:26:27.614659 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 15:26:27.614675 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 15:26:27.614691 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 15:26:27.614705 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 15:26:27.614721 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 15:26:27.614736 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 15:26:27.614749 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 15:26:27.614765 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 15:26:27.614786 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 15:26:27.614801 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 15:26:27.614815 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 15:26:27.980838 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:26:28.008750 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:26:50.155535 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 15:26:50.156023 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 15:26:50.156088 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 15:26:50.156146 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 15:26:50.156211 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 15:26:50.156264 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 15:26:50.156326 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 15:26:50.156379 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 15:26:50.156439 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 15:26:50.156493 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 15:26:50.156551 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 15:26:50.156604 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 15:26:50.156666 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 15:26:50.156719 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 15:26:50.156779 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 15:26:50.156832 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 15:26:50.156893 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 15:26:50.156946 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 15:26:50.157006 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 15:26:50.157058 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 15:26:50.157126 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 15:26:50.157181 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 15:26:50.157251 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 15:26:50.157304 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 15:26:50.157367 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 15:26:50.157420 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 15:26:50.157483 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 15:26:50.157535 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 15:26:50.157596 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 15:26:50.157649 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 15:26:50.157723 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 15:26:50.157781 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 15:26:50.157837 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 15:26:50.157893 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 15:26:50.157949 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 15:26:50.158005 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 15:26:50.158059 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 15:26:50.158113 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 15:26:50.158167 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 15:26:50.158224 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 15:26:50.158281 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 15:26:50.158337 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 15:26:50.158390 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 15:26:50.209798 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:26:50.217575 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:28:10.533441 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 15:28:10.533858 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 15:28:10.533881 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 15:28:10.533898 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 15:28:10.533922 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 15:28:10.533936 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 15:28:10.533957 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 15:28:10.533969 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 15:28:10.533988 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 15:28:10.534001 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 15:28:10.534019 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 15:28:10.534031 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 15:28:10.534053 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 15:28:10.534065 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 15:28:10.534084 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 15:28:10.534097 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 15:28:10.534117 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 15:28:10.534130 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 15:28:10.534148 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 15:28:10.534160 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 15:28:10.534187 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 15:28:10.534201 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 15:28:10.534230 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 15:28:10.534243 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 15:28:10.534266 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 15:28:10.534278 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 15:28:10.534301 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 15:28:10.534313 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 15:28:10.534334 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 15:28:10.534346 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 15:28:10.534380 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 15:28:10.534397 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 15:28:10.534412 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 15:28:10.534428 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 15:28:10.534442 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 15:28:10.534457 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 15:28:10.534471 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 15:28:10.534485 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 15:28:10.534498 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 15:28:10.534513 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 15:28:10.534531 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 15:28:10.534545 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 15:28:10.534558 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 15:28:10.538744 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:28:10.538930 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:33:26.168659 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 15:33:26.173307 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 15:33:26.174070 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 15:33:26.174144 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 15:33:26.174216 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 15:33:26.174275 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 15:33:26.174343 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 15:33:26.174401 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 15:33:26.174467 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 15:33:26.174525 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 15:33:26.174589 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 15:33:26.174647 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 15:33:26.174716 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 15:33:26.174774 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 15:33:26.174838 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 15:33:26.174895 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 15:33:26.174962 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 15:33:26.175019 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 15:33:26.175466 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 15:33:26.175543 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 15:33:26.175623 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 15:33:26.175683 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 15:33:26.175762 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 15:33:26.175820 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 15:33:26.175889 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 15:33:26.175946 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 15:33:26.176016 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 15:33:26.176073 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 15:33:26.176140 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 15:33:26.176198 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 15:33:26.176282 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 15:33:26.176344 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 15:33:26.176405 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 15:33:26.176465 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 15:33:26.176525 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 15:33:26.176583 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 15:33:26.176643 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 15:33:26.176730 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 15:33:26.176790 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 15:33:26.176851 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 15:33:26.176915 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 15:33:26.176973 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 15:33:26.177032 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 15:33:26.262477 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:33:26.262670 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:35:13.501684 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 15:35:13.502286 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 15:35:13.502352 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 15:35:13.502410 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 15:35:13.502475 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 15:35:13.502529 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 15:35:13.502592 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 15:35:13.502645 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 15:35:13.502705 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 15:35:13.502758 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 15:35:13.502818 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 15:35:13.502871 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 15:35:13.502935 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 15:35:13.502989 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 15:35:13.503074 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 15:35:13.503191 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 15:35:13.503279 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 15:35:13.503333 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 15:35:13.503394 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 15:35:13.503447 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 15:35:13.503518 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 15:35:13.503574 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 15:35:13.503647 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 15:35:13.503703 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 15:35:13.503767 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 15:35:13.503820 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 15:35:13.503885 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 15:35:13.503938 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 15:35:13.504000 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 15:35:13.504053 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 15:35:13.504133 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 15:35:13.504191 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 15:35:13.504247 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 15:35:13.504304 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 15:35:13.504360 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 15:35:13.504416 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 15:35:13.504471 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 15:35:13.504526 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 15:35:13.504581 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 15:35:13.504637 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 15:35:13.504697 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 15:35:13.504751 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 15:35:13.504806 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 15:35:13.556941 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:35:13.558509 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:36:23.075505 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 15:36:23.075988 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 15:36:23.076053 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 15:36:23.076112 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 15:36:23.076176 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 15:36:23.076229 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 15:36:23.076292 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 15:36:23.076344 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 15:36:23.076404 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 15:36:23.076459 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 15:36:23.076517 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 15:36:23.076570 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 15:36:23.076633 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 15:36:23.076686 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 15:36:23.076745 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 15:36:23.076799 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 15:36:23.076861 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 15:36:23.076964 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 15:36:23.077883 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 15:36:23.077955 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 15:36:23.078032 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 15:36:23.078087 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 15:36:23.078160 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 15:36:23.078214 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 15:36:23.078279 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 15:36:23.078408 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 15:36:23.078676 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 15:36:23.078738 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 15:36:23.078803 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 15:36:23.078856 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 15:36:23.078936 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 15:36:23.079124 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 15:36:23.079148 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 15:36:23.079206 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 15:36:23.079262 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 15:36:23.079317 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 15:36:23.079372 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 15:36:23.079426 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 15:36:23.079480 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 15:36:23.079537 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 15:36:23.085274 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 15:36:23.085367 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 15:36:23.085424 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 15:36:23.102022 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:36:23.102255 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:42:59.866696 [INFO]    System: Loading radio: demo_typical_8K.xml
+2016-Oct-17 15:42:59.883456 [INFO]    XmlParser: Parsed controller: forgecontroller
+2016-Oct-17 15:42:59.883522 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Oct-17 15:42:59.883546 [INFO]    XmlParser: Parsed component: filerawreader1
+2016-Oct-17 15:42:59.883571 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Oct-17 15:42:59.883585 [INFO]    XmlParser: Parsed component: dvbt1scrambler1
+2016-Oct-17 15:42:59.883606 [INFO]    XmlParser: Parsed engine: phyengine3
+2016-Oct-17 15:42:59.883619 [INFO]    XmlParser: Parsed component: dvbt1rsencoder1
+2016-Oct-17 15:42:59.883638 [INFO]    XmlParser: Parsed engine: phyengine4
+2016-Oct-17 15:42:59.883652 [INFO]    XmlParser: Parsed component: dvbt1convinterleaver1
+2016-Oct-17 15:42:59.883670 [INFO]    XmlParser: Parsed engine: phyengine5
+2016-Oct-17 15:42:59.883683 [INFO]    XmlParser: Parsed component: dvbt1convencoder1
+2016-Oct-17 15:42:59.883705 [INFO]    XmlParser: Parsed engine: phyengine6
+2016-Oct-17 15:42:59.883718 [INFO]    XmlParser: Parsed component: dvbt1puncturer1
+2016-Oct-17 15:42:59.883737 [INFO]    XmlParser: Parsed engine: phyengine7
+2016-Oct-17 15:42:59.883750 [INFO]    XmlParser: Parsed component: dvbt1bitinterleaver1
+2016-Oct-17 15:42:59.883770 [INFO]    XmlParser: Parsed engine: phyengine8
+2016-Oct-17 15:42:59.883783 [INFO]    XmlParser: Parsed component: dvbt1symbolinterleaver1
+2016-Oct-17 15:42:59.883801 [INFO]    XmlParser: Parsed engine: phyengine9
+2016-Oct-17 15:42:59.883814 [INFO]    XmlParser: Parsed component: dvbt1mapper1
+2016-Oct-17 15:42:59.883842 [INFO]    XmlParser: Parsed engine: phyengine10
+2016-Oct-17 15:42:59.883856 [INFO]    XmlParser: Parsed component: dvbt1framer1
+2016-Oct-17 15:42:59.883885 [INFO]    XmlParser: Parsed engine: phyengine11
+2016-Oct-17 15:42:59.883899 [INFO]    XmlParser: Parsed component: dvbt1ofdmmod1
+2016-Oct-17 15:42:59.883934 [INFO]    XmlParser: Parsed engine: phyengine12
+2016-Oct-17 15:42:59.883948 [INFO]    XmlParser: Parsed component: dvbt1interpolator1
+2016-Oct-17 15:42:59.883982 [INFO]    XmlParser: Parsed engine: phyengine13
+2016-Oct-17 15:42:59.883995 [INFO]    XmlParser: Parsed component: dvbt1filter1
+2016-Oct-17 15:42:59.884016 [INFO]    XmlParser: Parsed engine: phyengine14
+2016-Oct-17 15:42:59.884029 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Oct-17 15:42:59.884939 [INFO]    XmlParser: Parsed link: filerawreader1 . output1 -> dvbt1scrambler1 . input1
+2016-Oct-17 15:42:59.885026 [INFO]    XmlParser: Parsed link: dvbt1scrambler1 . output1 -> dvbt1rsencoder1 . input1
+2016-Oct-17 15:42:59.885090 [INFO]    XmlParser: Parsed link: dvbt1rsencoder1 . output1 -> dvbt1convinterleaver1 . input1
+2016-Oct-17 15:42:59.885149 [INFO]    XmlParser: Parsed link: dvbt1convinterleaver1 . output1 -> dvbt1convencoder1 . input1
+2016-Oct-17 15:42:59.885208 [INFO]    XmlParser: Parsed link: dvbt1convencoder1 . output1 -> dvbt1puncturer1 . input1
+2016-Oct-17 15:42:59.885283 [INFO]    XmlParser: Parsed link: dvbt1puncturer1 . output1 -> dvbt1bitinterleaver1 . input1
+2016-Oct-17 15:42:59.885354 [INFO]    XmlParser: Parsed link: dvbt1bitinterleaver1 . output1 -> dvbt1symbolinterleaver1 . input1
+2016-Oct-17 15:42:59.885425 [INFO]    XmlParser: Parsed link: dvbt1symbolinterleaver1 . output1 -> dvbt1mapper1 . input1
+2016-Oct-17 15:42:59.885497 [INFO]    XmlParser: Parsed link: dvbt1mapper1 . output1 -> dvbt1framer1 . input1
+2016-Oct-17 15:42:59.885570 [INFO]    XmlParser: Parsed link: dvbt1framer1 . output1 -> dvbt1ofdmmod1 . input1
+2016-Oct-17 15:42:59.885648 [INFO]    XmlParser: Parsed link: dvbt1ofdmmod1 . output1 -> dvbt1interpolator1 . input1
+2016-Oct-17 15:42:59.885719 [INFO]    XmlParser: Parsed link: dvbt1interpolator1 . output1 -> dvbt1filter1 . input1
+2016-Oct-17 15:42:59.885790 [INFO]    XmlParser: Parsed link: dvbt1filter1 . output1 -> usrptx1 . input1
+2016-Oct-17 15:42:59.909769 [FATAL]   filerawreader1: Could not open file hd3typ.ts for reading.
+2016-Oct-17 15:42:59.911918 [FATAL]   System: Error loading radio: Could not open file hd3typ.ts for reading.
