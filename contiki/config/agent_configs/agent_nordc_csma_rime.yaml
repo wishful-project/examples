@@ -1,0 +1,37 @@
+## WiSHFUL Agent config file
+
+agent_info:
+    name: 'contiki_control_agent'
+    info: 'WiSHFUL example Contiki control agent'
+    iface: 'lo'
+
+modules:
+    discovery:
+        module : wishful_module_discovery_pyre
+        class_name : PyreDiscoveryAgentModule
+        kwargs: {"iface":eth0, "groupName":"wishful_contiki"}
+    gitar_engine:
+        module : wishful_module_gitar
+        class_name : GitarEngine
+        interfaces : ['lowpan0']
+        kwargs :
+            GitarConfig : './config/localhost/gitar.ini'
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : './config/protocol_connectors/gitar_ctrl_attributes.csv'
+            ControlFunctions : './config/protocol_connectors/gitar_ctrl_functions.csv'
+    rime_connector:
+        module : wishful_module_rime
+        class_name : RIMEConnector
+        interfaces : ['lowpan0']
+        kwargs :
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : './config/protocol_connectors/rime_ctrl_attributes.csv'
+            ControlFunctions : './config/protocol_connectors/rime_ctrl_functions.csv'
+    nordc_csma_connector:
+        module : wishful_module_nordc_csma
+        class_name : NORDCCSMAConnector
+        interfaces : ['lowpan0']
+        kwargs :
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : ['./config/protocol_connectors/radio802154_ctrl_attributes.csv', './config/protocol_connectors/nordc_ctrl_attributes.csv', './config/protocol_connectors/csma_ctrl_attributes.csv']
+            ControlFunctions : ['./config/protocol_connectors/radio802154_ctrl_functions.csv', './config/protocol_connectors/nordc_ctrl_functions.csv', './config/protocol_connectors/csma_ctrl_functions.csv']

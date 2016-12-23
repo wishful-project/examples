@@ -17,8 +17,8 @@ modules:
         kwargs :
             GitarConfig : './config/localhost/gitar.ini'
             SupportedInterfaces : ['lowpan0']
-            ControlAttributes : ''
-            ControlFunctions : './gitar_ctrl_functions.csv'
+            ControlAttributes : './config/protocol_connectors/gitar_ctrl_attributes.csv'
+            ControlFunctions : './config/protocol_connectors/gitar_ctrl_functions.csv'
     taisc_connector:
         module : wishful_module_taisc
         class_name : TAISCConnector
@@ -26,13 +26,45 @@ modules:
         kwargs :
             RadioPrograms : {"CSMA":0,"TDMA":2,"TSCH":1}
             SupportedInterfaces : ['lowpan0']
-            ControlAttributes : './taisc_ctrl_attributes.csv'
-            ControlFunctions : './taisc_ctrl_functions.csv'
+            ControlAttributes : './config/protocol_connectors/taisc_ctrl_attributes.csv'
+            ControlFunctions : './config/protocol_connectors/taisc_ctrl_functions.csv'
     rime_connector:
         module : wishful_module_rime
         class_name : RIMEConnector
         interfaces : ['lowpan0']
         kwargs :
             SupportedInterfaces : ['lowpan0']
-            ControlAttributes : './rime_ctrl_attributes.csv'
-            ControlFunctions : ''
+            ControlAttributes : './config/protocol_connectors/rime_ctrl_attributes.csv'
+            ControlFunctions : './config/protocol_connectors/rime_ctrl_functions.csv'
+    ipv6_connector:
+        module : wishful_module_ipv6
+        class_name : IPv6Connector
+        interfaces : ['lowpan0']
+        kwargs :
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : ['./config/protocol_connectors/ipv6_ctrl_attributes.csv', './config/protocol_connectors/rpl_ctrl_attributes.csv'] 
+            ControlFunctions : ['./config/protocol_connectors/ipv6_ctrl_functions.csv', './config/protocol_connectors/rpl_ctrl_functions.csv']
+    lpl_csma_connector:
+        module : wishful_module_lpl_csma
+        class_name : LPLCSMAConnector
+        interfaces : ['lowpan0']
+        kwargs :
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : ['./config/protocol_connectors/radio802154_ctrl_attributes.csv', './config/protocol_connectors/lpl_ctrl_attributes.csv', './config/protocol_connectors/csma_ctrl_attributes.csv']
+            ControlFunctions : ['./config/protocol_connectors/radio802154_ctrl_functions.csv', './config/protocol_connectors/lpl_ctrl_functions.csv', './config/protocol_connectors/csma_ctrl_functions.csv']
+    lpl_nomac_connector:
+        module : wishful_module_lpl_nomac
+        class_name : LPLNOMACConnector
+        interfaces : ['lowpan0']
+        kwargs :
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : ['./config/protocol_connectors/radio802154_ctrl_attributes.csv', './config/protocol_connectors/lpl_ctrl_attributes.csv', './config/protocol_connectors/nomac_ctrl_attributes.csv']
+            ControlFunctions : ['./config/protocol_connectors/radio802154_ctrl_functions.csv', './config/protocol_connectors/lpl_ctrl_functions.csv', './config/protocol_connectors/nomac_ctrl_functions.csv']
+    nordc_csma_connector:
+        module : wishful_module_nordc_csma
+        class_name : NORDCCSMAConnector
+        interfaces : ['lowpan0']
+        kwargs :
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : ['./config/protocol_connectors/radio802154_ctrl_attributes.csv', './config/protocol_connectors/nordc_ctrl_attributes.csv', './config/protocol_connectors/csma_ctrl_attributes.csv']
+            ControlFunctions : ['./config/protocol_connectors/radio802154_ctrl_functions.csv', './config/protocol_connectors/nordc_ctrl_functions.csv', './config/protocol_connectors/csma_ctrl_functions.csv']

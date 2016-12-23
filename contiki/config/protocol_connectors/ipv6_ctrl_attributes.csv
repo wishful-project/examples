@@ -1,0 +1,8 @@
+"category","unique_name",""unique_id",""format",""sub_format",""endianness"
+"measurement","ipv6_stats",58840,"HHHHHHHHHH","","<"
+"measurement","icmp_stats",3248,"HHHHH","","<"
+"measurement","tcp_stats",7917,"HHHHHHHHH","","<"
+"measurement","udp_stats",13014,"HHHH","","<"
+"measurement","nd6_stats",6490,"HHH","","<"
+"parameter","ipv6_address",3805,"BBBBBBBBBBBBBBBB","","<"
+"parameter","link_address",41807,"BBBBBBBB","","<"
