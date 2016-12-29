@@ -77,13 +77,66 @@ if __name__ == "__main__":
         controller.load_config(config)
         controller.start()
 
+        radio_param_list = [
+            "ContikiMAC_ChannelCheckRate",
+            "ContikiMAC_PhaseOptimization",
+            "IEEE802154_macExtendedAddress",
+            "IEEE802154_macPANId",
+            "IEEE802154_macShortAddress",
+            "IEEE802154_phyCurrentChannel",
+            "IEEE802154_phyTXPower",
+            "IEEE802154_macMaxBE",
+            "IEEE802154_macMaxCSMABackoffs",
+            "IEEE802154_macMaxFrameRetries",
+            "IEEE802154_macMinBE",
+            "IEEE802154_backoff_algorithm",
+            "IEEE802154_macCW",
+        ]
+        radio_measurement_list = [
+            "IEEE802154_measurement_macStats"
+        ]
+        radio_event_list = [
+            "IEEE802154_event_macStats"
+        ]
+        net_param_list = [
+            "link_address",
+            "rpl_dio_interval_min",
+            "rpl_dio_interval_doublings",
+            "rpl_dio_redundancy",
+            "rpl_default_lifetime",
+            "rpl_objective_function"
+        ]
+
+        net_measurement_list = [
+            "ipv6_stats",
+            "icmp_stats",
+            "tcp_stats",
+            "udp_stats",
+            "nd6_stats",
+            "rpl_stats"
+        ]
+
         while True:
             gevent.sleep(10)
             print("\n")
             print("Connected nodes", [str(node.name) for node in nodes])
             if nodes:
-                val = controller.blocking(True).node(nodes[0]).radio.iface("lowpan0").get_parameters([1000])
-                print(val)
+                for node in nodes:
+                    for param in radio_param_list:
+                        val = controller.blocking(True).node(node).radio.iface("lowpan0").get_parameters([param])
+                        print(val)
+                    gevent.sleep(1)
+                    for param in net_param_list:
+                        val = controller.blocking(True).node(node).net.iface("lowpan0").get_parameters_net([param])
+                        print(val)
+                    gevent.sleep(1)
+                    for m in radio_measurement_list:
+                        val = controller.blocking(True).node(node).radio.iface("lowpan0").get_measurements([m])
+                        print(val)
+                    gevent.sleep(1)
+                    for m in net_measurement_list:
+                        val = controller.blocking(True).node(node).net.iface("lowpan0").get_measurements_net([m])
+                        print(val)
 
     except KeyboardInterrupt:
         log.debug("Controller exits")
