@@ -60,6 +60,7 @@ def get_vars_response(group, node, data):
 if __name__ == "__main__":
 
     TOTAL_NODES = 2
+    NODE_NAMES = ["tx", "rx1", "rx2"]
 
     # list of files that will be send to agents
     files = {
@@ -69,8 +70,9 @@ if __name__ == "__main__":
 
     # What code each node will execute. Node 0 is TX, Node 1 is RX
     nodes_to_program = {
-	    0: "tx",
-        1: "rx", 
+	    "tx" : "tx",
+        "rx1": "rx", 
+        "rx2": "rx", 
     }
 
     # open files, read content, keep it in codes dict
@@ -85,19 +87,22 @@ if __name__ == "__main__":
     running = False
     first_time = True
 
-    while len(nodes) < 2:
+    while len(nodes) < TOTAL_NODES:
     # Waiting for 2 nodes
         print("%d nodes connected. Waiting for %d more" % (len(nodes), TOTAL_NODES - len(nodes)))
         gevent.sleep(2)
 
-
     print("All nodes connected. Starting showcase...")
 
     for idx, node in enumerate(nodes):
-        program_name = nodes_to_program[idx]
-        program_code = program[program_name] 
+        if node.name not in NODE_NAMES:
+            self.log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
 
-        controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_type': 'py'})
+        else:
+            program_name = nodes_to_program[node.name]
+            program_code = program[program_name] 
+
+            controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_type': 'py'})
 
     #control loop
     while True:
