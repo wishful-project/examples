@@ -31,19 +31,20 @@ controller.add_module(moduleName="discovery", pyModuleName="wishful_module_disco
                       className="PyreDiscoveryControllerModule",
                       kwargs={"iface":"ens3", "groupName":"wishful_1234", "downlink":"tcp://192.168.5.55:8990", "uplink":"tcp://192.168.5.55:8989"})
 
-nodes = []
+nodes = {}
 the_node = None
 
 @controller.new_node_callback()
 def new_node(node):
-    nodes.append(node)
     print("New node appeared:")
     print(node)
+    nodes[node.name] = node
 
 @controller.node_exit_callback()
 def node_exit(node, reason):
-    if node in nodes:
-        nodes.remove(node);
+    if node in nodes.values():
+        del nodes[nodes.name]
+
     print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
 
 @controller.set_default_callback()
@@ -75,6 +76,16 @@ if __name__ == "__main__":
         "rx2": "rx", 
     }
 
+    program_getters = {
+        "tx": ["svl_bandwidth", "svl_center_freq"],
+        "rx": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
+    }
+
+    program_setters = {
+        "tx": ["svl_bandwidth", "svl_center_freq"],
+        "rx": ["andwidth", "center_freq", "gain"],
+    }
+
     # open files, read content, keep it in codes dict
     program = {}
     for _k, _v in files.items():
@@ -94,7 +105,7 @@ if __name__ == "__main__":
 
     print("All nodes connected. Starting showcase...")
 
-    for idx, node in enumerate(nodes):
+    for node in nodes.values():
         if node.name not in NODE_NAMES:
             self.log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
 
@@ -105,13 +116,10 @@ if __name__ == "__main__":
             controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_type': 'py'})
 
     #control loop
-    while True:
-        if nodes:
-            gvals = ['svl_center_freq','svl_bandwidth',]
-
+    while nodes:
             # TRICKY: gets are assynchronous. callback for get_parameters is called automatically
-            print("Requesting vals")
-            controller.blocking(False).node(nodes[0]).radio.iface('usrp').get_parameters(gvals)
+            print("Requesting values to VR 1 RX")
+            controller.blocking(False).node(nodes['rx1']).radio.iface('usrp').get_parameters(program_getters['rx'])
 
             """
             if running:
@@ -124,9 +132,8 @@ if __name__ == "__main__":
                 running = True
             """
 
-        else:
-            print("no nodes")
 
-        gevent.sleep(2)
+            gevent.sleep(2)
 
+    print("All nodes disconnected. Exiting controller")
     controller.stop()
