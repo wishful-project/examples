@@ -21,13 +21,15 @@ log_level = logging.INFO
 logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
 #Create controller
-controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+# ::TRICKY:: update IP addresses to external interface
+controller = wishful_controller.Controller(dl="tcp://192.168.5.55:8990", ul="tcp://192.168.5.55:8989")
 
 #Configure controller
 controller.set_controller_info(name="WishfulController", info="WishfulControllerInfo")
+# ::TRICKY:: update IP addresses to external interface
 controller.add_module(moduleName="discovery", pyModuleName="wishful_module_discovery_pyre",
                       className="PyreDiscoveryControllerModule",
-                      kwargs={"iface":"lo", "groupName":"wishful_1234", "downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"})
+                      kwargs={"iface":"ens3", "groupName":"wishful_1234", "downlink":"tcp://192.168.5.55:8990", "uplink":"tcp://192.168.5.55:8989"})
 
 nodes = []
 the_node = None
@@ -38,13 +40,11 @@ def new_node(node):
     print("New node appeared:")
     print(node)
 
-
 @controller.node_exit_callback()
 def node_exit(node, reason):
     if node in nodes:
         nodes.remove(node);
     print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
-
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
@@ -57,34 +57,50 @@ def get_vars_response(group, node, data):
     print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
 
-def print_response(group, node, data):
-    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data)) 
+if __name__ == "__main__":
 
+    TOTAL_NODES = 2
 
-try:
+    # list of files that will be send to agents
+    files = {
+        "tx" : 	"/home/nodeuser/gr-hydra/apps/video_benchmark_tx.py",
+	    "rx" :  "/home/nodeuser/gr-hydra/apps/video_rx.py"
+    }
+
+    # What code each node will execute. Node 0 is TX, Node 1 is RX
+    nodes_to_program = {
+	    0: "tx",
+        1: "rx", 
+    }
+
+    # open files, read content, keep it in codes dict
+    program = {}
+    for _k, _v in files.items():
+        with open(_v, "r") as fid:
+            program[_k] = fid.read()
+
     #Start controller
     controller.start()
-
-    #fid = open("/home/maiconkist/gr-svl/examples/svl_basic_sink_2vr_ofdm.grc")
-    fid = open("/home/maiconkist/gr-svl/apps/video_benchmark_tx.py")
-    grc_xml = fid.read()
-
-    program_name = 'svl'
-    program_code = grc_xml
 
     running = False
     first_time = True
 
+    while len(nodes) < 2:
+    # Waiting for 2 nodes
+        print("%d nodes connected. Waiting for %d more" % (len(nodes), TOTAL_NODES - len(nodes)))
+        gevent.sleep(2)
+
+
+    print("All nodes connected. Starting showcase...")
+
+    for idx, node in enumerate(nodes):
+        program_name = nodes_to_program[idx]
+        program_code = program[program_name] 
+
+        controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_type': 'py'})
+
     #control loop
     while True:
-        if first_time:
-            print("Connected nodes", [str(node.name) for node in nodes])
-
-            if nodes:
-                first_time = False
-                controller.blocking(False).node(nodes[0]).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_type': 'py'})
-                running = True
-
         if nodes:
             gvals = ['svl_center_freq','svl_bandwidth',]
 
@@ -92,21 +108,20 @@ try:
             print("Requesting vals")
             controller.blocking(False).node(nodes[0]).radio.iface('usrp').get_parameters(gvals)
 
+            """
             if running:
                 print("Deactivating program %s" % (program_name, ))
-                controller.blocking(False).node(nodes[0]).radio.iface('usrp').deactivate_radio_program({'program_name': program_name})
+                #controller.blocking(False).node(nodes[0]).radio.iface('usrp').deactivate_radio_program({'program_name': program_name})
                 running = False
             else:
                 print("Activating program %s" % (program_name, ))
-                controller.blocking(False).node(nodes[0]).radio.iface('usrp').activate_radio_program({'program_name': program_name})
+                #controller.blocking(False).node(nodes[0]).radio.iface('usrp').activate_radio_program({'program_name': program_name})
                 running = True
+            """
 
         else:
             print("no nodes")
 
         gevent.sleep(2)
 
-except KeyboardInterrupt:
-    print("Controller exits")
-finally:
     controller.stop()
