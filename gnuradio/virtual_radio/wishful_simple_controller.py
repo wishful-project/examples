@@ -102,7 +102,7 @@ def get_vars_response(group, node, data):
         the_variables['rx1_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
         the_variables['rx1_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
         the_variables['rx1_bandwidth'] = data['bandwidth'] if 'bandwidth' in data else 'NA'
-    #elif node.name == 'rx2':
+    elif node.name == 'rx2':
         the_variables['rx2_pkt_rcv'] = data['pkt_rcvd'] if 'pkt_rcvd' in data else 'NA'
         the_variables['rx2_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
         the_variables['rx2_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
@@ -152,7 +152,6 @@ def exec_loop():
             if 'rx2' in nodes:
                 log.info("Requesting values to VR 2 RX")
                 controller.blocking(False).node(nodes['rx2']).radio.iface('usrp').get_parameters(program_getters['rx'])
-
 
             try:
                 setters = pickle.load(open(SETTER_FILE, "rb"))
