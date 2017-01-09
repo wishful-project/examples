@@ -7,8 +7,11 @@ import wishful_controller
 import gevent
 import wishful_upis as upis
 import os
+import sys
 import time
 import wishful_module_gnuradio
+
+import threading
 
 __author__ = "Maicon Kist"
 __copyright__ = "Copyright (c) 2017 Connect Centre - Trinity College Dublin" 
@@ -31,13 +34,15 @@ controller.add_module(moduleName="discovery", pyModuleName="wishful_module_disco
                       className="PyreDiscoveryControllerModule",
                       kwargs={"iface":"ens3", "groupName":"wishful_1234", "downlink":"tcp://192.168.5.55:8990", "uplink":"tcp://192.168.5.55:8989"})
 
+
 nodes = {}
 the_node = None
+the_variables = {}
 
 @controller.new_node_callback()
 def new_node(node):
-    print("New node appeared:")
-    print(node)
+    log.info("New node appeared:")
+    log.info(node)
     nodes[node.name] = node
 
 @controller.node_exit_callback()
@@ -45,21 +50,34 @@ def node_exit(node, reason):
     if node in nodes.values():
         del nodes[nodes.name]
 
-    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
+    log.info(("NodeExit : NodeID : {} Reason : {}".format(node.id, reason)))
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
-    print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
+    log.info("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
 
 
 @controller.add_callback(upis.radio.get_parameters)
 def get_vars_response(group, node, data):
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX HAAAA PEAO")
-    print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+    log.info("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
+    if sys.argv[1] == '--write-to-file':
+            if node.name == 'rx1':
+                the_variables['rx1_pkt_rcv'] = data['pkt_rcvd'] if 'pkt_rcvd' in data else 'NA'
+                the_variables['rx1_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
+                the_variables['rx1_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
+                the_variables['rx1_bandwidth'] = data['bandwidth'] if 'bandwidth' in data else 'NA'
+            elif node.name == 'rx2':
+                the_variables['rx2_pkt_rcv'] = data['pkt_rcvd'] if 'pkt_rcvd' in data else 'NA'
+                the_variables['rx2_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
+                the_variables['rx2_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
+                the_variables['rx2_bandwidth'] = data['bandwidth'] if 'bandwidth' in data else 'NA'
 
-if __name__ == "__main__":
+            import pickle
+            pickle.dump(the_variables, open('controller_data.bin', 'wb'))
+ 
 
+def exec_loop():
     TOTAL_NODES = 2
     NODE_NAMES = ["tx", "rx1", "rx2"]
 
@@ -100,14 +118,14 @@ if __name__ == "__main__":
 
     while len(nodes) < TOTAL_NODES:
     # Waiting for 2 nodes
-        print("%d nodes connected. Waiting for %d more" % (len(nodes), TOTAL_NODES - len(nodes)))
+        log.info("%d nodes connected. Waiting for %d more" % (len(nodes), TOTAL_NODES - len(nodes)))
         gevent.sleep(2)
 
-    print("All nodes connected. Starting showcase...")
+    log.info("All nodes connected. Starting showcase...")
 
     for node in nodes.values():
         if node.name not in NODE_NAMES:
-            self.log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
+            log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
 
         else:
             program_name = nodes_to_program[node.name]
@@ -118,7 +136,7 @@ if __name__ == "__main__":
     #control loop
     while nodes:
             # TRICKY: gets are assynchronous. callback for get_parameters is called automatically
-            print("Requesting values to VR 1 RX")
+            log.info("Requesting values to VR 1 RX")
             controller.blocking(False).node(nodes['rx1']).radio.iface('usrp').get_parameters(program_getters['rx'])
 
             """
@@ -135,5 +153,8 @@ if __name__ == "__main__":
 
             gevent.sleep(2)
 
-    print("All nodes disconnected. Exiting controller")
+    log.info("All nodes disconnected. Exiting controller")
     controller.stop()
+
+if __name__ == '__main__':
+    exec_loop()
