@@ -12,8 +12,6 @@ import time
 import pickle
 import wishful_module_gnuradio
 
-import threading
-
 __author__ = "Maicon Kist"
 __copyright__ = "Copyright (c) 2017 Connect Centre - Trinity College Dublin" 
 __version__ = "0.1.0"
@@ -40,25 +38,36 @@ nodes = {}
 the_node = None
 the_variables = {}
 
-TOTAL_NODES = 2
+TOTAL_NODES = 1
 NODE_NAMES = ["tx", "rx1", "rx2"]
 
-# list of files that will be send to agents
-files = {
+conf = {
+
+    # list of files that will be send to agents
+    'files' : {
     "tx" : 	"/home/nodeuser/gr-hydra/apps/video_benchmark_tx.py",
     "rx" :  "/home/nodeuser/gr-hydra/apps/video_rx.py"
-}
+    },
 
-# What code each node will execute. Node 0 is TX, Node 1 is RX
-nodes_to_program = {
-    "tx" : "tx",
-    "rx1": "rx", 
-    "rx2": "rx", 
-}
+    # What code each node will execute. Node 0 is TX, Node 1 is RX
+    'nodes_to_program' : {
+        "tx" : "tx",
+        "rx1": "rx", 
+        "rx2": "rx", 
+    },
 
-program_getters = {
-    "tx": ["svl_bandwidth", "svl_center_freq"],
-    "rx": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
+    'program_getters' : {
+        "tx": ["svl_bandwidth", "svl_center_freq"],
+        "rx": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
+    },
+
+    'program_args': {
+        "tx": ["",], 
+        "rx1": ["",],
+        "rx2": ["--vr-configuration", "2"],
+    },
+
+
 }
 
 
@@ -84,8 +93,7 @@ def new_node(node):
 @controller.node_exit_callback()
 def node_exit(node, reason):
     if node in nodes.values():
-        del nodes[nodes.name]
-
+        del nodes[node.name]
     log.info(("NodeExit : NodeID : {} Reason : {}".format(node.id, reason)))
 
 @controller.set_default_callback()
@@ -95,7 +103,7 @@ def default_callback(group, node, cmd, data):
 
 @controller.add_callback(upis.radio.get_parameters)
 def get_vars_response(group, node, data):
-    log.info("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+    log.info("{} get_vars_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
     if node.name == 'rx1':
         the_variables['rx1_pkt_rcv'] = data['pkt_rcvd'] if 'pkt_rcvd' in data else 'NA'
@@ -108,13 +116,12 @@ def get_vars_response(group, node, data):
         the_variables['rx2_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
         the_variables['rx2_bandwidth'] = data['bandwidth'] if 'bandwidth' in data else 'NA'
 
-
-    pickle.dump(the_variables, open('controller_data.bin', 'wb'))
+    pickle.dump(the_variables, open("./getter.bin", "wb"))
 
 def exec_loop():
     # open files, read content, keep it in codes dict
     program = {}
-    for _k, _v in files.items():
+    for _k, _v in conf['files'].items():
         with open(_v, "r") as fid:
             program[_k] = fid.read()
 
@@ -136,10 +143,11 @@ def exec_loop():
             log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
 
         else:
-            program_name = nodes_to_program[node.name]
+            program_name = conf['nodes_to_program'][node.name]
             program_code = program[program_name] 
+            program_args = conf['program_args'][node.name]
 
-            controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_type': 'py'})
+            controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_args': program_args,'program_type': 'py'})
 
     #control loop
     while nodes:
@@ -147,12 +155,14 @@ def exec_loop():
 
             if 'rx1' in nodes:
                 log.info("Requesting values to VR 1 RX")
-                controller.blocking(False).node(nodes['rx1']).radio.iface('usrp').get_parameters(program_getters['rx'])
+                controller.blocking(False).node(nodes['rx1']).radio.iface('usrp').get_parameters(confg['program_getters']['rx'])
 
             if 'rx2' in nodes:
                 log.info("Requesting values to VR 2 RX")
-                controller.blocking(False).node(nodes['rx2']).radio.iface('usrp').get_parameters(program_getters['rx'])
+                controller.blocking(False).node(nodes['rx2']).radio.iface('usrp').get_parameters(conf['program_getters']['rx'])
 
+
+            # set variables
             try:
                 setters = pickle.load(open(SETTER_FILE, "rb"))
 
