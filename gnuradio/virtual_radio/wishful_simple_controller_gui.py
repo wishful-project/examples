@@ -73,7 +73,17 @@ class AppGui():
 
 
     def vr2_tx_amplitude_update(self, val):
-        print(val)
+        sets = {}
+        try:
+            sets = pickle.load(open(wsc.SETTER_FILE, "rb"))
+
+            if not 'tx' in sets:
+                sets['tx'] = {}
+
+            sets['tx'][wsc.VR_TX_GAIN.format(id=2)] = val
+            pickle.dump(sets, open(wsc.SETTER_FILE, "wb"))
+        except:
+            pass
 
 
 def update():

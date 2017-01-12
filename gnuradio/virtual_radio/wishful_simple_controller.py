@@ -46,7 +46,8 @@ conf = {
     # list of files that will be send to agents
     'files' : {
     "tx" : 	"/home/nodeuser/gr-hydra/apps/video_benchmark_tx.py",
-    "rx" :  "/home/nodeuser/gr-hydra/apps/video_rx.py"
+    "rx1" :  "/home/nodeuser/gr-hydra/apps/video_rx.py",
+    "rx2" :  "/home/nodeuser/gr-hydra/apps/video_rx.py"
     },
 
     # What code each node will execute. Node 0 is TX, Node 1 is RX
@@ -58,7 +59,8 @@ conf = {
 
     'program_getters' : {
         "tx": ["svl_bandwidth", "svl_center_freq"],
-        "rx": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
+        "rx1": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
+        "rx2": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
     },
 
     'program_args': {
@@ -86,9 +88,18 @@ SETTER_FILE = "./setter.bin"
 
 @controller.new_node_callback()
 def new_node(node):
-    log.info("New node appeared:")
-    log.info(node)
+    log.info("New node appeared: Name: %s" % (node.name, ))
     nodes[node.name] = node
+
+
+    if node.name not in NODE_NAMES:
+        log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
+    else:
+        program_name = node.name
+        program_code = open(conf['files'][program_name], "r").read()
+        program_args = conf['program_args'][node.name]
+
+        controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_args': program_args,'program_type': 'py'})
 
 @controller.node_exit_callback()
 def node_exit(node, reason):
@@ -119,12 +130,6 @@ def get_vars_response(group, node, data):
     pickle.dump(the_variables, open("./getter.bin", "wb"))
 
 def exec_loop():
-    # open files, read content, keep it in codes dict
-    program = {}
-    for _k, _v in conf['files'].items():
-        with open(_v, "r") as fid:
-            program[_k] = fid.read()
-
     #Start controller
     controller.start()
 
@@ -138,58 +143,22 @@ def exec_loop():
 
     log.info("All nodes connected. Starting showcase...")
 
-    for node in nodes.values():
-        if node.name not in NODE_NAMES:
-            log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
-
-        else:
-            program_name = conf['nodes_to_program'][node.name]
-            program_code = program[program_name] 
-            program_args = conf['program_args'][node.name]
-
-            controller.blocking(False).node(node).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_args': program_args,'program_type': 'py'})
-
     #control loop
     while nodes:
             # TRICKY: gets are assynchronous. callback for get_parameters is called automatically
-
-            if 'rx1' in nodes:
-                log.info("Requesting values to VR 1 RX")
-                controller.blocking(False).node(nodes['rx1']).radio.iface('usrp').get_parameters(confg['program_getters']['rx'])
-
-            if 'rx2' in nodes:
-                log.info("Requesting values to VR 2 RX")
-                controller.blocking(False).node(nodes['rx2']).radio.iface('usrp').get_parameters(conf['program_getters']['rx'])
-
+            for node in nodes.keys():
+                log.info("Requesting data to VR %s" % (node))
+                controller.blocking(False).node(nodes[node]).radio.iface('usrp').get_parameters(conf['program_getters'][node])
 
             # set variables
-            try:
-                setters = pickle.load(open(SETTER_FILE, "rb"))
+            setters = pickle.load(open(SETTER_FILE, "rb"))
+            for node in setters.keys():
+                if node in nodes:
+                    log.info("Setting configuration of node %s" % (node, )) 
+                    controller.blocking(False).node(nodes[node]).radio.iface('usrp').set_parameters(setters[node])
+                else:
+                    log.info("Node %s not connected. Skipping setting" % (node, )) 
 
-                if 'tx' in setters:
-                    log.info("Setting values to SVL")
-                    controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters(setters['tx'])
-                if 'rx1' in setters:
-                    log.info("Setting values to VR 1 RX")
-                    controller.blocking(False).node(nodes['rx1']).radio.iface('usrp').set_parameters(setters['rx1'])
-                if 'rx2' in setters:
-                    log.info("Setting values to VR 1 RX")
-                    controller.blocking(False).node(nodes['rx2']).radio.iface('usrp').set_parameters(setters['rx2'])
-
-            except Exception as e:
-                log.info("setters file for vr1 not found. Nothing to change" )
-                log.info(e)
-
-            """
-            if running:
-                print("Deactivating program %s" % (program_name, ))
-                #controller.blocking(False).node(nodes[0]).radio.iface('usrp').deactivate_radio_program({'program_name': program_name})
-                running = False
-            else:
-                print("Activating program %s" % (program_name, ))
-                #controller.blocking(False).node(nodes[0]).radio.iface('usrp').activate_radio_program({'program_name': program_name})
-                running = True
-            """
             gevent.sleep(2)
 
     log.info("All nodes disconnected. Exiting controller")
