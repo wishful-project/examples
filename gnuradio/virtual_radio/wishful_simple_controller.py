@@ -45,9 +45,9 @@ conf = {
 
     # list of files that will be send to agents
     'files' : {
-    "tx" : 	"/home/nodeuser/gr-hydra/apps/video_benchmark_tx.py",
-    "rx1" :  "/home/nodeuser/gr-hydra/apps/video_rx.py",
-    "rx2" :  "/home/nodeuser/gr-hydra/apps/video_rx.py"
+    	"tx" :   "/home/ctvr/wishful/gr-hydra/apps/video_benchmark_tx.py",
+    	"rx1" :  "/home/ctvr/wishful/gr-hydra/apps/video_rx.py",
+    	"rx2" :  "/home/ctvr/wishful/gr-hydra/apps/video_rx.py"
     },
 
     # What code each node will execute. Node 0 is TX, Node 1 is RX
@@ -151,7 +151,14 @@ def exec_loop():
                 controller.blocking(False).node(nodes[node]).radio.iface('usrp').get_parameters(conf['program_getters'][node])
 
             # set variables
-            setters = pickle.load(open(SETTER_FILE, "rb"))
+            setters = {}
+            try:
+                setters = pickle.load(open(SETTER_FILE, "rb"))
+            except Exception as e:
+                log.info("Could not open setters file")
+                log.info(e)
+                
+
             for node in setters.keys():
                 if node in nodes:
                     log.info("Setting configuration of node %s" % (node, )) 

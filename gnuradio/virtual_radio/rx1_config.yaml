@@ -3,13 +3,13 @@
 agent_info:
   name: 'rx1'
   info: 'agent_info'
-  iface: 'ens3'
+  iface: 'enx8cae4cdf4e35'
 
 modules:
   discovery:
       module : wishful_module_discovery_pyre
       class_name : PyreDiscoveryAgentModule
-      kwargs: {"iface":"ens3", "groupName":"wishful_1234"}
+      kwargs: {"iface":"enx8cae4cdf4e35", "groupName":"wishful_1234"}
 
   gnuradio:
       module : wishful_module_gnuradio
