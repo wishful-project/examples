@@ -15,6 +15,9 @@ class AppGui():
 
     def __init__(self, root):
         self.vr1_pkt_recv_info, self.vr1_pkt_right_info, self.vr1_cf_info, self.vr1_bw_info = self.build_vr_menu(1, root, self.vr1_tx_amplitude_update)
+
+
+
         self.vr2_pkt_recv_info, self.vr2_pkt_right_info, self.vr2_cf_info, self.vr2_bw_info = self.build_vr_menu(2, root, self.vr2_tx_amplitude_update)
 
 
@@ -53,8 +56,13 @@ class AppGui():
         # vr tx-amplitude
         vr_tx_amplitude_frame = Frame(vr_frame)
         Label(vr_tx_amplitude_frame, text="TX Amplitude [0:1]: ").pack(side=LEFT)
-        Scale(vr_tx_amplitude_frame, from_ = 0.0, to = 1.0, resolution= 0.001, orient = HORIZONTAL, command=tx_amplitude_callback).pack(anchor=CENTER)
+        scale = Scale(vr_tx_amplitude_frame, from_ = 0.0, to = 1.0, resolution= 0.001, orient = HORIZONTAL, command=tx_amplitude_callback)
+        scale.pack(anchor=CENTER)
         vr_tx_amplitude_frame.pack()
+        
+        scale.set(0.3)
+
+
 
         return vr_pkt_recv_info, vr_pkt_right_info, vr_cf_info, vr_bw_info
 
@@ -62,28 +70,28 @@ class AppGui():
         sets = {}
         try:
             sets = pickle.load(open(wsc.SETTER_FILE, "rb"))
-
-            if not 'tx' in sets:
-                sets['tx'] = {}
-
-            sets['tx'][wsc.VR_TX_GAIN.format(id=1)] = val
-            pickle.dump(sets, open(wsc.SETTER_FILE, "wb"))
         except:
             pass
+
+        if not 'tx' in sets:
+            sets['tx'] = {}
+    
+        sets['tx'][wsc.VR_TX_GAIN.format(id=1)] = float(val)
+        pickle.dump(sets, open(wsc.SETTER_FILE, "wb"))
 
 
     def vr2_tx_amplitude_update(self, val):
         sets = {}
         try:
             sets = pickle.load(open(wsc.SETTER_FILE, "rb"))
-
-            if not 'tx' in sets:
-                sets['tx'] = {}
-
-            sets['tx'][wsc.VR_TX_GAIN.format(id=2)] = val
-            pickle.dump(sets, open(wsc.SETTER_FILE, "wb"))
         except:
             pass
+
+        if not 'tx' in sets:
+            sets['tx'] = {}
+
+        sets['tx'][wsc.VR_TX_GAIN.format(id=2)] = float(val)
+        pickle.dump(sets, open(wsc.SETTER_FILE, "wb"))
 
 
 def update():

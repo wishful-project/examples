@@ -31,7 +31,7 @@ controller.set_controller_info(name="WishfulController", info="WishfulController
 # ::TRICKY:: update IP addresses to external interface
 controller.add_module(moduleName="discovery", pyModuleName="wishful_module_discovery_pyre",
                       className="PyreDiscoveryControllerModule",
-                      kwargs={"iface":"ens3", "groupName":"wishful_1234", "downlink":"tcp://192.168.5.55:8990", "uplink":"tcp://192.168.5.55:8989"})
+                      kwargs={"iface":"enx8cae4cdf4e35", "groupName":"wishful_1234", "downlink":"tcp://192.168.5.55:8990", "uplink":"tcp://192.168.5.55:8989"})
 
 
 nodes = {}
@@ -58,7 +58,7 @@ conf = {
     },
 
     'program_getters' : {
-        "tx": ["svl_bandwidth", "svl_center_freq"],
+        "tx":  ["svl_bandwidth", "svl_center_freq"],
         "rx1": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
         "rx2": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
     },
@@ -68,8 +68,6 @@ conf = {
         "rx1": ["",],
         "rx2": ["--vr-configuration", "2"],
     },
-
-
 }
 
 
@@ -154,10 +152,10 @@ def exec_loop():
             setters = {}
             try:
                 setters = pickle.load(open(SETTER_FILE, "rb"))
+                pickle.dump({}, open(SETTER_FILE, "rb"))
             except Exception as e:
                 log.info("Could not open setters file")
                 log.info(e)
-                
 
             for node in setters.keys():
                 if node in nodes:
