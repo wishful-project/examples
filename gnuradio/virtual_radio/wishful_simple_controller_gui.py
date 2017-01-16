@@ -16,8 +16,6 @@ class AppGui():
     def __init__(self, root):
         self.vr1_pkt_recv_info, self.vr1_pkt_right_info, self.vr1_cf_info, self.vr1_bw_info = self.build_vr_menu(1, root, self.vr1_tx_amplitude_update)
 
-
-
         self.vr2_pkt_recv_info, self.vr2_pkt_right_info, self.vr2_cf_info, self.vr2_bw_info = self.build_vr_menu(2, root, self.vr2_tx_amplitude_update)
 
 
