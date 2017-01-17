@@ -35,7 +35,7 @@ controller.add_module(moduleName="discovery", pyModuleName="wishful_module_disco
 
 
 nodes = {}
-the_node = None
+program_running = None
 the_variables = {}
 
 TOTAL_NODES = 1
@@ -48,13 +48,6 @@ conf = {
     	"tx" :   "/home/ctvr/wishful/gr-hydra/apps/video_benchmark_tx.py",
     	"rx1" :  "/home/ctvr/wishful/gr-hydra/apps/video_rx.py",
     	"rx2" :  "/home/ctvr/wishful/gr-hydra/apps/video_rx.py"
-    },
-
-    # What code each node will execute. Node 0 is TX, Node 1 is RX
-    'nodes_to_program' : {
-        "tx" : "tx",
-        "rx1": "rx", 
-        "rx2": "rx", 
     },
 
     'program_getters' : {
@@ -89,10 +82,10 @@ def new_node(node):
     log.info("New node appeared: Name: %s" % (node.name, ))
     nodes[node.name] = node
 
-
-    if node.name not in NODE_NAMES:
-        log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
-    else:
+    #if node.name not in NODE_NAMES:
+    #    log.info("Node '%s' is not part of this showcase. Ignoring it" % (node.name, ))
+    #else:
+    if node.name == 'tx':
         program_name = node.name
         program_code = open(conf['files'][program_name], "r").read()
         program_args = conf['program_args'][node.name]
@@ -101,8 +94,12 @@ def new_node(node):
 
 @controller.node_exit_callback()
 def node_exit(node, reason):
+
     if node in nodes.values():
+        if node.name == 'rx':
+            program_running = None
         del nodes[node.name]
+
     log.info(("NodeExit : NodeID : {} Reason : {}".format(node.id, reason)))
 
 @controller.set_default_callback()
@@ -114,12 +111,14 @@ def default_callback(group, node, cmd, data):
 def get_vars_response(group, node, data):
     log.info("{} get_vars_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
-    if node.name == 'rx1':
+    #if node.name == 'rx1':
+    if program_running == 'rx1':
         the_variables['rx1_pkt_rcv'] = data['pkt_rcvd'] if 'pkt_rcvd' in data else 'NA'
         the_variables['rx1_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
         the_variables['rx1_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
         the_variables['rx1_bandwidth'] = data['bandwidth'] if 'bandwidth' in data else 'NA'
-    elif node.name == 'rx2':
+    elif program_running == 'rx2':
+    #elif node.name == 'rx2':
         the_variables['rx2_pkt_rcv'] = data['pkt_rcvd'] if 'pkt_rcvd' in data else 'NA'
         the_variables['rx2_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
         the_variables['rx2_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
@@ -128,6 +127,8 @@ def get_vars_response(group, node, data):
     pickle.dump(the_variables, open("./getter.bin", "wb"))
 
 def exec_loop():
+    global program_running
+
     #Start controller
     controller.start()
 
@@ -144,25 +145,48 @@ def exec_loop():
     #control loop
     while nodes:
             # TRICKY: gets are assynchronous. callback for get_parameters is called automatically
-            for node in nodes.keys():
-                log.info("Requesting data to VR %s" % (node))
-                controller.blocking(False).node(nodes[node]).radio.iface('usrp').get_parameters(conf['program_getters'][node])
+            if 'tx' in nodes:
+                log.info("Requesting data to VR TX")
+                controller.blocking(False).node(nodes['tx']).radio.iface('usrp').get_parameters(conf['program_getters']['tx'])
+
+            if 'rx' in nodes and program_running != None:
+                log.info("Requesting data to VR %s" % (program_running, ))
+                controller.blocking(False).node(nodes['rx']).radio.iface('usrp').get_parameters(conf['program_getters'][program_running])
+
 
             # set variables
             setters = {}
             try:
                 setters = pickle.load(open(SETTER_FILE, "rb"))
-                pickle.dump({}, open(SETTER_FILE, "rb"))
+                pickle.dump({}, open(SETTER_FILE, "wb"))
             except Exception as e:
                 log.info("Could not open setters file")
                 log.info(e)
 
-            for node in setters.keys():
-                if node in nodes:
-                    log.info("Setting configuration of node %s" % (node, )) 
-                    controller.blocking(False).node(nodes[node]).radio.iface('usrp').set_parameters(setters[node])
-                else:
-                    log.info("Node %s not connected. Skipping setting" % (node, )) 
+            log.info(setters)
+
+            if 'tx' in setters.keys() and 'tx' in nodes:
+                    log.info("Setting configuration of node TX") 
+                    controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters(setters['tx'])
+
+            if 'rx1' in setters.keys() and program_running == 'rx1':
+                    log.info("Setting configuration of node RX1") 
+                    controller.blocking(False).node(nodes['rx']).radio.iface('usrp').set_parameters(setters['rx1'])
+            if 'rx2' in setters.keys() and program_running == 'rx2':
+                    log.info("Setting configuration of node RX2") 
+                    controller.blocking(False).node(nodes['rx']).radio.iface('usrp').set_parameters(setters['rx2'])
+
+            if 'vr' in setters.keys() and program_running != setters['vr'] and 'rx' in nodes:
+                    if program_running != None:
+                        controller.blocking(False).node(nodes['rx']).radio.iface('usrp').deactivate_radio_program(program_name)
+
+                    program_name = setters['vr']
+                    program_code = open(conf['files'][program_name], "r").read()
+                    program_args = conf['program_args'][program_name]
+                    controller.blocking(False).node(nodes['rx']).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_args': program_args,'program_type': 'py'})
+
+
+                    program_running = program_name
 
             gevent.sleep(2)
 

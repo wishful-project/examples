@@ -6,18 +6,41 @@ import subprocess
 
 import wishful_simple_controller as wsc
 
+root = Tk()
 controller_pid = None
 widget = None
+rx_var = IntVar()
 
 from tkinter import *
 
 class AppGui():
 
     def __init__(self, root):
+        vr_frame = LabelFrame(root, text="Select the VR to execute in the RX notebook")
+        rx1_rad = Radiobutton(vr_frame, text="VR 1", variable=rx_var, value=1, command=self.sel)
+        rx1_rad.pack(side = LEFT)
+        rx2_rad = Radiobutton(vr_frame, text="VR 2", variable=rx_var, value=2, command=self.sel)
+        rx2_rad.pack(side = LEFT)
+        vr_frame.pack()
+
         self.vr1_pkt_recv_info, self.vr1_pkt_right_info, self.vr1_cf_info, self.vr1_bw_info = self.build_vr_menu(1, root, self.vr1_tx_amplitude_update)
 
         self.vr2_pkt_recv_info, self.vr2_pkt_right_info, self.vr2_cf_info, self.vr2_bw_info = self.build_vr_menu(2, root, self.vr2_tx_amplitude_update)
 
+
+
+    def sel(self):
+        sets = {}
+        try:
+            sets = pickle.load(open(wsc.SETTER_FILE, "rb"))
+        except:
+            pass
+
+        if not 'vr' in sets:
+            sets['vr'] = {}
+    
+        sets['vr'] = 'rx1' if rx_var.get() == 1 else 'rx2'
+        pickle.dump(sets, open(wsc.SETTER_FILE, "wb"))
 
     def build_vr_menu(self, vr_id, root, tx_amplitude_callback):
         vr_frame = LabelFrame(root, text="Virtual Radio %d" % (vr_id, ))
@@ -113,7 +136,6 @@ def update():
     root.after(1000, update)
     
 if __name__ == '__main__':
-    root = Tk()
     widget = AppGui(root)
 
     controller_pid = subprocess.Popen('./wishful_simple_controller.py --write-to-file' , shell=True)
