@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import datetime
+import logging
+import wishful_controller
+import gevent
+import wishful_upis as upis
+import os
+import time
+import wishful_module_gnuradio
+
+__author__ = "Maicon Kist"
+__copyright__ = "Copyright (c) 2017 Connect Centre - Trinity College Dublin" 
+__version__ = "0.1.0"
+__email__ = "kistm@tcd.ie"
+
+
+log = logging.getLogger('wishful_controller')
+log_level = logging.INFO
+logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+#Create controller
+controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+
+#Configure controller
+controller.set_controller_info(name="WishfulController", info="WishfulControllerInfo")
+controller.add_module(moduleName="discovery", pyModuleName="wishful_module_discovery_pyre",
+                      className="PyreDiscoveryControllerModule",
+                      kwargs={"iface":"lo", "groupName":"wishful_1234", "downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"})
+
+nodes = []
+the_node = None
+
+@controller.new_node_callback()
+def new_node(node):
+    nodes.append(node)
+    print("New node appeared:")
+    print(node)
+
+
+@controller.node_exit_callback()
+def node_exit(node, reason):
+    if node in nodes:
+        nodes.remove(node);
+    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
+
+
+@controller.set_default_callback()
+def default_callback(group, node, cmd, data):
+    print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
+
+
+@controller.add_callback(upis.radio.get_parameters)
+def get_vars_response(group, node, data):
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX HAAAA PEAO")
+    print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+
+
+def print_response(group, node, data):
+    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data)) 
+
+
+try:
+    #Start controller
+    controller.start()
+
+    #fid = open("/home/maiconkist/gr-svl/examples/svl_basic_sink_2vr_ofdm.grc")
+    fid = open("/home/maiconkist/gr-svl/apps/video_benchmark_tx.py")
+    grc_xml = fid.read()
+
+    program_name = 'svl'
+    program_code = grc_xml
+
+    running = False
+    first_time = True
+
+    #control loop
+    while True:
+        if first_time:
+            print("Connected nodes", [str(node.name) for node in nodes])
+
+            if nodes:
+                first_time = False
+                controller.blocking(False).node(nodes[0]).radio.iface('usrp').activate_radio_program({'program_name': program_name, 'program_code': program_code, 'program_type': 'py'})
+                running = True
+
+        if nodes:
+            gvals = ['svl_center_freq','svl_bandwidth',]
+
+            # TRICKY: gets are assynchronous. callback for get_parameters is called automatically
+            print("Requesting vals")
+            controller.blocking(False).node(nodes[0]).radio.iface('usrp').get_parameters(gvals)
+
+            if running:
+                print("Deactivating program %s" % (program_name, ))
+                controller.blocking(False).node(nodes[0]).radio.iface('usrp').deactivate_radio_program({'program_name': program_name})
+                running = False
+            else:
+                print("Activating program %s" % (program_name, ))
+                controller.blocking(False).node(nodes[0]).radio.iface('usrp').activate_radio_program({'program_name': program_name})
+                running = True
+
+        else:
+            print("no nodes")
+
+        gevent.sleep(2)
+
+except KeyboardInterrupt:
+    print("Controller exits")
+finally:
+    controller.stop()

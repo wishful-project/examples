@@ -1,0 +1,19 @@
+2016-Aug-05 15:36:13.040246 [INFO]    System: Loading radio: alohamac_ofdm_tap_node1.xml
+2016-Aug-05 15:36:13.041478 [INFO]    XmlParser: Parsed engine: stackengine1
+2016-Aug-05 15:36:13.041583 [INFO]    XmlParser: Parsed component: tuntap0
+2016-Aug-05 15:36:13.041704 [INFO]    XmlParser: Parsed component: alohamac0
+2016-Aug-05 15:36:13.041876 [INFO]    XmlParser: Parsed engine: phyengine1
+2016-Aug-05 15:36:13.041965 [INFO]    XmlParser: Parsed component: usrprx1
+2016-Aug-05 15:36:13.042096 [INFO]    XmlParser: Parsed component: ofdmdemod1
+2016-Aug-05 15:36:13.042264 [INFO]    XmlParser: Parsed engine: phyengine2
+2016-Aug-05 15:36:13.042370 [INFO]    XmlParser: Parsed component: ofdmmod1
+2016-Aug-05 15:36:13.042483 [INFO]    XmlParser: Parsed component: signalscaler1
+2016-Aug-05 15:36:13.042608 [INFO]    XmlParser: Parsed component: usrptx1
+2016-Aug-05 15:36:13.042818 [INFO]    XmlParser: Parsed link: tuntap0 . bottomport1 -> alohamac0 . topport1
+2016-Aug-05 15:36:13.042927 [INFO]    XmlParser: Parsed link: usrprx1 . output1 -> ofdmdemod1 . input1
+2016-Aug-05 15:36:13.043035 [INFO]    XmlParser: Parsed link: ofdmdemod1 . output1 -> alohamac0 . bottomport1
+2016-Aug-05 15:36:13.043142 [INFO]    XmlParser: Parsed link: alohamac0 . bottomport1 -> ofdmmod1 . input1
+2016-Aug-05 15:36:13.043249 [INFO]    XmlParser: Parsed link: ofdmmod1 . output1 -> signalscaler1 . input1
+2016-Aug-05 15:36:13.043356 [INFO]    XmlParser: Parsed link: signalscaler1 . output1 -> usrptx1 . input1
+2016-Aug-05 15:36:13.118961 [INFO]    usrprx1: Creating the usrp device with args: 
+2016-Aug-05 15:36:14.683694 [FATAL]   System: Error loading radio: ValueError: unhandled clock configuration reference source: unknown
