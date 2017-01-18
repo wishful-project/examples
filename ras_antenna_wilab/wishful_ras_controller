@@ -54,6 +54,70 @@ DEMO START
     ./wishful_ras_controller --config controller_cfg.yaml
 """
 
+"""
+RAS commands
+
+
+
+cd wishful-github-manifest-3/examples/ras_antenna_wilab/
+
+
+cd apu-conf/
+cd ath10k-firmware/
+sudo sh install_firmware.sh
+cd ../athmodules/
+sudo sh install_module.sh
+sudo ifconfig wlan0 up
+cd ../scapy/
+sudo sh install_scapy.sh
+sudo ifconfig wlan0 up
+
+cd ../../
+
+
+per settare i nodi in monitor
+sudo su
+ifconfig wlan0 down
+iwconfig wlan0 mode monitor
+ifconfig wlan0 up
+iwconfig wlan0 channel 40
+
+
+sudo iw dev wlan0 interface add fish0 type monitor
+sudo ifconfig fish0 up
+
+
+Nodo con antenna
+sudo ./wishful_ras_agent --config  agent_ras_cfg.yaml
+
+Nodo senza antenna
+sudo ./wishful_ras_agent --config  agent_cfg.yaml
+
+Nodo controllore
+./wishful_ras_controller --config controller_cfg.yaml
+
+
+sudo iwconfig wlan0 txpower 10dbm fixed
+
+
+per avviare il visualizzatore
+
+ #to get configuration
+    ssh -L 8300:"pc controlle node":8300 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+    eg. ssh -L 8300:apuN4:8300 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+
+    #to get thr
+    ssh -L 8301:"ap node":8301 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+    eg. ssh -L 8301:apuT1:8301 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+
+    #to get power
+    ssh -L 8302:"ap node":8302 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+    eg. ssh -L 8302:apuT1:8302 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+
+    on local pc
+        python demo_visualizer.py
+
+"""
 
 
 import datetime

@@ -1,11 +1,17 @@
 #!/usr/bin/python
 
 import sys
-sys.path.append('../../../../')
-from examples.wmp.year1_showcase3.wmp_helper.MeasurementManager import MeasurementCollector
+sys.path.append('../')
+#../../../../examples/wmp/year1_showcase3/wmp_helper/
+from wmp_helper.MeasurementManager import MeasurementCollector
 
 meas_collector = MeasurementCollector(mytestbed=None, log=None)
-meas_collector.plot_measurements(plot_title="PLOT SC3", plot_directory=".")
+#meas_collector.plot_measurements(plot_title="PLOT SC3 legacy", plot_directory="./legacy/30seconds")
+#meas_collector.plot_measurements(plot_title="PLOT SC3 legacy", plot_directory="./legacy/120seconds")
+#meas_collector.plot_measurements(plot_title="PLOT SC3 legacy", plot_directory="./CWOPT/30seconds")
+meas_collector.plot_measurements(plot_title="PLOT SC3 legacy", plot_directory="./CWOPT/120seconds")
+#meas_collector.plot_measurements_mixed(plot_title="PLOT SC3 legacy", plot_directory_start_1="./CWOPT/30seconds", plot_directory_start_2="./legacy/30seconds", plot_directory="./mixed_10/30seconds")
+#meas_collector.plot_measurements_mixed(plot_title="PLOT SC3 legacy", plot_directory_start_1="./CWOPT/120seconds", plot_directory_start_2="./legacy/120seconds", plot_directory="./mixed_10/120seconds")
 
 
 

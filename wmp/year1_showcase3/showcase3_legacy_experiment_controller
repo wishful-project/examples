@@ -233,16 +233,19 @@ def main(args):
                 #start thread for collect measurements from nodes
                 _thread.start_new_thread( collect_remote_messages, (lcpDescriptor_legacy_nodes[ii], socket_visualizer, ) )
 
-            EXPERIMENT_DURATION= 30
+            EXPERIMENT_DURATION= 120
             dt=0
             old_traffic_number = 0
 
             #start server traffic
             controller.delay(2).nodes(mytestbed.ap_node).net.create_packetflow_sink(port='1234')
+            for node in mytestbed.legacy_nodes:
+                print("START iperf on client %s" % str(node.ip))
+                controller.delay(4).nodes(node).net.start_packetflow( '192.168.3.'+mytestbed.ap_node.ip.split('.')[3], '1234', '500', '3M')
+
             for node in mytestbed.wmp_nodes:
                 print("START iperf on client %s" % str(node.ip))
-                controller.delay(4).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '500', '3M')
-
+                controller.delay(4).nodes(node).net.start_packetflow( '192.168.3.'+mytestbed.ap_node.ip.split('.')[3], '1234', '500', '3M')
 
 
             while True:
@@ -259,6 +262,11 @@ def main(args):
                 if dt > EXPERIMENT_DURATION:
                     break
 
+
+            controller.delay(3).nodes(mytestbed.ap_node).net.destroy_packetflow_sink()
+            controller.delay(2).nodes(mytestbed.wmp_nodes).net.stop_packetflow()
+            controller.delay(2).nodes(mytestbed.legacy_nodes).net.stop_packetflow()
+
             print("Terminate remote local control program")
             lcpDescriptor_ap_node.close()
             for ii in range(0,len(mytestbed.wmp_nodes)):
@@ -266,16 +274,12 @@ def main(args):
             for ii in range(0,len(mytestbed.legacy_nodes)):
                 lcpDescriptor_legacy_nodes[ii].close()
 
-            controller.delay(3).nodes(mytestbed.ap_node).net.destroy_packetflow_sink()
-            controller.delay(2).nodes(mytestbed.wmp_nodes).net.stop_packetflow()
-            controller.delay(2).nodes(mytestbed.legacy_nodes).net.stop_packetflow()
-
-
             """
             Plot collect measurement of phase 1
             """
             meas_collector.plot_last_measurements(nodes=mytestbed.wifinodes, measurement_types=None, plot_title="PLOT SC3", plot_directory="showcase_data")
             # meas_collector.clear_nodes_measurements(nodes=mytestbed.wifinodes)
+
             break
 
 

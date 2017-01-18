@@ -47,6 +47,7 @@ def local_control_program(controller):
     import datetime
     import sys
     import threading
+    import zmq
 
     sys.path.append('../../../')
     sys.path.append("../../../agent_modules/wifi_ath")
@@ -59,7 +60,7 @@ def local_control_program(controller):
     from agent_modules.wifi_wmp.wmp_structure import UPI_R
 
     #socket iperf pointer
-	iperf_socket = None
+    iperf_socket = None
 
     def rcv_from_iperf_socket(iperf_througputh, controller, interface):
         iperf_thread = threading.currentThread()
@@ -73,20 +74,21 @@ def local_control_program(controller):
         iperf_socket.setsockopt_string(zmq.SUBSCRIBE, '')
 
         wlan_ip_address = controller.net.get_iface_ip_addr(interface)
+        wlan_ip_address = wlan_ip_address[0]
 
         print('socket iperf started')
         while getattr(iperf_thread, "do_run", True):
             parsed_json = iperf_socket.recv_json()
-            print('my address %s - parsed_json : %s' % (str(wlan_ip_address), str(parsed_json)))
+            #print('my address %s - parsed_json : %s' % (str(wlan_ip_address), str(parsed_json)))
             rcv_ip_address = parsed_json['ip_address']
             if rcv_ip_address == wlan_ip_address:
-                print('parsed_json : %s' % str(parsed_json))
+            #    print('parsed_json : %s' % str(parsed_json))
                 iperf_througputh[0] = float(parsed_json['throughput'])
 
     """
     Custom function used to implement local WiSHFUL controller
     """
-    def customLocalCtrlFunction(controller, interface, tuning_enabler):
+    def customLocalCtrlFunction(controller, interface, tuning_enabler, iperf_througputh):
 
         import time
         import logging
@@ -136,13 +138,8 @@ def local_control_program(controller):
         #UPI_myargs = {'interface' : interface, UPI_R.CSMA_CW : CWMIN, UPI_R.CSMA_CW_MIN : CWMIN, UPI_R.CSMA_CW_MAX : CWMAX }
         #controller.radio.set_parameter(UPI_myargs)
 
-        #receive message from controller
-        msg = controller.recv(timeout=1)
-        if msg:
-            n_tx_sta = msg["traffic_number"]
-            log.warning("num_tx_nodes=%d" % n_tx_sta )
-        else:
-            n_tx_sta = 0
+        #station number initializing
+        n_tx_sta = 5
 
         #local controller loop
         while not controller.is_stopped():
@@ -224,12 +221,12 @@ def local_control_program(controller):
             delta_num_rx_match=float(delta_num_rx_match)
 
             #PHY
-            bw=20;
-            Tpre=16*20/bw;
-            Tsig=4*20/bw;
-            Tsym=4*20/bw;
-            rate=2; #Mbps
-            basic_rate=2; #Mbps
+            bw=20
+            Tpre=16*20/bw
+            Tsig=4*20/bw
+            Tsym=4*20/bw
+            rate=24 #2 #Mbps
+            basic_rate=6 #2 #Mbps
 
             #MAC
             tslot=9
@@ -239,14 +236,22 @@ def local_control_program(controller):
 
             #PKT SIZE
             l_ack=14 #byte
-            data_size=200
+            data_size=1470 #200
 
-            t_data= Tpre + Tsig + math.ceil(Tsym/2+(22+8*(data_size))/rate);
-            t_ack=Tpre + Tsig+math.ceil(l_ack*8/basic_rate);
-            EIFS= t_ack + SIFS + DIFS;
+            t_data= Tpre + Tsig + math.ceil(Tsym/2+(22+8*(data_size))/rate)
+            t_ack=Tpre + Tsig+math.ceil(l_ack*8/basic_rate)
+            EIFS= t_ack + SIFS + DIFS
 
             #select algorithm to tune node CW
-            alg="MEDCA"
+            alg="CW_OPT"
+
+            if alg == "CW_OPT":
+                Tc = t_data + EIFS #Collision time
+                cw_f = n_tx_sta * math.sqrt(2*Tc / tslot)
+                cw = round(cw_f)
+                cw = int(cw)
+                cw = max(cw,CWMIN)
+                cw = min(cw,CWMAX)
 
             #MEDCA algorithm
             if alg == "MEDCA" :
@@ -266,14 +271,6 @@ def local_control_program(controller):
             if alg == "FIXED":
                 cw = 46
 
-            if alg == "CW_OPT":
-                Tc = t_data + EIFS; #Collision time
-                cw_f = n_tx_sta * math.sqrt(2*Tc / tslot)
-                cw = round(cw_f)
-                cw = int(cw)
-                cw = max(cw,CWMIN)
-                cw = min(cw,CWMAX)
-
             #update CW
             if tuning_enabler == 1 and alg != "DCF" :
                 log.warning(' >>>>>>>> CW setting : ENABLED')
@@ -285,17 +282,16 @@ def local_control_program(controller):
             #send value to MASTER
             cycle_update += 1
             if not(cycle_update % 1):
+                log.warning("num_tx_nodes=%d" % n_tx_sta )
                 #communicate with global controller by passing control message
-                log.warning('Sending result message to control program ');
+                log.warning('Sending result message to control program ')
                 controller.send_upstream({ "measure" : [[delta_freezing, tsf_reg, delta_ack_rx_ramatch, cw, ipt, delta_data_tx, delta_ack_rx,  delta_busytime, delta_tsf_reg, delta_num_rx_match, iperf_througputh[0] ]], "ip_address" : (ip_address) })
 
-             #receive message from controller
+            #receive message from controller
             msg = controller.recv(timeout=1)
             if msg:
                     n_tx_sta = msg["traffic_number"]
                     log.warning("num_tx_nodes=%d" % n_tx_sta )
-            else:
-                    n_tx_sta = 0
             #time.sleep(T)
 
         log.warning('Local WiSHFUL Controller END');
