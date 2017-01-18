@@ -145,10 +145,18 @@ def start_visualizer_connection():
 
     ''' implement message zmq for realtime visualizer '''
     #global socket_visualizer
+<<<<<<< HEAD
+    socket_visualizer_port = "8401"
+    context = zmq.Context()
+    socket_visualizer = context.socket(zmq.PUB)
+    socket_visualizer.bind("tcp://*:%s" % socket_visualizer_port)
+    print("Connecting to server on port 8401 ... ready to send information to visualizer")
+=======
     port = "8400"
     context = zmq.Context()
     socket_visualizer = context.socket(zmq.PUB)
     socket_visualizer.bind("tcp://*:%s" % port)
+>>>>>>> origin/master
 
     ''' implement OML database setup for realtime visualizer '''
     # #global omlInst
@@ -158,6 +166,27 @@ def start_visualizer_connection():
 
     return socket_visualizer
 
+<<<<<<< HEAD
+
+def start_command_connection():
+    ''' SETUP PYTHON COMMAND RECEIVER '''
+    ''' implement message zmq for realtime command '''
+
+    socket_command_port  = 8400
+    context = zmq.Context()
+    socket_command = context.socket(zmq.PAIR)
+    socket_command.bind("tcp://*:%s" % socket_command_port)
+    print("Connecting to server on port 8400 ... ready to receive command from demo visualizer")
+
+    # socket_command = context.socket(zmq.SUB)
+    # socket_command.connect ("tcp://localhost:%s", socket_command_port)
+    # socket_command.setsockopt(zmq.SUBSCRIBE, '')
+
+    return socket_command
+
+
+=======
+>>>>>>> origin/master
 def collect_remote_messages(lcpDescriptor_node, socket_visualizer):
     receive_thread = threading.currentThread()
     while getattr(receive_thread, "do_run", True):
@@ -229,6 +258,10 @@ def main(args):
 
             # ''' start connection to visualizzer - Python or testbed DB '''
             socket_visualizer = start_visualizer_connection()
+<<<<<<< HEAD
+            socket_command = start_command_connection()
+=======
+>>>>>>> origin/master
 
             ''' start local control program on WMP nodes '''
             lcpDescriptor_wmp_nodes = []
@@ -239,6 +272,50 @@ def main(args):
                 reading_thread.append(threading.Thread(target=collect_remote_messages, args=(lcpDescriptor_wmp_nodes[ii], socket_visualizer,)))
                 reading_thread[ii].start()
 
+<<<<<<< HEAD
+            EXPERIMENT_DURATION= 3000
+            CHANGE_TRAFFIC = 50
+            dt=0
+
+            poller = zmq.Poller()
+            poller.register(socket_command, flags=zmq.POLLIN)
+
+            while do_run:
+                socket_list = poller.poll(1000)
+                if socket_list:
+                    for socket_info in socket_list:
+                        if socket_info[1] == zmq.POLLIN:
+                            parsed_json = socket_command.recv_json()
+                            print('parsed_json : %s' % str(parsed_json))
+                            type = parsed_json['type']
+
+                            #parsed_json : {'ip_address': '192.168.3.104', 'command': 'TDMA 2', 'type': 'protocol'}
+                            if type == 'protocol':
+                                node_ipAddress = parsed_json['ip_address']
+                                command = parsed_json['command']
+                                for ii in range(len(mytestbed.wmp_nodes)):
+                                    if mytestbed.wmp_nodes[ii].ip == node_ipAddress :
+                                        lcpDescriptor_wmp_nodes[ii].send({"protocol": command})
+
+                            if type == 'traffic':
+                                command = parsed_json['command']
+                                if command == 'stop':
+                                    controller.nodes(mytestbed.ap_node).net.destroy_packetflow_sink()
+                                    controller.nodes(mytestbed.wmp_nodes).net.stop_packetflow()
+                                if command == 'start_low':
+                                    #start server traffic
+                                    controller.delay(1).nodes(mytestbed.ap_node).net.create_packetflow_sink('1234', '1', True, 'wlan0')
+                                    #start client traffic
+                                    for node in mytestbed.wmp_nodes:
+                                        controller.delay(2).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '3000', '0.3M', '1470')
+                                if command == 'start_high':
+                                    #start server traffic
+                                    controller.delay(1).nodes(mytestbed.ap_node).net.create_packetflow_sink('1234', '1', True, 'wlan0')
+                                    #start client traffic
+                                    for node in mytestbed.wmp_nodes:
+                                        controller.delay(2).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '3000', '1.5M', '1470')
+
+=======
 
             EXPERIMENT_DURATION= 300
             CHANGE_TRAFFIC = 50
@@ -251,6 +328,7 @@ def main(args):
                 controller.delay(4).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '500', '0.3M')
 
             while do_run:
+>>>>>>> origin/master
                 #need to keep alive the control program, if do not present the remote control program will been closed
                 lcpDescriptor_wmp_nodes[0].send({"alive": 1})
 
@@ -260,6 +338,8 @@ def main(args):
                 #gevent.sleep(1)
                 time.sleep(1)
 
+<<<<<<< HEAD
+=======
                 if dt == CHANGE_TRAFFIC:
                     controller.delay(2).nodes(mytestbed.ap_node).net.destroy_packetflow_sink()
                     for node in mytestbed.wmp_nodes:
@@ -269,6 +349,7 @@ def main(args):
                     for node in mytestbed.wmp_nodes:
                         controller.delay(4).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '500', '1.5M')
 
+>>>>>>> origin/master
                 if dt > EXPERIMENT_DURATION:
                     break
 

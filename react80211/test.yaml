@@ -1,4 +1,0 @@
-## WiSHFUL Controller's config file
-
-experiment:
-   flows: {"src":[1,2,3,4],"dst":[2,3,4,1],"bw_req":[6000,6000,3000,0]}

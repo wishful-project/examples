@@ -1,5 +1,0 @@
-pip3 uninstall wishful_module_wifi
-pip3 uninstall wishful_framework
-pip3 uninstall wishful_agent
-pip3 uninstall wishful_module_iperf
-pip3 uninstall wishful_upis

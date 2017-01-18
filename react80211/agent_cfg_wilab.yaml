@@ -1,15 +1,19 @@
 ## WiSHFUL agent config file
 
 agent_info:
-  name: 'ras_antenna'
-  info: 'RAS agent info'
-  iface: 'eth1'
+  name: 'react80211'
+  info: 'REACT80211 agent info'
+  iface: 'eth0'
 
 modules:
+  network:
+      module : wishful_module_net_linux
+      class_name : NetworkModule
+
   discovery:
       module : wishful_module_discovery_pyre
       class_name : PyreDiscoveryAgentModule
-      kwargs: {"iface":"eth1", "groupName":"ras_example"}
+      kwargs: {"iface":"eth0", "groupName":"react80211_example"}
 
   wlan:
       module : wishful_module_wifi
@@ -18,8 +22,3 @@ modules:
   iperf:
       module : wishful_module_iperf
       class_name : IperfModule
-
-  ras:
-      module : wishful_module_ras_antenna
-      class_name : RasAntennaModule
-

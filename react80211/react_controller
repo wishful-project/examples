@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-RAS implementation in WiSHFUL Project
-
 Usage:
    react_controller.py [options] [-q | -v]
 
@@ -14,7 +12,7 @@ Options:
    --experiment_info name experiment setup
 
 Example:
-   ./showcase3_controller_power -v --config ./controller_config.yaml
+   ./
 
 Other options:
    -h, --help          show this help message and exit
@@ -27,9 +25,7 @@ Other options:
 DEMO visualizer START
 
     ssh -L 8300:"pc controlle node":8300 dgarlisi@ops.wilab2.ilabt.iminds.be -v
-
     eg. ssh -L 8300:apuN4:8300 dgarlisi@ops.wilab2.ilabt.iminds.be -v
-
 
     on local pc
         python demo_visualizer.py
@@ -63,13 +59,13 @@ import yaml
 import zmq
 import json
 from node_setup import *
-
+import zmq
 
 sys.path.append('../../')
 sys.path.append("../../agent_modules/wifi_ath")
 sys.path.append("../../agent_modules/wifi_wmp")
 sys.path.append("../../agent_modules/wifi")
-#sys.path.append("../../agent_modules/iperf/wishful_module_iperf/")
+sys.path.append("../../agent_modules/iperf/")
 sys.path.append('../../upis')
 sys.path.append('../../framework')
 sys.path.append('../../agent')
@@ -85,73 +81,12 @@ __version__ = "0.1.0"
 __email__ = "domenico.garlisi@cnit.it"
 
 
-"""
-NODE IP
-
-apuN4 : 10.11.16.104
-apuT1 : 10.11.16.126
-apuU1 : 10.11.16.130
-apuO2 : 10.11.16.107
-apuP4 : 10.11.16.112
-apuU4 : 10.11.16.132
-apu04 : 10.11.16.108 (RAS)
-apuO5 : 10.11.16.109
-"""
-
-
-"""
-Setting of experiment nodes, ip address and name
-"""
-#PC
-controller_PC_name = "apuN4"
-controller_PC_ip_address = "10.11.16.104"
-controller_PC_interface = "eth0"
-
-# AP1 set in monitor on channel 40
-ap1_name = "apuT1"
-ap1_ip = "10.11.16.126"
-ap1_wlan_interface = "wlan0"
-
-# STA1 set in monitor on channel 40
-sta1_name = "apu04"
-sta1_ip = "10.11.16.108"
-sta1_wlan_interface = "wlan0"
-
-# AP2
-ap2_name = "apuU1"
-ap2_ip = "10.11.16.130"
-ap2_wlan_interface = "wlan0"
-
-# STA2
-sta2_name = "apuU4"
-sta2_ip = "10.11.16.132"
-sta2_wlan_interface = "wlan0"
-
-
-#Nodes number
-nodes_number=4
-ap_wlan_interface = "wlan0"
-sta_wlan_interface = "wlan0"
-
-# BSSID of our Network
-network_bssid = "wishful_ras_example"
-group_name = "ras_example"
-
-"""
-END setting of experiment nodes
-"""
-
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller()
 
 nodes = []
 configuration_message_for_visualizzer = {}
-ap1_node = None
-sta1_node= None
-
-ap2_node = None
-sta2_node= None
-
+do_run = None
 
 @controller.new_node_callback()
 def new_node(node):
@@ -172,8 +107,6 @@ def default_callback(group, node, cmd, data):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
 
 
-
-
 def send_react(node_id):
      for i in range(0,10): 
        my_mac= controller.nodes(node_id).net.get_iface_hw_addr(iface="wlan0")
@@ -187,107 +120,228 @@ def csResultCollector1(group, node, data):
     messagedata = data
     log.info('1 - receives data msg at %s - %s' % (str(node.ip), str(messagedata) ))
 
+def start_command_connection():
+    ''' SETUP PYTHON COMMAND RECEIVER '''
+    ''' implement message zmq for realtime command '''
+
+    socket_command_port  = 8400
+    context = zmq.Context()
+    socket_command = context.socket(zmq.PAIR)
+    socket_command.bind("tcp://*:%s" % socket_command_port)
+    print("Connecting to server on port 8400 ... ready to receive command from demo visualizer")
+    return socket_command
+
+
+def collect_remote_messages(lcpDescriptor_node, socket_visualizer, mac_address, label):
+    receive_thread = threading.currentThread()
+    while getattr(receive_thread, "do_run", True):
+        msg = lcpDescriptor_node.recv(timeout=0.1)
+        if msg:
+            #log.info("Recv ctrl message from remote local control program : %s" % str(msg))
+            for ii in range(0, len(mac_address)):
+                if msg['mac_address'] == mac_address[ii]:
+                    msg['label'] = label[ii]
+                    socket_visualizer.send_json(msg)
+
+        gevent.sleep(1)
+
+
+def start_visualizer_connection():
+    ''' SETUP PYTHON VISUALIZER '''
+
+    ''' implement message zmq for realtime visualizer '''
+    #global socket_visualizer
+    socket_visualizer_port = "8401"
+    context = zmq.Context()
+    socket_visualizer = context.socket(zmq.PUB)
+    socket_visualizer.bind("tcp://*:%s" % socket_visualizer_port)
+    print("Connecting to server on port 8401 ... ready to send information to visualizer")
+
+    ''' implement OML database setup for realtime visualizer '''
+    # #global omlInst
+    # #omlInst = oml4py.OMLBase("LocalControlProgram", "WiSHFUL", socket.gethostname(),"tcp:am.wilab2.ilabt.iminds.be:3004")
+    # #omlInst.addmp("IEEE802154_MACSTATS", "timestamp:int32 nodeID:int32 packetSize:int32 activeRadioprogram:string timeDiff:int32 numTxRequest:int32 numTxRequestFail:int32 numTxAttempt:int32 numTxSuccess:int32 numTxFail:int32 numTxBusy:int32 numTxNoAck:int32 numTxCollision:int32 numRx:int32 avgBackoffExponent:int32")
+    # #omlInst.start()
+
+    return socket_visualizer
+
+
+def signal_handler(signal, frame):
+    global do_run
+    do_run = False
+
+signal.signal(signal.SIGINT, signal_handler)
+
+
 def main(args):
     # get info from configuration csv file
-
+    global nodes
+    global do_run
+    do_run = True
     log.debug(args)
 
     config_file_path = args['--config']
     config = None
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
-
     controller.load_config(config)
 
     nodes_info_path=args['--nodes']
-    [hosts,driver,eth_ip,freq,tx_power,wlan_ip]=set_hosts(nodes_info_path);
-    print([hosts,driver,eth_ip,freq,tx_power,wlan_ip])
-    experiment_info_path=args['--experiment_info']
-    if experiment_info_path:
-	    [src,dst,bw_req,port,t_start,t_stop]=experiment_setup(experiment_info_path)
+    if nodes_info_path:
+        [hosts, driver, eth_ip, freq,tx_power, wlan_ip, mac_address, label]=set_hosts(nodes_info_path);
+        print([hosts, driver, eth_ip, freq, tx_power, wlan_ip, mac_address, label])
+
+    # experiment_info_path=args['--experiment_info']
+    # if experiment_info_path:
+    #     [src, dst, bw_req, port, t_start, t_stop]=experiment_setup(experiment_info_path)
+    #     # for ii in range(0, len(src)):
+    #     #     print('flow %d - %s %s %s %s %s %s' % (ii, src[ii], dst[ii], bw_req[ii], port[ii], t_start[ii], t_stop[ii]))
 
     #Start controller
     controller.start()
 
     #control loop
-    while True:
+    while do_run:
         gevent.sleep(1)
         print("\nConnected nodes", [str(node.name) for node in nodes])
-	
-        if len(nodes) == 2:
+        if len(nodes) == 3:
+            lcpDescriptor_nodes = []
+            reading_thread = []
 
-#SETUP NODES, RUN REACT
-          lcpDescriptor = None;
-          for ii in range(0, len(hosts)):
-            for jj in range(0, len(nodes)):
-              if nodes[jj].ip in eth_ip[ii]:
-                pos=eth_ip.index(nodes[jj].ip)
-                rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos],"wlan0","wishful-react",freq[pos],tx_power[pos],"6",wlan_ip[pos],"250","aa:bb:cc:dd:ee:ff",True)
-                gevent.sleep(5)
-                rvalue = controller.nodes(nodes[jj]).net.start_monitor(driver[pos],"wlan0")
-                gevent.sleep(5)
-                """
-                lcpDescriptor = controller.node(nodes[jj]).hc.start_local_control_program(program=react)
-                msg={"iface":"wlan0","i_time":1,"iperf_rate":0,"enable_react":False}
-                lcpDescriptor.send(msg)
-                """
+            #START visualizer socket
+            socket_visualizer = start_visualizer_connection()
 
-          break
-          """
-          for jj in range(0, len(nodes)):
-              if nodes[jj].ip == "10.11.16.22":
-                  print ("got: 10.11.16.22")
-                  my_tstart=2
-                  my_tstop=30
-                  my_port=5001
-                  controller.nodes(nodes[jj]).net.create_packetflow_sink(str(my_port))
+            nodes_sort = []
+            for ii in range(0, len(hosts)):
+                for jj in range(0, len(nodes)):
+                    if nodes[jj].ip in eth_ip[ii]:
+                        nodes_sort.append(nodes[jj])
+            nodes = nodes_sort
 
-              if nodes[jj].ip == "10.11.16.33":
-                  controller.nodes(nodes[jj]).net.start_packetflow('192.168.0.1', '5001', '100')
-          """
+            react_time_update = 1 #seconds
+            react_algorithm_activation = False
+            nodes_source_rate = []
+            for ii in range(0, len(nodes)):
+                nodes_source_rate.append(0)
 
-          for i_flow in range(0,len(src)):
-             for jj in range(0, len(nodes)):
-               if nodes[jj].ip == eth_ip[int(dst[i_flow])-1]:
-                  print ("SERVER: nodes.ip: {} port={} t_start={} t_stop={}".format(nodes[jj].ip,port[i_flow],t_start[i_flow],t_stop[i_flow]))
-#                  exec_time = datetime.datetime.now() + datetime.timedelta(int(t_start[i_flow]))
-#                  controller.callback(csResultCollector1).nodes(nodes[jj]).net.create_packetflow_sink(str(port[i_flow]))
-	
-               gevent.sleep(1)
+            #SETUP NODES
+            print("START node setup")
+            lcpDescriptor = None;
+            for ii in range(0, len(hosts)):
+                for jj in range(0, len(nodes)):
+                    if nodes[jj].ip in eth_ip[ii]:
+                        print("setup node %s" % nodes[jj].ip)
+                        pos = eth_ip.index(nodes[jj].ip)
+                        rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-react", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
+                        gevent.sleep(1)
+                        rvalue = controller.nodes(nodes[jj]).net.start_monitor(driver[pos], "wlan0")
 
-               if nodes[jj].ip == eth_ip[int(src[i_flow])-1]:
-                  print ("CLIENT: nodes.ip={}: {}-->{}".format(nodes[jj].ip,eth_ip[int(src[i_flow])-1],eth_ip[int(dst[i_flow])-1]))
-#                  print ("{}-->{}".format(wlan_ip[int(src[i_flow])-1],wlan_ip[int(dst[i_flow])-1]))
-#                  exec_time = datetime.datetime.now() + datetime.timedelta(int(t_start[i_flow]))
-#                  controller.callback(csResultCollector1).nodes(nodes[jj]).net.start_packetflow(str(wlan_ip[int(dst[i_flow])-1]), str(port[i_flow]), str(t_stop[i_flow]))
+                        #RUN REACT
+                        ''' start local control program on nodes '''
+                        lcpDescriptor_nodes.append(controller.node(nodes[jj]).hc.start_local_control_program(program=react))
+                        msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : 0, "enable_react" : react_algorithm_activation}
+                        lcpDescriptor_nodes[ii].send(msg)
+                        #start thread for collect measurements from nodes
+                        reading_thread.append(threading.Thread(target=collect_remote_messages, args=(lcpDescriptor_nodes[ii], socket_visualizer, mac_address, label)))
+                        reading_thread[ii].start()
+            print("END node setup")
 
-                  lcpDescriptor = controller.node(nodes[jj]).hc.start_local_control_program(program=react)
-                  msg={"iface":"wlan0","i_time":1,"iperf_rate":6000,"enable_react":True}
-                  lcpDescriptor.send(msg)
-		
-          break;
-			
-        """
-        gevent.sleep(1)
-        print("\nConnected nodes", [str(node.name) for node in nodes])
-	
-        if len(nodes) == 6:
+            for node in nodes:
+                controller.delay(1).nodes(node).net.create_packetflow_sink('1234', '1', True, 'wlan0')
 
-#SETUP NODES, RUN REACT
-          for ii in range(0, len(nodes)):
-           if nodes[ii].ip in eth_ip:
-             pos=eth_ip.index(nodes[ii].ip)
-             rvalue = controller.nodes(nodes[ii]).net.start_adhoc(driver[pos],"wlan0","wishful-react",freq[pos],tx_power[pos],"6",wlan_ip[pos],"250","aa:bb:cc:dd:ee:ff",True)
-             gevent.sleep(5)
-             rvalue = controller.nodes(nodes[ii]).net.start_monitor(driver[pos],"wlan0")
-             gevent.sleep(5)
-             lcpDescriptor = controller.node(nodes[ii]).hc.start_local_control_program(program=react)
-             msg={"iface":"wlan0","i_time":1,"iperf_rate":int(bw_req[ii]),"enable_react":False}
-             lcpDescriptor.send(msg)
-#SETUP EXPERIMENT
+            socket_command = start_command_connection()
+            poller = zmq.Poller()
+            poller.register(socket_command, flags=zmq.POLLIN)
+            EXPERIMENT_DURATION= 3000
+            dt=0
+            while do_run:
+                socket_list = poller.poll(1000)
+                if socket_list:
+                    for socket_info in socket_list:
+                        if socket_info[1] == zmq.POLLIN:
+                            parsed_json = socket_command.recv_json()
+                            print('parsed_json : %s' % str(parsed_json))
+                            type = parsed_json['type']
+                            if type == 'traffic':
+                                node = parsed_json['src']
+                                #TO DO --> find index in file
+                                if node == 'A':
+                                    node_src_index = 0
+                                elif node == 'B':
+                                    node_src_index = 1
+                                elif node == 'C':
+                                    node_src_index = 2
+                                else:
+                                    print('node index not retreive')
+                                    break
 
-          break
-        """
+                                command = parsed_json['command']
+                                if command == 'off_traffic':
+                                    source_rate = 0
+                                    nodes_source_rate[node_src_index] = source_rate
+                                    msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : float(source_rate), "enable_react" : react_algorithm_activation, "src" : node_src_index,}
+                                    lcpDescriptor_nodes[node_src_index].send(msg)
+                                    controller.nodes(nodes[node_src_index]).net.stop_packetflow()
+                                    break
+
+                                value = parsed_json['value']
+                                nodes_source_rate[node_src_index] = value
+                                node = parsed_json['dst']
+                                #TO DO --> find index in file
+                                if node == 'A':
+                                    node_dst_index = 0
+                                elif node == 'B':
+                                    node_dst_index = 1
+                                elif node == 'C':
+                                    node_dst_index = 2
+                                else:
+                                    print('node index not retreive')
+                                    break
+                                if command == 'set_traffic':
+                                    if react_algorithm_activation:
+                                        source_rate = nodes_source_rate[node_src_index]
+                                    else:
+                                        source_rate = 0
+                                    msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : float(source_rate), "enable_react" : react_algorithm_activation, "src" : node_src_index, "dst" : node_dst_index}
+                                    lcpDescriptor_nodes[node_src_index].send(msg)
+                                    controller.delay(1).nodes(nodes[node_src_index]).net.start_packetflow(wlan_ip[node_dst_index] , '1234', '3000', str(value)+'K', '1470')
+
+                            if type == 'algorithm':
+                                command = parsed_json['command']
+
+                                if command == 'start_react':
+                                    react_algorithm_activation = True
+                                    for jj in range(0, len(nodes)):
+                                        msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : nodes_source_rate[jj], "enable_react" : react_algorithm_activation}
+                                        lcpDescriptor_nodes[jj].send(msg)
+
+                                if command == 'stop_react':
+                                    react_algorithm_activation = False
+                                    msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : 0, "enable_react" : react_algorithm_activation}
+                                    for jj in range(0, len(nodes)):
+                                        lcpDescriptor_nodes[jj].send(msg)
+
+                if not(dt%10):
+                    log.warning('waiting for ... (%d sec / %d)' % (dt, EXPERIMENT_DURATION) )
+                dt += 1
+
+                gevent.sleep(1)
+
+                if dt > EXPERIMENT_DURATION:
+                    break
+
+            for ii in range(0,len(nodes)):
+                controller.nodes(nodes[ii]).net.destroy_packetflow_sink()
+
+                print("Terminate remote local control program")
+                lcpDescriptor_nodes[ii].close()
+
+                time.sleep(2)
+
+                print("Terminate receive thread")
+                reading_thread[ii].do_run = False
+                reading_thread[ii].join()
+
 
 if __name__ == "__main__":
     try:
@@ -317,6 +371,7 @@ if __name__ == "__main__":
 
     try:
         main(args)
+        print('end main')
     except KeyboardInterrupt:
         log.debug("Controller exits")
     finally:

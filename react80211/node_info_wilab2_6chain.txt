@@ -1,0 +1,7 @@
+#hostname,driver,eth0_ip,freq,txpower,wlan0_ip,mac_address,label
+nodezotacb3.wilab2.ilabt.iminds.be,ath9k,10.11.16.22,5180,1,192.168.0.1,mac_address,A
+nodezotacb4.wilab2.ilabt.iminds.be,ath9k,10.11.16.33,5180,1,192.168.0.2,mac_address,B
+nodezotacd3.wilab2.ilabt.iminds.be,ath9k,10.11.16.24,5180,3,192.168.0.3,mac_address,C
+nodezotaci3.wilab2.ilabt.iminds.be,ath9k,10.11.16.29,5180,3,192.168.0.4,mac_address,D
+nodezotack3.wilab2.ilabt.iminds.be,ath9k,10.11.16.31,5180,1,192.168.0.5,mac_address,E
+nodezotack4.wilab2.ilabt.iminds.be,ath9k,10.11.16.42,5180,1,192.168.0.6,mac_address,F

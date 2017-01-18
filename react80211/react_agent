@@ -34,7 +34,7 @@ sys.path.append("../../agent_modules/wifi_ath")
 sys.path.append("../../agent_modules/wifi_wmp")
 sys.path.append("../../agent_modules/wifi")
 sys.path.append("../../agent_modules/iperf")
-sys.path.append("../../agent_modules/ras_antenna")
+sys.path.append("../../agent_modules/net_linux")
 sys.path.append('../../upis')
 sys.path.append('../../framework')
 sys.path.append('../../agent')
@@ -46,30 +46,6 @@ __author__ = "Domenico Garlisi"
 __copyright__ = "Copyright (c) 2015, CNIT"
 __version__ = "0.1.0"
 __email__ = "domenico.garlisi@cnit.it"
-
-# # BSSID of our Network
-# network_bssid = "wishful_ras_examplel"
-# group_name = "ras_example"
-# node_interface = "eth0"
-#
-# log = logging.getLogger('wishful_agent')
-# logLevel = logging.DEBUG
-# logging.basicConfig(level=logLevel, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
-#
-# #Create and configure
-# agent = wishful_agent.Agent()
-#
-# agent.set_agent_info(name="RASAgent", info="RASAgentInfo", iface=node_interface)
-#
-# agent.add_module(moduleName="discovery", pyModule="wishful_module_discovery_pyre",
-#                  className="PyreDiscoveryAgentModule", kwargs={"iface":node_interface, "groupName":group_name})
-#
-# agent.add_module(moduleName="wifi", pyModuleName="wishful_module_wifi", className="WifiModule")
-#
-# # agent.add_module(moduleName="ras_antenna", pyModule="wishful_module_ras_antenna",
-# #                  className="RasAntennaModule")
-
-
 
 log = logging.getLogger('wishful_agent.main')
 agent = wishful_agent.Agent()

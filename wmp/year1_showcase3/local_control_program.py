@@ -47,7 +47,10 @@ def local_control_program(controller):
     import datetime
     import sys
     import threading
+<<<<<<< HEAD
     import zmq
+=======
+>>>>>>> origin/master
 
     sys.path.append('../../../')
     sys.path.append("../../../agent_modules/wifi_ath")
@@ -60,7 +63,11 @@ def local_control_program(controller):
     from agent_modules.wifi_wmp.wmp_structure import UPI_R
 
     #socket iperf pointer
+<<<<<<< HEAD
     iperf_socket = None
+=======
+	iperf_socket = None
+>>>>>>> origin/master
 
     def rcv_from_iperf_socket(iperf_througputh, controller, interface):
         iperf_thread = threading.currentThread()
@@ -74,15 +81,25 @@ def local_control_program(controller):
         iperf_socket.setsockopt_string(zmq.SUBSCRIBE, '')
 
         wlan_ip_address = controller.net.get_iface_ip_addr(interface)
+<<<<<<< HEAD
         wlan_ip_address = wlan_ip_address[0]
+=======
+>>>>>>> origin/master
 
         print('socket iperf started')
         while getattr(iperf_thread, "do_run", True):
             parsed_json = iperf_socket.recv_json()
+<<<<<<< HEAD
             #print('my address %s - parsed_json : %s' % (str(wlan_ip_address), str(parsed_json)))
             rcv_ip_address = parsed_json['ip_address']
             if rcv_ip_address == wlan_ip_address:
             #    print('parsed_json : %s' % str(parsed_json))
+=======
+            print('my address %s - parsed_json : %s' % (str(wlan_ip_address), str(parsed_json)))
+            rcv_ip_address = parsed_json['ip_address']
+            if rcv_ip_address == wlan_ip_address:
+                print('parsed_json : %s' % str(parsed_json))
+>>>>>>> origin/master
                 iperf_througputh[0] = float(parsed_json['throughput'])
 
     """
@@ -236,14 +253,18 @@ def local_control_program(controller):
 
             #PKT SIZE
             l_ack=14 #byte
+<<<<<<< HEAD
             data_size=1470 #200
+=======
+            data_size=200
+>>>>>>> origin/master
 
             t_data= Tpre + Tsig + math.ceil(Tsym/2+(22+8*(data_size))/rate)
             t_ack=Tpre + Tsig+math.ceil(l_ack*8/basic_rate)
             EIFS= t_ack + SIFS + DIFS
 
             #select algorithm to tune node CW
-            alg="CW_OPT"
+            alg="MEDCA"
 
             if alg == "CW_OPT":
                 Tc = t_data + EIFS #Collision time
@@ -284,7 +305,11 @@ def local_control_program(controller):
             if not(cycle_update % 1):
                 log.warning("num_tx_nodes=%d" % n_tx_sta )
                 #communicate with global controller by passing control message
+<<<<<<< HEAD
                 log.warning('Sending result message to control program ')
+=======
+                log.warning('Sending result message to control program ');
+>>>>>>> origin/master
                 controller.send_upstream({ "measure" : [[delta_freezing, tsf_reg, delta_ack_rx_ramatch, cw, ipt, delta_data_tx, delta_ack_rx,  delta_busytime, delta_tsf_reg, delta_num_rx_match, iperf_througputh[0] ]], "ip_address" : (ip_address) })
 
             #receive message from controller

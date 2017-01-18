@@ -1,6 +1,0 @@
-nodedssF5.REACT80211-3CHAIN.cognitiveradio.wilab2.ilabt.iminds.be,ath9k
-nodedssG5.REACT80211-3CHAIN.cognitiveradio.wilab2.ilabt.iminds.be,ath9k
-nodedssH5.REACT80211-3CHAIN.cognitiveradio.wilab2.ilabt.iminds.be,ath9k
-nodedssI5.REACT80211-3CHAIN.cognitiveradio.wilab2.ilabt.iminds.be,ath9k
-nodedssJ5.REACT80211-3CHAIN.cognitiveradio.wilab2.ilabt.iminds.be,ath9k
-nodedssK5.REACT80211-3CHAIN.cognitiveradio.wilab2.ilabt.iminds.be,ath9k
