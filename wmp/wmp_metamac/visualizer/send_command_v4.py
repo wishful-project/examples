@@ -141,7 +141,8 @@ class Adder(ttk.Frame):
     def loopCapture(self,x):
         if self.local_network :
             #location='http://10.8.19.1/crewdemo/plots/usrp.png'
-            location='http://10.8.9.3/crewdemo/plots/usrp.png'
+            #location='http://10.8.9.3/crewdemo/plots/usrp.png'
+            location='http://127.0.0.1:8484/crewdemo/plots/usrp.png'
         else :
             location='http://127.0.0.1:8484/crewdemo/plots/usrp.png'
 
@@ -530,7 +531,7 @@ class Adder(ttk.Frame):
             self.sta1_ipaddress = '10.8.8.104'
             self.sta2_ipaddress = '10.8.8.105'
             self.sta3_ipaddress = '10.8.8.110'
-            self.sta4_ipaddress = '10.8.8.111'
+            self.sta4_ipaddress = '10.8.8.114'
             self.socket_command_port = 8400
             self.sta1_server_port = self.socket_command_port
             self.sta2_server_port = self.socket_command_port

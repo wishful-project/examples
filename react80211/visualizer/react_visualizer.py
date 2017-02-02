@@ -49,7 +49,7 @@ class Adder(ttk.Frame):
 
     def centreWindow(self):
         w = 1500
-        h = 700
+        h = 800
         sw = self.parent.winfo_screenwidth()
         sh = self.parent.winfo_screenheight()
         #x = (sw - w)/2
@@ -57,6 +57,53 @@ class Adder(ttk.Frame):
         x = (sw - w)
         y = (sh - h)
         self.parent.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
+    def selectTopologyImage1(self):
+        print('1')
+        image_name = 'wilab2-topology-1.png'
+        img=Image.open(image_name)
+        wpercent=100
+        basewidth = 490
+        wpercent = (basewidth/float(img.size[0]))
+        hsize = int((float(img.size[1])*float(wpercent)))
+        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+        im = ImageTk.PhotoImage(img)
+
+        self.label_topo_img = Label(self.topo_frame, image=im)
+        self.label_topo_img.image = im
+        self.label_topo_img.grid(row=0, column=0, sticky='nesw')
+
+
+    def selectTopologyImage2(self):
+        print('2')
+        image_name = 'wilab2-topology-2.png'
+        img=Image.open(image_name)
+        wpercent=100
+        basewidth = 490
+        wpercent = (basewidth/float(img.size[0]))
+        hsize = int((float(img.size[1])*float(wpercent)))
+        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+        im = ImageTk.PhotoImage(img)
+
+        self.label_topo_img = Label(self.topo_frame, image=im)
+        self.label_topo_img.image = im
+        self.label_topo_img.grid(row=0, column=0, sticky='nesw')
+
+    def selectTopologyImage2bis(self):
+        print('2')
+        image_name = 'wilab2-topology-2bis.png'
+        img=Image.open(image_name)
+        wpercent=100
+        basewidth = 490
+        wpercent = (basewidth/float(img.size[0]))
+        hsize = int((float(img.size[1])*float(wpercent)))
+        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+        im = ImageTk.PhotoImage(img)
+
+        self.label_topo_img = Label(self.topo_frame, image=im)
+        self.label_topo_img.image = im
+        self.label_topo_img.grid(row=0, column=0, sticky='nesw')
+
 
 
     def stopReact(self):
@@ -87,13 +134,18 @@ class Adder(ttk.Frame):
 
 
     def setTraffic(self, src, val):
-
         if src == 'A':
             dst = self.countryVarA.get()
         elif src == 'B':
             dst = self.countryVarB.get()
         elif src == 'C':
             dst = self.countryVarC.get()
+        elif src == 'D':
+            dst = self.countryVarD.get()
+        elif src == 'E':
+            dst = self.countryVarE.get()
+        elif src == 'F':
+            dst = self.countryVarF.get()
         else:
             print('bad source node')
             return
@@ -124,90 +176,10 @@ class Adder(ttk.Frame):
                     self.socket_command.send_json(self.command_list)
                     self.last_traffic_update_time = time.time()
                     self.last_traffic_update_command = self.traffic_update_command
-            time.sleep(1)
-
-
-    def loopCapture(self,x):
-        if self.local_network :
-            #location='http://10.8.19.1/crewdemo/plots/usrp.png'
-            location='http://10.8.9.3/crewdemo/plots/usrp.png'
-        else :
-            location='http://127.0.0.1:8484/crewdemo/plots/usrp.png'
-
-        urllib2.urlopen(location)
-        import matplotlib.pyplot as plt
-        import matplotlib
-        matplotlib.use("TkAgg")
-        from matplotlib import rcParams
-        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-        from matplotlib.figure import Figure
-        import numpy
-        import cStringIO
-        rcParams.update({'figure.autolayout': True})
-
-        plt.ion()
-        f = Figure(frameon=False)
-        ax = f.add_subplot(111)
-        im = None
-
-        init = 1
-        while True:
-            if init:
-                try:
-                    # import matplotlib.image as mpimg
-                    # img = mpimg.imread("image.png")
-                    file = cStringIO.StringIO(urllib.urlopen(location).read())
-                    img = Image.open(file)
-
-                    wpercent=50
-                    basewidth = 350
-                    wpercent = (basewidth/float(img.size[0]))
-                    hsize = int((float(img.size[1])*float(wpercent)))
-                    img = img.resize((basewidth,hsize), Image.ANTIALIAS)
-
-                    #ax.imshow(img, aspect = 'normal')
-                    im = ax.imshow(img)
-                    ax.axis("off")
-
-                    # ax.autoscale(False)
-                    # ax.patch.set_visible(False)
-
-                    my_dpi=100
-                    width=1200
-                    height=400
-                    f.set_size_inches(width/my_dpi,height/my_dpi)
-
-
-                    self.channel_frame=ttk.LabelFrame(self, text="Channel occupation", height=20, width=100)
-                    self.channel_frame.grid(column=2, row=2, columnspan=1, sticky='nw')
-
-                    canvas = FigureCanvasTkAgg(f, self.channel_frame)
-                    canvas.show()
-                    #canvas.get_tk_widget().configure(background='white',  highlightcolor='white', highlightbackground='white')
-                    canvas.get_tk_widget().grid(column=0, row=0, columnspan=1, sticky='nw')
-
-                except Exception as e:
-                    print(e)
-
-                init = 0
-
-            else:
-                file = cStringIO.StringIO(urllib.urlopen(location).read())
-                if file:
-                    try:
-                        img = Image.open(file)
-                        im.set_data(img)
-                        f.canvas.draw()
-                    except Exception as e:
-                        print(e)
-                        print('ERRORE open image')
-                else:
-                    print('ERRORE download image')
-
+                    self.LabelTraffic.config(text="Select nodes traffic : (UPI executed!)")
 
             time.sleep(1)
-
-
+            self.LabelTraffic.config(text="Select nodes traffic : ")
 
     line1_psucc = None
     line2_psucc = None
@@ -253,21 +225,18 @@ class Adder(ttk.Frame):
                     line1_psucc, = ax.plot(self.xval_psucc, self.sta1val_psucc, label='Node A')
                     line2_psucc, = ax.plot(self.xval_psucc, self.sta2val_psucc, label='Node B')
                     line3_psucc, = ax.plot(self.xval_psucc, self.sta3val_psucc, label='Node C')
-                    # line4_psucc, = ax.plot(self.xval_psucc, self.sta4val_psucc, label='Node D')
-                    # line5_psucc, = ax.plot(self.xval_psucc, self.sta5val_psucc, label='Node E')
-                    # line6_psucc, = ax.plot(self.xval_psucc, self.sta6val_psucc, label='Node F')
+                    line4_psucc, = ax.plot(self.xval_psucc, self.sta4val_psucc, label='Node D')
+                    line5_psucc, = ax.plot(self.xval_psucc, self.sta5val_psucc, label='Node E')
+                    line6_psucc, = ax.plot(self.xval_psucc, self.sta6val_psucc, label='Node F')
 
                     ax.set_ylim([-0.1, 1.1])
                     ax.patch.set_facecolor('white')
                     #legend = ax.legend(loc='upper center', shadow=True, ncol=3)
 
-                    my_dpi=100
-                    width=600
-                    height=400
-                    figure_psucc.set_size_inches(width/my_dpi,height/my_dpi)
-                    #plt.tight_layout()
-                    self.statistics_psucc_frame=ttk.LabelFrame(self, text="Plot success probability", height=height, width=width)
-                    self.statistics_psucc_frame.grid(column=0, row=2, columnspan=1, sticky='nesw')
+                    my_dpi = self.my_dpi
+                    width = self.width
+                    height = self.height
+                    figure_psucc.set_size_inches(width/my_dpi, height/my_dpi)
 
                     canvas = FigureCanvasTkAgg(figure_psucc, self.statistics_psucc_frame)
                     canvas.show()
@@ -284,9 +253,9 @@ class Adder(ttk.Frame):
                 line1_psucc.set_ydata(self.sta1val_psucc)
                 line2_psucc.set_ydata(self.sta2val_psucc)
                 line3_psucc.set_ydata(self.sta3val_psucc)
-                # line4_psucc.set_ydata(self.sta4val_psucc)
-                # line5_psucc.set_ydata(self.sta5val_psucc)
-                # line6_psucc.set_ydata(self.sta6val_psucc)
+                line4_psucc.set_ydata(self.sta4val_psucc)
+                line5_psucc.set_ydata(self.sta5val_psucc)
+                line6_psucc.set_ydata(self.sta6val_psucc)
                 figure_psucc.canvas.draw()
             time.sleep(1)
 
@@ -343,14 +312,10 @@ class Adder(ttk.Frame):
                     ax.patch.set_facecolor('white')
                     #legend = ax.legend(loc='upper center', shadow=True, ncol=3)
 
-                    my_dpi=100
-                    width=600
-                    height=400
+                    my_dpi = self.my_dpi
+                    width = self.width
+                    height = self.height
                     figure_airtime.set_size_inches(width/my_dpi,height/my_dpi)
-                    #plt.tight_layout()
-                    self.statistics_airtime_frame=ttk.LabelFrame(self, text="Plot Airtime", height=height, width=width)
-                    self.statistics_airtime_frame.grid(column=1, row=2, columnspan=1, sticky='nesw')
-
                     canvas = FigureCanvasTkAgg(figure_airtime, self.statistics_airtime_frame)
                     canvas.show()
                     canvas.get_tk_widget().configure(background='white',  highlightcolor='white', highlightbackground='white')
@@ -366,9 +331,9 @@ class Adder(ttk.Frame):
                 line1_airtime.set_ydata(self.sta1val_airtime)
                 line2_airtime.set_ydata(self.sta2val_airtime)
                 line3_airtime.set_ydata(self.sta3val_airtime)
-                # line4_airtime.set_ydata(self.sta4val_airtime)
-                # line5_airtime.set_ydata(self.sta5val_airtime)
-                # line6_airtime.set_ydata(self.sta6val_airtime)
+                line4_airtime.set_ydata(self.sta4val_airtime)
+                line5_airtime.set_ydata(self.sta5val_airtime)
+                line6_airtime.set_ydata(self.sta6val_airtime)
                 figure_airtime.canvas.draw()
 
             time.sleep(1)
@@ -418,22 +383,18 @@ class Adder(ttk.Frame):
                     line1_cw, = ax.plot(self.xval_cw, self.sta1val_cw, label='Node A')
                     line2_cw, = ax.plot(self.xval_cw, self.sta2val_cw, label='Node B')
                     line3_cw, = ax.plot(self.xval_cw, self.sta3val_cw, label='Node C')
-                    # line4_cw, = ax.plot(self.xval_cw, self.sta4val_cw, label='Node D')
-                    # line5_cw, = ax.plot(self.xval_cw, self.sta5val_cw, label='Node E')
-                    # line6_cw, = ax.plot(self.xval_cw, self.sta6val_cw, label='Node F')
+                    line4_cw, = ax.plot(self.xval_cw, self.sta4val_cw, label='Node D')
+                    line5_cw, = ax.plot(self.xval_cw, self.sta5val_cw, label='Node E')
+                    line6_cw, = ax.plot(self.xval_cw, self.sta6val_cw, label='Node F')
 
                     ax.set_ylim([0, 1100])
                     ax.patch.set_facecolor('white')
                     legend = ax.legend(loc='upper center', shadow=True, ncol=3)
 
-                    my_dpi=100
-                    width=600
-                    height=400
+                    my_dpi = self.my_dpi
+                    width = self.width
+                    height = self.height
                     figure_cw.set_size_inches(width/my_dpi,height/my_dpi)
-                    #plt.tight_layout()
-                    self.statistics_cw_frame=ttk.LabelFrame(self, text="Plot Contention window", height=height, width=width)
-                    self.statistics_cw_frame.grid(column=2, row=2, columnspan=1, sticky='nesw')
-
                     canvas = FigureCanvasTkAgg(figure_cw, self.statistics_cw_frame)
                     canvas.show()
                     canvas.get_tk_widget().configure(background='white',  highlightcolor='white', highlightbackground='white')
@@ -449,9 +410,9 @@ class Adder(ttk.Frame):
                 line1_cw.set_ydata(self.sta1val_cw)
                 line2_cw.set_ydata(self.sta2val_cw)
                 line3_cw.set_ydata(self.sta3val_cw)
-                # line4_cw.set_ydata(self.sta4val_cw)
-                # line5_cw.set_ydata(self.sta5val_cw)
-                # line6_cw.set_ydata(self.sta6val_cw)
+                line4_cw.set_ydata(self.sta4val_cw)
+                line5_cw.set_ydata(self.sta5val_cw)
+                line6_cw.set_ydata(self.sta6val_cw)
                 figure_cw.canvas.draw()
             time.sleep(1)
 
@@ -464,7 +425,7 @@ class Adder(ttk.Frame):
     def receive_data_plot(self,x):
         while True:    # Run until cancelled
             parsed_json = self.socket_plot.recv_json()
-            #print('parsed_json : %s' % str(parsed_json))
+            print('parsed_json : %s' % str(parsed_json))
             #parsed_json : {u'label': u'C', u'measure': [[1484644417.3528204, 0.0, 0.0, 1.0, 0.0, 1023, 0, 0]], u'mac_address': u'00:0e:8e:30:9d:ee'}
             label = parsed_json['label']
             if label :
@@ -480,6 +441,8 @@ class Adder(ttk.Frame):
                     self.sta1val_airtime.pop(0)
                     self.sta1val_airtime.append( float(measure[7]) )
 
+                    self.LabelBusyA.config(text="{}%".format(float(measure[8])))
+
                     #self.sta1_log_Label.config(text="STA1 PROTOCOL={}".format(float(measure[1]) + 1))
 
                 elif label == 'B':
@@ -493,6 +456,8 @@ class Adder(ttk.Frame):
                     self.sta2val_airtime.pop(0)
                     self.sta2val_airtime.append( float(measure[7]) )
 
+                    self.LabelBusyB.config(text="{}%".format(float(measure[8])))
+
                 elif label == 'C':
                     item = 'I003'
                     self.sta3val_cw.pop(0)
@@ -503,6 +468,9 @@ class Adder(ttk.Frame):
 
                     self.sta3val_airtime.pop(0)
                     self.sta3val_airtime.append( float(measure[7]) )
+
+                    self.LabelBusyC.config(text="{}%".format(float(measure[8])))
+
 
                 elif label == 'D':
                     item = 'I004'
@@ -515,6 +483,9 @@ class Adder(ttk.Frame):
                     self.sta4val_airtime.pop(0)
                     self.sta4val_airtime.append( float(measure[7]) )
 
+                    self.LabelBusyD.config(text="{}%".format(float(measure[8])))
+
+
                 elif label == 'E':
                     item = 'I005'
                     self.sta5val_cw.pop(0)
@@ -526,6 +497,9 @@ class Adder(ttk.Frame):
                     self.sta5val_airtime.pop(0)
                     self.sta5val_airtime.append( float(measure[7]) )
 
+                    self.LabelBusyE.config(text="{}%".format(float(measure[8])))
+
+
                 elif label == 'F':
                     item = 'I006'
                     self.sta6val_cw.pop(0)
@@ -536,6 +510,9 @@ class Adder(ttk.Frame):
 
                     self.sta6val_airtime.pop(0)
                     self.sta6val_airtime.append( float(measure[7]) )
+
+                    self.LabelBusyF.config(text="{}%".format(float(measure[8])))
+
 
                 else:
                     print('Error in plot receive, wrong label present')
@@ -551,6 +528,10 @@ class Adder(ttk.Frame):
         #VISUALIZER CONFIGURATION
         self.local_network = 1
         self.Nplot=100
+
+        self.my_dpi = 100
+        self.width = 600
+        self.height = 400
 
         self.last_traffic_update_time = time.time()
         self.last_traffic_update_command = None
@@ -574,7 +555,7 @@ class Adder(ttk.Frame):
         self.sta6val_airtime=[4 for x in range(0,self.Nplot)]
         self.xval_airtime=[x for x in range(-self.Nplot, 0)]
 
-        #airtime
+        #cw
         self.sta1val_cw=[1 for x in range(0,self.Nplot)]
         self.sta2val_cw=[2 for x in range(0,self.Nplot)]
         self.sta3val_cw=[3 for x in range(0,self.Nplot)]
@@ -606,19 +587,6 @@ class Adder(ttk.Frame):
             self.socket_plot.setsockopt(zmq.SUBSCRIBE, '')
             start_new_thread(self.receive_data_plot,(99,))
 
-        else :
-            #global socket_visualizer
-            self.server_port = 8301
-            context = zmq.Context()
-            print("Connecting to server on port 8301 ... ready to send command to demo nodes")
-            self.socket_command = context.socket(zmq.REQ)
-            self.socket_command.connect ("tcp://localhost:%s" % self.server_port)
-
-            self.sta1_server_port = self.server_port
-            self.sta2_server_port = self.server_port
-            self.sta3_server_port = self.server_port
-            self.sta4_server_port = self.server_port
-
 
         """GUI SETUP"""
         print('GUI setup')
@@ -634,141 +602,49 @@ class Adder(ttk.Frame):
         self.grid(column=0, row=0, sticky='nsew')
 
         self.menubar = Menu(self.root)
+        #menu file
         self.menu_file = Menu(self.menubar)
         self.menu_file.add_command(label='Exit', command=self.on_quit)
-
-        self.menu_edit = Menu(self.menubar)
+        #menu edit topology
+        self.menu_edit_topology = Menu(self.menubar)
+        self.menu_edit_topology.add_command(label='Topology 1', command=self.selectTopologyImage1)
+        self.menu_edit_topology.add_command(label='Topology 2', command=self.selectTopologyImage2)
+        self.menu_edit_topology.add_command(label='Topology 2', command=self.selectTopologyImage2bis)
+        #show menu
         self.menubar.add_cascade(menu=self.menu_file, label='File')
-        self.menubar.add_cascade(menu=self.menu_edit, label='Edit')
+        self.menubar.add_cascade(menu=self.menu_edit_topology, label='Topology')
 
         self.root.config(menu=self.menubar)
 
-        # self.num1_entry = ttk.Entry(self, width=5)
-        # self.num1_entry.grid(column=1, row = 2)
-        #
-        # self.num2_entry = ttk.Entry(self, width=5)
-        # self.num2_entry.grid(column=3, row=2)
-        #
-        # self.calc_button = ttk.Button(self, text='Calculate', command=self.calculate)
-        # self.calc_button.grid(column=0, row=3, columnspan=4)
+        #PLOT TOPOLOGY IMAGE
+        self.topo_frame=ttk.LabelFrame(self, text="Network Scenario", height=50, width=50)
+        self.topo_frame.grid(column=0, row=1, columnspan=1, sticky='nesw')
 
+        #img=Image.open('topology-3full.png')
+        #wpercent=50
+        #basewidth = 350
+        #img=Image.open('topology-3chain.png')
+        #image_name = 'wilab2-map.png'
+        image_name = 'wilab2-topology-1.png'
+        img=Image.open(image_name)
+        wpercent=100
+        basewidth = 490
+        wpercent = (basewidth/float(img.size[0]))
+        hsize = int((float(img.size[1])*float(wpercent)))
+        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+        im = ImageTk.PhotoImage(img)
 
-        #IMAGE
-        # bard = Image.open("header2.png")
-        # bardejov = ImageTk.PhotoImage(bard)
-        # label1 = Label(self, image=bardejov)
-        # label1.image = bardejov
-        # #label1.place(x=5, y=150)
-        # #label1.grid(row=0,column=0, sticky=W+E)
-        # label1.grid(row=0,column=0, columnspan=3, sticky=W+E+N+S, padx=5, pady=5)
-
-        # #Protocol FRAME
-        # self.protocol_frame = ttk.LabelFrame(self, text='Protocol', height=100, width=100)
-        # self.protocol_frame.grid(column=0, row=1, columnspan=1, sticky='nesw')
-        #
-        # self.LabelProtocol = Label(self.protocol_frame, text="Select Protocol")
-        # #self.LabelProtocol.pack(side=TOP, anchor=CENTER, expand=NO)
-        # self.LabelProtocol.grid(row=0, column=0, padx=5, pady=5, ipady=2, sticky=W)
-        #
-        # #station1
-        # countryLabelSta1 = Label(self.protocol_frame, text="Station 1")
-        # countryLabelSta1.grid(row=1, column=0, sticky=W+E)
-        # self.countryVarSta1 = StringVar()
-        # self.countryComboSta1 = ttk.Combobox(self.protocol_frame, textvariable=self.countryVarSta1)
-        # self.countryComboSta1['values'] = ('METAMAC', 'TDMA 1', 'TDMA 2', 'TDMA 3', 'TDMA 4', 'ALOHA')
-        # self.countryComboSta1.current(0)
-        # #self.countryComboSta1.bind("<<ComboboxSelected>>", self.send_command(self.sta1_ipaddress, self.countryVarSta1.get()))
-        # self.countryComboSta1.bind("<<ComboboxSelected>>", self.send_command_sta1)
-        # self.countryComboSta1.grid(row=1, column=1, padx=5, pady=5, ipady=2, sticky=W)
-        # #self.countryComboSta1.pack(side=TOP, anchor=CENTER, expand=NO)
-        #
-        # #station2
-        # countryLabelSta2 = Label(self.protocol_frame, text="Station 2")
-        # countryLabelSta2.grid(row=2, column=0, sticky=W+E)
-        # self.countryVarSta2 = StringVar()
-        # self.countryComboSta2 = ttk.Combobox(self.protocol_frame, textvariable=self.countryVarSta2)
-        # self.countryComboSta2['values'] = ('METAMAC', 'TDMA 1', 'TDMA 2', 'TDMA 3', 'TDMA 4', 'ALOHA')
-        # self.countryComboSta2.current(0)
-        # #self.countryComboSta2.bind("<<ComboboxSelected>>", self.send_command(self.sta2_ipaddress, self.countryVarSta2.get()))
-        # self.countryComboSta2.bind("<<ComboboxSelected>>", self.send_command_sta2)
-        # self.countryComboSta2.grid(row=2, column=1, padx=5, pady=5, ipady=2, sticky=W)
-        # #self.countryComboSta2.pack(side=TOP, anchor=CENTER, expand=NO)
-        #
-        # #station3
-        # countryLabelSta3 = Label(self.protocol_frame, text="Station 3")
-        # countryLabelSta3.grid(row=3, column=0, sticky=W+E)
-        # self.countryVarSta3 = StringVar()
-        # self.countryComboSta3 = ttk.Combobox(self.protocol_frame, textvariable=self.countryVarSta3)
-        # self.countryComboSta3['values'] = ('METAMAC', 'TDMA 1', 'TDMA 2', 'TDMA 3', 'TDMA 4', 'ALOHA')
-        # self.countryComboSta3.current(0)
-        # #self.countryComboSta3.bind("<<ComboboxSelected>>", self.send_command(self.sta3_ipaddress, self.countryVarSta3.get()))
-        # self.countryComboSta3.bind("<<ComboboxSelected>>", self.send_command_sta3)
-        # self.countryComboSta3.grid(row=3, column=1, padx=5, pady=5, ipady=2, sticky=W)
-        # #self.countryComboSta3.pack(side=TOP, anchor=CENTER, expand=NO)
-        #
-        # #station4
-        # countryLabelSta4 = Label(self.protocol_frame, text="Station 4")
-        # countryLabelSta4.grid(row=4, column=0, sticky=W+E)
-        # self.countryVarSta4 = StringVar()
-        # self.countryComboSta4 = ttk.Combobox(self.protocol_frame, textvariable=self.countryVarSta4)
-        # self.countryComboSta4['values'] = ('METAMAC', 'TDMA 1', 'TDMA 2', 'TDMA 3', 'TDMA 4', 'ALOHA')
-        # self.countryComboSta4.current(0)
-        # #self.countryComboSta4.bind("<<ComboboxSelected>>", self.send_command(self.sta4_ipaddress, self.countryVarSta4.get()))
-        # self.countryComboSta4.bind("<<ComboboxSelected>>", self.send_command_sta4)
-        # self.countryComboSta4.grid(row=4, column=1, padx=5, pady=5, ipady=2, sticky=W)
-        # #self.countryComboSta4.pack(side=TOP, anchor=CENTER, expand=NO)
-
-
-        #PROTOCOL INFORMATION
-        self.stats_frame = ttk.LabelFrame(self, text='Monitor REACT values (Normalized)', height=100, width=150)
-        self.stats_frame.grid(column=2, row=1, columnspan=1, sticky='nesw')
-
-        # self.vb0 = ttk.Label(self.stats_frame, font=('Courier', 10))
-        # self.vb1 = ttk.Label(self.stats_frame, font=('Courier', 10))
-        #
-        # self.vb0.pack(anchor=NW, pady=3)
-        # self.vb1.pack(anchor=NW, pady=3)
-        #
-        # self.vb0['text'] = '{:<11} {:<8}'.format('enabled:', '1')
-        # self.vb1['text'] = '{:<11} {:<8}'.format('cheese:', '2')
-
-        self.tv = ttk.Treeview(self.stats_frame)
-        self.tv['columns'] = ('starttime', 'endtime', 'status')
-        self.tv.heading("#0", text='', anchor='w')
-        self.tv.column("#0", anchor="w", width=50)
-        self.tv.heading('starttime', text='SOURCE')
-        self.tv.column('starttime', anchor='center', width=100)
-        self.tv.heading('endtime', text='CLAIM')
-        self.tv.column('endtime', anchor='center', width=100)
-        self.tv.heading('status', text='OFFER')
-        self.tv.column('status', anchor='center', width=100)
-        self.tv.grid(sticky = (N,S,W,E))
-
-        self.tv.insert('', '0', text="A", values=('0', '0', '0'))
-        self.tv.insert('', '1', text="B", values=('0', '0', '0'))
-        self.tv.insert('', '2', text="C", values=('0', '0', '0'))
-
-        # cells = self.tv.get_children()
-        # for item in cells: ## Changing all children from root item
-        #     print(item)
-
-        #self.tv.item('I001', text="A", values=('1', '1', '1'))
-
-        self.startReactBtn = ttk.Button(self.stats_frame, text="START REACT", width=10, command=lambda : self.startReact(),  style=SUNKABLE_BUTTON2)
-        self.startReactBtn.grid(row=1, column=0, padx=5, pady=5, ipady=2, sticky=W)
-        self.stopReactBtn = ttk.Button(self.stats_frame, text="STOP REACT", width=10, command=lambda : self.stopReact(),  style=SUNKABLE_BUTTON1)
-        self.stopReactBtn.grid(row=1, column=1, padx=5, pady=5, ipady=2, sticky=W)
-
-
+        self.label_topo_img = Label(self.topo_frame, image=im)
+        self.label_topo_img.image = im
+        self.label_topo_img.grid(row=0, column=0, sticky='nesw')
 
 
         #TRAFFIC FRAME
-        self.traffic_frame = ttk.LabelFrame(self, text='Traffic', height=100, width=50)
+        self.traffic_frame = ttk.LabelFrame(self, text='Traffic', height=50, width=50)
         self.traffic_frame.grid(column=1, row=1, columnspan=1, sticky='nesw')
 
-        self.LabelTraffic = Label(self.traffic_frame, text="Select nodes traffic")
-        #self.LabelTraffic.pack(side=TOP, anchor=CENTER, expand=NO)
-        self.LabelTraffic.grid(row=0, column=0, columnspan=2, padx=1, pady=1, sticky=W)
+        self.LabelTraffic = Label(self.traffic_frame, text="Select nodes traffic :")
+        self.LabelTraffic.grid(row=0, column=0, columnspan=3, padx=1, pady=1, sticky=W)
 
         #traffic node A
         self.LabelTrafficA = Label(self.traffic_frame, text="A --> ")
@@ -780,6 +656,8 @@ class Adder(ttk.Frame):
         self.countryComboA.grid(row=1, column=1, padx=2, pady=2, sticky=W)
         self.TrafficA = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='A': self.setTraffic(src, value))
         self.TrafficA.grid(row=1, column=2, padx=2, pady=2, sticky=W)
+        self.LabelBusyA = Label(self.traffic_frame, text="0%", background='white')
+        self.LabelBusyA.grid(row=1, column=3, padx=1, pady=1, sticky=W)
 
         #traffic node B
         self.LabelTrafficB = Label(self.traffic_frame, text="B --> ")
@@ -792,59 +670,115 @@ class Adder(ttk.Frame):
         self.countryComboB.grid(row=2, column=1, padx=2, pady=2, sticky=W)
         self.TrafficB = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='B': self.setTraffic(src, value))
         self.TrafficB.grid(row=2, column=2, padx=2, pady=2, sticky=W)
+        self.LabelBusyB = Label(self.traffic_frame, text="0%", background='white')
+        self.LabelBusyB.grid(row=2, column=3, padx=1, pady=1, sticky=W)
 
         # #traffic node C
         self.LabelTrafficC = Label(self.traffic_frame, text="C --> ")
         self.LabelTrafficC.grid(row=3, column=0, padx=1, pady=1, sticky=W)
         self.countryVarC = StringVar()
         self.countryComboC = ttk.Combobox(self.traffic_frame, textvariable=self.countryVarC, width=5)
-        self.countryComboC['values'] = ('A', 'B')
+        self.countryComboC['values'] = ('A', 'B', 'D', 'E', 'F')
         self.countryComboC.current(0)
         self.countryComboC.grid(row=3, column=1, padx=2, pady=2, sticky=W)
         self.TrafficC = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='C': self.setTraffic(src, value))
         self.TrafficC.grid(row=3, column=2, padx=2, pady=2, sticky=W)
+        self.LabelBusyC = Label(self.traffic_frame, text="0%", background='white')
+        self.LabelBusyC.grid(row=3, column=3, padx=1, pady=1, sticky=W)
 
+        # #traffic node D
+        self.LabelTrafficD = Label(self.traffic_frame, text="D --> ")
+        self.LabelTrafficD.grid(row=4, column=0, padx=1, pady=1, sticky=W)
+        self.countryVarD = StringVar()
+        self.countryComboD = ttk.Combobox(self.traffic_frame, textvariable=self.countryVarD, width=5)
+        self.countryComboD['values'] = ('A', 'B', 'C', 'E', 'F')
+        self.countryComboD.current(0)
+        self.countryComboD.grid(row=4, column=1, padx=2, pady=2, sticky=W)
+        self.TrafficD = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='D': self.setTraffic(src, value))
+        self.TrafficD.grid(row=4, column=2, padx=2, pady=2, sticky=W)
+        self.LabelBusyD = Label(self.traffic_frame, text="0%", background='white')
+        self.LabelBusyD.grid(row=4, column=3, padx=1, pady=1, sticky=W)
 
-        #USRP FRAME
-        #start_new_thread(self.loopCapture,(99,))
+        # #traffic node E
+        self.LabelTrafficE = Label(self.traffic_frame, text="E --> ")
+        self.LabelTrafficE.grid(row=5, column=0, padx=1, pady=1, sticky=W)
+        self.countryVarE = StringVar()
+        self.countryComboE = ttk.Combobox(self.traffic_frame, textvariable=self.countryVarE, width=5)
+        self.countryComboE['values'] = ('B', 'D', 'F', 'C')
+        self.countryComboE.current(0)
+        self.countryComboE.grid(row=5, column=1, padx=2, pady=2, sticky=W)
+        self.TrafficE = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='E': self.setTraffic(src, value))
+        self.TrafficE.grid(row=5, column=2, padx=2, pady=2, sticky=W)
+        self.LabelBusyE = Label(self.traffic_frame, text="0%", background='white')
+        self.LabelBusyE.grid(row=5, column=3, padx=1, pady=1, sticky=W)
 
-        #PLOT TOPOLOGY IMAGE
-        self.topo_frame=ttk.LabelFrame(self, text="Network Scenario", height=100, width=100)
-        self.topo_frame.grid(column=0, row=1, columnspan=1, sticky='nesw')
+        # #traffic node F
+        self.LabelTrafficF = Label(self.traffic_frame, text="F --> ")
+        self.LabelTrafficF.grid(row=6, column=0, padx=1, pady=1, sticky=W)
+        self.countryVarF = StringVar()
+        self.countryComboF = ttk.Combobox(self.traffic_frame, textvariable=self.countryVarF, width=5)
+        self.countryComboF['values'] = ('B', 'D', 'E')
+        self.countryComboF.current(0)
+        self.countryComboF.grid(row=6, column=1, padx=2, pady=2, sticky=W)
+        self.TrafficF = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='F': self.setTraffic(src, value))
+        self.TrafficF.grid(row=6, column=2, padx=2, pady=2, sticky=W)
+        self.LabelBusyF = Label(self.traffic_frame, text="0%", background='white')
+        self.LabelBusyF.grid(row=6, column=3, padx=1, pady=1, sticky=W)
 
-        #img=Image.open('topology-3full.png')
-        #wpercent=50
-        #basewidth = 350
+        #PROTOCOL INFORMATION
+        self.stats_frame = ttk.LabelFrame(self, text='Monitor REACT values (Normalized)', height=50, width=50)
+        self.stats_frame.grid(column=2, row=1, columnspan=1, sticky='nesw')
 
-        img=Image.open('topology-3chain.png')
-        wpercent=100
-        basewidth = 500
+        self.tv = ttk.Treeview(self.stats_frame)
+        self.tv['columns'] = ('starttime', 'endtime', 'status')
+        self.tv.heading("#0", text='', anchor='w')
+        self.tv.column("#0", anchor="w", width=50)
+        self.tv.heading('starttime', text='SOURCE')
+        self.tv.column('starttime', anchor='center', width=100)
+        self.tv.heading('endtime', text='CLAIM')
+        self.tv.column('endtime', anchor='center', width=100)
+        self.tv.heading('status', text='OFFER')
+        self.tv.column('status', anchor='center', width=100)
+        self.tv.grid(row=0, column=0, columnspan=2, padx=5, pady=5, ipady=2, sticky ='nesw')
 
+        self.tv.insert('', '0', text="A", values=('0', '0', '0'))
+        self.tv.insert('', '1', text="B", values=('0', '0', '0'))
+        self.tv.insert('', '2', text="C", values=('0', '0', '0'))
+        self.tv.insert('', '3', text="D", values=('0', '0', '0'))
+        self.tv.insert('', '4', text="E", values=('0', '0', '0'))
+        self.tv.insert('', '5', text="F", values=('0', '0', '0'))
 
-        wpercent = (basewidth/float(img.size[0]))
-        hsize = int((float(img.size[1])*float(wpercent)))
+        # cells = self.tv.get_children()
+        # for item in cells: ## Changing all children from root item
+        #     print(item)
 
-        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+        #self.tv.item('I001', text="A", values=('1', '1', '1'))
 
-        im = ImageTk.PhotoImage(img)
-        label_topo_img = Label(self.topo_frame, image=im)
-        label_topo_img.image = im
-        label_topo_img.grid(row=0,column=0, sticky=W+E)
+        self.startReactBtn = ttk.Button(self.stats_frame, text="START REACT", width=10, command=lambda : self.startReact(),  style=SUNKABLE_BUTTON2)
+        self.startReactBtn.grid(row=1, column=0, padx=5, pady=5, ipady=2, sticky='nesw')
+        self.stopReactBtn = ttk.Button(self.stats_frame, text="STOP REACT", width=10, command=lambda : self.stopReact(),  style=SUNKABLE_BUTTON1)
+        self.stopReactBtn.grid(row=1, column=1, padx=5, pady=5, ipady=2, sticky='nesw')
 
 
         #PLOTTER psucc
+        self.statistics_psucc_frame=ttk.LabelFrame(self, text="Plot success probability", height=50, width=50)
+        self.statistics_psucc_frame.grid(column=0, row=2, columnspan=1, sticky='nesw')
         start_new_thread(self.plotpsucc,(99,))
+
         #PLOTTER airtime
+        self.statistics_airtime_frame=ttk.LabelFrame(self, text="Plot Airtime", height=50, width=50)
+        self.statistics_airtime_frame.grid(column=1, row=2, columnspan=1, sticky='nesw')
         start_new_thread(self.plotairtime,(99,))
+
         #PLOTTER cw
+        self.statistics_cw_frame=ttk.LabelFrame(self, text="Plot Contention window", height=50, width=50)
+        self.statistics_cw_frame.grid(column=2, row=2, columnspan=1, sticky='nesw')
         start_new_thread(self.plotcw,(99,))
 
         #LOOP command traffic
         start_new_thread(self.traffic_command_handles,(99,))
 
-
-        # ttk.Separator(self, orient='horizontal').grid(column=0,
-        #         row=1, columnspan=4, sticky='ew')
+        # ttk.Separator(self, orient='horizontal').grid(column=0, row=1, columnspan=4, sticky='ew')
         #
         for child in self.winfo_children():
             child.grid_configure(padx=5, pady=5)

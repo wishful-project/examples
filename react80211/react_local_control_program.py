@@ -36,7 +36,10 @@ def react(controller):
 	import wishful_framework.upi_arg_classes.edca as edca
 
 	#enable debug print
-	debug=False
+	debug = False
+	debug_statistics = True
+	debug_cw_set = False
+	debug_react_value = False
 
 	starttime=time.time()
 
@@ -44,14 +47,9 @@ def react(controller):
 	pkt_stats= {}
 	report_stats= {}
 
-	C=1
+	MAX_OFFER_C=1
 	CLAIM_CAPACITY=0.8
 	mon_iface="mon0"
-
-	cw_=1023
-	cw=cw_
-	data_count_=0
-	rts_count_=0
 
 	MAX_THR=5140 #kbps
 	#rate=0; #APP RATE
@@ -60,23 +58,12 @@ def react(controller):
 	REACT INIT
 	"""
 	def init(iface):
-		global my_mac;
+		global my_mac
 		my_mac=str(netifaces.ifaddresses(iface)[netifaces.AF_LINK][0]['addr'])
-
-		global cw
-		global cw_
-		global data_count_
-		global rts_count_
-
-		cw_=1023
-		cw=cw_
-		data_count_=0
-		rts_count_=0
-
 		#init offer/claim structure
 		init_pkt={}
 		init_pkt['t']=0
-		init_pkt['offer'] = C
+		init_pkt['offer'] = MAX_OFFER_C
 		init_pkt['claim'] = 0
 		init_pkt['w'] = 0
 		#init neighbors
@@ -89,6 +76,7 @@ def react(controller):
 		report_stats['cw'] = 0
 		report_stats['psucc'] = 0
 		report_stats['busytx2'] = 0
+		report_stats['busy_time'] = 0
 
 	"""
 	get PHY name for current device
@@ -116,10 +104,8 @@ def react(controller):
 	current format of iee80211_stats:
 	{'failed_count': 0, 'dot11FCSErrorCount': 3, 'dot11RTSSuccessCount': 0, 'dot11TransmittedFrameCount': 1, 'dot11ACKFailureCount': 0, 'retry_count': 0, 'multiple_retry_count': 0, 'received_fragment_count': 30, 'frame_duplicate_count': 0, 'transmitted_fragment_count': 1, 'multicast_dot11TransmittedFrameCount': 1, 'multicast_received_frame_count': 20, 'dot11RTSFailureCount': 0}
 	"""
-	def get_ieee80211_stats(iface,sleeptime):
-		global pkt_stats
-		phy=getPHY(iface);
-		out = subprocess.Popen(["bash","./ieee_stats.sh",phy,"{}".format(sleeptime)], stdout=subprocess.PIPE).communicate()[0]
+	def get_ieee80211_stats(phy):
+		out = subprocess.Popen(["bash","./ieee_stats.sh", phy], stdout=subprocess.PIPE).communicate()[0]
 		ieee80211_stats_diff=json.loads(out.decode("utf-8") )
 		return ieee80211_stats_diff
 
@@ -192,11 +178,12 @@ def react(controller):
 		# # UPI
 		# controller.radio.set_mac_access_parameters(iface=iface,queueId=qumId,queueParams=edcaParams)
 
-	    # echo "0 1 1 3 0" > /sys/kernel/debug/ieee80211/phy0/ath9k/txq_params
-	    # Proper sequence is : "qumId aifs cwmin cwmax burst"
+		# echo "0 1 1 3 0" > /sys/kernel/debug/ieee80211/phy0/ath9k/txq_params
+		# Proper sequence is : "qumId aifs cwmin cwmax burst"
 		phy=getPHY(iface)
 		edcaParams = edca.EdcaQueueParameters(aifs=aifs, cwmin=cwmin, cwmax=cwmax, txop=burst)
-		print("set iface %s, qumId %s, aifs %s, cwmin %s, cwmax %s, burst %s" % (str(phy), str(qumId), str(aifs), str(cwmin), str(cwmax), str(burst)) )
+		if debug or debug_cw_set:
+			print("set cw iface %s, qumId %s, aifs %s, cwmin %s, cwmax %s, burst %s" % (str(phy), str(qumId), str(aifs), str(cwmin), str(cwmax), str(burst)) )
 		f_name='/sys/kernel/debug/ieee80211/{}/ath9k/txq_params'.format(phy)
 		txq_params_msg='{} {} {} {} {}'.format(qumId,aifs,cwmin,cwmax,burst)
 		f_cw = open(f_name, 'w')
@@ -205,93 +192,143 @@ def react(controller):
 	"""
 	update CW decision based on ieee80211 stats values and virtual channel freezing estimation
 	"""
-	def update_cw(iface, sleep_time, enable_react):
+	def update_cw(iface, time_interval, enable_react):
 		cw_thread = threading.currentThread()
+
+		CWMIN=15
+		CWMAX=2047
+		cw_=1023
+
+		cw=cw_
+		data_count_= 0
+		rts_count_= 0
+
+		busy_time = 0
+		busy_time_ = 0
+
+		#QUEUE CW SETTING
+		qumId=1 #BE
+		aifs=2
+		burst=0
+
+		pkt_size=1534
+		phy=getPHY(iface)
+		debug_cycle = 0
+		cw_evaluate_cycle = 0
+		number_of_setting_in_interval = 5
+		cw_setting_interval = time_interval[0]/number_of_setting_in_interval
+
 		while getattr(cw_thread, "do_run", True):
 			#get stats
-			global my_mac
-			global cw
-			global cw_
-			global data_count_
-			global rts_count_
-			CWMIN=15
-			CWMAX=2047
 
 			#TODO: change/add/reuse UPI candidate: get_measurement
 			# UPI_myargs = {'interface' : 'wlan0', 'measurements' : [UPI_R.dot11RTSSuccessCount,UPI_R.dot11RTSFailureCount] }
 			# pkt_stats=controller.radio.get_measurements(UPI_myargs)
 
-			pkt_stats=get_ieee80211_stats(iface, sleep_time[0])
-			pkt_size=1534
-			if pkt_stats:
-				data_count = pkt_stats['dot11RTSSuccessCount'] - data_count_
-				rts_count = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
-				data_count_=pkt_stats['dot11RTSSuccessCount']
-				rts_count_=pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount']
-				tx_goal=0
-				I=0
-				dd = sleep_time[0]
-				gross_rate = float(CLAIM_CAPACITY)*float(neigh_list[my_mac]['claim'])
-				[tslot, tx_time_theor, t_rts, t_ack]= txtime_theor('11a', 6, 20, pkt_size)
+			if cw_evaluate_cycle > (number_of_setting_in_interval-2):
+				pkt_stats=get_ieee80211_stats(phy)
+				if pkt_stats:
+					data_count = pkt_stats['dot11RTSSuccessCount'] - data_count_
+					rts_count = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
 
-				busytx2 =  0.002198*float(data_count) + 0.000081*float(rts_count) #how much time the station spent in tx state during the last observation internval
-				#busytx2 =  0.002071*float(data_count) + 0.000046*float(rts_count) #how much time the station spent in tx state during the last observation internval
+					data_count_=pkt_stats['dot11RTSSuccessCount']
+					rts_count_=pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount']
 
-				SIFS=16 #usec
-				tslot=9e-6 #usec
-				#freeze2 = dd - busytx2 - cw_/float(2)*tslot*rts_count - 2*SIFS*1e-6; #how long the backoff has been frozen;
-				freeze2 = float(dd) - float(busytx2) - cw_/float(2)*float(tslot)*rts_count #how long the backoff has been frozen;
+					busy_time = (pkt_stats['busy_time'] - busy_time_)/10
+					busy_time_ = pkt_stats['busy_time']
 
-				if rts_count > 0:
-					avg_tx = float(busytx2)/float(rts_count) #average transmission time in a transmittion cycle
-					psucc = float(data_count)/float(rts_count)
-				else:
-					avg_tx=0
-					psucc=0
+					tx_goal=0
+					I=0
+					dd = time_interval[0]
+					gross_rate = float(CLAIM_CAPACITY)*float(neigh_list[my_mac]['claim'])
+					[tslot, tx_time_theor, t_rts, t_ack]= txtime_theor('11a', 6, 20, pkt_size)
 
-				if avg_tx > 0:
-					tx_goal = float(dd * gross_rate)/float(avg_tx)
-				else:
-					tx_goal = 0
+					busytx2 =  0.002198*float(data_count) + 0.000081*float(rts_count) #how much time the station spent in tx state during the last observation internval
+					#busytx2 =  0.002071*float(data_count) + 0.000046*float(rts_count) #how much time the station spent in tx state during the last observation internval
 
-				freeze_predict = float(freeze2) / float(dd-busytx2) * float(dd - dd * float(gross_rate))
-				if tx_goal > 0:
-					cw = 2/float(0.000009) * (dd - tx_goal * avg_tx -freeze_predict) / float(tx_goal)
+					SIFS=16 #usec
+					tslot=9e-6 #usec
+					#freeze2 = dd - busytx2 - cw_/float(2)*tslot*rts_count - 2*SIFS*1e-6; #how long the backoff has been frozen;
+					freeze2 = float(dd) - float(busytx2) - cw_/float(2)*float(tslot)*rts_count #how long the backoff has been frozen;
 
-				if cw < CWMIN:
-					cw_=CWMIN
-				elif cw > CWMAX:
-					cw_=CWMAX
-				else:
-					#TEST 4 CLAIM_CAPACITY = 0.8 #GOOD
-					cw_=cw
-					cw_= pow(2, round(math.log(cw_)/math.log(2)))-1;
+					if rts_count > 0:
+						avg_tx = float(busytx2)/float(rts_count) #average transmission time in a transmittion cycle
+						psucc = float(data_count)/float(rts_count)
+					else:
+						avg_tx=0
+						psucc=0
 
-				# ENFORCE CW
-				qumId=1 #BE
-				aifs=2
-				cwmin=int(cw_)
-				cwmax=int(cw_)
-				burst=0
-				if enable_react[0]:
-					setCW(iface, qumId, aifs, cwmin, cwmax, burst)
+					if avg_tx > 0:
+						tx_goal = float(dd * gross_rate)/float(avg_tx)
+					else:
+						tx_goal = 0
 
-				thr=(data_count)*1470*8 / float(dd*1e6)
-				if debug:
-					print("t=%.4f,dd=%.4f data_count=%.4f rts_count=%.4f busytx2=%.4f(%.4f) gross_rate=%.4f,avg_tx=%.4f freeze2=%.4f freeze_predict=%.4f tx_goal=%.4f I=%.4f cw=%.4f cw_=%.4f psucc=%.4f thr=%.4f" % (time.time(), dd, data_count, rts_count, busytx2, busytx2/float(dd), gross_rate, avg_tx, freeze2, freeze_predict, tx_goal, I, cw, cw_, psucc, thr))
+					freeze_predict = float(freeze2) / float(dd-busytx2) * float(dd - dd * float(gross_rate))
+					if tx_goal > 0:
+						cw = 2/float(0.000009) * (dd - tx_goal * avg_tx -freeze_predict) / float(tx_goal)
+
+					average_enable = True
+					if average_enable:
+						#moving average
+						cw_= 0.6 * cw_ + 0.4 * cw
+					else:
+						#not everage
+						cw_ = cw
+
+					if cw_ < CWMIN:
+						cw_=CWMIN
+						cw_array = [cw_] * number_of_setting_in_interval
+					elif cw_ > CWMAX:
+						cw_=CWMAX
+						cw_array = [cw_] * number_of_setting_in_interval
+					else:
+						#cw_= pow(2, round(math.log(cw_)/math.log(2))) - 1
+						cw_floor= pow(2, math.floor(math.log(cw_)/math.log(2))) - 1
+						cw_ceil= pow(2, math.ceil(math.log(cw_)/math.log(2))) - 1
+						if cw_floor == cw_ceil:
+							cw_array = [cw_ceil] * number_of_setting_in_interval
+						elif cw_ == cw_floor or cw_ == cw_ceil:
+							cw_array = [cw_] * number_of_setting_in_interval
+						else:
+							interval = cw_ceil - cw_floor
+							position_in_interval = cw_ - cw_floor
+							position_percent = position_in_interval / interval
+							cw_array = [cw_floor] * (number_of_setting_in_interval - round(position_percent * number_of_setting_in_interval))
+							cw_array = cw_array + [cw_ceil] * round(position_percent * number_of_setting_in_interval)
+
+
+					thr=(data_count)*1470*8 / float(dd*1e6)
+					if debug or debug_statistics:
+						if debug_cycle > 3:
+							#print("t=%.4f,dd=%.4f data_count=%.4f rts_count=%.4f busytx2=%.4f(%.4f) gross_rate=%.4f,avg_tx=%.4f freeze2=%.4f freeze_predict=%.4f tx_goal=%.4f I=%.4f cw=%.4f cw_=%.4f psucc=%.4f thr=%.4f" % (time.time(), dd, data_count, rts_count, busytx2, busytx2/float(dd), gross_rate, avg_tx, freeze2, freeze_predict, tx_goal, I, cw, cw_, psucc, thr))
+							print("data_count=%.4f rts_count=%.4f cw=%.4f cw_=%.4f psucc=%.4f thr=%.4f -- cw_array : %s" % (data_count, rts_count, cw, cw_, psucc, thr, str(cw_array) ))
+							debug_cycle = 0
+						else:
+							debug_cycle +=1
 
 				#store statistics for report
 				report_stats['thr'] = thr
-				report_stats['cw'] = cw
+				report_stats['cw'] = cw_
 				report_stats['psucc'] = psucc
 				report_stats['busytx2'] = busytx2
+				report_stats['busy_time'] = busy_time
+				cw_evaluate_cycle = 0
 
-			time.sleep(sleep_time[0] - ((time.time() - starttime) % sleep_time[0]))
+			else:
+				cw_evaluate_cycle += 1
+
+			# ENFORCE CW
+			if enable_react[0]:
+				# cwmin=int(cw_)
+				# cwmax=int(cw_)
+				setCW(iface, qumId, aifs, cw_array[cw_evaluate_cycle], cw_array[cw_evaluate_cycle], burst)
+
+			time.sleep(cw_setting_interval - ((time.time() - starttime) % cw_setting_interval))
 
 
 	def update_offer():
-		done = False;
-		A = C;
+		done = False
+		A = MAX_OFFER_C
 		global my_mac
 		D = [key for key,val in neigh_list.items()]
 		Dstar=[]
@@ -299,10 +336,10 @@ def react(controller):
 			Ddiff=list(set(D)-set(Dstar))
 			if set(D) == set(Dstar):
 				done = True
-				neigh_list[my_mac]['offer'] = A + max([val['claim'] for key,val in neigh_list.items()]) 
+				neigh_list[my_mac]['offer'] = A + max([val['claim'] for key,val in neigh_list.items()])
 			else:
 				done = True
-				neigh_list[my_mac]['offer'] = A / float(len(Ddiff)) 
+				neigh_list[my_mac]['offer'] = A / float(len(Ddiff))
 				for b in Ddiff:
 					if neigh_list[b]['claim'] < neigh_list[my_mac]['offer']:
 						Dstar.append(b)
@@ -332,25 +369,23 @@ def react(controller):
 					# print('received frame pkt %s' % (str(pkt)))
 					# print('\n\n')
 
-					if my_mac == '00:15:6d:85:90:2d':
-						if pkt.addr2 == '00:00:00:c0:00:c0' or pkt.addr2 == '00:00:00:bf:00:c1' or pkt.addr2 == '00:00:00:bb:00:b8' or pkt.addr2 == '00:00:00:bc:00:ba' or pkt.addr2 == '00:00:00:b0:00:b8' or pkt.addr2 == '00:00:00:ae:00:b7':
-							rx_mac = 'null'
-						elif pkt.addr2 == my_mac :
-							rx_mac = my_mac
-						else:
-							continue
-
-					elif my_mac == '00:15:6d:85:75:b3':
-						if pkt.addr2 == '00:be:00:b6:01:a0' or pkt.addr2 == '00:c7:00:b8:01:af' or pkt.addr2 == '00:c5:00:b8:01:ad' or pkt.addr2 == '00:be:00:b5:01:a1' or pkt.addr2 == '00:bf:00:b7:01:a2' or pkt.addr2 == '00:c7:00:b7:01:b0':
-							rx_mac = 'null'
-						elif pkt.addr2 == my_mac :
-							rx_mac = my_mac
-						else:
-							continue
-
-					else:
-						rx_mac = str(pkt.addr2)
-
+					# if my_mac == '00:15:6d:85:90:2d':
+					# 	if pkt.addr2 == '00:00:00:c0:00:c0' or pkt.addr2 == '00:00:00:bf:00:c1' or pkt.addr2 == '00:00:00:bb:00:b8' or pkt.addr2 == '00:00:00:bc:00:ba' or pkt.addr2 == '00:00:00:b0:00:b8' or pkt.addr2 == '00:00:00:ae:00:b7':
+					# 		rx_mac = 'null'
+					# 	elif pkt.addr2 == my_mac :
+					# 		rx_mac = my_mac
+					# 	else:
+					# 		continue
+					# elif my_mac == '00:15:6d:85:75:b3':
+					# 	if pkt.addr2 == '00:be:00:b6:01:a0' or pkt.addr2 == '00:c7:00:b8:01:af' or pkt.addr2 == '00:c5:00:b8:01:ad' or pkt.addr2 == '00:be:00:b5:01:a1' or pkt.addr2 == '00:bf:00:b7:01:a2' or pkt.addr2 == '00:c7:00:b7:01:b0':
+					# 		rx_mac = 'null'
+					# 	elif pkt.addr2 == my_mac :
+					# 		rx_mac = my_mac
+					# 	else:
+					# 		continue
+					# else:
+					# 	rx_mac = str(pkt.addr2)
+					rx_mac = str(pkt.addr2)
 					if rx_mac == my_mac:
 						pass
 					else:
@@ -381,9 +416,9 @@ def react(controller):
 		cycle = 0
 		sender_thread = threading.currentThread()
 		while getattr(sender_thread, "do_run", True):
-			rate = min((float)( C ),( (iperf_rate[0]*C)/float(MAX_THR)) )
+			rate = min((float)( MAX_OFFER_C ),( (iperf_rate[0]*MAX_OFFER_C)/float(MAX_THR)) )
 			neigh_list[my_mac]['w']=rate
-			if True:
+			if debug or debug_react_value:
 				if cycle > 50:
 					for key,val in neigh_list.items():
 						print('%s : %s' %(str(key), str(val)))
@@ -425,38 +460,40 @@ def react(controller):
 	log.info('*********** starting local WiSHFUL controller **********************')
 	msg={}
 	print("Local ctrl program started: {}".format(controller.name))
-	# metamac control loop
-	msg = controller.recv(timeout=1)
-	if msg:
-		print("START REACT main function")
-		#INIT REACT INFO
-		init(msg["iface"])
-		try:
+	while not controller.is_stopped():
+		msg = controller.recv(timeout=1)
+		if msg:
+			print("START REACT main function")
+			#INIT REACT INFO
+			init(msg["iface"])
+			try:
 
-			#Thread transmitter
-			i_time = []
-			i_time.append(msg['i_time'])
-			iperf_rate = []
-			iperf_rate.append(msg['iperf_rate'])
-			enable_react = []
-			enable_react.append(msg['enable_react'])
+				#Thread transmitter
+				i_time = []
+				i_time.append(msg['i_time'])
+				iperf_rate = []
+				iperf_rate.append(msg['iperf_rate'])
+				enable_react = []
+				enable_react.append(msg['enable_react'])
 
-			sender_thread = threading.Thread(target=send_REACT_msg, args=(msg['iface'], i_time, iperf_rate,))
-			sender_thread.start()
+				sender_thread = threading.Thread(target=send_REACT_msg, args=(msg['iface'], i_time, iperf_rate,))
+				sender_thread.start()
 
-			#thread receiver
-			receiver_thread = threading.Thread(target=sniffer_REACT, args=(msg['iface'], i_time, ))
-			receiver_thread.start()
+				#thread receiver
+				receiver_thread = threading.Thread(target=sniffer_REACT, args=(msg['iface'], i_time, ))
+				receiver_thread.start()
 
-			#update CW
-			cw_thread = threading.Thread(target=update_cw, args=(msg['iface'], i_time, enable_react, ))
-			cw_thread.start()
+				#update CW
+				cw_thread = threading.Thread(target=update_cw, args=(msg['iface'], i_time, enable_react, ))
+				cw_thread.start()
 
-		except (Exception) as err:
-			if debug:
-				print ( "exception", err)
-				print ("Error: unable to start thread")
-			pass
+			except (Exception) as err:
+				if debug:
+					print ( "exception", err)
+					print ("Error: unable to start thread")
+				pass
+
+			break
 
 	#CONTROLLER MAIN LOOP
 	while not controller.is_stopped():
@@ -467,13 +504,15 @@ def react(controller):
 			iperf_rate[0] = msg['iperf_rate']
 			enable_react[0] = msg['enable_react']
 
-			#if enable_react[0] == 0:
-			if True:
+			if enable_react[0] == 0:
 				setCW(msg['iface'],1,2,15,1023,0)
 
-
 		#send statistics to controller
-		controller.send_upstream({ "measure" : [[neigh_list[my_mac]['t'], neigh_list[my_mac]['w'], neigh_list[my_mac]['claim'], neigh_list[my_mac]['offer'], report_stats['thr'], report_stats['cw'], report_stats['psucc'], report_stats['busytx2'] ]], "mac_address" : (my_mac) })
+		if 'w' in neigh_list[my_mac]:
+			if debug:
+				print('send message to controller')
+			#print( "measure w %s claim %s offer %s " % (str( neigh_list[my_mac]['w']), str(neigh_list[my_mac]['claim']), str(neigh_list[my_mac]['offer'])) )
+			controller.send_upstream({ "measure" : [[neigh_list[my_mac]['t'], neigh_list[my_mac]['w'], neigh_list[my_mac]['claim'], neigh_list[my_mac]['offer'], report_stats['thr'], report_stats['cw'], report_stats['psucc'], report_stats['busytx2'], report_stats['busy_time'] ]], "mac_address" : (my_mac) })
 
 	receiver_thread.do_run = False
 	receiver_thread.join()

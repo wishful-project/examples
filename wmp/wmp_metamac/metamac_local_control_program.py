@@ -269,10 +269,7 @@ def metamac_local_control_program(controller):
 			log.warning('Error in protocol activation or switching')
 
 		suite.active_protocol = protocol
-<<<<<<< HEAD
 		log.info('active protocol %d' % suite.active_protocol)
-=======
->>>>>>> origin/master
 		suite.last_update = monotonic_time()
 
 
@@ -569,11 +566,7 @@ def metamac_local_control_program(controller):
 	"""				************				"""
 
 	log = logging.getLogger()
-<<<<<<< HEAD
 	log.info('*********** WISHFUL *************')
-=======
-	log.info('*********** WISHFUL SC4 *************')
->>>>>>> origin/master
 	log.info('*********** starting local WiSHFUL controller **********************')
 
 	suite = protocol_suite()
@@ -695,10 +688,6 @@ def metamac_local_control_program(controller):
 
 	time.sleep(2)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
 	story_file = open("story.csv", "w")
 	story_file.write("slot_num, read_num, host_time, tsf_time, slot_index, slots_passed, \
 	 filler, packet_queued, transmitted, transmit_success, transmit_other, \
@@ -712,7 +701,6 @@ def metamac_local_control_program(controller):
 	print("Local ctrl program started: {}".format(controller.name))
 	# metamac control loop
 	while not controller.is_stopped():
-<<<<<<< HEAD
 		msg = controller.recv(timeout=1)
 		if msg:
 			print("Receive message %s" % str(msg))
@@ -739,16 +727,6 @@ def metamac_local_control_program(controller):
 
 		#print("Main thread")
 		#time.sleep(0.1)
-=======
-
-
-		msg = controller.recv(timeout=1)
-		# if msg:
-		# 	print("Receive message %s" % str(msg))
-
-		#print("Main thread")
-		time.sleep(0.1)
->>>>>>> origin/master
 
 		if( (len(story_channel) - story_channel_len) > 60):
 			story_channel_len_old = len(story_channel)-60

@@ -21,10 +21,10 @@ def experiment_setup(exp_file):
 
 def set_hosts(host_file):
 	hosts_info_file = open(host_file, 'r').readlines()
-	hosts_info=[];
+	hosts_info=[]
 	for i in hosts_info_file:
 		if not i.startswith("#"):
-			hosts_info.append(i);
+			hosts_info.append(i)
 	j=0
 	hosts = [i.split(',')[j] for i in hosts_info]
 	j=j+1

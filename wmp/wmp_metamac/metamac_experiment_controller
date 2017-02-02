@@ -145,18 +145,11 @@ def start_visualizer_connection():
 
     ''' implement message zmq for realtime visualizer '''
     #global socket_visualizer
-<<<<<<< HEAD
     socket_visualizer_port = "8401"
     context = zmq.Context()
     socket_visualizer = context.socket(zmq.PUB)
     socket_visualizer.bind("tcp://*:%s" % socket_visualizer_port)
     print("Connecting to server on port 8401 ... ready to send information to visualizer")
-=======
-    port = "8400"
-    context = zmq.Context()
-    socket_visualizer = context.socket(zmq.PUB)
-    socket_visualizer.bind("tcp://*:%s" % port)
->>>>>>> origin/master
 
     ''' implement OML database setup for realtime visualizer '''
     # #global omlInst
@@ -166,7 +159,6 @@ def start_visualizer_connection():
 
     return socket_visualizer
 
-<<<<<<< HEAD
 
 def start_command_connection():
     ''' SETUP PYTHON COMMAND RECEIVER '''
@@ -185,8 +177,6 @@ def start_command_connection():
     return socket_command
 
 
-=======
->>>>>>> origin/master
 def collect_remote_messages(lcpDescriptor_node, socket_visualizer):
     receive_thread = threading.currentThread()
     while getattr(receive_thread, "do_run", True):
@@ -258,10 +248,7 @@ def main(args):
 
             # ''' start connection to visualizzer - Python or testbed DB '''
             socket_visualizer = start_visualizer_connection()
-<<<<<<< HEAD
             socket_command = start_command_connection()
-=======
->>>>>>> origin/master
 
             ''' start local control program on WMP nodes '''
             lcpDescriptor_wmp_nodes = []
@@ -272,7 +259,6 @@ def main(args):
                 reading_thread.append(threading.Thread(target=collect_remote_messages, args=(lcpDescriptor_wmp_nodes[ii], socket_visualizer,)))
                 reading_thread[ii].start()
 
-<<<<<<< HEAD
             EXPERIMENT_DURATION= 3000
             CHANGE_TRAFFIC = 50
             dt=0
@@ -315,20 +301,6 @@ def main(args):
                                     for node in mytestbed.wmp_nodes:
                                         controller.delay(2).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '3000', '1.5M', '1470')
 
-=======
-
-            EXPERIMENT_DURATION= 300
-            CHANGE_TRAFFIC = 50
-            dt=0
-
-            #start server traffic
-            controller.delay(2).nodes(mytestbed.ap_node).net.create_packetflow_sink(port='1234')
-            for node in mytestbed.wmp_nodes:
-                print("START iperf on client %s" % str(node.ip))
-                controller.delay(4).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '500', '0.3M')
-
-            while do_run:
->>>>>>> origin/master
                 #need to keep alive the control program, if do not present the remote control program will been closed
                 lcpDescriptor_wmp_nodes[0].send({"alive": 1})
 
@@ -338,18 +310,6 @@ def main(args):
                 #gevent.sleep(1)
                 time.sleep(1)
 
-<<<<<<< HEAD
-=======
-                if dt == CHANGE_TRAFFIC:
-                    controller.delay(2).nodes(mytestbed.ap_node).net.destroy_packetflow_sink()
-                    for node in mytestbed.wmp_nodes:
-                        controller.delay(2).nodes(node).net.stop_packetflow()
-
-                    controller.delay(4).nodes(mytestbed.ap_node).net.create_packetflow_sink(port='1234')
-                    for node in mytestbed.wmp_nodes:
-                        controller.delay(4).nodes(node).net.start_packetflow( '192.168.3.'+str(mytestbed.ap_node.ip[7:10]), '1234', '500', '1.5M')
-
->>>>>>> origin/master
                 if dt > EXPERIMENT_DURATION:
                     break
 

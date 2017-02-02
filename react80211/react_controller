@@ -91,7 +91,7 @@ do_run = None
 @controller.new_node_callback()
 def new_node(node):
     nodes.append(node)
-    print("New node appeared:")
+    print("\nNew node appeared:")
     print(node)
 
 
@@ -188,7 +188,7 @@ def main(args):
 
     nodes_info_path=args['--nodes']
     if nodes_info_path:
-        [hosts, driver, eth_ip, freq,tx_power, wlan_ip, mac_address, label]=set_hosts(nodes_info_path);
+        [hosts, driver, eth_ip, freq,tx_power, wlan_ip, mac_address, label]=set_hosts(nodes_info_path)
         print([hosts, driver, eth_ip, freq, tx_power, wlan_ip, mac_address, label])
 
     # experiment_info_path=args['--experiment_info']
@@ -204,7 +204,8 @@ def main(args):
     while do_run:
         gevent.sleep(1)
         print("\nConnected nodes", [str(node.name) for node in nodes])
-        if len(nodes) == 3:
+        if len(nodes) == 6:
+            time.sleep(1)
             lcpDescriptor_nodes = []
             reading_thread = []
 
@@ -221,16 +222,23 @@ def main(args):
             react_time_update = 1 #seconds
             react_algorithm_activation = False
             nodes_source_rate = []
+            nodes_temp = []
+
             for ii in range(0, len(nodes)):
                 nodes_source_rate.append(0)
+                if not nodes[ii] in nodes_temp:
+                    print("node %s - index %d" % (nodes[ii].ip, ii) )
+                    nodes_temp.append(nodes[ii])
+            nodes = nodes_temp
 
             #SETUP NODES
             print("START node setup")
             lcpDescriptor = None;
             for ii in range(0, len(hosts)):
+                print("search node %s - index %d" % (eth_ip[ii], ii) )
                 for jj in range(0, len(nodes)):
-                    if nodes[jj].ip in eth_ip[ii]:
-                        print("setup node %s" % nodes[jj].ip)
+                    if nodes[jj].ip == eth_ip[ii]:
+                        print("setup node %s - index %d" % (nodes[jj].ip, jj) )
                         pos = eth_ip.index(nodes[jj].ip)
                         rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-react", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
                         gevent.sleep(1)
@@ -244,6 +252,7 @@ def main(args):
                         #start thread for collect measurements from nodes
                         reading_thread.append(threading.Thread(target=collect_remote_messages, args=(lcpDescriptor_nodes[ii], socket_visualizer, mac_address, label)))
                         reading_thread[ii].start()
+                        break
             print("END node setup")
 
             for node in nodes:
@@ -271,6 +280,12 @@ def main(args):
                                     node_src_index = 1
                                 elif node == 'C':
                                     node_src_index = 2
+                                elif node == 'D':
+                                    node_src_index = 3
+                                elif node == 'E':
+                                    node_src_index = 4
+                                elif node == 'F':
+                                    node_src_index = 5
                                 else:
                                     print('node index not retreive')
                                     break
@@ -279,7 +294,7 @@ def main(args):
                                 if command == 'off_traffic':
                                     source_rate = 0
                                     nodes_source_rate[node_src_index] = source_rate
-                                    msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : float(source_rate), "enable_react" : react_algorithm_activation, "src" : node_src_index,}
+                                    msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : float(source_rate), "enable_react" : react_algorithm_activation, "src" : node_src_index}
                                     lcpDescriptor_nodes[node_src_index].send(msg)
                                     controller.nodes(nodes[node_src_index]).net.stop_packetflow()
                                     break
@@ -294,6 +309,12 @@ def main(args):
                                     node_dst_index = 1
                                 elif node == 'C':
                                     node_dst_index = 2
+                                elif node == 'D':
+                                    node_dst_index = 3
+                                elif node == 'E':
+                                    node_dst_index = 4
+                                elif node == 'F':
+                                    node_dst_index = 5
                                 else:
                                     print('node index not retreive')
                                     break
