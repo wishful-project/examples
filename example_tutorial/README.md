@@ -63,6 +63,17 @@ group_name = "example_tutorial"
 END setting of experiment nodes
 """
 
+### WORKING WITH EMULAB
+reserve all the ALIX nodes and two SERVER (SERVER3 + SERVER15)
+swap in the experiment alix-wishful (https://www.wilab2.ilabt.iminds.be/showexp.php3?pid=cognitiveradio&eid=alix-wishful)
+
+connect to controller PC [from ops.wilab2.ilabt.iminds.be]
+SHELL 1 - CONTROLLER PC :
+    ssh YOUR_USER@alixserver.alix-wishful.cognitiveradio.wilab2.ilabt.iminds.be
+
+        run command to set speed alixnode network
+        sudo ethtool -s eth4 speed 100 duplex full
+
 ### 2. Starting agents
 Start the agent on each node to be controlled (AP and STA).
 To run it, user has to execute command:

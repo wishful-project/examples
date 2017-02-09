@@ -59,7 +59,6 @@ class Adder(ttk.Frame):
         self.parent.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     def selectTopologyImage1(self):
-        print('1')
         image_name = 'wilab2-topology-1.png'
         img=Image.open(image_name)
         wpercent=100
@@ -75,22 +74,6 @@ class Adder(ttk.Frame):
 
 
     def selectTopologyImage2(self):
-        print('2')
-        image_name = 'wilab2-topology-2.png'
-        img=Image.open(image_name)
-        wpercent=100
-        basewidth = 490
-        wpercent = (basewidth/float(img.size[0]))
-        hsize = int((float(img.size[1])*float(wpercent)))
-        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
-        im = ImageTk.PhotoImage(img)
-
-        self.label_topo_img = Label(self.topo_frame, image=im)
-        self.label_topo_img.image = im
-        self.label_topo_img.grid(row=0, column=0, sticky='nesw')
-
-    def selectTopologyImage2bis(self):
-        print('2')
         image_name = 'wilab2-topology-2bis.png'
         img=Image.open(image_name)
         wpercent=100
@@ -103,6 +86,21 @@ class Adder(ttk.Frame):
         self.label_topo_img = Label(self.topo_frame, image=im)
         self.label_topo_img.image = im
         self.label_topo_img.grid(row=0, column=0, sticky='nesw')
+
+    def selectTopologyImagePortableTestbed(self):
+        image_name = 'wilab2-topology-2bis.png'
+        img=Image.open(image_name)
+        wpercent=100
+        basewidth = 490
+        wpercent = (basewidth/float(img.size[0]))
+        hsize = int((float(img.size[1])*float(wpercent)))
+        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+        im = ImageTk.PhotoImage(img)
+
+        self.label_topo_img = Label(self.topo_frame, image=im)
+        self.label_topo_img.image = im
+        self.label_topo_img.grid(row=0, column=0, sticky='nesw')
+
 
 
 
@@ -430,6 +428,9 @@ class Adder(ttk.Frame):
             label = parsed_json['label']
             if label :
                 measure = parsed_json['measure'][0]
+                if float(measure[8]) > 100:
+                    measure[8] = 100
+
                 if label == 'A':
                     item = 'I001'
                     self.sta1val_cw.pop(0)
@@ -607,9 +608,9 @@ class Adder(ttk.Frame):
         self.menu_file.add_command(label='Exit', command=self.on_quit)
         #menu edit topology
         self.menu_edit_topology = Menu(self.menubar)
-        self.menu_edit_topology.add_command(label='Topology 1', command=self.selectTopologyImage1)
-        self.menu_edit_topology.add_command(label='Topology 2', command=self.selectTopologyImage2)
-        self.menu_edit_topology.add_command(label='Topology 2', command=self.selectTopologyImage2bis)
+        self.menu_edit_topology.add_command(label='Topology 1 w-iLab', command=self.selectTopologyImage1)
+        self.menu_edit_topology.add_command(label='Topology 2 w-iLab', command=self.selectTopologyImage2)
+        self.menu_edit_topology.add_command(label='Topology portable testbed', command=self.selectTopologyImagePortableTestbed)
         #show menu
         self.menubar.add_cascade(menu=self.menu_file, label='File')
         self.menubar.add_cascade(menu=self.menu_edit_topology, label='Topology')
@@ -639,19 +640,34 @@ class Adder(ttk.Frame):
         self.label_topo_img.grid(row=0, column=0, sticky='nesw')
 
 
+        img=Image.open('logo.png')
+        wpercent=100
+        basewidth = 490
+        wpercent = (basewidth/float(img.size[0]))
+        hsize = int((float(img.size[1])*float(wpercent)))
+        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+        im = ImageTk.PhotoImage(img)
+
+        label_logo_img = Label(self.topo_frame, image=im)
+        label_logo_img.image = im
+        label_logo_img.grid(row=1,column=0, sticky=W+E)
+
+
         #TRAFFIC FRAME
         self.traffic_frame = ttk.LabelFrame(self, text='Traffic', height=50, width=50)
         self.traffic_frame.grid(column=1, row=1, columnspan=1, sticky='nesw')
 
-        self.LabelTraffic = Label(self.traffic_frame, text="Select nodes traffic :")
+        self.LabelTraffic = Label(self.traffic_frame, text="Selector nodes traffic")
         self.LabelTraffic.grid(row=0, column=0, columnspan=3, padx=1, pady=1, sticky=W)
+        self.LabelBusy = Label(self.traffic_frame, text="busy-time")
+        self.LabelBusy.grid(row=0, column=3, columnspan=1, padx=1, pady=1, sticky=W)
 
         #traffic node A
         self.LabelTrafficA = Label(self.traffic_frame, text="A --> ")
         self.LabelTrafficA.grid(row=1, column=0, padx=2, pady=2, sticky=W)
         self.countryVarA = StringVar()
         self.countryComboA = ttk.Combobox(self.traffic_frame, textvariable=self.countryVarA, width=5)
-        self.countryComboA['values'] = ('B', 'C')
+        self.countryComboA['values'] = ('B', 'C', 'D', 'E', 'F')
         self.countryComboA.current(0)
         self.countryComboA.grid(row=1, column=1, padx=2, pady=2, sticky=W)
         self.TrafficA = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='A': self.setTraffic(src, value))
@@ -665,7 +681,7 @@ class Adder(ttk.Frame):
 
         self.countryVarB = StringVar()
         self.countryComboB = ttk.Combobox(self.traffic_frame, textvariable=self.countryVarB, width=5)
-        self.countryComboB['values'] = ('A', 'C')
+        self.countryComboB['values'] = ('A', 'C', 'D', 'E', 'F')
         self.countryComboB.current(0)
         self.countryComboB.grid(row=2, column=1, padx=2, pady=2, sticky=W)
         self.TrafficB = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='B': self.setTraffic(src, value))
@@ -704,7 +720,7 @@ class Adder(ttk.Frame):
         self.LabelTrafficE.grid(row=5, column=0, padx=1, pady=1, sticky=W)
         self.countryVarE = StringVar()
         self.countryComboE = ttk.Combobox(self.traffic_frame, textvariable=self.countryVarE, width=5)
-        self.countryComboE['values'] = ('B', 'D', 'F', 'C')
+        self.countryComboE['values'] = ('A', 'B', 'D', 'F', 'C')
         self.countryComboE.current(0)
         self.countryComboE.grid(row=5, column=1, padx=2, pady=2, sticky=W)
         self.TrafficE = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='E': self.setTraffic(src, value))
@@ -717,7 +733,7 @@ class Adder(ttk.Frame):
         self.LabelTrafficF.grid(row=6, column=0, padx=1, pady=1, sticky=W)
         self.countryVarF = StringVar()
         self.countryComboF = ttk.Combobox(self.traffic_frame, textvariable=self.countryVarF, width=5)
-        self.countryComboF['values'] = ('B', 'D', 'E')
+        self.countryComboF['values'] = ('A', 'B', 'C', 'D', 'E')
         self.countryComboF.current(0)
         self.countryComboF.grid(row=6, column=1, padx=2, pady=2, sticky=W)
         self.TrafficF = Scale(self.traffic_frame, from_=0, to=6000, length=300, resolution=1000, tickinterval=3000, orient='horizontal', command= lambda value, src='F': self.setTraffic(src, value))
@@ -758,6 +774,18 @@ class Adder(ttk.Frame):
         self.startReactBtn.grid(row=1, column=0, padx=5, pady=5, ipady=2, sticky='nesw')
         self.stopReactBtn = ttk.Button(self.stats_frame, text="STOP REACT", width=10, command=lambda : self.stopReact(),  style=SUNKABLE_BUTTON1)
         self.stopReactBtn.grid(row=1, column=1, padx=5, pady=5, ipady=2, sticky='nesw')
+
+        self.LabelSourceDescription = Label(self.stats_frame, text="REACT algorithm: ")
+        self.LabelSourceDescription.grid(row=2, column=0, columnspan=1, padx=1, pady=1, sticky=W)
+        self.LabelClaimDescription = Label(self.stats_frame, justify=LEFT, text="Each node runs an auctioneer that maintains an offer,\n\
+the maximum airtime consumed by any adjacent bidder.\n\
+Similarly, each node also runs a bidder that maintains a claim, \n\
+the airtime the bidder intends to consume at adjacent auctions.\n\
+Through updates of offers and claims, the auctioneers and\n\
+bidders converge on an allocation of airtime.")
+        self.LabelClaimDescription.grid(row=3, column=0, columnspan=3, padx=1, pady=1, sticky='nesw')
+        # self.LabelOfferDescription = Label(self.stats_frame, text="The OFFER ")
+        # self.LabelOfferDescription.grid(row=4, column=0, columnspan=1, padx=1, pady=1, sticky=W)
 
 
         #PLOTTER psucc

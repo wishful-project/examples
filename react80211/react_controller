@@ -191,12 +191,6 @@ def main(args):
         [hosts, driver, eth_ip, freq,tx_power, wlan_ip, mac_address, label]=set_hosts(nodes_info_path)
         print([hosts, driver, eth_ip, freq, tx_power, wlan_ip, mac_address, label])
 
-    # experiment_info_path=args['--experiment_info']
-    # if experiment_info_path:
-    #     [src, dst, bw_req, port, t_start, t_stop]=experiment_setup(experiment_info_path)
-    #     # for ii in range(0, len(src)):
-    #     #     print('flow %d - %s %s %s %s %s %s' % (ii, src[ii], dst[ii], bw_req[ii], port[ii], t_start[ii], t_stop[ii]))
-
     #Start controller
     controller.start()
 
@@ -204,7 +198,7 @@ def main(args):
     while do_run:
         gevent.sleep(1)
         print("\nConnected nodes", [str(node.name) for node in nodes])
-        if len(nodes) == 6:
+        if len(nodes) >= len(hosts):
             time.sleep(1)
             lcpDescriptor_nodes = []
             reading_thread = []
@@ -217,6 +211,11 @@ def main(args):
                 for jj in range(0, len(nodes)):
                     if nodes[jj].ip in eth_ip[ii]:
                         nodes_sort.append(nodes[jj])
+
+            if len(nodes_sort) != len(hosts):
+                print('Error in build node list')
+                break
+
             nodes = nodes_sort
 
             react_time_update = 1 #seconds
@@ -351,18 +350,22 @@ def main(args):
                 if dt > EXPERIMENT_DURATION:
                     break
 
-            for ii in range(0,len(nodes)):
-                controller.nodes(nodes[ii]).net.destroy_packetflow_sink()
 
-                print("Terminate remote local control program")
-                lcpDescriptor_nodes[ii].close()
+            try:
+                for ii in range(0,len(nodes)):
+                    controller.nodes(nodes[ii]).net.destroy_packetflow_sink()
 
-                time.sleep(2)
+                    print("Terminate remote local control program")
+                    lcpDescriptor_nodes[ii].close()
 
-                print("Terminate receive thread")
-                reading_thread[ii].do_run = False
-                reading_thread[ii].join()
+                    time.sleep(2)
 
+                    print("Terminate receive thread")
+                    reading_thread[ii].do_run = False
+                    reading_thread[ii].join()
+            except:
+                print('Error in locola control program shutdown')
+                raise
 
 if __name__ == "__main__":
     try:

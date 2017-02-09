@@ -163,9 +163,7 @@ class TestbedTopology:
         :param node: elected Access Point Node
         :param essid: the SSID
         """
-        #eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node.ip))
-        #wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
-        wlan_ipAddress = '192.168.3.' + str(node.ip[7:10])
+        wlan_ipAddress = '192.168.3.' + node.ip.split('.')[3]
 
         #stop hostpad
         rvalue = self.controller.nodes(node).net.stop_hostapd()
@@ -186,10 +184,7 @@ class TestbedTopology:
         :param node: elected station node by associate
         :param essid: the SSID
         """
-        # eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node))
-        # wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[6]
-        wlan_ipAddress = '192.168.3.' + str(node.ip[7:10])
-
+        wlan_ipAddress = '192.168.3.' + node.ip.split('.')[3]
         #stop hostpad
         rvalue = self.controller.nodes(node).net.stop_hostapd()
         #set ip address

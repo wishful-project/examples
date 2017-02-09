@@ -39,7 +39,7 @@ def react(controller):
 	debug = False
 	debug_statistics = True
 	debug_cw_set = False
-	debug_react_value = False
+	debug_react_value = True
 
 	starttime=time.time()
 

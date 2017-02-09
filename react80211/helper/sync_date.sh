@@ -1,6 +1,6 @@
 #! /bin/bash
 if [ $# -lt 1 ]; then
-	echo "usage $0 nodes_list     (use ',' to separate nodes in list )"
+	echo "usage $0 <user> <nodes_list> (use ',' to separate nodes in list )"
 	exit
 fi
 nodes=$(echo $2 | tr "," "\n")
