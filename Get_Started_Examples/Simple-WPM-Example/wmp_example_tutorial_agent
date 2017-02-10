@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-wishful_example_tutorial_agent: Example tutorial of WiSHFUL (agent side)
+wmp_example_tutorial_agent: Example tutorial of WiSHFUL (agent side)
 
 Usage:
-   wishful_example_tutorial_agent [options] [-q | -v]
+   wmp_example_tutorial_agent [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
@@ -20,6 +20,7 @@ Other options:
    -v, --verbose       print more text
    --version           show version and exit
 """
+
 
 import logging
 import signal

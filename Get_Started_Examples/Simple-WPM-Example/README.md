@@ -1,4 +1,4 @@
-Wishful EXAMPLE TUTORIAL
+WiSHFUL WMP example tutorial
 ============================
 
 For any information or issue, please contact Domenico Garlisi at domenico.garlisi@cnit.it
@@ -95,7 +95,7 @@ experiment alix-wishful at : https://www.wilab2.ilabt.iminds.be/showexp.php3?pid
              follow the user installation How To present at link: https://github.com/wishful-project/manifests
 
         move in the experiment directory
-                cd examples/example_tutorial
+                cd examples/Get_Started_Examples/Simple-WPM-Example
 
         deploy framework on alixnodes
             sh deploy_upis.sh alixnode9,alixnode12
@@ -104,8 +104,8 @@ experiment alix-wishful at : https://www.wilab2.ilabt.iminds.be/showexp.php3?pid
             sh sync_date.sh alixnode9,alixnode12
 
         start controller
-            chmod +x wishful_example_tutorial_controller
-            ./wishful_example_tutorial_controller (#run with -v for debugging)
+            chmod +x wmp_example_tutorial_controller
+            ./wmp_example_tutorial_controller (#run with -v for debugging)
 
 
 ### 3. Connect on ALIX agent nodes and run the WiSHFUL agent
@@ -117,11 +117,11 @@ experiment alix-wishful at : https://www.wilab2.ilabt.iminds.be/showexp.php3?pid
             ssh root@alixnode9
 
         move on the experiment directory
-            cd wishful-github-manifest/examples/example_tutorial/
+            cd wishful-github-manifest/examples/Get_Started_Examples/Simple-WPM-Example
 
         start agent
-            chmod +x wishful_example_tutorial_agent
-            ./wishful_example_tutorial_agent (#run with -v for debugging)
+            chmod +x wmp_example_tutorial_agent
+            ./wmp_example_tutorial_agent (#run with -v for debugging)
 
     SHELL 3 - ALIXNODE12 (alix node password  : 123456) :
         connect to controller PC [from ops.wilab2.ilabt.iminds.be]
@@ -131,11 +131,11 @@ experiment alix-wishful at : https://www.wilab2.ilabt.iminds.be/showexp.php3?pid
             ssh root@alixnode12
 
         move on the experiment directory
-            cd wishful-github-manifest/examples/example_tutorial/
+            cd wishful-github-manifest/examples/Get_Started_Examples/Simple-WPM-Example
 
         start agent
-            chmod +x wishful_example_tutorial_agent
-            ./wishful_example_tutorial_agent (#run with -v for debugging)
+            chmod +x wmp_example_tutorial_agent
+            ./wmp_example_tutorial_agent (#run with -v for debugging)
 
 
 ## Acknowledgement

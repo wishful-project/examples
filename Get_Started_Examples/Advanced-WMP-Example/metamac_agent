@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-wishful_agent_simple.py: First implementation of WiSHFUL agent
+metamac_agent: First implementation of WiSHFUL agent
 
 Usage:
-   wishful_agent_simple.py [options] [-q | -v]
+   metamac_agent [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./wishful_agent_simple -v --config ./config.yaml
+   ./metamac_agent -v --config ./config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -41,10 +41,9 @@ import wishful_agent
 from agent_modules.wifi_wmp.wmp_structure import UPI_R
 
 __author__ = "Domenico Garlisi"
-__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__copyright__ = "Copyright (c) 2016, CNIT"
 __version__ = "0.1.0"
 __email__ = "domenico.garlisi@cnit.it"
-
 
 log = logging.getLogger('wishful_agent.main')
 agent = wishful_agent.Agent()

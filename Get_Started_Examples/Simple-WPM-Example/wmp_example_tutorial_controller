@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 """
-wishful_example_tutorial_controller: Example tutorial of WiSHFUL (agent side)
+wmp_example_tutorial_controller: Example tutorial of WiSHFUL (agent side)
 
 Usage:
-   wishful_example_tutorial_controller [options] [-q | -v]
+   wmp_example_tutorial_controller [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
@@ -21,7 +20,6 @@ Other options:
    -v, --verbose       print more text
    --version           show version and exit
 """
-
 import types
 import sys
 import time

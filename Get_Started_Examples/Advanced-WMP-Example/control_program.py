@@ -3,9 +3,9 @@ Local control program to be executed on remote nodes.
 """
 
 __author__ = "Domenico Garlisi"
-__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
+__copyright__ = "Copyright (c) 2016, CNIT"
 __version__ = "0.1.0"
-
+__email__ = "domenico.garlisi@cnit.it"
 
 import time
 import datetime
@@ -19,8 +19,6 @@ import threading
 import math
 import zmq
 import netifaces as ni
-
-
 
 libc = CDLL('libc.so.6')
 usleep = lambda x: time.sleep(x/1000000.0)

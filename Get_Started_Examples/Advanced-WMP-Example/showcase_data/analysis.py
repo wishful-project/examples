@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 '''Utilities for analysis of Metamac log files.
-Author: Nathan Flick
 '''
+
+__author__ = "Pierluigi Gallo, Domenico Garlisi"
+__copyright__ = "Copyright (c) 2016, CNIT"
+__version__ = "0.1.0"
+__email__ = "domenico.garlisi@cnit.it"
 
 import csv
 from math import *

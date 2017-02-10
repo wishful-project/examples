@@ -1,8 +1,13 @@
 #!/usr/bin/python
-__author__ = 'Domenico Garlisi'
 """
 EU project WISHFUL
 """
+
+__author__ = "Pierluigi Gallo, Domenico Garlisi"
+__copyright__ = "Copyright (c) 2016, CNIT"
+__version__ = "0.1.0"
+__email__ = "domenico.garlisi@cnit.it"
+
 import types
 from agent_modules.wifi_wmp.wmp_structure import UPI_R
 from agent_modules.wifi_wmp.wmp_structure import execution_engine_t

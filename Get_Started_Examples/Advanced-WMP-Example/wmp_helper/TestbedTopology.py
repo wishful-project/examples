@@ -1,5 +1,10 @@
 #!/usr/bin/python
-__author__ = 'Pierluigi Gallo'
+
+__author__ = "Domenico Garlisi"
+__copyright__ = "Copyright (c) 2016, CNIT"
+__version__ = "0.1.0"
+__email__ = "domenico.garlisi@cnit.it"
+
 """
 EU project WISHFUL
 """

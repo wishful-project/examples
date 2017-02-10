@@ -2,19 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-Showacase 3 (Year 1) implementation of WiSHFUL Project
-This python script performs the topology creation of the testbed, specifically,
-the script starts the access point and connect the stations.
-
 Usage:
-   showcase3_testbed_controller.py [options] [-q | -v]
+   metamac_testbed_controller [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./showcase3_testbed_controller -v --config ./controller_config.yaml
+   ./metamac_testbed_controller -v --config ./controller_config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -23,20 +19,17 @@ Other options:
    --version           show version and exit
 """
 __author__ = "Domenico Garlisi"
-__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__copyright__ = "Copyright (c) 2016, CNIT"
 __version__ = "0.1.0"
 __email__ = "domenico.garlisi@cnit.it"
 
 import sys
 import datetime
 import logging
+import csv
+
 import gevent
 import yaml
-import time
-import random
-import _thread
-import zmq
-import csv
 
 sys.path.append('../../../')
 sys.path.append("../../../agent_modules/wifi_ath")
@@ -48,13 +41,10 @@ sys.path.append('../../../framework')
 sys.path.append('../../../agent')
 sys.path.append('../../../controller')
 
-
-import wishful_upis as upis
 import wishful_controller
 
 from examples.wmp.wmp_metamac.wmp_helper.controller_utils import *
 from examples.wmp.wmp_metamac.wmp_helper.TestbedTopology import TestbedTopology
-from agent_modules.wifi_wmp.wmp_structure import UPI_R
 
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller()

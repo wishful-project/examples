@@ -50,6 +50,7 @@ SHELL B  - ALIXNODE :
         sudo apt-get install apache2
         sudo cp -r /users/dgarlisi/USRP_DEMO/web-site /var/www/html/
         sudo cp -r /users/dgarlisi/USRP_DEMO/web-site/crewdemo /var/www/html/
+        sudo /users/dgarlisi/USRP_DEMO/pyTrackers/pyUsrpTracker/run_usrp.sh 6
     #local pc
         ssh -L 8410:server13:80 dgarlisi@ops.wilab2.ilabt.iminds.be -v
         http://127.0.0.1:8410/crewdemo/plots/usrp.png
@@ -99,4 +100,4 @@ ssh -L 8300:127.0.0.1:8300 domenico@lab.tti.unipa.it -v
     sudo /home/domenico/work/CREW_FINAL_DEMO/pyTrackers/pyUsrpTracker/run_usrp.sh 6
     ssh -L 8310:10.8.9.3:80 domenico@lab.tti.unipa.it
     http://127.0.0.1:8310/crewdemo/plots/usrp.png
-
+    python metamac_visualizer.py

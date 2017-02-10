@@ -5,6 +5,7 @@ Local control program to be executed on remote nodes.
 __author__ = "Domenico Garlisi"
 __copyright__ = "Copyright (c) 2016, CNIT"
 __version__ = "0.1.0"
+__email__ = "domenico.garlisi@cnit.it"
 
 # Definition of Local Control Program
 def metamac_local_control_program(controller):

@@ -2,17 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-Showacase 3 (Year 1) implementation of WiSHFUL Project
-
 Usage:
-   showcase3_controller.py [options] [-q | -v]
+   metamac_experiment_controller [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./showcase3_controller -v --config ./controller_config.yaml
+   ./metamac_experiment_controller -v --config ./controller_config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -21,23 +19,22 @@ Other options:
    --version           show version and exit
 """
 __author__ = "Domenico Garlisi"
-__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__copyright__ = "Copyright (c) 2016, CNIT"
 __version__ = "0.1.0"
 __email__ = "domenico.garlisi@cnit.it"
 
 import sys
 import datetime
 import logging
-import gevent
-import yaml
 import time
-import random
 import threading
-import zmq
 import csv
 import shutil
 import signal
-from tempfile import NamedTemporaryFile
+
+import gevent
+import yaml
+import zmq
 
 sys.path.append('../../../')
 sys.path.append("../../../agent_modules/wifi_ath")
@@ -49,15 +46,11 @@ sys.path.append('../../../agent')
 sys.path.append('../../../controller')
 sys.path.append("../../../agent_modules/net_linux")
 
-
-
-import wishful_upis as upis
 import wishful_controller
 
 from examples.wmp.wmp_metamac.wmp_helper.controller_utils import *
 from examples.wmp.wmp_metamac.wmp_helper.TestbedTopology import TestbedTopology
 from examples.wmp.wmp_metamac.wmp_helper.MeasurementManager import MeasurementCollector
-from agent_modules.wifi_wmp.wmp_structure import UPI_R
 #from local_control_program import *
 from metamac_local_control_program import *
 
