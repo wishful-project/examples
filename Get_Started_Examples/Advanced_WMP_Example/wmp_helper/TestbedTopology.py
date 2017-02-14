@@ -97,6 +97,12 @@ class TestbedTopology:
         self.nodes.append(node)
 
     def getExperimentNodesNumber(self):
+        """
+        Get the number of nodes of the experiment. The experiment nodes configuration can be configured by editing of
+        the file testbed_nodes.csv present in the experiment directory.
+
+        :return: experiment_nodes_number : number of nodes in the experiment
+        """
         with open('testbed_nodes.csv') as csvfile:
             reader = csv.DictReader(filter(lambda row: row[0]!='#', csvfile))
             for row in reader:

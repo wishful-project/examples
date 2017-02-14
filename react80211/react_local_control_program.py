@@ -202,9 +202,13 @@ def react(controller):
 		cw=cw_
 		data_count_= 0
 		rts_count_= 0
+		ack_failure_count_ = 0
 
 		busy_time = 0
 		busy_time_ = 0
+
+		SIFS=16 #usec
+		tslot=9e-6 #usec
 
 		#QUEUE CW SETTING
 		qumId=1 #BE
@@ -218,6 +222,8 @@ def react(controller):
 		number_of_setting_in_interval = 5
 		cw_setting_interval = time_interval[0]/number_of_setting_in_interval
 
+		average_enable = True
+
 		while getattr(cw_thread, "do_run", True):
 			#get stats
 
@@ -225,14 +231,34 @@ def react(controller):
 			# UPI_myargs = {'interface' : 'wlan0', 'measurements' : [UPI_R.dot11RTSSuccessCount,UPI_R.dot11RTSFailureCount] }
 			# pkt_stats=controller.radio.get_measurements(UPI_myargs)
 
+			#{"busy_time" : 1245283, "dot11ACKFailureCount" : 10182, "dot11FailedCount" : 87, "dot11FCSErrorCount" : 17627, "dot11FrameDuplicateCount" : 1398,
+			# "dot11MulticastReceivedFrameCount" : 313176, "dot11MulticastTransmittedFrameCount" : 35308, "dot11MultipleRetryCount" : 9619,
+			# "dot11ReceivedFragmentCount" : 565822, "dot11RetryCount" : 17584, "dot11RTSFailureCount" : 331102, "dot11RTSSuccessCount" : 261543,
+			# "dot11TransmittedFragmentCount" : 297722, "dot11TransmittedFrameCount" : 297722, "rx_expand_skb_head_defrag" : 0,
+			# "rx_handlers_drop" : 98606, "rx_handlers_drop_defrag" : 0, "rx_handlers_drop_nullfunc" : 0, "rx_handlers_drop_short" : 0,
+			# "rx_handlers_fragments" : 0, "rx_handlers_queued" : 461432, "tx_expand_skb_head" : 0, "tx_expand_skb_head_cloned" : 40986, "tx_handlers_drop" : 0,
+			# "tx_handlers_drop_not_assoc" : 0, "tx_handlers_drop_unauth_port" : 0, "tx_handlers_drop_wep" : 0, "tx_handlers_queued" : 0, "tx_status_drop" : 0 }
+			# dot11TransmittedFragmentCount	297722
+			# dot11ACKFailureCount 			 10182
+			# dot11RTSSuccessCount			261543
+			# dot11RTSFailureCount			331102
+
 			if cw_evaluate_cycle > (number_of_setting_in_interval-2):
 				pkt_stats=get_ieee80211_stats(phy)
 				if pkt_stats:
-					data_count = pkt_stats['dot11RTSSuccessCount'] - data_count_
-					rts_count = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
+					# consider only RTS statistics
+					# data_count = pkt_stats['dot11RTSSuccessCount'] - data_count_
+					# rts_count = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
+					# data_count_=pkt_stats['dot11RTSSuccessCount']
+					# rts_count_=pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount']
 
-					data_count_=pkt_stats['dot11RTSSuccessCount']
+					#consider scenario with e without RTS/CTS
+					data_count = pkt_stats['dot11TransmittedFragmentCount'] - data_count_
+					rts_count = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
+					ack_failure_count = pkt_stats['dot11ACKFailureCount'] - ack_failure_count_
+					data_count_=pkt_stats['dot11TransmittedFragmentCount']
 					rts_count_=pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount']
+					ack_failure_count_ = pkt_stats['dot11ACKFailureCount']
 
 					busy_time = (pkt_stats['busy_time'] - busy_time_)/10
 					busy_time_ = pkt_stats['busy_time']
@@ -241,22 +267,20 @@ def react(controller):
 					I=0
 					dd = time_interval[0]
 					gross_rate = float(CLAIM_CAPACITY)*float(neigh_list[my_mac]['claim'])
+
 					[tslot, tx_time_theor, t_rts, t_ack]= txtime_theor('11a', 6, 20, pkt_size)
 
 					busytx2 =  0.002198*float(data_count) + 0.000081*float(rts_count) #how much time the station spent in tx state during the last observation internval
 					#busytx2 =  0.002071*float(data_count) + 0.000046*float(rts_count) #how much time the station spent in tx state during the last observation internval
 
-					SIFS=16 #usec
-					tslot=9e-6 #usec
-					#freeze2 = dd - busytx2 - cw_/float(2)*tslot*rts_count - 2*SIFS*1e-6; #how long the backoff has been frozen;
-					freeze2 = float(dd) - float(busytx2) - cw_/float(2)*float(tslot)*rts_count #how long the backoff has been frozen;
-
 					if rts_count > 0:
+						freeze2 = float(dd) - float(busytx2) - cw_/float(2)*float(tslot)*rts_count #how long the backoff has been frozen;
 						avg_tx = float(busytx2)/float(rts_count) #average transmission time in a transmittion cycle
 						psucc = float(data_count)/float(rts_count)
 					else:
+						freeze2 = float(dd) - float(busytx2)
 						avg_tx=0
-						psucc=0
+						psucc= float(data_count)/float(data_count + ack_failure_count)
 
 					if avg_tx > 0:
 						tx_goal = float(dd * gross_rate)/float(avg_tx)
@@ -267,7 +291,6 @@ def react(controller):
 					if tx_goal > 0:
 						cw = 2/float(0.000009) * (dd - tx_goal * avg_tx -freeze_predict) / float(tx_goal)
 
-					average_enable = True
 					if average_enable:
 						#moving average
 						cw_= 0.6 * cw_ + 0.4 * cw
@@ -477,14 +500,17 @@ def react(controller):
 				enable_react.append(msg['enable_react'])
 
 				sender_thread = threading.Thread(target=send_REACT_msg, args=(msg['iface'], i_time, iperf_rate,))
+				sender_thread.do_run = True
 				sender_thread.start()
 
 				#thread receiver
 				receiver_thread = threading.Thread(target=sniffer_REACT, args=(msg['iface'], i_time, ))
+				receiver_thread.do_run = True
 				receiver_thread.start()
 
 				#update CW
 				cw_thread = threading.Thread(target=update_cw, args=(msg['iface'], i_time, enable_react, ))
+				cw_thread.do_run = True
 				cw_thread.start()
 
 			except (Exception) as err:

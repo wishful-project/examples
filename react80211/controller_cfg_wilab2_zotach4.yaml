@@ -1,7 +1,7 @@
 ## WiSHFUL Controller's config file
 
 controller:
-    name: "Controller"
+    name: "Controller wilab"
     info: "WiSHFUL Controller"
     dl: "tcp://10.11.16.39:8990"
     ul: "tcp://10.11.16.39:8989"

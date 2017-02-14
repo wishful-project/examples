@@ -43,8 +43,8 @@ sys.path.append('../../../controller')
 
 import wishful_controller
 
-from examples.wmp.wmp_metamac.wmp_helper.controller_utils import *
-from examples.wmp.wmp_metamac.wmp_helper.TestbedTopology import TestbedTopology
+from examples.Get_Started_Examples.Advanced_WMP_Example.wmp_helper.controller_utils import *
+from examples.Get_Started_Examples.Advanced_WMP_Example.wmp_helper.TestbedTopology import TestbedTopology
 
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller()
@@ -94,10 +94,13 @@ def main(args):
 
     config_file_path = args['--config']
     config = None
+    #open agent module configuration
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
 
+    #load agent module configuration
     controller.load_config(config)
+    #start WiSHFUL controller
     controller.start()
     num_testbed_nodes = mytestbed.getExperimentNodesNumber()
 

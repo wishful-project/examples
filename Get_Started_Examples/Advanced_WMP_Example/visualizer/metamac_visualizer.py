@@ -44,6 +44,100 @@ SUNKABLE_BUTTON3 = 'SunkableButton.TButton'
 
 DELAY = 1000
 
+import tkSimpleDialog
+
+class Dialog(Toplevel):
+
+    def __init__(self, parent, title = None):
+
+        Toplevel.__init__(self, parent)
+        self.transient(parent)
+        if title:
+            self.title(title)
+        self.parent = parent
+        self.result = None
+        body = Frame(self)
+        self.initial_focus = self.body(body)
+        body.pack(padx=5, pady=5)
+        self.buttonbox()
+        self.grab_set()
+        if not self.initial_focus:
+            self.initial_focus = self
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.geometry("+%d+%d" % (parent.winfo_rootx()+50, parent.winfo_rooty()+50))
+        self.initial_focus.focus_set()
+        self.wait_window(self)
+
+    #
+    # construction hooks
+    def body(self, master):
+        Label(master, text="SHIFT STA1:").grid(row=0)
+        Label(master, text="SHIFT STA2:").grid(row=1)
+        Label(master, text="SHIFT STA3:").grid(row=2)
+        Label(master, text="SHIFT STA4:").grid(row=3)
+
+        v1 = StringVar(root, value='0')
+        v2 = StringVar(root, value='0')
+        v3 = StringVar(root, value='0')
+        v4 = StringVar(root, value='0')
+        self.e1 = Entry(master, textvariable=v1)
+        self.e2 = Entry(master, textvariable=v2)
+        self.e3 = Entry(master, textvariable=v3)
+        self.e4 = Entry(master, textvariable=v4)
+        self.e1.grid(row=0, column=1)
+        self.e2.grid(row=1, column=1)
+        self.e3.grid(row=2, column=1)
+        self.e4.grid(row=3, column=1)
+
+        Label(master, text="LOW RATE:").grid(row=4)
+        Label(master, text="HIGH RATE:").grid(row=5)
+        self.low_rate = Entry(master)
+        self.high_rate = Entry(master)
+        self.low_rate.grid(row=4, column=1)
+        self.high_rate.grid(row=5, column=1)
+
+
+
+    def buttonbox(self):
+        # add standard button box. override if you don't want the
+        # standard buttons
+        box = Frame(self)
+        w = Button(box, text="OK", width=10, command=self.ok, default=ACTIVE)
+        w.pack(side=LEFT, padx=5, pady=5)
+        w = Button(box, text="Cancel", width=10, command=self.cancel)
+        w.pack(side=LEFT, padx=5, pady=5)
+        self.bind("<Return>", self.ok)
+        self.bind("<Escape>", self.cancel)
+        box.pack()
+
+    #
+    # standard button semantics
+
+    def ok(self, event=None):
+        if not self.validate():
+            self.initial_focus.focus_set() # put focus back
+            return
+        self.withdraw()
+        self.update_idletasks()
+        self.apply()
+        self.cancel()
+
+    def cancel(self, event=None):
+        # put focus back to the parent window
+        self.parent.focus_set()
+        self.destroy()
+
+    #
+    # command hooks
+    def validate(self):
+        return 1
+
+    def apply(self):
+        first = int(self.e1.get())
+        second = int(self.e2.get())
+        self.result = [int(self.e1.get()), int(self.e2.get()), int(self.e3.get()), int(self.e4.get())]
+
+
 class Adder(ttk.Frame):
     """The adders gui and functions."""
     def __init__(self, parent, *args, **kwargs):
@@ -111,17 +205,19 @@ class Adder(ttk.Frame):
 
 
     def select_source_rate(self):
-        # self.label_topo_img = Label(self.topo_frame, image=im)
-        # self.label_topo_img.image = im
-        # self.label_topo_img.grid(row=0, column=0, sticky='nesw')
-        tkMessageBox.showinfo('Title','Stuff')
+        d = Dialog(self.root)
+        print('%s' % str(d.result))
+        self.sta1_shift = int(d.result[0])
+        self.sta2_shift = int(d.result[1])
+        self.sta3_shift = int(d.result[2])
+        self.sta4_shift = int(d.result[3])
 
 
     def select_ttilab(self):
-        self.sta1_ipaddress = '10.8.8.104'
-        self.sta2_ipaddress = '10.8.8.105'
+        self.sta1_ipaddress = '10.8.8.103'
+        self.sta2_ipaddress = '10.8.8.111'
         self.sta3_ipaddress = '10.8.8.110'
-        self.sta4_ipaddress = '10.8.8.114'
+        self.sta4_ipaddress = '10.8.8.118'
         self.local_network = 0
         #self.location='http://10.8.9.3/crewdemo/plots/usrp.png'
         self.location='http://127.0.0.1:8310/crewdemo/plots/usrp.png'
@@ -347,27 +443,18 @@ class Adder(ttk.Frame):
         poller.register(self.socket_plot_local_network, zmq.POLLIN)
         poller.register(self.socket_plot_remote_network, zmq.POLLIN)
 
-
-
-
         while True:    # Run until cancelled
             socks = dict(poller.poll(1000))
             if self.socket_plot_local_network in socks:
                 parsed_json = self.socket_plot_local_network.recv_json()
-                # process task
+                if not self.local_network:
+                    continue
             elif self.socket_plot_remote_network in socks:
                 parsed_json = self.socket_plot_remote_network.recv_json()
+                if self.local_network:
+                    continue
             else:
                 continue
-
-            # poller.poll(1000) # 1s timeout in milliseconds
-            # if poller.pollin(0):
-            #     parsed_json = self.socket_plot_local_network.recv_json()
-            # elif poller.pollin(1):
-            #     parsed_json = self.socket_plot_remote_network.recv_json()
-            # else:
-            #     raise IOError("Timeout processing auth request")
-            #     continue
 
             #print('parsed_json : %s' % str(parsed_json))
             #parsed_json : {u'wlan_ip_address': u'192.168.3.110', u'measure': [[2668741, 4, 0.0]]}
@@ -387,23 +474,40 @@ class Adder(ttk.Frame):
 
             if self.sta1_ipaddress.split('.')[3] == remote_ipAddress.split('.')[3] :
                 self.sta1val.pop(0)
-                self.sta1val.append( float(measure[1]) + 1 - 0.1   )
-                self.sta1_log_Label.config(text="A => {}".format(self.protocol_list[int(measure[1]) + 1]))
+                if int(measure[1]) < 5:
+                    self.sta1val.append( float(measure[1]) + 1 - 0.1  + self.sta1_shift )
+                    self.sta1_log_Label.config(text="A => {}".format(self.protocol_list[int(measure[1]) + 1 + self.sta1_shift]))
+                else:
+                    self.sta1val.append( float(measure[1]) + 1 - 0.1  )
+                    self.sta1_log_Label.config(text="A => {}".format(self.protocol_list[int(measure[1]) + 1] ))
 
             if self.sta2_ipaddress.split('.')[3] == remote_ipAddress.split('.')[3] :
                 self.sta2val.pop(0)
-                self.sta2val.append( float(measure[1]) + 1 - 0.2   )
-                self.sta2_log_Label.config(text="B => {}".format(self.protocol_list[int(measure[1]) + 1]))
+                if int(measure[1]) < 5:
+                    self.sta2val.append( float(measure[1]) + 1 - 0.2  + self.sta2_shift )
+                    self.sta2_log_Label.config(text="B => {}".format(self.protocol_list[int(measure[1]) + 1 + self.sta2_shift]))
+                else:
+                    self.sta2val.append( float(measure[1]) + 1 - 0.2   )
+                    self.sta2_log_Label.config(text="B => {}".format(self.protocol_list[int(measure[1]) + 1 ]))
 
             if self.sta3_ipaddress.split('.')[3] == remote_ipAddress.split('.')[3] :
                 self.sta3val.pop(0)
-                self.sta3val.append( float(measure[1]) + 1 + 0.1   )
-                self.sta3_log_Label.config(text="C => {}".format(self.protocol_list[int(measure[1]) + 1]))
+                if int(measure[1]) < 5:
+                    self.sta3val.append( float(measure[1]) + 1 + 0.1 + self.sta3_shift )
+                    self.sta3_log_Label.config(text="C => {}".format(self.protocol_list[int(measure[1]) + 1 + self.sta3_shift]))
+                else:
+                    self.sta3val.append( float(measure[1]) + 1 + 0.1 )
+                    self.sta3_log_Label.config(text="C => {}".format(self.protocol_list[int(measure[1]) + 1 ]))
 
             if self.sta4_ipaddress.split('.')[3] == remote_ipAddress.split('.')[3] :
                 self.sta4val.pop(0)
-                self.sta4val.append( float(measure[1]) + 1 + 0.2   )
-                self.sta4_log_Label.config(text="D => {}".format(self.protocol_list[int(measure[1]) + 1]))
+                if int(measure[1]) < 5:
+                    self.sta4val.append( float(measure[1]) + 1 + 0.2 + self.sta4_shift )
+                    self.sta4_log_Label.config(text="D => {}".format(self.protocol_list[int(measure[1]) + 1 + self.sta4_shift]))
+                else:
+                    self.sta4val.append( float(measure[1]) + 1 + 0.2 )
+                    self.sta4_log_Label.config(text="D => {}".format(self.protocol_list[int(measure[1]) + 1 ]))
+
 
 
     def init_gui(self):
@@ -423,11 +527,11 @@ class Adder(ttk.Frame):
 
         """GUI SETUP"""
         print('GUI setup')
-        self.root.title('WISHFUL DEMO YEAR 2')
+        self.root.title('WiSHFUL Meta-MAC showcase')
         self.root.option_add('*tearOff', 'FALSE')
 
         self.parent = self.root
-        self.root.title("WISHFUL DEMO YEAR 2")
+        self.root.title("WiSHFUL Meta-MAC showcase")
         self.style = ttk.Style()
         self.style.theme_use("default")
         self.centreWindow()
@@ -442,13 +546,14 @@ class Adder(ttk.Frame):
         self.menu_file.add_command(label='Exit', command=self.on_quit)
         #menu edit traffic source
         self.menu_edit_traffic = Menu(self.menubar)
-        self.menu_edit_traffic.add_command(label='Source rate', command=self.select_source_rate)
-        self.menu_edit_traffic.add_command(label='TTILAB', command=self.select_ttilab)
-        self.menu_edit_traffic.add_command(label='WILAB2', command=self.select_wilab2)
+        self.menu_edit_traffic.add_command(label='Select station rate', command=self.select_source_rate)
+        self.menu_edit_traffic.add_command(label='Reset plot', command=self.select_ttilab)
+        self.menu_edit_traffic.add_command(label='Reset rate', command=self.select_wilab2)
         #create menu
         self.menubar.add_cascade(menu=self.menu_file, label='File')
         self.menubar.add_cascade(menu=self.menu_edit_traffic, label='Edit')
         self.root.config(menu=self.menubar)
+
 
         #NETWORK SOCKET SETUP
         print('Network socket setup')
@@ -456,6 +561,11 @@ class Adder(ttk.Frame):
         self.location='http://127.0.0.1:8410/crewdemo/plots/usrp.png'
         self.init_loop_capture = 1
         self.static = 0
+
+        self.sta1_shift = 0
+        self.sta2_shift = 0
+        self.sta3_shift = 0
+        self.sta4_shift = 0
 
         #default local network selected (wilab2)
         self.sta1_ipaddress = '172.16.0.9'
@@ -475,8 +585,6 @@ class Adder(ttk.Frame):
         self.socket_plot_local_network = self.context2.socket(zmq.SUB)
         self.socket_plot_local_network.connect ("tcp://localhost:%s" % self.socket_plot_port_local_network)
         self.socket_plot_local_network.setsockopt(zmq.SUBSCRIBE, '')
-
-
 
         #open connection to remote network (ttilab)
         self.socket_command_port_remote_network = 8300

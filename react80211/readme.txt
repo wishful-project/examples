@@ -1,73 +1,66 @@
 REACT howto on wilab2
 
-EMULAB experiment link (atlas)
-https://www.wilab2.ilabt.iminds.be/showexp.php3?pid=cognitiveradio&eid=atlas
+#EMULAB experiment link (atlas)
+ https://www.wilab2.ilabt.iminds.be/showexp.php3?pid=cognitiveradio&eid=atlas
 
-CONTROLLER
-nodezotach4,ath9k,10.11.16.39,5180,1,192.168.0.1,00:0e:8e:30:9e:ce,A
+#experiment nodes
+ CONTROLLER
+ nodezotach4,ath9k,10.11.16.39,5180,1,192.168.0.1,00:0e:8e:30:9e:ce,A
 
-NODES
-nodezotacb4,ath9k,10.11.16.33,5180,1,192.168.0.2,mac_address,B
-nodezotacd3,ath9k,10.11.16.24,5180,3,192.168.0.3,mac_address,C
-nodezotack4,ath9k,10.11.16.42,5180,1,192.168.0.6,mac_address,F
-nodezotach1,ath9k,10.11.16.7,5180,1,192.168.0.1,00:0e:8e:30:9e:ce,A
-nodezotach2,ath9k,10.11.16.17,5180,3,192.168.0.2,00:0e:8e:30:9e:dc,B
-nodezotach3,ath9k,10.11.16.28,5180,3,192.168.0.3,00:0e:8e:30:9d:ee,C
-nodezotacb3,ath9k,10.11.16.22,5180,3,192.168.0.4,00:0e:8e:30:9d:2d,D
-nodezotack3,ath9k,10.11.16.31,5180,3,192.168.0.5,00:0e:8e:30:9e:d8,E
-nodezotacc6,ath9k,10.11.16.53,5180,5,192.168.0.1,00:0e:8e:30:9c:af,A
-nodezotack6,ath9k,10.11.16.60,5180,8,192.168.0.3,00:0e:8e:30:9c:eb,C
+ NODES
+ nodezotacb4,ath9k,10.11.16.33,5180,1,192.168.0.2,mac_address,B
+ nodezotacd3,ath9k,10.11.16.24,5180,3,192.168.0.3,mac_address,C
+ nodezotack4,ath9k,10.11.16.42,5180,1,192.168.0.6,mac_address,F
+ nodezotach1,ath9k,10.11.16.7,5180,1,192.168.0.1,00:0e:8e:30:9e:ce,A
+ nodezotach2,ath9k,10.11.16.17,5180,3,192.168.0.2,00:0e:8e:30:9e:dc,B
+ nodezotach3,ath9k,10.11.16.28,5180,3,192.168.0.3,00:0e:8e:30:9d:ee,C
+ nodezotacb3,ath9k,10.11.16.22,5180,3,192.168.0.4,00:0e:8e:30:9d:2d,D
+ nodezotack3,ath9k,10.11.16.31,5180,3,192.168.0.5,00:0e:8e:30:9e:d8,E
+ nodezotacc6,ath9k,10.11.16.53,5180,5,192.168.0.1,00:0e:8e:30:9c:af,A
+ nodezotack6,ath9k,10.11.16.60,5180,8,192.168.0.3,00:0e:8e:30:9c:eb,C
 
-EXPERIMET NODES
-nodezotacd6,ath9k,10.11.16.54,5180,3,192.168.0.1,00:0e:8e:30:9c:ba,A
-nodezotacg6,ath9k,10.11.16.56,5180,3,192.168.0.2,00:0e:8e:30:9d:3c,B
-nodezotacj6,ath9k,10.11.16.59,5180,3,192.168.0.3,00:0e:8e:30:9c:ea,C
-nodezotacb1,ath9k,10.11.16.1,5180,3,192.168.0.4,00:0e:8e:30:9c:b3,D
-nodezotack1,ath9k,10.11.16.10,5180,3,192.168.0.5,00:0e:8e:30:9e:ea,E
-nodezotaci3,ath9k,10.11.16.29,5180,3,192.168.0.6,00:0e:8e:30:91:7b,F
+ EXPERIMET NODES
+ nodezotacd6,ath9k,10.11.16.54,5180,3,192.168.0.1,00:0e:8e:30:9c:ba,A
+ nodezotacg6,ath9k,10.11.16.56,5180,3,192.168.0.2,00:0e:8e:30:9d:3c,B
+ nodezotacj6,ath9k,10.11.16.59,5180,3,192.168.0.3,00:0e:8e:30:9c:ea,C
+ nodezotacb1,ath9k,10.11.16.1,5180,3,192.168.0.4,00:0e:8e:30:9c:b3,D
+ nodezotack1,ath9k,10.11.16.10,5180,3,192.168.0.5,00:0e:8e:30:9e:ea,E
+ nodezotaci3,ath9k,10.11.16.29,5180,3,192.168.0.6,00:0e:8e:30:91:7b,F
 
 #move files on wilab
-rsync -avz --delete  --exclude=.git --exclude '*.o' --exclude '*.h' --exclude '*.c' --exclude '*.pyc' --exclude .repo/ ./wishful-github-manifest-3/  -e ssh dgarlisi@ops.wilab2.ilabt.iminds.be:~/wishful-github-manifest-3/
+ rsync -avz --delete  --exclude=.git --exclude '*.o' --exclude '*.h' --exclude '*.c' --exclude '*.pyc' --exclude .repo/ ./wishful-github-manifest-3/  -e ssh dgarlisi@ops.wilab2.ilabt.iminds.be:~/wishful-github-manifest-3/
 
 #connect to nodes
-ssh dgarlisi@ops.wilab2.ilabt.iminds.be
-ssh dgarlisi@zotach1
-...
-ssh dgarlisi@zotach4
-
-#sync clock nodes
-sh sync_date.sh dgarlisi 10.11.16.17,10.11.16.7,10.11.16.2
-sh sync_date.sh dgarlisi zotacc6,zotacg6,zotack6
-
-NB: on wilab, we do not need deploy
- sh deploy_upis.sh dgarlisi zotacc6,zotacg6,zotack6
+ ssh dgarlisi@ops.wilab2.ilabt.iminds.be
+  ssh dgarlisi@zotacd6
+  ...
+  ssh dgarlisi@zotach4
 
 #move on experiment directory
-cd wishful-github-manifest-3/examples/react80211/
+ cd wishful-github-manifest-3/examples/react80211/
+
+#sync clock nodes
+ sh sync_date.sh dgarlisi zotacd6,zotacg6,zotacj6,zotacb1,zotack1,zotaci3
+
+ NB: on wilab, we do not need deploy
+  sh deploy_upis.sh dgarlisi zotacc6,zotacg6,zotack6
 
 #setup nodes
-cd zotac-conf/scapy/ && sudo sh install_scapy.sh && cd ../../
-cd zotac-conf/athmodules/ && sudo sh install_module.sh && cd ../../
+ cd zotac-conf/scapy/ && sudo sh install_scapy.sh && cd ../../
+ cd zotac-conf/athmodules/ && sudo sh install_module.sh && cd ../../
 
 #start agent
-sudo python3 react_agent --config agent_cfg_wilab.yaml
+ sudo python3 react_agent --config agent_cfg_wilab_ptestbed.yaml
 
 #controller (39 --> CONTROLLER)
-sudo python3 react_controller --config controller_cfg_wilab2.yaml --nodes node_info_wilab2_full.txt
-sudo python3 react_controller --config controller_cfg_wilab2_zotach4.yaml --nodes node_info_wilab2_3chain.txt
+ sudo python3 react_controller --config controller_cfg_wilab2_zotach4.yaml --nodes node_info_wilab2_4hop.txt
 
 #visualizer connect (39 --> CONTROLLER)
-ssh -L 8401:10.11.16.39:8401 dgarlisi@ops.wilab2.ilabt.iminds.be -v
-ssh -L 8400:10.11.16.39:8400 dgarlisi@ops.wilab2.ilabt.iminds.be -v
-
-ssh -L 8400:127.0.0.1:8400 dgarlisi@nuc1 -v
-ssh -L 8401:127.0.0.1:8401 dgarlisi@nuc1 -v
-sudo openvpn --config ~/Desktop/portable-testbed/portableTestbed.ovpn
+ ssh -L 8501:10.11.16.39:8501 dgarlisi@ops.wilab2.ilabt.iminds.be -v
+ ssh -L 8500:10.11.16.39:8500 dgarlisi@ops.wilab2.ilabt.iminds.be -v
 
 #visualizer
-python react_visualizer.py
-
-
+ python react_visualizer.py
 
 
 REACT howto on portable testbed
@@ -167,8 +160,8 @@ REACT howto on portable testbed
 
 #ON LOCAL STATION
  #visualizer connect (6 --> CONTROLLER)
- ssh -L 8400:127.0.0.1:8400 nuc6 -v
- ssh -L 8401:127.0.0.1:8401 nuc6 -v
+ ssh -L 8600:127.0.0.1:8600 nuc6 -v
+ ssh -L 8601:127.0.0.1:8601 nuc6 -v
 
  #visualizer
  python react_visualizer.py

@@ -48,9 +48,9 @@ sys.path.append("../../../agent_modules/net_linux")
 
 import wishful_controller
 
-from examples.wmp.wmp_metamac.wmp_helper.controller_utils import *
-from examples.wmp.wmp_metamac.wmp_helper.TestbedTopology import TestbedTopology
-from examples.wmp.wmp_metamac.wmp_helper.MeasurementManager import MeasurementCollector
+from examples.Get_Started_Examples.Advanced_WMP_Example.wmp_helper.controller_utils import *
+from examples.Get_Started_Examples.Advanced_WMP_Example.wmp_helper.TestbedTopology import TestbedTopology
+from examples.Get_Started_Examples.Advanced_WMP_Example.wmp_helper.MeasurementManager import MeasurementCollector
 #from local_control_program import *
 from metamac_local_control_program import *
 

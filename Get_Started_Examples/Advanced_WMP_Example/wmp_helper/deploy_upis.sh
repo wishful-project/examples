@@ -20,7 +20,8 @@ if [ 1 -eq 1 ]; then
         rsync -avz  ../../../../agent_modules/wifi_wmp/  -e ssh root@$sta:~/wishful-github-manifest/agent_modules/wifi_wmp/
         rsync -avz  ../../../../agent_modules/wifi/  -e ssh root@$sta:~/wishful-github-manifest/agent_modules/wifi/
         rsync -avz  ../../../../agent_modules/net_linux/  -e ssh root@$sta:~/wishful-github-manifest/agent_modules/net_linux/
-        rsync -avz  ../../../../examples/wmp/  -e ssh root@$sta:~/wishful-github-manifest/examples/wmp/
+        ssh root@$sta 'mkdir ~/wishful-github-manifest/examples/Get_Started_Examples'
+        rsync -avz  ../../../../examples/Get_Started_Examples/Advanced_WMP_Example/  -e ssh root@$sta:~/wishful-github-manifest/examples/Get_Started_Examples/Advanced_WMP_Example/
     done
 
 fi

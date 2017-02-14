@@ -106,10 +106,12 @@ class Adder(ttk.Frame):
 
     def stopReact(self):
         command = 'stop_react'
-        if self.local_network :
-            json_command = {'type': 'algorithm', 'command': command}
-            print(json_command)
-            self.socket_command.send_json(json_command)
+        json_command = {'type': 'algorithm', 'command': command}
+        print(json_command)
+        if self.local_network:
+            self.socket_command_local_network.send_json(json_command)
+        else:
+            self.socket_command_remote_network.send_json(json_command)
 
         self.stopReactBtn.state(['pressed', 'disabled'])
         self.style.configure(SUNKABLE_BUTTON1, relief=SUNKEN, foreground='red')
@@ -119,10 +121,12 @@ class Adder(ttk.Frame):
 
     def startReact(self):
         command = 'start_react'
-        if self.local_network :
-            json_command = {'type': 'algorithm', 'command': command}
-            print(json_command)
-            self.socket_command.send_json(json_command)
+        json_command = {'type': 'algorithm', 'command': command}
+        print(json_command)
+        if self.local_network:
+            self.socket_command_local_network.send_json(json_command)
+        else:
+            self.socket_command_remote_network.send_json(json_command)
 
         self.startReactBtn.state(['pressed', 'disabled'])
         self.style.configure(SUNKABLE_BUTTON2, relief=SUNKEN, foreground='red')
@@ -169,12 +173,14 @@ class Adder(ttk.Frame):
     def traffic_command_handles(self,x):
         while True:
             if time.time() - self.last_traffic_update_time > 1.3 and self.traffic_update_command != self.last_traffic_update_command:
-                if self.local_network :
-                    print('command sent %s' % str(self.command_list))
-                    self.socket_command.send_json(self.command_list)
-                    self.last_traffic_update_time = time.time()
-                    self.last_traffic_update_command = self.traffic_update_command
-                    self.LabelTraffic.config(text="Select nodes traffic : (UPI executed!)")
+                print('command sent %s' % str(self.command_list))
+                if self.local_network:
+                    self.socket_command_local_network.send_json(self.command_list)
+                else:
+                    self.socket_command_remote_network.send_json(self.command_list)
+                self.last_traffic_update_time = time.time()
+                self.last_traffic_update_command = self.traffic_update_command
+                self.LabelTraffic.config(text="Select nodes traffic : (UPI executed!)")
 
             time.sleep(1)
             self.LabelTraffic.config(text="Select nodes traffic : ")
@@ -421,9 +427,26 @@ class Adder(ttk.Frame):
     #reveive data plot from controller
     #*****************
     def receive_data_plot(self,x):
+
+         # use poll for timeouts:
+        poller = zmq.Poller()
+        poller.register(self.socket_plot_local_network, zmq.POLLIN)
+        poller.register(self.socket_plot_remote_network, zmq.POLLIN)
+
         while True:    # Run until cancelled
-            parsed_json = self.socket_plot.recv_json()
-            print('parsed_json : %s' % str(parsed_json))
+            socks = dict(poller.poll(1000))
+            if self.socket_plot_local_network in socks:
+                parsed_json = self.socket_plot_local_network.recv_json()
+                if not self.local_network:
+                    continue
+            elif self.socket_plot_remote_network in socks:
+                parsed_json = self.socket_plot_remote_network.recv_json()
+                if self.local_network:
+                    continue
+            else:
+                continue
+
+            #print('parsed_json : %s' % str(parsed_json))
             #parsed_json : {u'label': u'C', u'measure': [[1484644417.3528204, 0.0, 0.0, 1.0, 0.0, 1023, 0, 0]], u'mac_address': u'00:0e:8e:30:9d:ee'}
             label = parsed_json['label']
             if label :
@@ -523,11 +546,19 @@ class Adder(ttk.Frame):
             else:
                 print('Error in plot receive, no label present')
 
+    def select_ptestbed(self):
+        self.local_network = 0
+        print('switch to portable testbed')
+
+
+    def select_wilab2(self):
+        self.local_network = 1
+        print('switch to wilab')
+
 
     def init_gui(self):
 
         #VISUALIZER CONFIGURATION
-        self.local_network = 1
         self.Nplot=100
 
         self.my_dpi = 100
@@ -569,24 +600,37 @@ class Adder(ttk.Frame):
         #NETWORK SOCKET SETUP
         print('Network socket setup')
         self.command_list = {}
-        if self.local_network :
-            self.socket_command_port = 8400
-            self.sta1_server_port = self.socket_command_port
-            self.sta2_server_port = self.socket_command_port
-            self.sta3_server_port = self.socket_command_port
-            self.sta4_server_port = self.socket_command_port
-            self.context1 = zmq.Context()
-            print("Connecting to server on port 8400 ... ready to send command to demo experiment node")
-            self.socket_command = self.context1.socket(zmq.PAIR)
-            self.socket_command.connect ("tcp://localhost:%s" % self.socket_command_port)
+        self.local_network = 1
 
-            self.socket_plot_port  = 8401
-            self.context2 = zmq.Context()
-            print("Connecting to server on port 8401 ... ready to receive protocol information from demo experiment node")
-            self.socket_plot = self.context2.socket(zmq.SUB)
-            self.socket_plot.connect ("tcp://localhost:%s" % self.socket_plot_port)
-            self.socket_plot.setsockopt(zmq.SUBSCRIBE, '')
-            start_new_thread(self.receive_data_plot,(99,))
+        #connect to the wilabtestbed
+        self.socket_command_local_network_port = 8500
+        self.context1_local_network = zmq.Context()
+        print("Connecting to server on port 8500 ... ready to send command to demo experiment node")
+        self.socket_command_local_network = self.context1_local_network.socket(zmq.PAIR)
+        self.socket_command_local_network.connect ("tcp://localhost:%s" % self.socket_command_local_network_port)
+
+        self.socket_plot_local_network_port  = 8501
+        self.context2__local_network = zmq.Context()
+        print("Connecting to server on port 8501 ... ready to receive protocol information from demo experiment node")
+        self.socket_plot_local_network = self.context2__local_network.socket(zmq.SUB)
+        self.socket_plot_local_network.connect ("tcp://localhost:%s" % self.socket_plot_local_network_port)
+        self.socket_plot_local_network.setsockopt(zmq.SUBSCRIBE, '')
+
+        #connect to the portable testbed
+        self.socket_command_remote_network_port = 8600
+        self.context1_remote_network = zmq.Context()
+        print("Connecting to server on port 8600 ... ready to send command to demo experiment node")
+        self.socket_command_remote_network = self.context1_remote_network.socket(zmq.PAIR)
+        self.socket_command_remote_network.connect ("tcp://localhost:%s" % self.socket_command_remote_network_port)
+
+        self.socket_plot_remote_network_port  = 8601
+        self.context2_remote_network = zmq.Context()
+        print("Connecting to server on port 8601 ... ready to receive protocol information from demo experiment node")
+        self.socket_plot_remote_network = self.context2_remote_network.socket(zmq.SUB)
+        self.socket_plot_remote_network.connect ("tcp://localhost:%s" % self.socket_plot_remote_network_port)
+        self.socket_plot_remote_network.setsockopt(zmq.SUBSCRIBE, '')
+
+        start_new_thread(self.receive_data_plot,(99,))
 
 
         """GUI SETUP"""
@@ -605,6 +649,10 @@ class Adder(ttk.Frame):
         self.menubar = Menu(self.root)
         #menu file
         self.menu_file = Menu(self.menubar)
+
+        self.menu_file.add_command(label='PTESTBED', command=self.select_ptestbed)
+        self.menu_file.add_command(label='WILAB2', command=self.select_wilab2)
+
         self.menu_file.add_command(label='Exit', command=self.on_quit)
         #menu edit topology
         self.menu_edit_topology = Menu(self.menubar)
@@ -626,7 +674,7 @@ class Adder(ttk.Frame):
         #basewidth = 350
         #img=Image.open('topology-3chain.png')
         #image_name = 'wilab2-map.png'
-        image_name = 'wilab2-topology-1.png'
+        image_name = 'wilab2-topology-2bis.png'
         img=Image.open(image_name)
         wpercent=100
         basewidth = 490

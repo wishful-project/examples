@@ -24,19 +24,20 @@ Wishful REACT demo showcase
 
  #connect to nodes
   ssh dgarlisi@ops.wilab2.ilabt.iminds.be
-  ssh dgarlisi@zotach1
+  ssh dgarlisi@zotacd6
   ...
   ssh dgarlisi@zotach4
 
+ #move on experiment directory
+  cd wishful-github-manifest-3/examples/react80211/
+
  #sync clock nodes
   sh sync_date.sh dgarlisi 10.11.16.17,10.11.16.7,10.11.16.2
-  sh sync_date.sh dgarlisi zotacc6,zotacg6,zotack6
+  sh sync_date.sh dgarlisi zotacc6,zotacg6,zotack6,zotacb1,zotack1,zotaci3
 
-NB: on wilab, we do not need deploy
- sh deploy_upis.sh dgarlisi zotacc6,zotacg6,zotack6
+ NB: on wilab, we do not need deploy
+  sh deploy_upis.sh dgarlisi zotacc6,zotacg6,zotack6
 
-#move on experiment directory
-cd wishful-github-manifest-3/examples/react80211/
 
 #setup nodes
 cd zotac-conf/scapy/ && sudo sh install_scapy.sh && cd ../../

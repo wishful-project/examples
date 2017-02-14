@@ -1,7 +1,7 @@
 METAMAC howto
 
 ### WORKING ON EMULAB
-reserve all the ALIX nodes and two SERVER (SERVER3 + SERVER15 + USRP5)
+reserve all the ALIX nodes and two SERVER (SERVER3 + SERVER13 + USRP4)
 swap in the experiment alix-wishful (https://www.wilab2.ilabt.iminds.be/showexp.php3?pid=cognitiveradio&eid=alix-wishful)
 
 #connect to controller PC [from ops.wilab2.ilabt.iminds.be (ssh  dgarlisi@ops.wilab2.ilabt.iminds.be)]
@@ -31,6 +31,7 @@ SHELL B  - ALIXNODE :
     python3 metamac_agent --config agent_config_ap.yaml
 
 #start controller on server
+    #replace nodes configuraiton if needed
     172.16.0.8,alixnode8,AP,wmp,0
     172.16.0.9,alixnode9,STA,wmp,0
     172.16.0.10,alixnode10,STA,wmp,0
@@ -66,12 +67,12 @@ SHELL B  - ALIXNODE :
 
 
 ### WORKING ON PALERMO TESTBED
+#move files on ttilab server
+    rsync -avz --delete  --exclude=.git --exclude '*.o' --exclude '*.h' --exclude '*.c' --exclude '*.pyc' --exclude .repo/ ./wishful-github-manifest-3/  -e ssh lab.tti.unipa.it:~/wishful-github-manifest-3/
+
 #connect to controller PC
     ssh lab.tti.unipa.it
-
-#move files on ttilab
-    rsync -avz --delete  ./wishful-github-manifest-3  -e ssh domenico@lab.tti.unipa.it:/home/domenico/work/
-    cd work/wishful-github-manifest-3/examples/wmp/wmp_metamac/
+    cd wishful-github-manifest-3/examples/Get_Started_Examples/Advanced_WMP_Example/
 
         cd wmp_helper/
     #deploy framework on alixnodes
@@ -84,7 +85,14 @@ SHELL B  - ALIXNODE :
 python3 metamac_agent --config agent_config.yaml
 python3 metamac_agent --config agent_config_ap.yaml
 
-#start controller
+#start controller on server
+    #replace nodes configuraiton if needed
+    10.8.8.102,alix02,AP,wmp,0
+    10.8.8.104,alix04,STA,wmp,0
+    10.8.8.111,alix11,STA,wmp,0
+    10.8.8.110,alix10,STA,wmp,0
+    10.8.8.103,alix03,STA,wmp,0
+
 python3 metamac_testbed_controller --config controller_config_nova.yaml
     #test network
     ping 192.168.3.102
