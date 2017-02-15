@@ -21,22 +21,17 @@ FAILURE = 2
 
 def get_platform_information(node, log, controller):
     """ Gives the node platform information and instantiates a object of radio_info_t class related to the node passed by argument parameter
-        Uses UPI_RN.getRadioPlatforms to check if WMP platform is available for node
-        Uses UPI_RN.getRadioInfo to
-             Extracts the ip address of the sender node and uses it to find appropriate object in WiFiNode list.
-                 Stores the bunch of measurements in last_bunch_measurement WiFinode attribute.
+        Uses UPI_R:get_radio_platforms to check if WMP platform is available for node
+        Uses UPI_R:get_radio_info to get the node capabilities
 
     :param node: node from get platform supported and capabilities
     :param log: experiment logging module attribute
-    :param global_mgr: experiment global manager attribute
+    :param controller: experiment controller
     :return current_platform_info: return an object of class radio_info_t with all the node capabilities, false if the WMP
                               platform is not supported by node or an error occurred.
     """
 
     log.debug('***************** %s ***************' % get_platform_information.__name__)
-
-    # all UPI_R functions are execute immediately
-    exec_time = None
 
     #object inizialization
     current_radio_list = None
@@ -47,27 +42,26 @@ def get_platform_information(node, log, controller):
 
     log.info("Platform information for %s " % str(node))
     wmp_platform_index = None
+    #get node radio platform
     current_radio_list_string = controller.nodes(node).radio.get_radio_platforms()
 
     log.debug("returned information %s " % str(current_radio_list_string))
     current_radio_list[0].platform_id =  current_radio_list_string[0]
     current_radio_list[0].platform_type =  current_radio_list_string[1]
 
+    #check if WMP platform is present on node
     for ii in range(len(current_radio_list)):
         log.info('INTERFACE : %s : SUPPORTED PLATFORM : %s' % (current_radio_list[ii].platform_id, current_radio_list[ii].platform_type) )
         if current_radio_list[ii].platform_type == "WMP" :
             wmp_platform_index = ii
             break
-
-    # Check if the Node NIC support the WMP platform
     if wmp_platform_index == None :
         log.debug('No WMP platform is supported')
         return False
 
-    # Gets available NIC capabilities on boards that support WMP platform
+    # Gets available device capabilities on boards that support WMP platform
     current_platform_info_str = controller.nodes(node).radio.get_radio_info(current_radio_list[wmp_platform_index].platform_id)
     log.debug('current_platform_str %s' % current_platform_info_str)
-    #current_platform_info_str = current_platform_info_str
 
     current_platform_info.platform_info.platform_id = current_platform_info_str['radio_info'][0]
     current_platform_info.platform_info.platform_type = current_platform_info_str['radio_info'][1]
@@ -106,13 +100,12 @@ def get_platform_information(node, log, controller):
 
 def active_CSMA_radio_program(node, log, controller, current_platform_info):
     """ Active CSMA radio program to the node passed by argument parameter.
-        To enable a radio program on WMP platform we need two different action, inject the radio program and activate it.
 
     :param node: Node or Nodes list in which active CSMA radio program
     :param log: experiment logging module attribute
-    :param global_mgr: experiment global manager attribute
-    :param current_platform_info: the radio capabilities of the NIC in Node
-    :return result: result of activation (True = successful, False = failure)
+    :param controller: experiment controller
+    :param current_platform_info: the radio capabilities of the device in Node
+    :return result: result of activation (SUCCESS, FAILURE)
     """
     log.debug('***************** %s ***************' % active_CSMA_radio_program.__name__)
 
@@ -133,7 +126,7 @@ def active_CSMA_radio_program(node, log, controller, current_platform_info):
 
     # Active CSMA radio program
     UPIargs = {'position' : position, 'radio_program_name' : 'CSMA', 'path' : radio_program_pointer_CSMA, 'interface' : 'wlan0' }
-    rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)#     if rvalue == SUCCESS :
+    rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)
     if rvalue == SUCCESS:
         log.warning('Radio program activation successful')
     else :
@@ -145,29 +138,13 @@ def active_CSMA_radio_program(node, log, controller, current_platform_info):
 
 def active_CSMA_radio_program_slot_1(node, log, controller):
     """ Active CSMA radio program to the node passed by argument parameter.
-        To enable a radio program on WMP platform we need two different action, inject the radio program and activate it.
 
     :param node: Node or Nodes list in which active CSMA radio program
     :param log: experiment logging module attribute
-    :param global_mgr: experiment global manager attribute
-    :param current_platform_info: the radio capabilities of the NIC in Node
-    :return result: result of activation (True = successful, False = failure)
+    :param controller: experiment controller
+    :return result: result of activation (SUCCESS, FAILURE)
     """
     log.debug('***************** %s ***************' % active_CSMA_radio_program.__name__)
-
-    radio_program_pointer_CSMA = ""
-    position = ""
-    # # Find CSMA radio program pointer in current_platform_info capability list
-    # for ii in range(len(current_platform_info.radio_program_list)):
-    #     if current_platform_info.radio_program_list[ii].radio_prg_name == "CSMA" :
-    #         radio_program_pointer_CSMA = current_platform_info.radio_program_list[ii].radio_prg_pointer
-    #         #force the radio memory slot position in which store the radio program description
-    #         #the WMP platform on broadcom vard has only two memory slot
-    #         position = '2'
-    #
-    # if radio_program_pointer_CSMA == "" :
-    #     log.debug("CSMA radio program not found in node capabilities list")
-    #     return False
     position = '1'
     # Active CSMA radio program
     UPIargs = {'position' : position, 'interface' : 'wlan0' }
@@ -181,17 +158,15 @@ def active_CSMA_radio_program_slot_1(node, log, controller):
 
 def active_TDMA_radio_program_slot_2(node, log, controller):
     """ Active TDMA radio program to the node passed by argument parameter.
-        To enable a radio program on WMP platform we need two different action, inject the radio program and activate it.
 
     :param node: Node or Nodes list in which active CSMA radio program
     :param log: experiment logging module attribute
-    :param global_mgr: experiment global manager attribute
-    :param current_platform_info: the radio capabilities of the NIC in Node
-    :return result: result of activation (True = successful, False = failure)
+    :param controller: experiment controller
+    :return result: result of activation (SUCCESS, FAILURE)
     """
     log.debug('***************** %s ***************' % active_TDMA_radio_program.__name__)
     position = '2'
-    # # Active CSMA radio program
+    # Active CSMA radio program
     UPIargs = {'position' : position, 'interface' : 'wlan0' }
     rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)
     if rvalue == SUCCESS :
@@ -203,16 +178,14 @@ def active_TDMA_radio_program_slot_2(node, log, controller):
     return True
 
 
-
 def active_TDMA_radio_program(node, log, controller, current_platform_info):
     """ Active TDMA radio program to the node passed by argument parameter.
-        To enable a radio program on WMP platform we need two different action, inject the radio program and activate it.
 
     :param node: Node or Nodes list in which active TDMA radio program
     :param log: experiment logging module attribute
-    :param global_mgr: experiment global manager attribute
-    :param current_platform_info: the radio capabilities of the NIC in Node
-    :return result: Result of activation (True = successful, False = failure)
+    :param controller: experiment controller
+    :param current_platform_info: the radio capabilities of the device in Node
+    :return result: Result of activation (SUCCESS, FAILURE)
     """
     log.debug('***************** %s ***************' % active_TDMA_radio_program.__name__)
 
@@ -250,9 +223,9 @@ def set_TDMA_parameters(node, log, controller, tdma_params):
 
     :param node: Node or Nodes list in which set the parameters
     :param log: experiment logging module attribute
-    :param global_mgr: experiment global manager attribute
+    :param controller: experiment controller
     :param tdma_params: a dictionary data type (list of key: value) in which the key are TDMA_SUPER_FRAME_SIZE TDMA_NUMBER_OF_SYNC_SLOT TDMA_ALLOCATED_SLOT
-    :return result: Result of setting (True = successful, False = failure)
+    :return result: Result of setting (SUCCESS, FAILURE)
     """
 
     # Set the TDMA parameter
@@ -276,20 +249,17 @@ def set_TDMA_parameters(node, log, controller, tdma_params):
 
 def active_ALOHA_radio_program(node, log, controller, current_platform_info):
     """ Active ALOHA radio program to the node passed by argument parameter.
-        To enable a radio program on WMP platform we need two different action, inject the radio program and activate it.
 
     :param node: Node or Nodes list in which active CSMA radio program
     :param log: experiment logging module attribute
-    :param global_mgr: experiment global manager attribute
-    :param current_platform_info: the radio capabilities of the NIC in Node
-    :return result: result of activation (True = successful, False = failure)
+    :param controller: experiment controller
+    :param current_platform_info: the radio capabilities of the device in Node
+    :return result: result of activation (SUCCESS, FAILURE)
     """
     log.debug('***************** %s ***************' % active_CSMA_radio_program.__name__)
-
     radio_program_pointer_ALOHA = ""
     position = ""
-
-    # Find CSMA radio program pointer in current_platform_info capability list
+    # Find ALOHA radio program pointer in current_platform_info capability list
     for ii in range(len(current_platform_info.radio_program_list)):
         if current_platform_info.radio_program_list[ii].radio_prg_name == "ALOHA" :
             radio_program_pointer_ALOHA = current_platform_info.radio_program_list[ii].radio_prg_pointer
@@ -301,7 +271,7 @@ def active_ALOHA_radio_program(node, log, controller, current_platform_info):
         log.debug("ALOHA radio program not found in node capabilities list")
         return False
 
-    # Active CSMA radio program
+    # Active ALOHA radio program
     UPIargs = {'position' : position, 'radio_program_name' : 'ALOHA', 'path' : radio_program_pointer_ALOHA, 'interface' : 'wlan0' }
     rvalue = controller.nodes(node).radio.activate_radio_program(UPIargs)
     if rvalue == SUCCESS:

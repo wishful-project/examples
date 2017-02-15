@@ -7,7 +7,7 @@ __copyright__ = "Copyright (c) 2016, CNIT"
 __version__ = "0.1.0"
 __email__ = "domenico.garlisi@cnit.it"
 
-# Definition of Local Control Program
+# Definition of Meta-MAC Local Control Program
 def metamac_local_control_program(controller):
 
 	#import
@@ -23,7 +23,6 @@ def metamac_local_control_program(controller):
 	import zmq
 	import netifaces as ni
 	import logging
-	#import math
 	#references to Wishful framework
 	global upiHCImpl # interface used for communication with global controller and control runtime
 
@@ -36,7 +35,6 @@ def metamac_local_control_program(controller):
 	sys.path.append('../../../framework')
 	sys.path.append('../../../agent')
 	from agent_modules.wifi_wmp.wmp_structure import UPI_R
-	#from agent_modules.wifi_wmp.adaptation_module.libb43 import *
 
 	libc = ctypes.CDLL('libc.so.6')
 	usleep = lambda x: time.sleep(x/1000000.0)
@@ -53,11 +51,13 @@ def metamac_local_control_program(controller):
 	clock_gettime.argtypes = [ctypes.c_int, ctypes.POINTER(timespec)]
 
 	def monotonic_time():
+		"""
+		Get monotonic refence time
+		"""
 		t = timespec()
 		if clock_gettime(CLOCK_MONOTONIC_RAW , ctypes.pointer(t)) != 0:
 			errno_ = ctypes.get_errno()
 			raise OSError(errno_, os.strerror(errno_))
-		#return t.tv_sec + t.tv_nsec * 1e-9\
 		return t
 
 	#Flags
@@ -80,8 +80,9 @@ def metamac_local_control_program(controller):
 	SINC_SLOT_1	=	41
 	SINC_SLOT_0	=	42
 
-
-	#class tdma_param(ctypes.Structure):
+	#define suit protocol structures to contain TDMA and ALOHA in order to store configuration  and emulate transmission
+	# on channel
+	#define structures to save channel slot measurement and decision
 	class emulator_param(ctypes.Structure):
 		_fields_= [
 			('frame_offset', ctypes.c_int),
@@ -106,7 +107,7 @@ def metamac_local_control_program(controller):
 			('id', ctypes.c_int),
 			#Readable name, such as "TDMA (slot 1)"
 			('name', ctypes.c_char_p),
-			#Path to the compiled (.txt) FSM implementation
+			#Path to the radio program
 			('fsm_path', ctypes.c_char_p),
 			#Parameters for the FSM
 			('fsm_params', fsm_param * 2),
@@ -160,13 +161,11 @@ def metamac_local_control_program(controller):
 			#Array of all protocols.
 			('protocols', protocol * 5),
 			#Array of weights corresponding to protocols.
-			('weights', ctypes.c_double * 5),	#double *weights; !!!WARNING for *
+			('weights', ctypes.c_double * 5),	#weights;
 			#Factor used in computing weights.
 			('eta', ctypes.c_double),
 			#Slot information for last to be emulated.
 			('last_slot', metamac_slot),
-			#Time of last protocol update.
-			#('last_update', timespec), # struct  ;!!!WARNING for *
 			#Indicates whether protocols should be cycled.
 			('cycle', ctypes.c_int),
 		]
@@ -175,6 +174,9 @@ def metamac_local_control_program(controller):
 	FAILURE = 2
 
 	def tdma_emulate(param, slot_num, offset):
+		"""
+		This function emulate the tdma protocol
+		"""
 		slot_num += offset
 		tdma_params = param
 		#print('slot_num %d - tdma_params.frame_offset %d - tdma_params.frame_length %d - tdma_params.slot_assignment %d' \
@@ -189,16 +191,17 @@ def metamac_local_control_program(controller):
 
 
 	def aloha_emulate(param, slot_num, offset):
+		"""
+		This function emulate the aloha protocol
+		"""
 		aloha_params = param
 		return aloha_params.persistence
 
 
 	def configure_params(slot, param):
-		# for i in range(2):
-		# 	set_parameter(slot, param[i].num, param[i].value)
-
-		#print('param[1].value %d' % param[1].value)
-
+		"""
+		This function use UPI to configure radio program parameters
+		"""
 		UPIargs = { 'interface' : 'wlan0', UPI_R.TDMA_ALLOCATED_SLOT : param[1].value }
 		rvalue = controller.radio.set_parameters(UPIargs)
 		if rvalue[0] == SUCCESS:
@@ -206,24 +209,21 @@ def metamac_local_control_program(controller):
 		else :
 			log.warning('Error in parameter writing')
 
-		#currently we set only the TDMA_ALLOCATED_SLOT, in case of other parameters we need active the radio program
-		#to initialize the radio program
-
 
 	def load_protocol(suite, protocol):
-
-		#struct options opt;
+		"""
+		This function load a specific radio program according with the Meta-MAC decision
+		"""
 		active = suite.active_slot # Always 0 or 1 since metamac_init will already have run.
 		inactive = 1 - active
 
 		if (protocol == suite.slots[active]) :
 			#This protocol is already running.
-			#print('load protocol : no change')
 			pass
 
 		elif (protocol < (suite.num_protocols - 1) and suite.slots[active] < (suite.num_protocols - 1)) :
 			#The protocol loading is TDMA and the protocol running is TDMA but they use different slot
-			#Protocol in active slot shares same FSM, but is not the same protocol
+			#Protocol in active slot shares same radio program, but is not the same protocol
 			#(already checked). Write the parameters for this protocol.
 			configure_params(active, suite.protocols[protocol].fsm_params)
 			suite.slots[active] = protocol
@@ -275,16 +275,19 @@ def metamac_local_control_program(controller):
 
 
 	def metamac_evaluate(suite):
-		#Identify the best protocol.
+		"""
+		This funciotn identify the best protocol between the protocols in the Meta-MAC suite
+		"""
 		best = 0
 		for i in range(suite.num_protocols):
 			if (suite.weights[i] > suite.weights[best]) :
 				best = i
-
 		load_protocol(suite, best)
 
-	#static void metamac_display(unsigned long loop, struct protocol_suite *suite)
 	def metamac_display(loop, suite):
+		"""
+		This funciton display in real time the weight of all the protocol
+		"""
 		for i in range(0, suite.num_protocols):
 			active_string = ' '
 			if suite.active_protocol == i:
@@ -301,7 +304,9 @@ def metamac_local_control_program(controller):
 
 
 	def queue_multipush(story_channel, story_file, story_channel_len, story_channel_len_diff):
-
+		"""
+		This function collect the measurements on queue, in order to keep their available for different process
+		"""
 		ai = story_channel_len - story_channel_len_diff
 		while ai < story_channel_len :
 
@@ -323,6 +328,9 @@ def metamac_local_control_program(controller):
 
 
 	def acquire_slots_channel(story_channel):
+		"""
+		This function acquire the measurement about the channel slots
+		"""
 		reading_thread = threading.currentThread()
 		slot_time = 2200 #(us)
 
@@ -357,22 +365,9 @@ def metamac_local_control_program(controller):
 			last_tsf = tsf
 			last_slot_index = slot_index
 
+			#call UPI to get channel slots measurements
 			UPI_myargs = {'interface' : 'wlan0', 'measurements' : [UPI_R.TSF, UPI_R.COUNT_SLOT, UPI_R.PACKET_TO_TRANSMIT, UPI_R.MY_TRANSMISSION, UPI_R.SUCCES_TRANSMISSION, UPI_R.OTHER_TRANSMISSION, UPI_R.BAD_RECEPTION , UPI_R.BUSY_SLOT, UPI_R.COUNT_SLOT] }
 			node_measures = controller.radio.get_measurements_periodic(UPI_myargs, collect_period, report_period, num_iterations, None )
-
-			'''
-			last_tsf = tsf
-			tsf = b43.getTSFRegs()
-			last_slot_index = slot_index
-			slot_index = b43.shmRead16(b43.B43_SHM_REGS, COUNT_SLOT) & 0x7
-			packet_queued = b43.shmRead16(b43.B43_SHM_SHARED, PACKET_TO_TRANSMIT) #(uint)
-			transmitted = b43.shmRead16(b43.B43_SHM_SHARED, MY_TRANSMISSION) #(uint)
-			transmit_success = b43.shmRead16(b43.B43_SHM_SHARED, SUCCES_TRANSMISSION) #(uint)
-			transmit_other = b43.shmRead16(b43.B43_SHM_SHARED, OTHER_TRANSMISSION) #(uint)
-			bad_reception = b43.shmRead16(b43.B43_SHM_SHARED, BAD_RECEPTION) #(uint)
-			busy_slot = b43.shmRead16(b43.B43_SHM_SHARED, BUSY_SLOT) #(uint)
-			end_slot_index = b43.shmRead16(b43.B43_SHM_REGS, COUNT_SLOT) & 0x7 #(int)
-			'''
 
 			tsf =node_measures[0]
 			slot_index = node_measures[1]& 0x7
@@ -399,6 +394,7 @@ def metamac_local_control_program(controller):
 			slot_offset = slots_passed #(int)
 			slots = [ metamac_slot() for i in range(8)] #(struct metamac_slot) |!!! warning for memory leak
 			ai = 0
+			#we need extract single slot informaiton from UPI call result, each call report 8 slots information
 			while slot_offset > 0 :
 				slot_offset-=1
 				si = slot_index - slot_offset #(int)
@@ -422,9 +418,9 @@ def metamac_local_control_program(controller):
 				slots[ai].channel_busy = (channel_busy >> si) & 1
 				ai+=1
 
+			#save slot information in list
 			for i in range(ai):
-				#save in dynamic array
-			 	story_channel.append(slots[i])
+				story_channel.append(slots[i])
 
 			#debug
 			# for i in range(ai):
@@ -435,31 +431,25 @@ def metamac_local_control_program(controller):
 			delay = (loop_start + read_interval - loop_end) #(int64_t) #delay = ((int64_t)loop_start) + read_interval - ((int64_t)loop_end) #(int64_t)
 			#print("ai %d - loop_start %d - loop_end %d - diff %d - delay %d - story_channel_len %d" % (ai, loop_start, loop_end, loop_end-loop_start, delay, len(story_channel) ))
 
-			# we cant make dalay minor of ~7ms
+			# we cant make dalay minor of ~7ms, processing limit
 			if (delay > 0):
-				#usleep(delay)
 				libc.usleep(int(delay))
 
 			read_num+=1
 
 
-	#Performs the computation for emulating the suite of protocols
-	#for a single slot, and adjusting the weights.
-	#void update_weights(struct protocol_suite* suite, struct metamac_slot current_slot)
-	def update_weights(suite, current_slot, ai):
-		#Accounting for the fact that the slots that TDMA variants transmit on are
-		# not necessarily aligned to the slot indices provided by the board. For instance,
-		# one would expect that TDMA-4 slot 1 would transmit on slot indexes 1 and 5, but
-		# this is not necessarily true. Offset between transmissions will be 4, but not
-		# necessarily aligned to the slot indexes.
 
+	def update_weights(suite, current_slot, ai):
+		"""
+		This funtion performs the computation for emulating the suite of protocols for a single slot,
+		and adjusting the weights.
+		"""
 		# print("%d - %d : %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d" %
 		# 	( ai, story_channel_len_diff, int(story_channel[ai].slot_num), int(story_channel[ai].read_num), int(story_channel[ai].host_time),
 		# 	story_channel[ai].tsf_time, story_channel[ai].slot_index, story_channel[ai].slots_passed,
 		# 	(story_channel[ai].filler), (story_channel[ai].packet_queued), (story_channel[ai].transmitted),
 		# 	(story_channel[ai].transmit_success), (story_channel[ai].transmit_other),
 		# 	(story_channel[ai].bad_reception), (story_channel[ai].busy_slot), (story_channel[ai].channel_busy) ))
-
 
 		if (suite.protocols[suite.active_protocol].emulator == b'tdma' and current_slot.transmitted):
 			#Update slot_offset
@@ -492,15 +482,6 @@ def metamac_local_control_program(controller):
 				# //	z = 1 - p_current
 
 				p_curr = suite.protocols[suite.active_protocol].parameter.persistence
-				# if (	(current_slot.transmitted and current_slot.transmit_success) or \
-				# 				(not current_slot.transmitted and (current_slot.transmit_other | current_slot.bad_reception)) ) :
-				# 	z = p_curr
-				# 	uu=1
-				# else:
-				# 	if ( (current_slot.transmitted and not current_slot.transmit_success) or \
-				# 					(not current_slot.transmitted and not( current_slot.transmit_other or current_slot.bad_reception)) ):
-				# 		z = 1.0 - p_curr;
-				# 		uu=0;
 				if (not current_slot.channel_busy):
 					z = p_curr
 				else :
@@ -509,17 +490,12 @@ def metamac_local_control_program(controller):
 			#evaluate protocols weights
 			for p in range(suite.num_protocols) :
 				# d is the decision of this component protocol - between 0 and 1
-				# d = suite.protocols[p].emulator(suite->protocols[p].parameter,
-				# 	current_slot.slot_num, suite->slot_offset, suite->last_slot);
-
 				if (suite.protocols[p].emulator == b'tdma') :
 					d = tdma_emulate(suite.protocols[p].parameter, current_slot.slot_num, suite.slot_offset)
 				else :
 					d = aloha_emulate(suite.protocols[p].parameter, current_slot.slot_num, suite.slot_offset)
 
-				# stdout.write("[%d] d=%e, z=%e \n" % (p, d, z,))
-
-				#evaluate weight
+				#weight evaluate
 				exponent = suite.eta * math.fabs(d - z)
 				suite.weights[p] *= math.exp(-exponent)
 
@@ -542,6 +518,9 @@ def metamac_local_control_program(controller):
 	iperf_socket = None
 
 	def rcv_from_iperf_socket(iperf_througputh):
+		"""
+		This function collects the throughput information result
+		"""
 		iperf_thread = threading.currentThread()
 		print('start socket iperf')
 		iperf_port = "8301"
@@ -725,9 +704,6 @@ def metamac_local_control_program(controller):
 					FLAG_READONLY = 1
 				if protocol == 'METAMAC':
 					FLAG_READONLY = 0
-
-		#print("Main thread")
-		#time.sleep(0.1)
 
 		if( (len(story_channel) - story_channel_len) > 60):
 			story_channel_len_old = len(story_channel)-60

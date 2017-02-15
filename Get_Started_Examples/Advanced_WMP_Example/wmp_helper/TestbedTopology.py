@@ -34,20 +34,19 @@ class WiFiNode():
         Store the low level measurements type
     """
     def __init__(self, node):
-        """ Creates a new WiFiNode
+        """ Creates a new WiFiNode object
         """
         self.node = node
-        # eth_ipAddress_part = re.split(r'[:./\s]\s*', str(node))
-        # self.wlan_ipAddress = '192.168.3.' + eth_ipAddress_part[3]
-        self.wlan_ipAddress = '192.168.3.' + str(node.ip[7:10])
+        self.wlan_ipAddress = '192.168.3.' + node.ip.split('.')[3]
         self.measurements = []
         self.measurements_types = []
         self.role = None
         self.platform = None
+        self.interface = None
 
     def add_measure(self, measure):
         """ Adds a measure or a list of measurable in the list of node measurement
-        :param measure: list of measure to add at last_bunch_measurement object attribute
+        :param measure: list of measure to add at measurements object attribute
         """
         self.measurements.append(measure)
 
@@ -60,7 +59,7 @@ class WiFiNode():
 
 class TestbedTopology:
     """
-    This class defines an experiment controller and takes the most appropriate actions in order to :
+    This class defines an experiment topology and takes the most appropriate actions in order to :
         Create the WiFiNode and Nodelist
         Setup the nodes roles (AP/STA)
         Setup the wireless network (Network create and station association)
@@ -76,25 +75,26 @@ class TestbedTopology:
         self.controller = controller
 
         #used to save specific information for WiFi node
-        #self.wifi_ap_wmp_nodes = []
-        self.wifinodes = [] #
-        #self.athnodes = [] #
+        self.wifinodes = []  #list with all experiment WiFiNode object
+        self.iface = "wlan0" #nodes interface
 
         #used to run UPI function on node
-        self.nodes = []     #
-        #self.ap_node
-        self.wmp_nodes = []  #
-        self.ath_nodes = []  #
+        self.nodes = []     #list with all experiment nodes
+        self.ap_node = None
+        self.wmp_nodes = []  #list with wmp nodes
+        self.ath_nodes = []  #list with ath nodes
 
         #used to save the total number of node present in the experiment
         self.experiment_nodes_number = 0
         self.wmp_nodes_number = 0
         self.ath_nodes_number = 0
 
-        self.iface = "wlan0"
 
     def add_discovered_node(self, node):
+        """ append node to nodes list
+        """
         self.nodes.append(node)
+
 
     def getExperimentNodesNumber(self):
         """
@@ -109,15 +109,16 @@ class TestbedTopology:
                 self.experiment_nodes_number += 1
         return self.experiment_nodes_number
 
+
     def initializeTestbedTopology(self):
-        """ Initializes testbed setup one AP and one STA
+        """ Initializes testbed setup one AP and STA nodes, this function finds the nodes rules, and creates the nodes
+            list used to call the UPI function.
         """
         #get available nodes on testbed
         nodes_ip_list = []
         nodes_role_list = []
         nodes_platform_list = []
         with open('testbed_nodes.csv') as csvfile:
-            #reader = csv.DictReader(csvfile)
             reader = csv.DictReader(filter(lambda row: row[0]!='#', csvfile))
             for row in reader:
                 for ii in range(0, len(self.nodes)):
@@ -138,35 +139,27 @@ class TestbedTopology:
                             self.ath_nodes_number += 1
 
                         if row['platform'] == 'ath' or row['platform'] == 'wmp' or row['role'] == 'AP':
-                            #self.wifinodes.append(self.nodes[ii])
                             self.wifinodes.append(WiFiNode(self.nodes[ii]))
 
-        #self.log.debug('ath_nodes_number : %s - wmp_nodes_number : %s' % (str(self.ath_nodes_number), str(self.wmp_nodes_number) ) )
         self.log.debug('ath_nodes_number : %s - wmp_nodes_number : %s' % (str(len(self.ath_nodes)), str(len(self.wmp_nodes)) ) )
         self.log.debug('len wifinodes : %s' % (str(len(self.wifinodes) ) ) )
 
 
-        """ Check if all expected nodes are present in the testbed
-        """
-        # if experiment_nodes_number != testbed_node_number :
-        #         return FAILURE
-
     def initializeTestbedFunctions(self, controller):
-        """ Setups all the node in the experiment, executes the follow operation :
-                installs the execution environment or execution engine
-                restarts module and microcode
-                executes the node role
+        """ Setups all the node in the experiment according with the nodes rule, executes the follow operation :
+                 going up the access point on node AP
+                 associate the STA nodes to the AP
 
         :return  result: True if the operation are successful execute, False otherwise
         """
-
         self.setAP(self.ap_node, self.exp_group_name)
         node_index = 0
         while node_index < self.wmp_nodes_number :
             connected = self.setSTA(self.wmp_nodes[node_index], self.exp_group_name)
             print('Node %s connected %s' % (str( self.wmp_nodes[node_index].ip), str(connected) ))
+            if not connected:
+                return False
             node_index += 1
-
         return True
 
     def setAP(self, node, essid):
@@ -175,7 +168,6 @@ class TestbedTopology:
         :param essid: the SSID
         """
         wlan_ipAddress = '192.168.3.' + node.ip.split('.')[3]
-
         #stop hostpad
         rvalue = self.controller.nodes(node).net.stop_hostapd()
         #set ip address

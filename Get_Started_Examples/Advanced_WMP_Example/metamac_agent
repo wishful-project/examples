@@ -73,18 +73,20 @@ if __name__ == "__main__":
         """)
         raise
 
+    #loading agent option command
     args = docopt(__doc__, version=__version__)
-
     log_level = logging.INFO  # default
     if args['--verbose']:
         log_level = logging.DEBUG
     elif args['--quiet']:
         log_level = logging.ERROR
 
+    #read agent file configuration
     logfile = None
     if args['--logfile']:
         logfile = args['--logfile']
 
+    #load agent file configuration
     logging.basicConfig(filename=logfile, level=log_level,
         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 

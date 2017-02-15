@@ -18,7 +18,6 @@ from datetime import datetime, date, timedelta
 import matplotlib
 import json
 import numpy as np
-#from common.upihelper import unix_time_as_tuple, get_now_full_second, dumpFuncName
 
 # Force matplotlib to not use any Xwindows backend.
 matplotlib.use('Agg')
@@ -38,59 +37,43 @@ class MeasurementCollector:
         self.measurements_types = []
 
 
-    def column(self, matrix, i):
-        return [row[i] for row in matrix]
-
-
     def clear_nodes_measurements(self, nodes):
         """ Clear all the measurement stored in WiFiNode object.
-            The measurements are stored in the last_bunch_measurement attribute of WiFiNode class.
+            The measurements are stored in the measurements attribute of WiFiNode class.
 
         :param nodes: list of WiFiNode.
         """
         for node in nodes:
-            node.last_bunch_measurement = []
+            node.measurements = []
         return
 
 
     def save_measurements(self, nodes, directory):
-        """ Uses matplotlib library to plot all the measurements stored in WiFiNode object.
-            The measurements are stored in the last_bunch_measurement attribute of WiFiNode class.
+        """ This function extract measurement from measurements object attribute for each node and store them in a json
+            file.
 
         :param nodes: list of WiFiNode.
-        :param measurement_types: list of measurements name.
-        :param plot_title: the title to write on graphic plot.
+        :param directory: directory in which store the json file.
         """
 
-        out_measure={};
-
+        out_measure={}
+        #print nodes measurements
         for node in nodes:
             self.log.info("node : %s - measurements : %s" % (str(node), node.measurements))
 
         file_path = directory + '/measure.json'
-        #save experiments log
+        #save experiments measurements
         with open(file_path, 'w') as outfile:
             for node in nodes:
                 out_measure.update({node.wlan_ipAddress : node.measurements})
-
             json.dump(out_measure, outfile)
-
-        return
-
-
-    def plot_measurements(self, nodes, plot_directory):
-
-        #get experiment log
-        with open('measure.json') as data_file:
-            data = json.load(data_file)
-
         return
 
 
     def generate_measurement_report(self, nodes, filename="experiment_report.pdf"):
         """ Uses matplotlib library to plot all the measurements stored in WiFiNode object.
             Uses PdfPages to create a pdf with graphical plot.
-            The measurements are stored in the last_bunch_measurement attribute of WiFiNode class.
+            The measurements are stored in the measurements attribute of WiFiNode class.
 
         :param nodes: list of WiFiNode.
         :param filename: file name of the pdf report.

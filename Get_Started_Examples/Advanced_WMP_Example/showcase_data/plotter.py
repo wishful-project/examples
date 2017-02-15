@@ -25,12 +25,17 @@ from matplotlib.backends.backend_pdf import PdfPages
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
-
 import json
 
+"""
+Starting from the stored experiment measurements this script creates 2 plots with protocol and throughput experiment
+result.
+"""
+#loading data
 with open('measure.json') as data_file:
 	data = json.load(data_file)
 
+#define data field
 measurement_types=['TIME', 'PROTOCOL', 'THR']
 protocols_labels = ['', 'TDMA 0 (slot 0)', 'TDMA 1 (slot 1)', 'TDMA 2 (slot 2)', 'TDMA 3 (slot 3)', 'ALOHA p=0.9']
 protocols_tick = [0, 1, 2, 3, 4]
@@ -60,15 +65,14 @@ for node in list(sort(data.keys())):
 		number_type_measurements = 1
 
 
-
 	for meas_type_id in range(number_type_measurements):
-
+		#extract reference time information
 		if measurement_types[meas_type_id] == "TIME" :
 			min_time=np.min(x[:,0,meas_type_id])
 			for ii in range(dim[0]):
 				xaxis.append(x[ii][0][meas_type_id])
 
-
+		#extract protocol information
 		if measurement_types[meas_type_id] == "PROTOCOL" :
 			protocol_yaxis = []
 
@@ -100,7 +104,7 @@ for node in list(sort(data.keys())):
 				plt.tight_layout()
 				legend = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1), ncol=5, fancybox=True, shadow=True)
 
-
+		#extract throughput information
 		if measurement_types[meas_type_id] == "THR" :
 			num_thr_yaxis = []
 			if nodeIp=="192.168.3.110" or nodeIp=="192.168.3.104" or nodeIp=="192.168.3.105" or nodeIp=="192.168.3.114":
@@ -130,9 +134,9 @@ for node in list(sort(data.keys())):
 
 
 
-
+#generate pdf plot
 fig.set_size_inches(width/my_dpi,height/my_dpi)
 plt.tight_layout()
 #plt.show()
-fig_filename="fig_%s.pdf" % 'showcase4' #measurement_types[meas_type_id]
+fig_filename="fig_%s.pdf" % 'metamac-experiment-result'
 fig.savefig(fig_filename, format='pdf')

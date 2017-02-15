@@ -19,11 +19,14 @@ import base64
 import StringIO
 import io
 import urllib
+import numpy
+import cStringIO
 import zmq
 from urllib2 import urlopen, Request, URLError
 import time
 from thread import start_new_thread
 import tkMessageBox
+import tkSimpleDialog
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -34,17 +37,18 @@ from matplotlib import rcParams
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 
-import numpy
-import cStringIO
-
-
 SUNKABLE_BUTTON1 = 'SunkableButton.TButton'
 SUNKABLE_BUTTON2 = 'SunkableButton.TButton'
 SUNKABLE_BUTTON3 = 'SunkableButton.TButton'
 
-DELAY = 1000
+"""
+This program implement a python gui to control and to plot result of the WiSHFUL metamac demo showcase.
+It requires a connection to the demo global controller, to receive protocol information and to send demo command.
 
-import tkSimpleDialog
+usage:
+    python metamac_visualizer.py
+
+"""
 
 class Dialog(Toplevel):
 
@@ -97,9 +101,7 @@ class Dialog(Toplevel):
         self.high_rate.grid(row=5, column=1)
 
 
-
     def buttonbox(self):
-        # add standard button box. override if you don't want the
         # standard buttons
         box = Frame(self)
         w = Button(box, text="OK", width=10, command=self.ok, default=ACTIVE)
@@ -110,9 +112,8 @@ class Dialog(Toplevel):
         self.bind("<Escape>", self.cancel)
         box.pack()
 
-    #
-    # standard button semantics
 
+    # standard button semantics
     def ok(self, event=None):
         if not self.validate():
             self.initial_focus.focus_set() # put focus back
@@ -127,7 +128,6 @@ class Dialog(Toplevel):
         self.parent.focus_set()
         self.destroy()
 
-    #
     # command hooks
     def validate(self):
         return 1
@@ -148,13 +148,6 @@ class Adder(ttk.Frame):
     def on_quit(self):
         """Exits program."""
         quit()
-
-    def calculate(self):
-        """Calculates the sum of the two inputted numbers."""
-        num1 = int(self.num1_entry.get())
-        num2 = int(self.num2_entry.get())
-        num3 = num1 + num2
-        self.answer_label['text'] = num3
 
     def centreWindow(self):
         w = 1500
@@ -203,7 +196,6 @@ class Adder(ttk.Frame):
         else:
             self.socket_command_remote_network.send_json(json_command)
 
-
     def select_source_rate(self):
         d = Dialog(self.root)
         print('%s' % str(d.result))
@@ -211,7 +203,6 @@ class Adder(ttk.Frame):
         self.sta2_shift = int(d.result[1])
         self.sta3_shift = int(d.result[2])
         self.sta4_shift = int(d.result[3])
-
 
     def select_ttilab(self):
         self.sta1_ipaddress = '10.8.8.103'
@@ -225,7 +216,6 @@ class Adder(ttk.Frame):
         self.static = 0
         print('switch to ttilab')
 
-
     def select_wilab2(self):
         self.sta1_ipaddress = '172.16.0.9'
         self.sta2_ipaddress = '172.16.0.10'
@@ -236,7 +226,6 @@ class Adder(ttk.Frame):
         self.init_loop_capture = 1
         self.static = 0
         print('switch to wilab')
-
 
     def stopTraffic(self):
         command = 'stop'
@@ -295,9 +284,7 @@ class Adder(ttk.Frame):
         self.lowTrafficBtn.state(['!pressed', '!disabled'])
         self.style.configure(SUNKABLE_BUTTON2, relief=RAISED, foreground='red')
 
-
     def loopCapture(self,x):
-
         rcParams.update({'figure.autolayout': True})
         plt.ion()
         f = Figure(frameon=False)
@@ -461,17 +448,6 @@ class Adder(ttk.Frame):
             remote_ipAddress = parsed_json['wlan_ip_address']
             measure = parsed_json['measure'][0]
 
-            # len_station_dump = len(stations_dump)
-            # #print 'len_station_dump %d' % len_station_dump
-            #
-			# # add measurement on nodes element
-			# for i in range(0,len_station_dump):
-             #    #print 'stations_dump[i][0] (%s) == remote_wlan_ipAddress (%s)' % (str(stations_dump[i][0]), str(remote_wlan_ipAddress) )
-			# 	if stations_dump[i][0] == remote_ipAddress :
-             #        stations_dump[i][2] = float(parsed_json['active'])+1	#active protocol
-             #        stations_dump[i][3] = float(parsed_json['0'][0])	#protocol 1 weigth
-             #        stations_dump[i][4] = parsed_json['0'][1]	#protocol 1 name
-
             if self.sta1_ipaddress.split('.')[3] == remote_ipAddress.split('.')[3] :
                 self.sta1val.pop(0)
                 if int(measure[1]) < 5:
@@ -507,7 +483,6 @@ class Adder(ttk.Frame):
                 else:
                     self.sta4val.append( float(measure[1]) + 1 + 0.2 )
                     self.sta4_log_Label.config(text="D => {}".format(self.protocol_list[int(measure[1]) + 1 ]))
-
 
 
     def init_gui(self):
