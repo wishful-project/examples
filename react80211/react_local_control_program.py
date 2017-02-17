@@ -39,7 +39,7 @@ def react(controller):
 	debug = False
 	debug_statistics = True
 	debug_cw_set = False
-	debug_react_value = True
+	debug_react_value = False
 
 	starttime=time.time()
 
@@ -107,7 +107,8 @@ def react(controller):
 	def get_ieee80211_stats(phy):
 		out = subprocess.Popen(["bash","./ieee_stats.sh", phy], stdout=subprocess.PIPE).communicate()[0]
 		ieee80211_stats_diff=json.loads(out.decode("utf-8") )
-		return ieee80211_stats_diff
+		reading_time = time.time()
+		return [ieee80211_stats_diff, reading_time]
 
 	"""
 	Compute txtime theoretical value for given:
@@ -127,7 +128,7 @@ def react(controller):
 		tx_time_theor=0
 		if v80211 == '11b':
 			CWmin=15;
-			tslot=20;
+			tslot=20e-6;
 			SIFS=10;
 			AIFS=3;
 			DIFS=AIFS*tslot+SIFS;
@@ -139,7 +140,7 @@ def react(controller):
 		elif v80211 == '11g':
 			rate=bitrate*bw/20;
 			CWmin=15;
-			tslot=9;
+			tslot=9e-6;
 			SIFS=16;
 			AIFS=3;
 			DIFS=AIFS*tslot+SIFS;
@@ -150,7 +151,7 @@ def react(controller):
 		elif v80211 == '11a':
 			rate=bitrate*bw/20;
 			CWmin=15;
-			tslot=9;
+			tslot=9e-6;
 			SIFS=16;
 			AIFS=3;
 			DIFS=AIFS*tslot+SIFS;
@@ -161,7 +162,7 @@ def react(controller):
 		elif v80211 == '11p':
 			rate=bitrate*bw/20;
 			CWmin=15;
-			tslot=13;
+			tslot=13e-6;
 			SIFS=32;
 			AIFS=2;
 			DIFS=AIFS*tslot+SIFS;
@@ -199,10 +200,12 @@ def react(controller):
 		CWMAX=2047
 		cw_=1023
 
+		tx_goal=0
 		cw=cw_
 		data_count_= 0
 		rts_count_= 0
 		ack_failure_count_ = 0
+		data_count_data_ = 0
 
 		busy_time = 0
 		busy_time_ = 0
@@ -218,136 +221,152 @@ def react(controller):
 		pkt_size=1534
 		phy=getPHY(iface)
 		debug_cycle = 0
-		cw_evaluate_cycle = 0
+		cw_evaluate_cycle = 5
 		number_of_setting_in_interval = 5
 		cw_setting_interval = time_interval[0]/number_of_setting_in_interval
-
-		average_enable = True
+		dd = time_interval[0]
+		reading_time_ = 0
+		tx_goal=0
 
 		while getattr(cw_thread, "do_run", True):
-			#get stats
-
-			#TODO: change/add/reuse UPI candidate: get_measurement
-			# UPI_myargs = {'interface' : 'wlan0', 'measurements' : [UPI_R.dot11RTSSuccessCount,UPI_R.dot11RTSFailureCount] }
-			# pkt_stats=controller.radio.get_measurements(UPI_myargs)
-
-			#{"busy_time" : 1245283, "dot11ACKFailureCount" : 10182, "dot11FailedCount" : 87, "dot11FCSErrorCount" : 17627, "dot11FrameDuplicateCount" : 1398,
-			# "dot11MulticastReceivedFrameCount" : 313176, "dot11MulticastTransmittedFrameCount" : 35308, "dot11MultipleRetryCount" : 9619,
-			# "dot11ReceivedFragmentCount" : 565822, "dot11RetryCount" : 17584, "dot11RTSFailureCount" : 331102, "dot11RTSSuccessCount" : 261543,
-			# "dot11TransmittedFragmentCount" : 297722, "dot11TransmittedFrameCount" : 297722, "rx_expand_skb_head_defrag" : 0,
-			# "rx_handlers_drop" : 98606, "rx_handlers_drop_defrag" : 0, "rx_handlers_drop_nullfunc" : 0, "rx_handlers_drop_short" : 0,
-			# "rx_handlers_fragments" : 0, "rx_handlers_queued" : 461432, "tx_expand_skb_head" : 0, "tx_expand_skb_head_cloned" : 40986, "tx_handlers_drop" : 0,
-			# "tx_handlers_drop_not_assoc" : 0, "tx_handlers_drop_unauth_port" : 0, "tx_handlers_drop_wep" : 0, "tx_handlers_queued" : 0, "tx_status_drop" : 0 }
-			# dot11TransmittedFragmentCount	297722
-			# dot11ACKFailureCount 			 10182
-			# dot11RTSSuccessCount			261543
-			# dot11RTSFailureCount			331102
-
-			if cw_evaluate_cycle > (number_of_setting_in_interval-2):
-				pkt_stats=get_ieee80211_stats(phy)
+			if cw_evaluate_cycle < number_of_setting_in_interval:
+				if enable_react[0]:
+					#print('cw_evaluae_cycle %d' % cw_evaluate_cycle)
+					# ENFORCE CW
+					setCW(iface, qumId, aifs, cw_array[cw_evaluate_cycle], cw_array[cw_evaluate_cycle], burst)
+				cw_evaluate_cycle += 1
+			else:
+				[pkt_stats, reading_time] = get_ieee80211_stats(phy)
 				if pkt_stats:
-					# consider only RTS statistics
-					# data_count = pkt_stats['dot11RTSSuccessCount'] - data_count_
-					# rts_count = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
-					# data_count_=pkt_stats['dot11RTSSuccessCount']
-					# rts_count_=pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount']
+					if enable_react[0]:
 
-					#consider scenario with e without RTS/CTS
-					data_count = pkt_stats['dot11TransmittedFragmentCount'] - data_count_
-					rts_count = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
-					ack_failure_count = pkt_stats['dot11ACKFailureCount'] - ack_failure_count_
-					data_count_=pkt_stats['dot11TransmittedFragmentCount']
-					rts_count_=pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount']
-					ack_failure_count_ = pkt_stats['dot11ACKFailureCount']
+
+						# data_count = pkt_stats['dot11RTSSuccessCount'] - data_count_
+						# rts_count = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
+						data_count = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] - data_count_
+						rts_count = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
+
+						data_count_data = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] - data_count_data_
+						if reading_time_ > 0:
+							dd = float(reading_time - reading_time_)
+						else:
+							dd = 1
+
+						# data_count_=pkt_stats['dot11RTSSuccessCount']
+						# rts_count_ = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount']
+						data_count_= pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount']
+						rts_count_= pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] + pkt_stats['dot11RTSFailureCount']
+
+						data_count_data_ = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount']
+						reading_time_ = reading_time
+
+						gross_rate = float(CLAIM_CAPACITY)*float(neigh_list[my_mac]['claim'])
+						[tslot, tx_time_theor, t_rts, t_ack]= txtime_theor('11a', 6, 20, pkt_size)
+
+						busytx2 =  0.002198*float(data_count) + 0.000081*float(rts_count) #how much time the station spent in tx state during the last observation internval
+						#busytx2 =  0.002071*float(data_count) + 0.000046*float(rts_count) #how much time the station spent in tx state during the last observation internval
+
+						freeze2 = float(dd) - float(busytx2) - cw_/float(2)*float(tslot)*rts_count #how long the backoff has been frozen;
+
+						if rts_count > 0:
+							avg_tx = float(busytx2)/float(rts_count) #average transmission time in a transmittion cycle
+							psucc = float(data_count)/float(rts_count)
+						else:
+							avg_tx=0
+							psucc=0
+
+						if avg_tx > 0:
+							tx_goal = float(dd * gross_rate)/float(avg_tx)
+						else:
+							tx_goal = 0
+
+						freeze_predict = float(freeze2) / float(dd-busytx2) * float(dd - dd * float(gross_rate))
+						if tx_goal > 0:
+							cw = 2/float(0.000009) * (dd - tx_goal * avg_tx -freeze_predict) / float(tx_goal)
+
+						#CWmoving average
+						cw_= 0.6 * cw_ + 0.4 * cw
+
+						if cw_ < CWMIN:
+							cw_=CWMIN
+							cw_array = [cw_] * number_of_setting_in_interval
+						elif cw_ > CWMAX:
+							cw_=CWMAX
+							cw_array = [cw_] * number_of_setting_in_interval
+						else:
+							#cw_= pow(2, round(math.log(cw_)/math.log(2))) - 1
+							cw_floor= pow(2, math.floor(math.log(cw_)/math.log(2))) - 1
+							cw_ceil= pow(2, math.ceil(math.log(cw_)/math.log(2))) - 1
+							if cw_floor == cw_ceil:
+								cw_array = [cw_ceil] * number_of_setting_in_interval
+							elif cw_ == cw_floor or cw_ == cw_ceil:
+								cw_array = [cw_] * number_of_setting_in_interval
+							else:
+								interval = cw_ceil - cw_floor
+								position_in_interval = cw_ - cw_floor
+								position_percent = position_in_interval / interval
+								cw_array = [cw_floor] * (number_of_setting_in_interval - round(position_percent * number_of_setting_in_interval))
+								cw_array = cw_array + [cw_ceil] * round(position_percent * number_of_setting_in_interval)
+
+					else:
+						data_count = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] - data_count_
+						rts_count = 0
+						data_count_data = 0
+						ack_failure_count = pkt_stats['dot11ACKFailureCount'] - ack_failure_count_
+
+						data_count_=pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount']
+						rts_count_= 0
+						data_count_data_ = 0
+						ack_failure_count_ = pkt_stats['dot11ACKFailureCount']
+
+						busytx2 =  0.002198*float(data_count) #how much time the station spent in tx state during the last observation internval
+						if busytx2 > 1:
+							busytx2 = 0.8
+						else:
+							busytx2 = busytx2 * 0.8
+
+						if float(ack_failure_count + data_count) > 0:
+							psucc = float(data_count)/float(ack_failure_count + data_count)
+						else:
+							psucc = 0
+
+						cw_ = CWMAX
+						cw_array = [cw_] * number_of_setting_in_interval
 
 					busy_time = (pkt_stats['busy_time'] - busy_time_)/10
 					busy_time_ = pkt_stats['busy_time']
+					thr = (data_count)*1470*8 / float(dd*1e6)
 
-					tx_goal=0
-					I=0
-					dd = time_interval[0]
-					gross_rate = float(CLAIM_CAPACITY)*float(neigh_list[my_mac]['claim'])
-
-					[tslot, tx_time_theor, t_rts, t_ack]= txtime_theor('11a', 6, 20, pkt_size)
-
-					busytx2 =  0.002198*float(data_count) + 0.000081*float(rts_count) #how much time the station spent in tx state during the last observation internval
-					#busytx2 =  0.002071*float(data_count) + 0.000046*float(rts_count) #how much time the station spent in tx state during the last observation internval
-
-					if rts_count > 0:
-						freeze2 = float(dd) - float(busytx2) - cw_/float(2)*float(tslot)*rts_count #how long the backoff has been frozen;
-						avg_tx = float(busytx2)/float(rts_count) #average transmission time in a transmittion cycle
-						psucc = float(data_count)/float(rts_count)
-					else:
-						freeze2 = float(dd) - float(busytx2)
-						avg_tx=0
-						psucc= float(data_count)/float(data_count + ack_failure_count)
-
-					if avg_tx > 0:
-						tx_goal = float(dd * gross_rate)/float(avg_tx)
-					else:
-						tx_goal = 0
-
-					freeze_predict = float(freeze2) / float(dd-busytx2) * float(dd - dd * float(gross_rate))
-					if tx_goal > 0:
-						cw = 2/float(0.000009) * (dd - tx_goal * avg_tx -freeze_predict) / float(tx_goal)
-
-					if average_enable:
-						#moving average
-						cw_= 0.6 * cw_ + 0.4 * cw
-					else:
-						#not everage
-						cw_ = cw
-
-					if cw_ < CWMIN:
-						cw_=CWMIN
-						cw_array = [cw_] * number_of_setting_in_interval
-					elif cw_ > CWMAX:
-						cw_=CWMAX
-						cw_array = [cw_] * number_of_setting_in_interval
-					else:
-						#cw_= pow(2, round(math.log(cw_)/math.log(2))) - 1
-						cw_floor= pow(2, math.floor(math.log(cw_)/math.log(2))) - 1
-						cw_ceil= pow(2, math.ceil(math.log(cw_)/math.log(2))) - 1
-						if cw_floor == cw_ceil:
-							cw_array = [cw_ceil] * number_of_setting_in_interval
-						elif cw_ == cw_floor or cw_ == cw_ceil:
-							cw_array = [cw_] * number_of_setting_in_interval
-						else:
-							interval = cw_ceil - cw_floor
-							position_in_interval = cw_ - cw_floor
-							position_percent = position_in_interval / interval
-							cw_array = [cw_floor] * (number_of_setting_in_interval - round(position_percent * number_of_setting_in_interval))
-							cw_array = cw_array + [cw_ceil] * round(position_percent * number_of_setting_in_interval)
-
-
-					thr=(data_count)*1470*8 / float(dd*1e6)
 					if debug or debug_statistics:
-						if debug_cycle > 3:
+						#if debug_cycle > 3:
+						if True:
 							#print("t=%.4f,dd=%.4f data_count=%.4f rts_count=%.4f busytx2=%.4f(%.4f) gross_rate=%.4f,avg_tx=%.4f freeze2=%.4f freeze_predict=%.4f tx_goal=%.4f I=%.4f cw=%.4f cw_=%.4f psucc=%.4f thr=%.4f" % (time.time(), dd, data_count, rts_count, busytx2, busytx2/float(dd), gross_rate, avg_tx, freeze2, freeze_predict, tx_goal, I, cw, cw_, psucc, thr))
-							print("data_count=%.4f rts_count=%.4f cw=%.4f cw_=%.4f psucc=%.4f thr=%.4f -- cw_array : %s" % (data_count, rts_count, cw, cw_, psucc, thr, str(cw_array) ))
+							print("%.6f - busytime=%d - data_count_data=%.4f data_count(%d)=%.4f ack_failure_count=%.4f rts_count(%d)=%.4f cw=%.4f cw_=%.4f psucc=%.4f thr=%.4f -- cw_array : %s" % (reading_time, busy_time, data_count_data, pkt_stats['dot11RTSSuccessCount'], data_count, ack_failure_count, pkt_stats['dot11RTSFailureCount'], rts_count, cw, cw_, psucc, thr, str(cw_array) ))
 							debug_cycle = 0
 						else:
 							debug_cycle +=1
 
-				#store statistics for report
-				report_stats['thr'] = thr
-				report_stats['cw'] = cw_
-				report_stats['psucc'] = psucc
-				report_stats['busytx2'] = busytx2
-				report_stats['busy_time'] = busy_time
-				cw_evaluate_cycle = 0
+					#store statistics for report
+					report_stats['thr'] = thr
+					report_stats['cw'] = cw_
+					report_stats['psucc'] = psucc
+					if busytx2 < 0:
+						busytx2 = 0
+					if busytx2 > 0.8:
+						busytx2 = 0.8
+					report_stats['busytx2'] = busytx2
+					report_stats['busy_time'] = busy_time
 
-			else:
+				cw_evaluate_cycle = 0
+				if enable_react[0]:
+					#print('cw_evaluae_cycle %d' % cw_evaluate_cycle)
+					# ENFORCE CW
+					setCW(iface, qumId, aifs, cw_array[cw_evaluate_cycle], cw_array[cw_evaluate_cycle], burst)
 				cw_evaluate_cycle += 1
 
-			# ENFORCE CW
-			if enable_react[0]:
-				# cwmin=int(cw_)
-				# cwmax=int(cw_)
-				setCW(iface, qumId, aifs, cw_array[cw_evaluate_cycle], cw_array[cw_evaluate_cycle], burst)
+
 
 			time.sleep(cw_setting_interval - ((time.time() - starttime) % cw_setting_interval))
-
 
 	def update_offer():
 		done = False

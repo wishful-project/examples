@@ -101,9 +101,6 @@ class Adder(ttk.Frame):
         self.label_topo_img.image = im
         self.label_topo_img.grid(row=0, column=0, sticky='nesw')
 
-
-
-
     def stopReact(self):
         command = 'stop_react'
         json_command = {'type': 'algorithm', 'command': command}
@@ -136,23 +133,47 @@ class Adder(ttk.Frame):
 
 
     def setTraffic(self, src, val):
+        val = int(val)
         if src == 'A':
             dst = self.countryVarA.get()
+            if 500 < val and val <= 6000:
+                self.sta1val_traffic_activation = True
+            else:
+                self.sta1val_traffic_activation = False
         elif src == 'B':
             dst = self.countryVarB.get()
+            if 500 < val and val <= 6000:
+                self.sta2val_traffic_activation = True
+            else:
+                self.sta2val_traffic_activation = False
         elif src == 'C':
             dst = self.countryVarC.get()
+            if 500 < val and val <= 6000:
+                self.sta3val_traffic_activation = True
+            else:
+                self.sta3val_traffic_activation = False
         elif src == 'D':
             dst = self.countryVarD.get()
+            if 500 < val and val <= 6000:
+                self.sta4val_traffic_activation = True
+            else:
+                self.sta4val_traffic_activation = False
         elif src == 'E':
             dst = self.countryVarE.get()
+            if 500 < val and val <= 6000:
+                self.sta5val_traffic_activation = True
+            else:
+                self.sta5val_traffic_activation = False
         elif src == 'F':
             dst = self.countryVarF.get()
+            if 500 < val and val <= 6000:
+                self.sta6val_traffic_activation = True
+            else:
+                self.sta6val_traffic_activation = False
         else:
             print('bad source node')
             return
 
-        val = int(val)
         if 500 < val and val <= 6000:
             command = 'set_traffic'
             round_val = round(val/1000)*1000
@@ -233,7 +254,7 @@ class Adder(ttk.Frame):
                     line5_psucc, = ax.plot(self.xval_psucc, self.sta5val_psucc, label='Node E')
                     line6_psucc, = ax.plot(self.xval_psucc, self.sta6val_psucc, label='Node F')
 
-                    ax.set_ylim([-0.1, 1.1])
+                    ax.set_ylim([-0.05, 1.05])
                     ax.patch.set_facecolor('white')
                     #legend = ax.legend(loc='upper center', shadow=True, ncol=3)
 
@@ -312,7 +333,11 @@ class Adder(ttk.Frame):
                     line5_airtime, = ax.plot(self.xval_airtime, self.sta5val_airtime, label='Node E')
                     line6_airtime, = ax.plot(self.xval_airtime, self.sta6val_airtime, label='Node F')
 
-                    ax.set_ylim([-0.1, 1.1])
+                    labels = ['',  '0.0', '', '0.5', '', '1', '']
+                    # set the tick labels
+                    ax.set_yticklabels(labels, rotation=0)
+
+                    ax.set_ylim([-0.05, 0.85])
                     ax.patch.set_facecolor('white')
                     #legend = ax.legend(loc='upper center', shadow=True, ncol=3)
 
@@ -384,14 +409,21 @@ class Adder(ttk.Frame):
                     ax.set_xlabel('Time [s]', fontsize=12)
                     ax.set_ylabel('Contention window')
 
-                    line1_cw, = ax.plot(self.xval_cw, self.sta1val_cw, label='Node A')
-                    line2_cw, = ax.plot(self.xval_cw, self.sta2val_cw, label='Node B')
-                    line3_cw, = ax.plot(self.xval_cw, self.sta3val_cw, label='Node C')
-                    line4_cw, = ax.plot(self.xval_cw, self.sta4val_cw, label='Node D')
-                    line5_cw, = ax.plot(self.xval_cw, self.sta5val_cw, label='Node E')
-                    line6_cw, = ax.plot(self.xval_cw, self.sta6val_cw, label='Node F')
+                    line1_cw, = ax.semilogy(self.xval_cw, self.sta1val_cw, label='Node A')
+                    line2_cw, = ax.semilogy(self.xval_cw, self.sta2val_cw, label='Node B')
+                    line3_cw, = ax.semilogy(self.xval_cw, self.sta3val_cw, label='Node C')
+                    line4_cw, = ax.semilogy(self.xval_cw, self.sta4val_cw, label='Node D')
+                    line5_cw, = ax.semilogy(self.xval_cw, self.sta5val_cw, label='Node E')
+                    line6_cw, = ax.semilogy(self.xval_cw, self.sta6val_cw, label='Node F')
 
-                    ax.set_ylim([0, 1100])
+                    # line1_cw, = ax.plot(self.xval_cw, self.sta1val_cw, label='Node A')
+                    # line2_cw, = ax.plot(self.xval_cw, self.sta2val_cw, label='Node B')
+                    # line3_cw, = ax.plot(self.xval_cw, self.sta3val_cw, label='Node C')
+                    # line4_cw, = ax.plot(self.xval_cw, self.sta4val_cw, label='Node D')
+                    # line5_cw, = ax.plot(self.xval_cw, self.sta5val_cw, label='Node E')
+                    # line6_cw, = ax.plot(self.xval_cw, self.sta6val_cw, label='Node F')
+
+                    ax.set_ylim([10, 10000])
                     ax.patch.set_facecolor('white')
                     legend = ax.legend(loc='upper center', shadow=True, ncol=3)
 
@@ -456,6 +488,11 @@ class Adder(ttk.Frame):
 
                 if label == 'A':
                     item = 'I001'
+
+                    if not self.sta1val_traffic_activation:
+                        measure[5] = 0
+                        measure[6] = 0
+
                     self.sta1val_cw.pop(0)
                     self.sta1val_cw.append( float(measure[5]) )
 
@@ -471,6 +508,11 @@ class Adder(ttk.Frame):
 
                 elif label == 'B':
                     item = 'I002'
+
+                    if not self.sta2val_traffic_activation:
+                        measure[5] = 0
+                        measure[6] = 0
+
                     self.sta2val_cw.pop(0)
                     self.sta2val_cw.append( float(measure[5]) )
 
@@ -484,6 +526,11 @@ class Adder(ttk.Frame):
 
                 elif label == 'C':
                     item = 'I003'
+
+                    if not self.sta3val_traffic_activation:
+                        measure[5] = 0
+                        measure[6] = 0
+
                     self.sta3val_cw.pop(0)
                     self.sta3val_cw.append( float(measure[5]) )
 
@@ -498,6 +545,11 @@ class Adder(ttk.Frame):
 
                 elif label == 'D':
                     item = 'I004'
+
+                    if not self.sta4val_traffic_activation:
+                        measure[5] = 0
+                        measure[6] = 0
+
                     self.sta4val_cw.pop(0)
                     self.sta4val_cw.append( float(measure[5]) )
 
@@ -512,6 +564,11 @@ class Adder(ttk.Frame):
 
                 elif label == 'E':
                     item = 'I005'
+
+                    if not self.sta5val_traffic_activation:
+                        measure[5] = 0
+                        measure[6] = 0
+
                     self.sta5val_cw.pop(0)
                     self.sta5val_cw.append( float(measure[5]) )
 
@@ -526,6 +583,11 @@ class Adder(ttk.Frame):
 
                 elif label == 'F':
                     item = 'I006'
+
+                    if not self.sta6val_traffic_activation:
+                        measure[5] = 0
+                        measure[6] = 0
+
                     self.sta6val_cw.pop(0)
                     self.sta6val_cw.append( float(measure[5]) )
 
@@ -568,6 +630,14 @@ class Adder(ttk.Frame):
         self.last_traffic_update_time = time.time()
         self.last_traffic_update_command = None
         self.traffic_update_command = None
+
+        #traffic active
+        self.sta1val_traffic_activation = False
+        self.sta2val_traffic_activation = False
+        self.sta3val_traffic_activation = False
+        self.sta4val_traffic_activation = False
+        self.sta5val_traffic_activation = False
+        self.sta6val_traffic_activation = False
 
         #psucc
         self.sta1val_psucc=[1 for x in range(0,self.Nplot)]

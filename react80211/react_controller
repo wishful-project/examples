@@ -260,18 +260,19 @@ def main(args):
                     print("search node %s - index %d" % (eth_ip[ii], ii) )
                     for jj in range(0, len(nodes)):
                         if nodes[jj].ip == eth_ip[ii]:
-                            print("setup node %s - index %d" % (nodes[jj].ip, jj) )
+                            print("setup topology node %s - index %d" % (nodes[jj].ip, jj) )
                             pos = eth_ip.index(nodes[jj].ip)
-                            rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-react", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
+                            #rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-react", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
+                            rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-react", freq[pos], tx_power[pos], "6", wlan_ip[pos], "off", "aa:bb:cc:dd:ee:ff", True)
                             gevent.sleep(1)
                             rvalue = controller.nodes(nodes[jj]).net.start_monitor(driver[pos], "wlan0")
 
                             #RUN REACT
-                            ''' start local control program on nodes '''
+                            print("start local control program on nodes")
                             lcpDescriptor_nodes.append(controller.node(nodes[jj]).hc.start_local_control_program(program=react))
                             msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : 0, "enable_react" : react_algorithm_activation}
                             lcpDescriptor_nodes[ii].send(msg)
-                            #start thread for collect measurements from nodes
+                            print("start thread for collect measurements from nodes")
                             reading_thread.append(threading.Thread(target=collect_remote_messages, args=(lcpDescriptor_nodes[ii], socket_visualizer, mac_address, label)))
                             reading_thread[ii].start()
                             break
@@ -365,9 +366,9 @@ def main(args):
 
                                     if command == 'stop_react':
                                         react_algorithm_activation = False
-                                        controller.nodes(nodes[jj]).radio.set_rts_threshold('off')
-                                        msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : 0, "enable_react" : react_algorithm_activation}
                                         for jj in range(0, len(nodes)):
+                                            controller.nodes(nodes[jj]).radio.set_rts_threshold('off')
+                                            msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : 0, "enable_react" : react_algorithm_activation}
                                             lcpDescriptor_nodes[jj].send(msg)
 
                     if not(dt%10):
@@ -384,8 +385,9 @@ def main(args):
                 try:
                     controller.nodes(nodes[ii]).net.destroy_packetflow_sink()
 
-                    print("Terminate remote local control program")
-                    lcpDescriptor_nodes[ii].close()
+                    if lcpDescriptor_nodes[ii]:
+                        print("Terminate remote local control program")
+                        lcpDescriptor_nodes[ii].close()
 
                     time.sleep(2)
 

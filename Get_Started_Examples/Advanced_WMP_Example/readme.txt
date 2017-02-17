@@ -76,9 +76,9 @@ SHELL B  - ALIXNODE :
 
         cd wmp_helper/
     #deploy framework on alixnodes
-        sh deploy_upis.sh alix02,alix04,alix05,alix10,alix14
+        sh deploy_upis.sh alix02,alix03,alix11,alix10,alix18
     #sync nodes time:
-        sh sync_date.sh alix02,alix04,alix05,alix10,alix14
+        sh sync_date.sh alix02,alix03,alix11,alix10,alix18
         cd ..
 
 #start agent

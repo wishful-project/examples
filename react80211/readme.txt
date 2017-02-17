@@ -40,7 +40,9 @@ REACT howto on wilab2
  cd wishful-github-manifest-3/examples/react80211/
 
 #sync clock nodes
+ cd helper
  sh sync_date.sh dgarlisi zotacd6,zotacg6,zotacj6,zotacb1,zotack1,zotaci3
+ cd ..
 
  NB: on wilab, we do not need deploy
   sh deploy_upis.sh dgarlisi zotacc6,zotacg6,zotack6
@@ -64,7 +66,6 @@ REACT howto on wilab2
 
 
 REACT howto on portable testbed
-
 #ON LOCAL STATION
  #connect to vpn
  sudo openvpn --config ~/Desktop/portable-testbed/portableTestbed.ovpn
