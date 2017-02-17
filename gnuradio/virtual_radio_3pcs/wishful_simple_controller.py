@@ -53,12 +53,12 @@ conf = {
 
     'program_getters' : {
         "tx":  ["svl_bandwidth", "svl_center_freq"],
-        "rx1": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
-        "rx2": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", ],
+        "rx1": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", "throughput" ],
+        "rx2": ["bandwidth", "center_freq", "pkt_rcvd", "pkt_right", "throughput"],
     },
 
     'program_args': {
-        "tx": ["",], 
+        "tx":  [""], 
         "rx1": ["",],
         "rx2": ["--vr-configuration", "2"],
     },
@@ -69,6 +69,8 @@ conf = {
 SVL_TX_BANDWIDTH = 'svl_bandwidth'
 SVL_TX_CENTER_FREQ = 'svl_center_freq'
 VR_TX_GAIN = 'vr{id}_gain'
+VR_CENTER_FREQ = 'vr{id}_center_freq'
+VR_BANDWIDTH = 'vr{id}_bandwidth'
 
 # for the receivers only
 RX_BANDWIDTH = 'bandwidth'
@@ -118,12 +120,24 @@ def get_vars_response(group, node, data):
         the_variables['rx1_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
         the_variables['rx1_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
         the_variables['rx1_bandwidth'] = data['bandwidth'] if 'bandwidth' in data else 'NA'
+
+        if 'throughput' in data:
+           the_variables['rx1_throughput'] = str( float(data['throughput'])/1000.0) + " Kbps"
+        else:
+           the_variables['rx1_throughput'] = 'NA'
+		
+	 
     elif node.name == 'rx2':
     #elif node.name == 'rx2':
         the_variables['rx2_pkt_rcv'] = data['pkt_rcvd'] if 'pkt_rcvd' in data else 'NA'
         the_variables['rx2_pkt_right'] = data['pkt_right'] if 'pkt_right' in data else 'NA'
         the_variables['rx2_center_freq'] = data['center_freq'] if 'center_freq' in data else 'NA'
         the_variables['rx2_bandwidth'] = data['bandwidth'] if 'bandwidth' in data else 'NA'
+
+        if 'throughput' in data:
+           the_variables['rx2_throughput'] = str( float(data['throughput'])/1000.0) + " Kbps"
+        else:
+           the_variables['rx2_throughput'] = 'NA'
 
     pickle.dump(the_variables, open("./getter.bin", "wb"))
 
@@ -166,19 +180,17 @@ def exec_loop():
                 log.info("Could not open setters file")
                 log.info(e)
 
-            log.info(setters)
-
             if 'tx' in setters.keys() and 'tx' in nodes:
                     log.info("Setting configuration of node TX") 
                     controller.blocking(False).node(nodes['tx']).radio.iface('usrp').set_parameters(setters['tx'])
 
-            if 'rx1' in setters.keys():
+            if 'rx1' in setters.keys() and 'rx1' in nodes:
                     log.info("Setting configuration of node RX1") 
-                    controller.blocking(False).node(nodes['rx']).radio.iface('usrp').set_parameters(setters['rx1'])
+                    controller.blocking(False).node(nodes['rx1']).radio.iface('usrp').set_parameters(setters['rx1'])
 
-            if 'rx2' in setters.keys():
+            if 'rx2' in setters.keys() and 'rx2' in nodes:
                     log.info("Setting configuration of node RX2") 
-                    controller.blocking(False).node(nodes['rx']).radio.iface('usrp').set_parameters(setters['rx2'])
+                    controller.blocking(False).node(nodes['rx2']).radio.iface('usrp').set_parameters(setters['rx2'])
 
             gevent.sleep(2)
 
@@ -186,4 +198,7 @@ def exec_loop():
     controller.stop()
 
 if __name__ == '__main__':
-    exec_loop()
+   try:
+   	exec_loop()
+   except KeyboardInterrupt:
+        controller.stop() 
