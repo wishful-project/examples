@@ -4,4 +4,4 @@
 "PARAMETER","rpl_dio_redundancy",56854,"UINT8","","<"
 "PARAMETER","rpl_default_lifetime",28735,"UINT8","","<"
 "PARAMETER","rpl_objective_function",2355,"UINT16","","<"
-"MEASUREMENT","rpl_stats",54452,"HHHHHHHHHH","","<"
+"MEASUREMENT","rpl_stats",54452,"UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16","","<"

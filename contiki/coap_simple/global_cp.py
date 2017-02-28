@@ -77,9 +77,11 @@ if __name__ == "__main__":
         controller.load_config(config)
         controller.start()
 
+        first_time = True
+
         radio_param_list = [
-            "ContikiMAC_ChannelCheckRate",
-            "ContikiMAC_PhaseOptimization",
+            # "ContikiMAC_ChannelCheckRate",
+            # "ContikiMAC_PhaseOptimization",
             "IEEE802154_macExtendedAddress",
             "IEEE802154_macPANId",
             "IEEE802154_macShortAddress",
@@ -121,22 +123,36 @@ if __name__ == "__main__":
             print("\n")
             print("Connected nodes", [str(node.name) for node in nodes])
             if nodes:
-                for node in nodes:
-                    for param in radio_param_list:
-                        val = controller.blocking(True).node(node).radio.iface("lowpan0").get_parameters([param])
-                        print(val)
-                    gevent.sleep(1)
-                    for param in net_param_list:
-                        val = controller.blocking(True).node(node).net.iface("lowpan0").get_parameters_net([param])
-                        print(val)
-                    gevent.sleep(1)
-                    for m in radio_measurement_list:
-                        val = controller.blocking(True).node(node).radio.iface("lowpan0").get_measurements([m])
-                        print(val)
-                    gevent.sleep(1)
-                    for m in net_measurement_list:
-                        val = controller.blocking(True).node(node).net.iface("lowpan0").get_measurements_net([m])
-                        print(val)
+                if first_time:
+                    ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").rpl_set_border_router([0xfd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01])
+                    print(ret)
+                    first_time = False
+                else:
+                    for node in nodes:
+                        for param in radio_param_list:
+                            val = controller.blocking(True).node(node).radio.iface("lowpan0").get_parameters([param])
+                            print("lowpan0: {}".format(val))
+                            val = controller.blocking(True).node(node).radio.iface("lowpan1").get_parameters([param])
+                            print("lowpan1: {}".format(val))
+                            gevent.sleep(1)
+                        for param in net_param_list:
+                            val = controller.blocking(True).node(node).net.iface("lowpan0").get_parameters_net([param])
+                            print("lowpan0: {}".format(val))
+                            val = controller.blocking(True).node(node).net.iface("lowpan1").get_parameters_net([param])
+                            print("lowpan1: {}".format(val))
+                            gevent.sleep(1)
+                        for m in radio_measurement_list:
+                            val = controller.blocking(True).node(node).radio.iface("lowpan0").get_measurements([m])
+                            print("lowpan0: {}".format(val))
+                            val = controller.blocking(True).node(node).radio.iface("lowpan1").get_measurements([m])
+                            print("lowpan1: {}".format(val))
+                            gevent.sleep(1)
+                        for m in net_measurement_list:
+                            val = controller.blocking(True).node(node).net.iface("lowpan0").get_measurements_net([m])
+                            print("lowpan0: {}".format(val))
+                            val = controller.blocking(True).node(node).net.iface("lowpan1").get_measurements_net([m])
+                            print("lowpan1: {}".format(val))
+                            gevent.sleep(1)
 
     except KeyboardInterrupt:
         log.debug("Controller exits")
