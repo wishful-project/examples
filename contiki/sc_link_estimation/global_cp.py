@@ -141,16 +141,15 @@ if __name__ == "__main__":
             print(ret)
             gevent.sleep(5)
             val = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").get_measurements_net(['APP_RxStats'])
-            print(val)
             rx = val['APP_RxStats'][0] - prev_val[0]
             rx_loss = val['APP_RxStats'][1] - prev_val[1]
-            pdr = rx / (rx + rx_loss + 1)
+            pdr = rx / (rx + rx_loss)
             measurement_logger.log_measurement("UDP_rxstats", [time.time(), rx, rx + rx_loss, rx_loss, pdr])
-            print("rx = {}, rx_loss {}, PDR {}".format(rx, rx_loss, pdr))
+            # print("rx = {}, rx_loss {}, PDR {}".format(rx, rx_loss, pdr))
             prev_val = val['APP_RxStats']
 
         for rp in radio_platforms:
-            ret = controller.blocking(True).node(nodes[0]).net.iface(radio_platforms[i]).set_parameters_net({'APP_ActiveApplication': 0})
+            ret = controller.blocking(True).node(nodes[0]).net.iface(rp).set_parameters_net({'APP_ActiveApplication': 0})
             control_msg_rx_overhead[rp] += 2
             control_msg_tx_overhead[rp] += 2
             print(ret)
@@ -187,8 +186,14 @@ if __name__ == "__main__":
             rx_loss = val['APP_RxStats'][1] - prev_val[1]
             pdr = rx / (rx + rx_loss)
             measurement_logger.log_measurement("UDP_rxstats", [time.time(), rx, rx + rx_loss, rx_loss, pdr])
-            print("rx = {}, rx_loss {}, PDR {}".format(rx, rx_loss, pdr))
+            # print("rx = {}, rx_loss {}, PDR {}".format(rx, rx_loss, pdr))
             prev_val = val['APP_RxStats']
+
+        for rp in radio_platforms:
+            ret = controller.blocking(True).node(nodes[0]).net.iface(rp).set_parameters_net({'APP_ActiveApplication': 0})
+            control_msg_rx_overhead[rp] += 2
+            control_msg_tx_overhead[rp] += 2
+            print(ret)
 
     except KeyboardInterrupt:
         log.debug("Controller exits")
