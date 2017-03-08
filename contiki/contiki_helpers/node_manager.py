@@ -1,11 +1,11 @@
 import abc
 import logging
-import yaml
+
 
 class Group(object):
 
-    def __init__(self,name, manager, mac_address_list=None):
-        self.name = named
+    def __init__(self, name, manager, mac_address_list=None):
+        self.name = name
         self.mac_address_list = []
         self.manager = manager
         if mac_address_list is not None and type(mac_address_list) is list:
@@ -28,10 +28,11 @@ class Group(object):
     def delayed_group_call(self, upi_type, upi_fname, delay, *args, **kwargs):
         return self.manager.schedule_upi_function(upi_type, upi_fname, delay, self.mac_address_list, args=args, kwargs=kwargs)
 
+
 class NodeManager():
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self,scope):
+    def __init__(self, scope):
         self.log = logging.getLogger("Contiki Node Manager: ")
         self.scope = scope
         self.groups = {}
@@ -43,7 +44,7 @@ class NodeManager():
 
     def create_group(self, group_name, mac_address_list=None):
         if group_name not in self.groups:
-            self.groups[group_name] = Group(group_name,self,mac_address_list)
+            self.groups[group_name] = Group(group_name, self, mac_address_list)
             return self.groups[group_name]
         return None
 

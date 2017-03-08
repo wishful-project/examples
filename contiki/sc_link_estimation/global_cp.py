@@ -141,9 +141,10 @@ if __name__ == "__main__":
             print(ret)
             gevent.sleep(5)
             val = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").get_measurements_net(['APP_RxStats'])
+            print(val)
             rx = val['APP_RxStats'][0] - prev_val[0]
             rx_loss = val['APP_RxStats'][1] - prev_val[1]
-            pdr = rx / (rx + rx_loss)
+            pdr = rx / (rx + rx_loss + 1)
             measurement_logger.log_measurement("UDP_rxstats", [time.time(), rx, rx + rx_loss, rx_loss, pdr])
             print("rx = {}, rx_loss {}, PDR {}".format(rx, rx_loss, pdr))
             prev_val = val['APP_RxStats']

@@ -3,11 +3,11 @@
 controller:
     name: "contiki_global_control"
     info: "Example Contiki global control program"
-    dl: "tcp://127.0.0.1:8990"
-    ul: "tcp://127.0.0.1:8989"
+    dl: "tcp://192.168.217.128:8990"
+    ul: "tcp://192.168.217.128:8989"
 
 modules:
     discovery:
         module : wishful_module_discovery_pyre
         class_name : PyreDiscoveryControllerModule
-        kwargs: {"iface":"lo", "groupName":"wishful_contiki", "downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"}
+        kwargs: {"iface":"eth0", "groupName":"wishful_contiki", "downlink":"tcp://192.168.217.128:8990", "uplink":"tcp://192.168.217.128:8989"}

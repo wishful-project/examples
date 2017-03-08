@@ -23,15 +23,15 @@ class TAISCMACManager(MACManager):
         while(current_offset < taisc_slotframe.slotframe_length):
             slotframe_tpl = taisc_slotframe.to_tuple(current_offset, MAX_MSG_SIZE)
             param_key_values_dict = {'taiscSlotframe': slotframe_tpl}
-            print("UPDATE : %s"%(param_key_values_dict))
+            print("UPDATE : %s" % (param_key_values_dict))
             ret = self.update_macconfiguration(param_key_values_dict)
             for mac_address in ret:
                 if type(ret[mac_address]) is dict:
                     ret_dict[mac_address] += ret[mac_address]['taiscSlotframe']
-                    ret_val+=ret[mac_address]['taiscSlotframe']
+                    ret_val += ret[mac_address]['taiscSlotframe']
                 else:
                     ret_dict[mac_address] += ret[mac_address]
-                    ret_val+=ret[mac_address]
+                    ret_val += ret[mac_address]
             current_offset += slotframe_tpl[1]
         return ret_val
 
@@ -48,9 +48,9 @@ class TAISCMACManager(MACManager):
                 param_key_values_dict = {'taiscSlotList': slotlist_tpl}
                 ret = self.update_macconfiguration(param_key_values_dict, mac_address)
                 if type(ret[mac_address]) is dict:
-                    ret_val+=ret[mac_address]['taiscSlotList']
+                    ret_val += ret[mac_address]['taiscSlotList']
                 else:
-                    ret_val+=ret[mac_address]
+                    ret_val += ret[mac_address]
                 current_offset += slotlist_tpl[0]
         return ret_val
 
@@ -86,8 +86,6 @@ class TAISCMACManager(MACManager):
             self.log.info("New hopping scheme: {} blacklisted {}, new len {}".format(str(new_hopping_sequence), str(channel_lst), len(new_hopping_sequence) - len(channel_lst)))
             param_key_values = {"IEEE802154e_macHoppingSequenceList": tuple(new_hopping_sequence)}
             ret = self.update_macconfiguration(param_key_values, mac_address_list)
-            #~ if ret == -1:
-                #~ return -1
             return ret
         else:
             return -1
@@ -234,7 +232,7 @@ class taiscSlotList(object):
 
     def to_tuple(self, slotlist_offset, max_size):
         num_slots = (max_size - 1) // taiscSlot.SLOT_ITEM_SIZE
-        if slotlist_offset + t_num_slots > self.slot_list_length:
+        if slotlist_offset + num_slots > self.slot_list_length:
             num_slots = self.slot_list_length - slotlist_offset
         ret_tuple = (num_slots,)
         for i in range(slotlist_offset, slotlist_offset + num_slots):

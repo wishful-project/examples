@@ -11,7 +11,6 @@ def local_monitoring_program(control_engine):
 
     @control_engine.set_default_callback()
     def default_callback(cmd, data):
-        #print(("{} DEFAULT CALLBACK : Cmd: {}, Returns: {}".format(datetime.datetime.now(), cmd, data)))
         control_engine.send_upstream({"msg_type": "cmd_result", "cmd": cmd, "result": data})
         pass
 
@@ -29,7 +28,6 @@ def local_monitoring_program(control_engine):
     while not control_engine.is_stopped():
         msg = control_engine.recv(block=False)
         if msg is not None and type(msg) is dict and 'command' in msg:
-            radio_platforms = []
             if 'interface' in msg:
                 ifaces = msg['interface']
             else:
@@ -37,17 +35,17 @@ def local_monitoring_program(control_engine):
             if msg['command'] == 'SUBSCRIBE_EVENT':
                 for iface in ifaces:
                     if msg['upi_type'] == 'net':
-                        control_engine.blocking(False).net.iface(iface).subscribe_events_net(msg['event_key_list'],event_handler,msg['event_duration'])
+                        control_engine.blocking(False).net.iface(iface).subscribe_events_net(msg['event_key_list'], event_handler, msg['event_duration'])
                     elif msg['upi_type'] == 'radio':
-                        control_engine.blocking(False).radio.iface(iface).subscribe_events(msg['event_key_list'],event_handler,msg['event_duration'])
+                        control_engine.blocking(False).radio.iface(iface).subscribe_events(msg['event_key_list'], event_handler, msg['event_duration'])
                     else:
                         print("async event listener unsupported upi_type {}".format(msg['upi_type']))
             elif msg['command'] == 'GET_MEASUREMENTS_PERIODIC':
                 for iface in ifaces:
                     if msg['upi_type'] == 'net':
-                        control_engine.blocking(False).iface(iface).net.get_measurements_periodic_net(msg['measurement_key_list'], msg['collect_period'], msg['report_period'], msg['num_iterations'], report_handler)
+                        control_engine.blocking(False).iface(iface).net.get_measurements_periodic_net(msg['measurement_key_list'], msg['collect_period'], msg['report_period'], msg['num_iterations'], report_callback)
                     elif msg['upi_type'] == 'radio':
-                        control_engine.blocking(False).iface(iface).radio.get_measurements_periodic(msg['measurement_key_list'], msg['collect_period'], msg['report_period'], msg['num_iterations'], report_handler)
+                        control_engine.blocking(False).iface(iface).radio.get_measurements_periodic(msg['measurement_key_list'], msg['collect_period'], msg['report_period'], msg['num_iterations'], report_callback)
                     else:
                         print("periodic measurement collector unsupported upi_type {}".format(msg['upi_type']))
             else:

@@ -11,7 +11,7 @@ class LocalNodeManager(NodeManager):
         self.control_engine = self.agent.get_local_controller()
         self.agent.load_config(config)
         self.agent.run()
-        t = threading.Timer(5,self.__update_mac_address_list)
+        t = threading.Timer(5, self.__update_mac_address_list)
         t.start()
 
     def __update_mac_address_list(self):
