@@ -193,8 +193,9 @@ def react(controller):
 	"""
 	update CW decision based on ieee80211 stats values and virtual channel freezing estimation
 	"""
-	def update_cw(iface, time_interval, enable_react):
+	def update_cw(iface, time_interval, enable_react, station_claim):
 		cw_thread = threading.currentThread()
+		print('start update_cw')
 
 		CWMIN=15
 		CWMAX=2047
@@ -231,7 +232,6 @@ def react(controller):
 		while getattr(cw_thread, "do_run", True):
 			if cw_evaluate_cycle < number_of_setting_in_interval:
 				if enable_react[0]:
-					#print('cw_evaluae_cycle %d' % cw_evaluate_cycle)
 					# ENFORCE CW
 					setCW(iface, qumId, aifs, cw_array[cw_evaluate_cycle], cw_array[cw_evaluate_cycle], burst)
 				cw_evaluate_cycle += 1
@@ -244,7 +244,8 @@ def react(controller):
 						# data_count = pkt_stats['dot11RTSSuccessCount'] - data_count_
 						# rts_count = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
 						data_count = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] - data_count_
-						rts_count = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
+						#rts_count = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] + pkt_stats['dot11RTSFailureCount'] - rts_count_
+						rts_count = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] + pkt_stats['dot11ACKFailureCount'] - rts_count_
 
 						data_count_data = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] - data_count_data_
 						if reading_time_ > 0:
@@ -255,12 +256,15 @@ def react(controller):
 						# data_count_=pkt_stats['dot11RTSSuccessCount']
 						# rts_count_ = pkt_stats['dot11RTSSuccessCount'] + pkt_stats['dot11RTSFailureCount']
 						data_count_= pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount']
-						rts_count_= pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] + pkt_stats['dot11RTSFailureCount']
+						#rts_count_= pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] + pkt_stats['dot11RTSFailureCount']
+						rts_count_= pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount'] + pkt_stats['dot11ACKFailureCount']
+
 
 						data_count_data_ = pkt_stats['dot11TransmittedFragmentCount'] - pkt_stats['dot11MulticastTransmittedFrameCount']
 						reading_time_ = reading_time
 
-						gross_rate = float(CLAIM_CAPACITY)*float(neigh_list[my_mac]['claim'])
+						#gross_rate = float(CLAIM_CAPACITY)*float(neigh_list[my_mac]['claim'])
+						gross_rate = float(CLAIM_CAPACITY)*float(station_claim[0])
 						[tslot, tx_time_theor, t_rts, t_ack]= txtime_theor('11a', 6, 20, pkt_size)
 
 						busytx2 =  0.002198*float(data_count) + 0.000081*float(rts_count) #how much time the station spent in tx state during the last observation internval
@@ -502,6 +506,8 @@ def react(controller):
 	log.info('*********** starting local WiSHFUL controller **********************')
 	msg={}
 	print("Local ctrl program started: {}".format(controller.name))
+	distributed = False
+	cycle_1 = 0
 	while not controller.is_stopped():
 		msg = controller.recv(timeout=1)
 		if msg:
@@ -510,7 +516,6 @@ def react(controller):
 			init(msg["iface"])
 			try:
 
-				#Thread transmitter
 				i_time = []
 				i_time.append(msg['i_time'])
 				iperf_rate = []
@@ -518,17 +523,26 @@ def react(controller):
 				enable_react = []
 				enable_react.append(msg['enable_react'])
 
-				sender_thread = threading.Thread(target=send_REACT_msg, args=(msg['iface'], i_time, iperf_rate,))
-				sender_thread.do_run = True
-				sender_thread.start()
+				station_claim = []
+				station_claim.append(msg['claim'])
+				station_w = []
+				station_w.append(msg['w'])
+				station_offer = []
+				station_offer.append(msg['offer'])
 
-				#thread receiver
-				receiver_thread = threading.Thread(target=sniffer_REACT, args=(msg['iface'], i_time, ))
-				receiver_thread.do_run = True
-				receiver_thread.start()
+				if distributed:
+					#Thread transmitter
+					sender_thread = threading.Thread(target=send_REACT_msg, args=(msg['iface'], i_time, iperf_rate,))
+					sender_thread.do_run = True
+					sender_thread.start()
+
+					#thread receiver
+					receiver_thread = threading.Thread(target=sniffer_REACT, args=(msg['iface'], i_time, ))
+					receiver_thread.do_run = True
+					receiver_thread.start()
 
 				#update CW
-				cw_thread = threading.Thread(target=update_cw, args=(msg['iface'], i_time, enable_react, ))
+				cw_thread = threading.Thread(target=update_cw, args=(msg['iface'], i_time, enable_react, station_claim))
 				cw_thread.do_run = True
 				cw_thread.start()
 
@@ -537,7 +551,6 @@ def react(controller):
 					print ( "exception", err)
 					print ("Error: unable to start thread")
 				pass
-
 			break
 
 	#CONTROLLER MAIN LOOP
@@ -548,21 +561,29 @@ def react(controller):
 			#i_time[0] = msg['i_time']
 			iperf_rate[0] = msg['iperf_rate']
 			enable_react[0] = msg['enable_react']
+			station_claim[0] = msg['claim']
+			station_w[0] = msg['w']
+			station_offer[0] = msg['offer']
 
 			if enable_react[0] == 0:
 				setCW(msg['iface'],1,2,15,1023,0)
 
 		#send statistics to controller
-		if 'w' in neigh_list[my_mac]:
-			if debug:
-				print('send message to controller')
+		#if 'w' in neigh_list[my_mac]:
+		if enable_react[0]:
 			#print( "measure w %s claim %s offer %s " % (str( neigh_list[my_mac]['w']), str(neigh_list[my_mac]['claim']), str(neigh_list[my_mac]['offer'])) )
-			controller.send_upstream({ "measure" : [[neigh_list[my_mac]['t'], neigh_list[my_mac]['w'], neigh_list[my_mac]['claim'], neigh_list[my_mac]['offer'], report_stats['thr'], report_stats['cw'], report_stats['psucc'], report_stats['busytx2'], report_stats['busy_time'] ]], "mac_address" : (my_mac) })
+			#controller.send_upstream({ "measure" : [[neigh_list[my_mac]['t'], neigh_list[my_mac]['w'], neigh_list[my_mac]['claim'], neigh_list[my_mac]['offer'], report_stats['thr'], report_stats['cw'], report_stats['psucc'], report_stats['busytx2'], report_stats['busy_time'] ]], "mac_address" : (my_mac) })
+			controller.send_upstream({ "measure" : [[0, station_w[0], station_claim[0], station_offer[0], report_stats['thr'], report_stats['cw'], report_stats['psucc'], report_stats['busytx2'], report_stats['busy_time'] ]], "mac_address" : (my_mac) })
+		else:
+			controller.send_upstream({ "measure" : [[0, 0, 0, 0, report_stats['thr'], report_stats['cw'], report_stats['psucc'], report_stats['busytx2'], report_stats['busy_time'] ]], "mac_address" : (my_mac) })
 
-	receiver_thread.do_run = False
-	receiver_thread.join()
-	sender_thread.do_run = False
-	sender_thread.join()
+
+	if distributed:
+		receiver_thread.do_run = False
+		receiver_thread.join()
+		sender_thread.do_run = False
+		sender_thread.join()
+
 	cw_thread.do_run = False
 	cw_thread.join()
 	time.sleep(2)

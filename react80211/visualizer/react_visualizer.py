@@ -88,7 +88,7 @@ class Adder(ttk.Frame):
         self.label_topo_img.grid(row=0, column=0, sticky='nesw')
 
     def selectTopologyImagePortableTestbed(self):
-        image_name = 'wilab2-topology-2bis.png'
+        image_name = 'ptestbed-review-topology.png'
         img=Image.open(image_name)
         wpercent=100
         basewidth = 490

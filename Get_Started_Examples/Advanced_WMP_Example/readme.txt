@@ -51,6 +51,8 @@ SHELL B  - ALIXNODE :
         sudo apt-get install apache2
         sudo cp -r /users/dgarlisi/USRP_DEMO/web-site /var/www/html/
         sudo cp -r /users/dgarlisi/USRP_DEMO/web-site/crewdemo /var/www/html/
+        sudo ifconfig eno2 192.168.40.1
+        ping 192.168.40.2
         sudo /users/dgarlisi/USRP_DEMO/pyTrackers/pyUsrpTracker/run_usrp.sh 6
     #local pc
         ssh -L 8410:server13:80 dgarlisi@ops.wilab2.ilabt.iminds.be -v
