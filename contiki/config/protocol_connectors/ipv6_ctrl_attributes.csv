@@ -9,3 +9,4 @@
 "MEASUREMENT","APP_RxStats",28060,"UINT32;UINT32","","<"
 "PARAMETER","APP_ActiveApplication",57303,"UINT8","","<"
 "PARAMETER","test_opaque",22285,"UINT16","UINT32;UINT32;UINT16;UINT16","<"
+"EVENT","app_rx_event",58574,"UINT32;UINT32","","<"
