@@ -3,6 +3,7 @@ import wishful_agent
 import wishful_controller
 from contiki.contiki_helpers.node_manager import NodeManager
 
+
 class LocalNodeManager(NodeManager):
 
     def __init__(self, config):

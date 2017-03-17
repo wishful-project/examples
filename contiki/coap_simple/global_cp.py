@@ -119,7 +119,7 @@ if __name__ == "__main__":
         ]
 
         while True:
-            gevent.sleep(10)
+            gevent.sleep(5)
             print("\n")
             print("Connected nodes", [str(node.name) for node in nodes])
             if nodes:
@@ -128,28 +128,42 @@ if __name__ == "__main__":
                     print(ret)
                     first_time = False
                     radio_platforms = controller.blocking(True).node(nodes[0]).radio.iface("lowpan0").get_radio_platforms()
+                    for rp in radio_platforms:
+                        ret = controller.blocking(True).node(nodes[0]).net.iface(rp).set_parameters_net({'rpl_objective_function': 1})
+                        print(ret)
                 else:
                     for node in nodes:
-                        for param in radio_param_list:
-                            for radio_platform in radio_platforms:
-                                val = controller.blocking(True).node(node).radio.iface(radio_platform).get_parameters([param])
-                                print("{}: {}".format(radio_platform, val))
+                        val = controller.blocking(True).node(node).net.iface("lowpan0").get_parameters_net(["test_opaque"])
+                        print("{}: {}".format("lowpan0", val))
+                        gevent.sleep(1)
+                        for i in range(0, 4):
+                            new_val = [i + 1]
+                            for j in range(0, i + 1):
+                                new_val = new_val + [4, 3, 2, 1]
+                            err = controller.blocking(True).node(node).net.iface("lowpan0").set_parameters_net({"test_opaque": new_val})
+                            val = controller.blocking(True).node(node).net.iface("lowpan0").get_parameters_net(["test_opaque"])
+                            print("{}: {} {}".format("lowpan0", err, val))
                             gevent.sleep(1)
-                        for param in net_param_list:
-                            for radio_platform in radio_platforms:
-                                val = controller.blocking(True).node(node).net.iface(radio_platform).get_parameters_net([param])
-                                print("{}: {}".format(radio_platform, val))
-                            gevent.sleep(1)
-                        for m in radio_measurement_list:
-                            for radio_platform in radio_platforms:
-                                val = controller.blocking(True).node(node).radio.iface(radio_platform).get_measurements([m])
-                                print("{}: {}".format(radio_platform, val))
-                            gevent.sleep(1)
-                        for m in net_measurement_list:
-                            for radio_platform in radio_platforms:
-                                val = controller.blocking(True).node(node).net.iface(radio_platform).get_measurements_net([m])
-                                print("{}: {}".format(radio_platform, val))
-                            gevent.sleep(1)
+                        # for param in radio_param_list:
+                        #     for radio_platform in radio_platforms:
+                        #         val = controller.blocking(True).node(node).radio.iface(radio_platform).get_parameters([param])
+                        #         print("{}: {}".format(radio_platform, val))
+                        #     gevent.sleep(1)
+                        # for param in net_param_list:
+                        #     for radio_platform in radio_platforms:
+                        #         val = controller.blocking(True).node(node).net.iface(radio_platform).get_parameters_net([param])
+                        #         print("{}: {}".format(radio_platform, val))
+                        #     gevent.sleep(1)
+                        # for m in radio_measurement_list:
+                        #     for radio_platform in radio_platforms:
+                        #         val = controller.blocking(True).node(node).radio.iface(radio_platform).get_measurements([m])
+                        #         print("{}: {}".format(radio_platform, val))
+                        #     gevent.sleep(1)
+                        # for m in net_measurement_list:
+                        #     for radio_platform in radio_platforms:
+                        #         val = controller.blocking(True).node(node).net.iface(radio_platform).get_measurements_net([m])
+                        #         print("{}: {}".format(radio_platform, val))
+                        #     gevent.sleep(1)
 
     except KeyboardInterrupt:
         log.debug("Controller exits")
