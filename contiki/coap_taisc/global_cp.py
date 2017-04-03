@@ -8,11 +8,15 @@ Usage:
    global_cp.py [options] [-q | -v]
 
 Options:
-   --logfile name      Name of the logfile
+   --logfile name Name of the logfile
    --config configFile Config file path
+   --nodes nodesFile   Config file with node info
+   --experiment_name Name of the experiment
+   --experiment_group Name of the experiment group
+   --abs_log_dir Absolute path of the logging directory
 
 Example:
-   python global_cp.py --config config/localhost/global_cp_config.yaml
+   python global_cp.py --config config/localhost/global_cp_config.yaml 
    
 Other options:
    -h, --help          show this help message and exit
@@ -21,18 +25,85 @@ Other options:
    --version           show version and exit
 """
 import logging
-import wishful_controller
 import yaml
 import gevent
 import datetime
+import numpy   
+import wishful_upis as upis
+from measurement_logger import *
+from stdout_measurement_logger import *
+from file_measurement_logger import *
+from gnuplot_measurement_logger import *
+from contiki.contiki_helpers.global_node_manager import *
+from contiki.contiki_helpers.taisc_manager import *
+from contiki.contiki_helpers.app_manager import *
 
 
-__author__ = "Peter Ruckebusch"
+__author__ = "Peter Ruckebusch & Jan Bauwens"
 __copyright__ = "Copyright (c) 2016, IMEC"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
 log = logging.getLogger('contiki_global_control_program')
+measurement_logger_stdout = None
+measurement_logger_file = None
+measurement_logger_gnuplot = None
+
+radio_param_list = [
+    #~ "ContikiMAC_ChannelCheckRate",
+    #~ "ContikiMAC_PhaseOptimization",
+    "IEEE802154_macExtendedAddress",
+    "IEEE802154_macPANId",
+    "IEEE802154_macShortAddress",
+    "IEEE802154_phyCurrentChannel",
+    "IEEE802154_phyTXPower",
+]
+radio_measurement_list = [
+    "IEEE802154_measurement_macStats",
+    "IEEE802154_measurement_energyStats"   
+]
+radio_event_list = [
+    "IEEE802154_event_macStats"
+]
+net_param_list = [
+    "link_address",
+    "rpl_dio_interval_min",
+    "rpl_dio_interval_doublings",
+    "rpl_dio_redundancy",
+    "rpl_default_lifetime",
+    "rpl_objective_function",
+    "APP_ActiveApplication"
+]
+
+net_measurement_list = [
+    "ipv6_stats",
+    "icmp_stats",
+    "tcp_stats",
+    "udp_stats",
+    "nd6_stats",
+    "rpl_stats"
+]
+
+def default_callback(group, node, cmd, data, interface = ""):
+    print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}, interface: {}".format(datetime.datetime.now(), group, node.name, cmd, data, interface))
+    #~ threading.Thread(target=flush_measurements(group, node, cmd, data, interface)).start()
+
+def flush_measurements(group, node, cmd, data, interface):
+    global counter,measurements,prev_measurements, time
+    counter += 1
+    for key, value in data.items():
+        measurement_logger_file.log_measurement(key, str((interface,) + value).replace(" ", "").replace("'","")[1:-2])
+        measurement_logger_stdout.log_measurement(key, str(counter) + " - " + str((interface,) + value).replace(" ", "").replace("'","")[1:-2])
+        measurements += numpy.array(value)/64
+        if(counter == 64):
+            time += measurements[0]
+            log_measurements    = (measurements - prev_measurements)/(measurements.item(0)/1000000) * 31.25
+            log_measurements[0] = time
+            log.fatal((25.8 *  log_measurements.item(1) + 1.6 * log_measurements.item(2) + log_measurements.item(3) * 0.175 + 22.3 * log_measurements.item(4)) / 1000000 * 3)
+            prev_measurements   = measurements
+            measurement_logger_gnuplot.log_measurement(key, log_measurements.tolist())
+            counter = 0
+            measurements = numpy.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
 if __name__ == "__main__":
     try:
@@ -58,121 +129,97 @@ if __name__ == "__main__":
     if args['--logfile']:
         logfile = args['--logfile']
     logging.basicConfig(filename=logfile, level=log_level, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
-
-    controller = wishful_controller.Controller()
-    nodes = []
-
-    @controller.new_node_callback()
-    def new_node(node):
-        nodes.append(node)
-        print("New node appeared:")
-        print(node)
-        
     
-    @controller.set_default_callback()
-    def default_callback(group, node, cmd, data):
-        #~ print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
-        print(data)
+    experiment_name = None
+    if '--experiment_name' in args:
+        experiment_name = args['--experiment_name']
+    else:
+        experiment_name = "experiment"
+        
+    experiment_group = None
+    if '--experiment_group' in args:
+        experiment_group = args['--experiment_group']
+    else:
+        experiment_group = "global_cp_taisc"
+        
+    log_dir = None
+    if '--abs_log_dir' in args:
+        log_dir = args['--abs_log_dir']
+    else:
+        import os
+        log_dir = os.getcwd()
+        
+    measurement_logger_stdout   = STDOUTMeasurementLogger(experiment_name)
+    measurement_logger_file     = FileMeasurementLogger(experiment_name, radio_measurement_list, log_dir + "/" + experiment_group + "/" )
+    measurement_logger_gnuplot  = GnuplotMeasurementLogger(experiment_name, radio_measurement_list, log_dir + "/" + experiment_group + "/" )
+    measurement_logger_file.start_logging()
+    measurement_logger_gnuplot.start_logging()
 
+    nodes = []
+    counter = 0  
+    time = 0
+    measurements = numpy.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    prev_measurements = numpy.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        
     try:
         config_file_path = args['--config']
         config = None
         with open(config_file_path, 'r') as f:
             config = yaml.load(f)
+            
+        global_node_manager = GlobalNodeManager(config)
+        app_manager = AppManager(global_node_manager)
+        taisc_manager = TAISCMACManager(global_node_manager, "ContikiMAC")
+        
+        global_node_manager.set_default_callback(default_callback)
 
-        controller.load_config(config)
-        controller.start()
+        nodes_file_path = args['--nodes']
+        with open(nodes_file_path, 'r') as f:
+            node_config = yaml.load(f)
+        global_node_manager.wait_for_agents(node_config['ip_address_list'])
+        
+        
+        border_router_id = 1
+        print("Set node %d as border router"%(border_router_id))
+        app_manager.rpl_set_border_router([0xfd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01],border_router_id)
+        
+        #~ for param in radio_param_list:
+            #~ val = taisc_manager.read_macconfiguration([param],list(global_node_manager.mac_address_to_node_id.keys()))
+            #~ print("lowpan0: {}".format(val))
+        #~ for param in net_param_list:
+            #~ val = app_manager.read_configuration([param],list(global_node_manager.mac_address_to_node_id.keys()))
+            #~ print("lowpan0: {}".format(val))
 
-        first_time = True
-
-        radio_param_list = [
-            # "ContikiMAC_ChannelCheckRate",
-            # "ContikiMAC_PhaseOptimization",
-            "IEEE802154_macExtendedAddress",
-            "IEEE802154_macPANId",
-            "IEEE802154_macShortAddress",
-            "IEEE802154_phyCurrentChannel",
-            "IEEE802154_phyTXPower",
-        ]
-        radio_measurement_list = [
-            "IEEE802154_measurement_macStats",
-            "IEEE802154_measurement_energyStats"   
-        ]
-        radio_event_list = [
-            "IEEE802154_event_macStats"
-        ]
-        net_param_list = [
-            "link_address",
-            "rpl_dio_interval_min",
-            "rpl_dio_interval_doublings",
-            "rpl_dio_redundancy",
-            "rpl_default_lifetime",
-            "rpl_objective_function",
-            "APP_ActiveApplication"
-        ]
-
-        net_measurement_list = [
-            "ipv6_stats",
-            "icmp_stats",
-            "tcp_stats",
-            "udp_stats",
-            "nd6_stats",
-            "rpl_stats"
-        ]
-
+        #~ gevent.sleep(20)
+        
+        #~ print("Starting applications")
+        #~ app_manager.update_configuration({"APP_ActiveApplication":1},[border_router_id])
+        #~ app_manager.update_configuration({"APP_ActiveApplication":2},list(global_node_manager.mac_address_to_node_id.keys())[1:])
+        #~ print("Applications started")
+        
+        #~ for param in radio_param_list:
+            #~ val = taisc_manager.read_macconfiguration([param],list(global_node_manager.mac_address_to_node_id.keys()))
+            #~ print("lowpan0: {}".format(val))
+        #~ for param in net_param_list:
+            #~ val = app_manager.read_configuration([param],list(global_node_manager.mac_address_to_node_id.keys()))
+            #~ print("lowpan0: {}".format(val))
+            
+          
+        global_node_manager.start_local_monitoring_cp()
+        gevent.sleep(5)  
+        ret_events = taisc_manager.subscribe_events(["IEEE802154_event_energyStats"], default_callback, 0)
+        print("Suscribe event returns %s"%(ret_events))
+        
+        
         while True:
-            gevent.sleep(10)
-            print("\n")
-            print("Connected nodes", [str(node.name) for node in nodes])
-            if nodes:
-                if first_time:
-                    ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").rpl_set_border_router([0xfd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01])
-                    #~ ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").set_parameters_net({"APP_ActiveApplication":1})
-                    #~ ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan1").set_parameters_net({"APP_ActiveApplication":2})
-                    print(ret)
-                    for node in nodes:
-                        for param in radio_param_list:
-                            val = controller.blocking(True).node(node).radio.iface("lowpan0").get_parameters([param])
-                            print("lowpan0: {}".format(val))
-                            val = controller.blocking(True).node(node).radio.iface("lowpan1").get_parameters([param])
-                            print("lowpan1: {}".format(val))
-                            #~ gevent.sleep(1)
-                        for param in net_param_list:
-                            val = controller.blocking(True).node(node).net.iface("lowpan0").get_parameters_net([param])
-                            print("lowpan0: {}".format(val))
-                            val = controller.blocking(True).node(node).net.iface("lowpan1").get_parameters_net([param])
-                            print("lowpan1: {}".format(val))
-                            #~ gevent.sleep(1)
-                    first_time = False
-                else:
-                    for node in nodes:
-                        for m in radio_measurement_list:
-                            val = controller.blocking(False).node(node).radio.iface("lowpan0").get_measurements([m])
-                            val = controller.blocking(False).node(node).radio.iface("lowpan1").get_measurements([m])
-                            val = controller.blocking(False).node(node).radio.iface("lowpan2").get_measurements([m])
-                            val = controller.blocking(False).node(node).radio.iface("lowpan3").get_measurements([m])
-                            val = controller.blocking(False).node(node).radio.iface("lowpan4").get_measurements([m])
-                            val = controller.blocking(False).node(node).radio.iface("lowpan5").get_measurements([m])
-                            val = controller.blocking(False).node(node).radio.iface("lowpan6").get_measurements([m])
-                            val = controller.blocking(False).node(node).radio.iface("lowpan7").get_measurements([m])
-                            val = controller.blocking(False).node(node).radio.iface("lowpan8").get_measurements([m])
-                            val = controller.blocking(False).node(node).radio.iface("lowpan9").get_measurements([m])
-                            #~ gevent.sleep(1)
-                        for m in net_measurement_list:
-                            val = controller.blocking(False).node(node).net.iface("lowpan0").get_measurements_net([m])
-                            val = controller.blocking(False).node(node).net.iface("lowpan1").get_measurements_net([m])
-                            val = controller.blocking(False).node(node).net.iface("lowpan2").get_measurements_net([m])
-                            val = controller.blocking(False).node(node).net.iface("lowpan3").get_measurements_net([m])
-                            val = controller.blocking(False).node(node).net.iface("lowpan4").get_measurements_net([m])
-                            val = controller.blocking(False).node(node).net.iface("lowpan5").get_measurements_net([m])
-                            val = controller.blocking(False).node(node).net.iface("lowpan6").get_measurements_net([m])
-                            val = controller.blocking(False).node(node).net.iface("lowpan7").get_measurements_net([m])
-                            val = controller.blocking(False).node(node).net.iface("lowpan8").get_measurements_net([m])
-                            val = controller.blocking(False).node(node).net.iface("lowpan9").get_measurements_net([m])
-                            #~ gevent.sleep(1)
+            gevent.sleep(20)
+
 
     except KeyboardInterrupt:
         log.debug("Controller exits")
     finally:
+        measurement_logger_file.stop_logging()
+        measurement_logger_gnuplot.stop_logging()
+
         log.debug("Exit")
-        controller.stop()
+        global_node_manager.stop()
