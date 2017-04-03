@@ -1,0 +1,10 @@
+measurement_config:
+    module: mysql_measurement_logger
+    class_name: MySQLMeasurementLogger
+    kwargs:
+        measurement_db_name: "taisc"
+        measurement_definitions:
+            energy: "nodeID:int32 timestamp:int32 energest_transmit:float energest_idle:float energest_sleep:float energest_listen:float energest_cpu:float"
+        db_host: "localhost"
+        db_username: "demo"
+        db_password: "demo"

@@ -16,6 +16,20 @@ class AppManager(object):
         self.node_manager = node_manager
         self.log = logging.getLogger("local_app_manager")
 
+    def rpl_set_border_router(self, prefix_array, mac_address):
+        """Sets the rpl border router.
+        This function takes the ipv6 prefix of the border router
+        This function returns a dictionary containing parameter key-error_code pairs.
+
+        Args:
+            prefix_array (List[str]): a list containing the ipv6 prefix
+             radio_platforms (List[str], optional): list of radio platforms
+
+        Returns:
+            Dict[str, int]: This function returs a dictionary containing parameter key-error_codes pairs.
+        """
+        return self.node_manager.execute_upi_function("net", "rpl_set_border_router", [mac_address], prefix_array)
+
     def update_configuration(self, param_key_values_dict, mac_address_list=None):
         """Update the current MAC configuration.
         This function takes a dictionary argument containing parameter key-value pairs.
