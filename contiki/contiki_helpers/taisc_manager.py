@@ -11,7 +11,17 @@ class TAISCMACManager(MACManager):
         super(TAISCMACManager, self).__init__(node_manager, mac_mode)
         pass
 
-    def update_slotframe(self, slotframe_csv):
+    def update_slotframe(self, slotframe_csv, mac_protocol="TDMA"):
+        if mac_protocol is not "TDMA" and mac_protocol is not "TSCH":
+            self.log.error("Configuring slotframe not possible for {}".format(mac_protocol))
+            return -1
+        if self.mac_mode is not mac_protocol:
+            self.log.warning("Configuring {} slotframe in different mac mode {}".format(mac_protocol, self.mac_mode))
+        param_name = ""
+        if mac_protocol == "TDMA":
+            param_name = "IEEE802154_macSlotframe"
+        elif mac_protocol == "TSCH":
+            param_name = "IEEE802154e_macSlotframe"
         if slotframe_csv == '':
             slotframe_csv = './mac_managers/default_taisc_slotframe.csv'
         taisc_slotframe = read_taisc_slotframe(slotframe_csv)
@@ -22,20 +32,30 @@ class TAISCMACManager(MACManager):
             ret_dict[mac_address] = 0
         while(current_offset < taisc_slotframe.slotframe_length):
             slotframe_tpl = taisc_slotframe.to_tuple(current_offset, MAX_MSG_SIZE)
-            param_key_values_dict = {'taiscSlotframe': slotframe_tpl}
+            param_key_values_dict = {param_name: slotframe_tpl}
             print("UPDATE : %s" % (param_key_values_dict))
             ret = self.update_macconfiguration(param_key_values_dict)
             for mac_address in ret:
                 if type(ret[mac_address]) is dict:
-                    ret_dict[mac_address] += ret[mac_address]['taiscSlotframe']
-                    ret_val += ret[mac_address]['taiscSlotframe']
+                    ret_dict[mac_address] += ret[mac_address][param_name]
+                    ret_val += ret[mac_address][param_name]
                 else:
                     ret_dict[mac_address] += ret[mac_address]
                     ret_val += ret[mac_address]
             current_offset += slotframe_tpl[1]
         return ret_val
 
-    def add_slots(self, slotframe_csv):
+    def add_slots(self, slotframe_csv, mac_protocol="TDMA"):
+        if mac_protocol is not "TDMA" and mac_protocol is not "TSCH":
+            self.log.error("Configuring slotframe not possible for {}".format(mac_protocol))
+            return -1
+        if self.mac_mode is not mac_protocol:
+            self.log.warning("Configuring {} slotframe in different mac mode {}".format(mac_protocol, self.mac_mode))
+        param_name = ""
+        if mac_protocol == "TDMA":
+            param_name = "IEEE802154_macSlotlist"
+        elif mac_protocol == "TSCH":
+            param_name = "IEEE802154e_macSlotlist"
         if slotframe_csv == '':
             slotframe_csv = './mac_managers/default_taisc_slotframe.csv'
         current_offset = 0
@@ -45,10 +65,10 @@ class TAISCMACManager(MACManager):
             taisc_slotlist = taisc_mac_address_slot_list_dict[mac_address]
             while(current_offset < taisc_slotlist.slot_list_length):
                 slotlist_tpl = taisc_slotlist.to_tuple(current_offset, MAX_MSG_SIZE)
-                param_key_values_dict = {'taiscSlotList': slotlist_tpl}
+                param_key_values_dict = {param_name: slotlist_tpl}
                 ret = self.update_macconfiguration(param_key_values_dict, mac_address)
                 if type(ret[mac_address]) is dict:
-                    ret_val += ret[mac_address]['taiscSlotList']
+                    ret_val += ret[mac_address][param_name]
                 else:
                     ret_val += ret[mac_address]
                 current_offset += slotlist_tpl[0]
