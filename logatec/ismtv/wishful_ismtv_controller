@@ -7,6 +7,9 @@ import wishful_controller
 import gevent
 import wishful_upis as upis
 
+import numpy
+from matplotlib import pyplot
+
 __author__ = "Piotr Gawlowicz, Matevz Vucnik"
 __copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
 __version__ = "0.1.0"
