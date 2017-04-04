@@ -52,8 +52,21 @@ def get_channel_reponse(group, node, data):
 
 
 def print_response(group, node, data):
-    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data)) 
+    print("{} Print response : Group:{}, NodeIP:{}".format(datetime.datetime.now(), group, node.ip))
 
+    f_mhz = numpy.array(data['frequency']) / 1e6
+
+    pyplot.clf()
+    pyplot.grid()
+    pyplot.xlabel("frequency [MHz]")
+    pyplot.ylabel("power [dBm]")
+
+    # Plot data
+    pyplot.plot(f_mhz, data['power'])
+
+    pyplot.axis([min(f_mhz), max(f_mhz), -110, -50])
+    pyplot.show(block=False)
+    pyplot.pause(0.001)
 
 try:
     #Start controller
@@ -64,9 +77,9 @@ try:
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
-            controller.callback(print_response).node(nodes[0]).radio.iface("ismtv").get_noise()
+            controller.callback(print_response).node(nodes[0]).radio.iface("ismtv").get_measurements([868.3e6, 919.0e6, 400e3])
 
-        gevent.sleep(10)
+        gevent.sleep(1)
 
 except KeyboardInterrupt:
     print("Controller exits")
