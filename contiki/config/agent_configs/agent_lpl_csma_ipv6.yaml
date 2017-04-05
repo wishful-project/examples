@@ -3,13 +3,13 @@
 agent_info:
     name: 'contiki_control_agent'
     info: 'WiSHFUL example Contiki control agent'
-    iface: 'eth0'
+    iface: 'lo'
 
 modules:
     discovery:
         module : wishful_module_discovery_pyre
         class_name : PyreDiscoveryAgentModule
-        kwargs: {"iface":"eth0", "groupName":"wishful_contiki"}
+        kwargs: {"iface":"lo", "groupName":"wishful_contiki"}
     gitar_engine:
         module : wishful_module_gitar
         class_name : GitarEngine
