@@ -71,20 +71,27 @@ def print_response_sensor(group, node, data):
     pyplot.show(block=False)
     pyplot.pause(0.001)
 
-def print_response_generator(group, node, data):
+def print_response_generic(group, node, data):
     print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data)) 
 
 try:
     #Start controller
     controller.start()
 
+    start = True
+
     #control loop
     while True:
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
+            if start:
+                start = False
+                controller.callback(print_response_generic).node(nodes[0]).radio.iface("ismtv").get_radio_info("sensor")
+                controller.callback(print_response_generic).node(nodes[0]).radio.iface("ismtv").get_radio_info("generator")
+
             controller.callback(print_response_sensor).node(nodes[0]).radio.iface("ismtv").get_measurements([868.3e6, 919.0e6, 400e3])
-            controller.callback(print_response_generator).node(nodes[0]).radio.iface("ismtv").play_waveform(iface=10, freq=868e6, power_lvl=-10)
+            controller.callback(print_response_generic).node(nodes[0]).radio.iface("ismtv").play_waveform(iface=10, freq=869e6, power_lvl=-10)
 
         gevent.sleep(30)
 
