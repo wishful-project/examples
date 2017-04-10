@@ -23,7 +23,7 @@ agent.add_module(moduleName="discovery", pyModule="wishful_module_discovery_pyre
                  className="PyreDiscoveryAgentModule", kwargs={"iface":"lo", "groupName":"wishful_1234"})
 
 agent.add_module(moduleName="ismtv", pyModule="wishful_module_ismtv", 
-                 className="IsmtvModule", interfaces=['ismtv'])
+                 className="IsmtvModule", interfaces=['ismtv'], kwargs={"service":"http://127.0.0.1:9000", "serial":"/dev/ttyS1"})
 
 try:
     #Start agent
