@@ -1,35 +1,84 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+wishful_agent_ismtv.py: First implementation of WiSHFUL agent
+
+Usage:
+   wishful_agent_ismtv.py [options] [-q | -v]
+
+Options:
+   --logfile name      Name of the logfile
+   --config configFile Config file path
+
+Example:
+   ./wishful_agent_ismtv -v --config ./config.yaml
+
+Other options:
+   -h, --help          show this help message and exit
+   -q, --quiet         print less text
+   -v, --verbose       print more text
+   --version           show version and exit
+"""
+
 import logging
+import signal
+import sys, os
+import yaml
 import wishful_agent
 
-__author__ = "Piotr Gawlowicz, Matevz Vucnik"
+__author__ = "Piotr Gawlowicz, Mikolaj Chwalisz"
 __copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
 __version__ = "0.1.0"
-__email__ = "gawlowicz@tkn.tu-berlin.de, matevz.vucnik@ijs.si"
+__email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
 
-
-log = logging.getLogger('wishful_agent')
-logLevel = logging.INFO
-logging.basicConfig(level=logLevel, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
-
-#Create and configure
+log = logging.getLogger('wishful_agent.main')
 agent = wishful_agent.Agent()
 
-agent.set_agent_info(name="BasicAgent", info="BasicAgentInfo", iface="lo")
+def main(args):
+    log.debug(args)
 
-agent.add_module(moduleName="discovery", pyModule="wishful_module_discovery_pyre", 
-                 className="PyreDiscoveryAgentModule", kwargs={"iface":"lo", "groupName":"wishful_1234"})
+    config_file_path = args['--config']
 
-agent.add_module(moduleName="ismtv", pyModule="wishful_module_ismtv", 
-                 className="IsmtvModule", interfaces=['ismtv'], kwargs={"service":"http://127.0.0.1:9000", "serial":"/dev/ttyS1"})
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
 
-try:
-    #Start agent
+    agent.load_config(config)
     agent.run()
-except KeyboardInterrupt:
-    print("Agent exits")
-finally:
-    #Stop agent
-    agent.stop()
+
+
+if __name__ == "__main__":
+    try:
+        from docopt import docopt
+    except:
+        print("""
+        Please install docopt using:
+            pip install docopt==0.6.1
+        For more refer to:
+        https://github.com/docopt/docopt
+        """)
+        raise
+
+    args = docopt(__doc__, version=__version__)
+
+    log_level = logging.INFO  # default
+    if args['--verbose']:
+        log_level = logging.DEBUG
+    elif args['--quiet']:
+        log_level = logging.ERROR
+
+    logfile = None
+    if args['--logfile']:
+        logfile = args['--logfile']
+
+    logging.basicConfig(filename=logfile, level=log_level,
+        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    try:
+        main(args)
+    except KeyboardInterrupt:
+        log.debug("Agent exits")
+    finally:
+        log.debug("Exit")
+        agent.stop()
