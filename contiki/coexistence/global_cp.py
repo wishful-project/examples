@@ -191,30 +191,10 @@ if __name__ == "__main__":
     else:
         import os
         log_dir = os.getcwd()
-        
-    measurement_logger_file                     = FileMeasurementLogger(experiment_name, radio_measurement_list + radio_event_list, log_dir + "/" + experiment_group + "/" )
-    measurement_logger_gnuplot_energy           = GnuplotMeasurementLogger(experiment_name, radio_measurement_list + radio_event_list, log_dir + "/" + experiment_group + "/" )
-    measurement_logger_gnuplot_current          = GnuplotMeasurementLogger(experiment_name, ["current"], log_dir + "/" + experiment_group + "/" )
-    measurement_logger_gnuplot_strobe_uc        = GnuplotMeasurementLogger(experiment_name, ["strobe_uc"], log_dir + "/" + experiment_group + "/" )
-    measurement_logger_gnuplot_strobe_bc        = GnuplotMeasurementLogger(experiment_name, ["strobe_bc"], log_dir + "/" + experiment_group + "/" )
-    measurement_logger_gnuplot_strobe_time_uc   = GnuplotMeasurementLogger(experiment_name, ["strobe_time_uc"], log_dir + "/" + experiment_group + "/" )
-    measurement_logger_gnuplot_strobe_time_bc   = GnuplotMeasurementLogger(experiment_name, ["strobe_time_bc"], log_dir + "/" + experiment_group + "/" )
-    measurement_logger_gnuplot_tx_stats         = GnuplotMeasurementLogger(experiment_name, ["tx_statistics"], log_dir + "/" + experiment_group + "/" )
-    
-    measurement_logger_file.start_logging()
-    measurement_logger_gnuplot_energy.start_logging()
-    measurement_logger_gnuplot_current.start_logging()
-    measurement_logger_gnuplot_strobe_bc.start_logging()
-    measurement_logger_gnuplot_strobe_uc.start_logging()
-    measurement_logger_gnuplot_strobe_time_bc.start_logging()
-    measurement_logger_gnuplot_strobe_time_uc.start_logging()
-    measurement_logger_gnuplot_tx_stats.start_logging()
 
     nodes = []
     counter = 0  
     time = 0
-    measurements = numpy.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-    prev_measurements = numpy.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         
     config_file_path = args['--config']
     config = None
@@ -243,16 +223,7 @@ if __name__ == "__main__":
         app_manager.rpl_set_border_router([0xfd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01],border_router_id)
           
         global_node_manager.start_local_monitoring_cp()
-        gevent.sleep(5) 
-        ret_events = taisc_manager.subscribe_events(["IEEE802154_event_contikimacStats"],   event_cb, 0) 
-        ret_events = taisc_manager.subscribe_events(["IEEE802154_event_energyStats"],       event_cb, 0)
-        print("Suscribe event returns %s"%(ret_events))
-        
-        print("Activating server")
-        app_manager.update_configuration({"APP_ActiveApplication": 1},[1])
-        print("Activating clients")
-        app_manager.update_configuration({"APP_ActiveApplication": 2},range(2,len(global_node_manager.get_mac_address_list())+1))
-        
+      
         while True:
             gevent.sleep(20)
     except KeyboardInterrupt:
