@@ -221,9 +221,12 @@ if __name__ == "__main__":
         border_router_id = 1
         print("Set node %d as border router"%(border_router_id))
         app_manager.rpl_set_border_router([0xfd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01],border_router_id)
-          
+        
         global_node_manager.start_local_monitoring_cp()
-      
+        
+        ret_events = taisc_manager.subscribe_events(["coexistence_stats"], event_cb, 0)
+        print("Suscribe event returns %s"%(ret_events))      
+        
         while True:
             gevent.sleep(20)
     except KeyboardInterrupt:
