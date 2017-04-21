@@ -224,8 +224,9 @@ if __name__ == "__main__":
         
         global_node_manager.start_local_monitoring_cp()
         
+        gevent.sleep(2)
         ret = taisc_manager.update_slotframe('./coexistence/default_taisc_slotframe.csv')
-        print("Update slot frame " + ret)
+        print("Update slot frame " + str(ret))
         ret_events = taisc_manager.subscribe_events(["coexistence_stats"], event_cb, 0)
         print("Suscribe event returns %s"%(ret_events))      
         
