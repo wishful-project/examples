@@ -208,7 +208,7 @@ if __name__ == "__main__":
             
         global_node_manager = GlobalNodeManager(config)
         app_manager = AppManager(global_node_manager)
-        taisc_manager = TAISCMACManager(global_node_manager, "ContikiMAC")
+        taisc_manager = TAISCMACManager(global_node_manager, "TDMA")
         
         global_node_manager.set_default_callback(default_callback)
 
