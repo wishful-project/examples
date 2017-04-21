@@ -87,7 +87,7 @@ def default_callback(group, node, cmd, data, interface = ""):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}, interface: {}".format(datetime.datetime.now(), group, node.name, cmd, data, interface))
 
 def event_cb(mac_address, event_name, event_value):
-    print(str(event_name) + " : " + str(event_value))
+    print(str(event_name) + " : " + str(event_value) + " (" + str(mac_address) + ")")
     global packet_statistics_total
     #~ print("Event " + event_name + "(" + event_value[0] + "," + event_value[0])
     if event_name == "IEEE802154_event_contikimacStats":
@@ -225,10 +225,12 @@ if __name__ == "__main__":
         global_node_manager.start_local_monitoring_cp()
         
         gevent.sleep(2)
-        ret = taisc_manager.update_slotframe('./coexistence/default_taisc_slotframe.csv')
-        print("Update slot frame " + str(ret))
+        #~ ret = taisc_manager.update_slotframe('./coexistence/default_taisc_slotframe.csv')
+        #~ print("Update slot frame " + str(ret))
         ret_events = taisc_manager.subscribe_events(["coexistence_stats"], event_cb, 0)
-        print("Suscribe event returns %s"%(ret_events))      
+        print("Suscribe event returns %s"%(ret_events))    
+        ret_events = taisc_manager.subscribe_events(["tdma_stats"], event_cb, 0)
+        print("Suscribe event returns %s"%(ret_events))        
         
         while True:
             gevent.sleep(20)
