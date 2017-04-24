@@ -36,6 +36,7 @@ from measurement_logger import *
 from stdout_measurement_logger import *
 from file_measurement_logger import *
 from gnuplot_measurement_logger import *
+from mysql_measurement_logger import *
 from contiki.contiki_helpers.global_node_manager import *
 from contiki.contiki_helpers.taisc_manager import *
 from contiki.contiki_helpers.app_manager import *
@@ -46,107 +47,19 @@ __copyright__ = "Copyright (c) 2016, IMEC"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
-CONTIKIMAC_TX_SUCCESS       = 0;
-CONTIKIMAC_TX_NOACK         = 1;
-CONTIKIMAC_TX_COLLISION     = 2;
-CONTIKIMAC_CCA_FAILED       = 3;
-
-cm_msg_type_index           = 0;
-cm_msg_success_index        = 1;
-cm_msg_size_index           = 2;
-cm_strobe_amount_index      = 3;
-cm_strobe_duration_index    = 4;
-
-BROADCAST_STAT              = 1
-UNICAST_STAT                = 2
-
-radio_measurement_list = [
-    "IEEE802154_measurement_macStats",
-    "IEEE802154_measurement_energyStats"   
-]
-radio_event_list = [
-    "IEEE802154_event_macStats",
-    "IEEE802154_event_energyStats"
-]
-
 log = logging.getLogger('contiki_global_control_program')
 
-measurement_logger_file                     = None
-measurement_logger_gnuplot_energy           = None
-measurement_logger_gnuplot_current          = None
-measurement_logger_gnuplot_strobe_uc        = None
-measurement_logger_gnuplot_strobe_bc        = None
-measurement_logger_gnuplot_strobe_time_uc   = None
-measurement_logger_gnuplot_strobe_time_bc   = None
-measurement_logger_gnuplot_tx_stats         = None
+coexistence_logger  = None
 
 packet_statistics_total = 0
 packet_statistics = { 0:0, 1:0, 2:0, 3:0}
 
 def default_callback(group, node, cmd, data, interface = ""):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}, interface: {}".format(datetime.datetime.now(), group, node.name, cmd, data, interface))
+    #~ coexistence_logger.log_measurement(
 
 def event_cb(mac_address, event_name, event_value):
     print(str(event_name) + " : " + str(event_value) + " (" + str(mac_address) + ")")
-    global packet_statistics_total
-    #~ print("Event " + event_name + "(" + event_value[0] + "," + event_value[0])
-    if event_name == "IEEE802154_event_contikimacStats":
-        # Broadcast:
-        #~ if event_value[0] == BROADCAST_STAT:
-            #~ measurement_logger_gnuplot_strobe_Bc.log_measurement("strobe_bc", str(event_value[cm_msg_size_index]) + " " + str(event_value[cm_strobe_amount_index]))
-            #~ measurement_logger_gnuplot_strobe_time_bc.log_measurement("strobe_time_bc", str(event_value[cm_msg_size_index]) + " " + str(event_value[cm_strobe_duration_index]))
-        # Unicast:
-        if event_value[cm_msg_type_index] == UNICAST_STAT and  event_value[cm_msg_success_index] == CONTIKIMAC_TX_SUCCESS:
-            measurement_logger_gnuplot_strobe_uc.log_measurement("strobe_uc", str(event_value[cm_msg_size_index]) + " " + str(event_value[cm_strobe_amount_index]))
-            measurement_logger_gnuplot_strobe_time_uc.log_measurement("strobe_time_uc", str(event_value[cm_msg_size_index]) + " " + str(event_value[cm_strobe_duration_index]))
-        
-        if event_value[cm_msg_type_index] == UNICAST_STAT:
-            packet_statistics[event_value[cm_msg_success_index]]+= 1
-            packet_statistics_total += 1
-            
-    elif event_name == "IEEE802154_event_energyStats":
-        threading.Thread(target=flush_measurements("TAISC_event", mac_address, event_name, event_value, mac_address)).start()
-    
-def contikimac_event_cb(mac_address, event_name, event_value):
-    print(str(mac_address) + " - " + str(event_name) + " - " + str(event_value))
-
-def flush_measurements(group, node, cmd, data, interface):
-    global counter,measurements,prev_measurements, time
-    counter += 1
-    measurement_logger_file.log_measurement(cmd, str((interface,) + data).replace(" ", "").replace("'","")[1:-2])
-    measurements += numpy.array(data)/64
-    if(counter == 64):
-        time += measurements[0]
-        log_measurements    = (measurements - prev_measurements)/(measurements.item(0)/1000000) * 31.25
-        log_measurements[0] = time
-        prev_measurements   = measurements
-        measurement_logger_gnuplot_energy.log_measurement(cmd, log_measurements.tolist())
-        measurement_logger_gnuplot_current.log_measurement("current", [((25.8 *  log_measurements.item(1) + 1.6 * log_measurements.item(2) + log_measurements.item(3) * 0.175 + 22.3 * log_measurements.item(4)) / 1000000 * 3)])
-        counter = 0
-        measurements = numpy.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-
-def signal_handler(signum, frame):
-    if packet_statistics_total != 0:
-        value = (packet_statistics[CONTIKIMAC_TX_SUCCESS] if CONTIKIMAC_TX_SUCCESS in packet_statistics else 0) * 100 / packet_statistics_total
-        measurement_logger_gnuplot_tx_stats.log_measurement("tx_statistics","success    " + str(value))
-        value = (packet_statistics[CONTIKIMAC_TX_NOACK] if CONTIKIMAC_TX_NOACK in packet_statistics else 0) * 100 / packet_statistics_total
-        measurement_logger_gnuplot_tx_stats.log_measurement("tx_statistics","noack      " + str(value))
-        value = (packet_statistics[CONTIKIMAC_TX_COLLISION] if CONTIKIMAC_TX_COLLISION in packet_statistics else 0) * 100 / packet_statistics_total
-        measurement_logger_gnuplot_tx_stats.log_measurement("tx_statistics","collision  " + str(value))
-        value = (packet_statistics[CONTIKIMAC_CCA_FAILED] if CONTIKIMAC_CCA_FAILED in packet_statistics else 0) * 100 / packet_statistics_total
-        measurement_logger_gnuplot_tx_stats.log_measurement("tx_statistics","cca\\\\_failed " + str(value))
-    
-    measurement_logger_file.stop_logging()
-    measurement_logger_gnuplot_energy.stop_logging()
-    measurement_logger_gnuplot_current.stop_logging()
-    measurement_logger_gnuplot_strobe_bc.stop_logging()
-    measurement_logger_gnuplot_strobe_uc.stop_logging()
-    measurement_logger_gnuplot_strobe_time_bc.stop_logging()
-    measurement_logger_gnuplot_strobe_time_uc.stop_logging()
-    measurement_logger_gnuplot_tx_stats.stop_logging()
-
-    log.debug("Exit")
-    global_node_manager.stop()
 
 if __name__ == "__main__":
     try:
@@ -199,8 +112,8 @@ if __name__ == "__main__":
     config_file_path = args['--config']
     config = None
     
-    
-    signal.signal(signal.SIGTERM, signal_handler)
+    coexistence_logger  = MySQLMeasurementLogger(experiment_name, {"coexistence_stats":"channel part_a part_b", "tdma_stats":"channel tx rx"}, "localhost")
+    coexistence_logger.start_logging()
     
     try:
         with open(config_file_path, 'r') as f:
@@ -235,6 +148,8 @@ if __name__ == "__main__":
         while True:
             gevent.sleep(20)
     except KeyboardInterrupt:
+        log.debug("Exit")
+        global_node_manager.stop()
         log.debug("Controller exits")
         import sys
         sys.exit(0)
