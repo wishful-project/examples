@@ -56,10 +56,10 @@ packet_statistics = { 0:0, 1:0, 2:0, 3:0}
 
 def default_callback(group, node, cmd, data, interface = ""):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}, interface: {}".format(datetime.datetime.now(), group, node.name, cmd, data, interface))
-    #~ coexistence_logger.log_measurement(
 
 def event_cb(mac_address, event_name, event_value):
     print(str(event_name) + " : " + str(event_value) + " (" + str(mac_address) + ")")
+    coexistence_logger.log_measurement(event_name, event_value)
 
 if __name__ == "__main__":
     try:
