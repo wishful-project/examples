@@ -2,32 +2,19 @@ import time
 import numpy as np
 import _thread
 
+
+
 #---------- CONSTANTS ----------
-C = 1
+#C=0.81
+C=1.6
 #-------------------------------
 
 class Centralized_react:
-	""" init functions
-	"""
-	def __init__(self, T, W, w, node_number):
-		self.debug_mode = 0
-		self.T = T
-		self.T_virtual = [row[:] for row in self.T]
-		self.W = W
-		self.w = w
-		self.S = []
-		self.node_number = node_number
-
-		if self.debug_mode:
-			self.print_matrix(self.T)
-		self.add_two_hops_link()
-		if self.debug_mode:
-			self.print_matrix(self.T_virtual)
-		self.S = self.init_S()
-
-		self.update_enabler = False
-
-
+	def print_matrix(self, A):
+		print('--------------------')
+		print('\n'.join([''.join(['{}\t'.format(item) for item in row]) for row in A]))
+		print('--------------------')
+	
 	def init_S(self):
 		S = []
 		N = len(self.T)
@@ -39,7 +26,7 @@ class Centralized_react:
 
 		for i in range(0,N):
 			for j in range(0,N):
-				if self.T_virtual[i][j]!= 0:
+				if self.T_virtual[i][j]!= 0 or i==j:
 					S[i][j]= {'w' : self.w[j], 'claim' : self.w[j], 'offer' : 1}
 
 		# i=0
@@ -53,52 +40,30 @@ class Centralized_react:
 
 		return S
 
-
-	def add_two_hops_link(self):
-		for i in range(0, self.node_number):
-			for j in range(0, self.node_number):
-				#print("%d - %d" %(i, self.W[i][j]))
-				if self.W[i][j] > 0 :
-					neighj = [k for k,x in enumerate(self.T[j]) if x==1] #neighj=find(G(j,:)==1);
-					#print(self.T[j])
-					#print(neighj)
-					#print(self.T_virtual[i])
-					for k in range(0, len(neighj)):
-						self.T_virtual[i][neighj[k]] = 1 #G2(i,neighj)=1;
-						self.T_virtual[neighj[k]][i] = 1 #G2(neighj,i)=1;
-					#print(self.T_virtual[i])
-					#self.print_matrix(self.T)
-
-	""" react functions
-	"""
-	def update_offer(self, neigh_list ,my_mac):
+	def update_offer(self,neigh_list,my_mac):
 		done = False
 		A = C
 		D = [key for key,val in neigh_list.items()]
-		Dstar = []
-		iteration = 0
-		#print('%d - set(D) %s - set(Dstar) %s - offer %f' % (iteration, str(set(D)), str(set(Dstar)), neigh_list[my_mac]['offer']))
+		Dstar=[]
 		while done == False:
-			Ddiff = list(set(D) - set(Dstar))
-
+			Ddiff=list(set(D)-set(Dstar))
 			if set(D) == set(Dstar):
 				done = True
 				neigh_list[my_mac]['offer'] = A + max([val['claim'] for key,val in neigh_list.items()])
 			else:
 				done = True
-				neigh_list[my_mac]['offer'] = A / float(len(Ddiff))
+				neigh_list[my_mac]['offer'] = A / float(len(Ddiff)) 
 				for b in Ddiff:
 					if neigh_list[b]['claim'] < neigh_list[my_mac]['offer']:
 						Dstar.append(b)
 						A -= neigh_list[b]['claim']
-						done = False
-			iteration += 1
-			#print('%d - set(D) %s - set(Dstar) %s - offer %f' % (iteration, str(set(D)), str(set(Dstar)), neigh_list[my_mac]['offer']))
+						done = False	
+		#neigh_list[my_mac]['offer'] = neigh_list[my_mac]['offer'] - neigh_list[my_mac]['claim']
 		return neigh_list
 
-	def update_claim(self, neigh_list, my_mac):
-		off_w = [ val['offer'] for key,val in neigh_list.items() ]
-		off_w.append( neigh_list[my_mac]['w'] )
+	def update_claim(self,neigh_list,my_mac):
+		off_w = [val['offer'] for key,val in neigh_list.items()]
+		off_w.append(neigh_list[my_mac]['w'])
 		neigh_list[my_mac]['claim'] = min(off_w)
 		return neigh_list
 
@@ -110,22 +75,12 @@ class Centralized_react:
 					ll_b[key_b]['offer'] = ll_a[key_a]['offer']
 		return ll_b
 
-
-	""" printing functions
-	"""
-
-	def print_matrix(self, A):
-		print('--------------------')
-		print('\n'.join([''.join(['{}\t'.format(item) for item in row]) for row in A]))
-		print('--------------------')
-
 	def print_neigh_list(self,S):
 		i=0
 		for s in S:
 			print("node: {}".format(i))	
 			for k,v in s.items():
-				#if v:
-				if v and k == i:
+				if v:
 					print("k : {} w:{} \t claim:{}\t offer:{}".format(k, v['w'], v['claim'], v['offer']))
 			i+=1
 
@@ -133,10 +88,10 @@ class Centralized_react:
 		node_index = 0
 		curr_claim=[0 for x in range(0, self.node_number)]
 		for s in self.S:
-			#print("node: {}".format(node_index))
+			print("node: {}".format(node_index))
 			for k, v in s.items():
 				if v and node_index == k:
-					print("k: {} - node claim: {}".format(k, v['claim']))
+					print("node claim: {}".format(v['claim']))
 					curr_claim[node_index] = v['claim']
 			node_index += 1
 		return curr_claim
@@ -157,11 +112,52 @@ class Centralized_react:
 			node_index += 1
 		return [curr_claim, curr_w, curr_offer]
 
+	# def add_two_hops_link(self):
+	# 	nh = 2
+	# 	i = 0
+	# 	while i < len(self.w) - nh:
+	# 		if self.w[i] + self.w[i+1] + self.w[i+2] == 1 and self.w[i+1] == 0:
+	# 			self.T[i][i+nh] = 1
+	# 			self.T[i+nh][i] = 1
+	# 		i += 1
+
+	def add_two_hops_link(self):
+		for i in range(0, self.node_number):
+			for j in range(0, self.node_number):
+				# print("%d - %d" %(i, self.W[i][j]))
+				if self.W[i][j] > 0 :
+					neighj = [k for k,x in enumerate(self.T[j]) if x==1] #neighj=find(G(j,:)==1);
+					#print(self.T[j])
+					#print(neighj)
+					#print(self.T_virtual[i])
+					for k in range(0, len(neighj)):
+						self.T_virtual[i][neighj[k]] = 1 #G2(i,neighj)=1;
+						self.T_virtual[neighj[k]][i] = 1 #G2(neighj,i)=1;
+					#print(self.T_virtual[i])
+					#self.print_matrix(self.T)
+
+
+	def __init__(self, T, W, w, node_number):
+		self.debug_mode = 1
+		self.T = T
+		self.T_virtual = [row[:] for row in self.T]
+		self.W = W
+		self.w = w
+		self.S = []
+		self.node_number = node_number
+		self.update_enabler = False
+
+		if self.debug_mode:
+			self.print_matrix(self.T)
+		self.add_two_hops_link()
+		if self.debug_mode:
+			self.print_matrix(self.T_virtual)
+		self.S = self.init_S()
+
 
 	def update_traffic(self, W, w):
 		self.W = W
 		self.w = w
-		self.T_virtual = [row[:] for row in self.T]
 
 		if self.debug_mode:
 			self.print_matrix(self.T)
@@ -176,13 +172,13 @@ class Centralized_react:
 
 		self.update_enabler = False
 
-
 	def run_loop(self):
 		# init neighbors list
 
+		iteration = 0
 		while True:
 			if self.update_enabler:
-				#self.print_neigh_list(self.S)
+				# self.print_neigh_list(self.S)
 				#curr_claim=self.get_claim_list()
 				for i in range(0, self.node_number):
 					self.S[i]=self.update_offer(self.S[i],i)

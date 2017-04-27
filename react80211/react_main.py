@@ -3,178 +3,42 @@ import time
 import numpy as np
 import _thread
 def main():
-	T=[	[1, 1, 1],
-		[1, 1, 1],
-		[1, 1, 1]]
-	w = [1,1,1]
 
-	T=[	[1, 1, 0, 0],
-		[1, 1, 1, 0],
-		[0, 1, 1, 1],
-		[0, 0, 1, 1]]
-	w = [1,0,0,1]
 
-	T=[	[1, 1, 1, 0],
-		[1, 1, 1, 1],
-		[1, 1, 1, 1],
-		[0, 1, 1, 1]]
-	w = [1,0,0,1]
+	T_topology = [	[0,     1,     1,     0,     0,     0], #A
+	[1,     0,     1,     0,     0,     0], #B
+	[1,     1,     0,     0,     0,     0], #C
+	[0,     0,     0,     0,     0,     0], #D
+	[0,     0,     0,     0,     0,     0], #E
+	[0,     0,     0,     0,     0,     0]] #F
 
-	T=[	[1, 1, 0, 0],
-		[1, 1, 1, 1],
-		[0, 1, 1, 1],
-		[0, 1, 1, 1]]
-	w = [1,0,1,1]
 
-	"""
-	# ALTRO ESEMPIO: A-B-C-D-E
-	T=[	[1,     1,     0,     0,     0],
-		[1,     1,     1,     0,     0],
-		[0,     1,     1,     1,     0],
-		[0,     0,     1,     1,     1],
-		[0,     0,     1,     1,     1]]
-	w=[1,     0,     0,     1,     1]
-	#Matrice Iniziale con Aggiunzioni di link A-C e B-D
-	#connectivity matrix
-	# [A]-->[B]<--[C]
-	T=[	[1, 1, 0,],
-		[1, 1, 1,],
-		[0, 1, 1,]]
-	w = [1,1,1]
+	w_source = [0,     0,     0,     0,     0,     0]
 
-	# FULL CONNECTED TOPOLOGY
-	T=[	[1, 1, 1],
-		[1, 1, 1],
-		[1, 1, 1]]
-	w = [1,1,1]
-	"""
+	W_source = [	[0,     0,     0,     0,     0,     0],
+	[0,     0,     0,     0,     0,     0],
+	[0,     0,     0,     0,     0,     0],
+	[0,     0,     0,     0,     0,     0],
+	[0,     0,     0,     0,     0,     0],
+	[0,     0,     0,     0,     0,     0]]
 
-	iteration_number = 2
-	# #		D		A		B	  C		E		F
-	# T = [	[0,     1,     0,     0,     0,     0], #D
-	# 		[1,     0,     1,     0,     0,     0], #A
-	# 		[0,     1,     0,     1,     0,     1], #B
-	# 		[0,     0,     1,     0,     1,     1], #C
-	# 		[0,     0,     0,     1,     0,     1], #E
-	# 		[0,     0,     1,     1,     1,     0]] #F
-	#		D		A		B	  C		E		F
-	T = [	[1,     1,     0,     0,     0,     0], #D
-			[1,     1,     1,     0,     0,     0], #A
-			[0,     1,     1,     1,     0,     1], #B
-			[0,     0,     1,     1,     1,     1], #C
-			[0,     0,     0,     1,     1,     1], #E
-			[0,     0,     1,     1,     1,     1]] #F
-	#		D		A		B	  C		E		F
-	w = [0,     1,     0,     0,     1,     0]
-	W = [	[0,     0,     0,     0,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     1,     0,     0],
-			[0,     0,     0,     0,     0,     0]]
+	node_claim_order = [0, 1, 2, 3, 4, 5]
 
-	x= Centralized_react(T, W, w, len(w))
+	#start REACT
+	x = Centralized_react(T_topology, W_source, w_source, len(w_source))
 	_thread.start_new_thread( x.run_loop, () )
-
-	i=0
-	while i < iteration_number:
-		print(x.get_claim_list())
-		time.sleep(1)
-		i += 1
-
-	#		D		A		B	  C		E		F
-	w = [0,     0,     0,     0,     1,     0]
-	W = [	[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     1,     0,     0],
-			[0,     0,     0,     0,     0,     0]]
-	x.update_traffic(W, w)
-
-	i=0
-	while i < iteration_number:
-		print(x.get_claim_list())
-		time.sleep(1)
-		i += 1
+	time.sleep(1)
+	[staions_claims, stations_w, stations_offer] = x.get_node_react_list()
 
 
-	#	D		A		B	  C		E		F
-	w = [0,     1,     0,     1,     0,     0]
-	W = [	[0,     0,     0,     0,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0]]
-	x.update_traffic(W, w)
-	i=0
-	while i < iteration_number:
-		print(x.get_claim_list())
-		time.sleep(1)
-		i += 1
-
-	#	D		A		B	  C		E		F
-	w = [0,     1,     1,     1,     0,     0]
-	W = [	[0,     0,     0,     0,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     1,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0]]
-	x.update_traffic(W, w)
-	i=0
-	while i < iteration_number:
-		print(x.get_claim_list())
-		time.sleep(1)
-		i += 1
-
-
-	#	D		A		B	  C		E		F
-	w = [0,     0.2,     0.2,     0.2,     0,     0]
-	W = [	[0,     0,     0,     0,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     1,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0]]
-	x.update_traffic(W, w)
-	i=0
-	while i < iteration_number:
-		print(x.get_claim_list())
-		time.sleep(1)
-		i += 1
-
-
-	#	D		A		B	  C		E		F
-	w = [0,     1,     0,     0,     1,     0]
-	W = [	[0,     0,     0,     0,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     0,     1,     0,     0],
-			[0,     0,     0,     0,     0,     0]]
-	x.update_traffic(W, w)
-	i=0
-	while i < iteration_number:
-		print(x.get_claim_list())
-		time.sleep(1)
-		i += 1
-
-	#	D		A		B	  C		E		F
-	w = [0,     1,     0,     1,     1,     0]
-	W = [	[0,     0,     0,     0,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     0,     0,     0],
-			[0,     0,     1,     0,     0,     0],
-			[0,     0,     0,     1,     0,     0],
-			[0,     0,     0,     0,     0,     0]]
-	x.update_traffic(W, w)
-	i=0
-	while i < iteration_number:
-		print(x.get_claim_list())
-		time.sleep(1)
-		i += 1
+	#update react
+	w_source = [1, 1, 1, 0, 0, 0]
+	W_source = [ [0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
+	x.update_traffic(W_source, w_source)
+	[staions_claims, stations_w, stations_offer] = x.get_node_react_list()
+	print(w_source)
+	print('A B C D E F')
+	print(staions_claims)
 
 if __name__ == "__main__":
 	main()

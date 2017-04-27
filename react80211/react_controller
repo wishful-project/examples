@@ -76,6 +76,7 @@ sys.path.append('../../controller')
 import wishful_controller
 import wishful_upis as upis
 from react_local_control_program import react
+from helper.MeasurementManager import MeasurementCollector
 
 __author__ = "Domenico Garlisi"
 __copyright__ = "Copyright (c) 2015, CNIT"
@@ -83,12 +84,52 @@ __version__ = "0.1.0"
 __email__ = "domenico.garlisi@cnit.it"
 
 
+class WiFiNode():
+    """
+    This class defines an WiFi node and takes the most appropriate actions in order to :
+        Set wireless lan interface ip address and network role (Station/AccessPoint)
+        Stores/Removes low level measurements
+        Store the low level measurements type
+    """
+    def __init__(self, node, mac_address):
+        """ Creates a new WiFiNode object
+        """
+        self.node = node
+        self.wlan_ipAddress = '192.168.0.' + node.ip.split('.')[3]
+        self.mac_address = mac_address
+        self.measurements = []
+        self.measurements_types = []
+        self.role = None
+        self.platform = None
+        self.interface = None
+
+    def add_measure(self, measure):
+        """ Adds a measure or a list of measurable in the list of node measurement
+        :param measure: list of measure to add at measurements object attribute
+        """
+        self.measurements.append(measure)
+
+    def get_available_measures(self):
+        """ Gets the available measure of the node
+        :return measure_list: the list of measure stored until now
+        """
+        return self.measurements
+
+
+
+
+
+
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller()
+#create MeasurementCollector object, to keep information about WiFiNode measurements and perform plotting result
+meas_collector = MeasurementCollector(log)
 
 nodes = []
+wifinodes = []
 configuration_message_for_visualizzer = {}
 do_run = None
+
 
 @controller.new_node_callback()
 def new_node(node):
@@ -144,11 +185,18 @@ def collect_remote_messages(lcpDescriptor_node, socket_visualizer, mac_address, 
     while getattr(receive_thread, "do_run", True):
         msg = lcpDescriptor_node.recv(timeout=0.1)
         if msg:
-            #log.info("Recv ctrl message from remote local control program : %s" % str(msg))
-            for ii in range(0, len(mac_address)):
-                if msg['mac_address'] == mac_address[ii]:
-                    msg['label'] = label[ii]
-                    socket_visualizer.send_json(msg)
+            log.info("Recv: %s" % str(msg))
+            #print("Recv: %s" % str(msg))
+
+            # for ii in range(0, len(mac_address)):
+            #     if msg['mac_address'] == mac_address[ii]:
+            #         msg['label'] = label[ii]
+            #         socket_visualizer.send_json(msg)
+
+            # add measurement on nodes element
+            for node in wifinodes:
+                if node.mac_address == msg['mac_address'] and msg['measure'][0][0] != 0:
+                    node.measurements.append(msg['measure'])
 
         gevent.sleep(1)
 
@@ -186,6 +234,54 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
+
+def setAP(controller, node, iface, wlan_ip, essid):
+        """ Creates infrastructure BSS, uses node such as Access Point
+        :param node: elected Access Point Node
+        :param essid: the SSID
+        """
+        #stop hostpad
+        rvalue = controller.nodes(node).net.stop_hostapd()
+        #set ip address
+        rvalue = controller.nodes(node).net.set_ip_address(iface, wlan_ip)
+        #set hostapd configuration
+        rvalue = controller.nodes(node).net.set_hostapd_conf(iface, './helper/hostapd.conf', 6, essid)
+        #start hostapd
+        rvalue = controller.nodes(node).net.start_hostapd('./helper/hostapd.conf')
+        #set power
+        rvalue = controller.nodes(node).radio.set_tx_power(15)
+        #set modulation rate
+        rvalue = controller.nodes(node).radio.set_modulation_rate(6)
+
+def setSTA(controller, node, iface, wlan_ip, essid):
+        """ Associate node to infrastructure BSS
+        :param node: elected station node by associate
+        :param essid: the SSID
+        """
+        #stop hostpad
+        rvalue = controller.nodes(node).net.stop_hostapd()
+        #set ip address
+        rvalue = controller.nodes(node).net.set_ip_address(iface, wlan_ip)
+        #set power
+        rvalue = controller.nodes(node).radio.set_tx_power(15)
+        #set modulation rate
+        rvalue = controller.nodes(node).radio.set_modulation_rate(6)
+        connected = False
+        for ii in range(10):
+            #associate station
+            rvalue = controller.nodes(node).net.connect_to_network(iface, essid)
+            time.sleep(2)
+            #dump connection
+            rvalue = controller.nodes(node).net.network_dump(iface)
+            #self.log.debug('dump connection :\n%s\n'  % (str(rvalue) ))
+            flow_info_lines = rvalue.rstrip().split('\n')
+            if flow_info_lines[0][0:9] == "Connected" :
+                connected = True
+                break
+
+        return connected
+
+
 def main(args):
     # get info from configuration csv file
     global nodes
@@ -201,62 +297,23 @@ def main(args):
 
     nodes_info_path=args['--nodes']
     if nodes_info_path:
-        [hosts, driver, eth_ip, freq,tx_power, wlan_ip, mac_address, label]=set_hosts(nodes_info_path)
-        print([hosts, driver, eth_ip, freq, tx_power, wlan_ip, mac_address, label])
+        [hosts, driver, eth_ip, freq,tx_power, wlan_ip, mac_address, label, role, iface]=set_hosts(nodes_info_path)
+        print([hosts, driver, eth_ip, freq, tx_power, wlan_ip, mac_address, label, role, iface])
 
     #Start controller
     controller.start()
 
 
-    # MAX_THR=5140 #kbps
-    # #Setup topology
-    # #		D		A		B	  C		E		F
-    # T_topology = [	[1,     1,     0,     0,     0,     0], #D
-		# 	[1,     1,     1,     0,     0,     0], #A
-		# 	[0,     1,     1,     1,     0,     1], #B
-		# 	[0,     0,     1,     1,     1,     1], #C
-		# 	[0,     0,     0,     1,     1,     1], #E
-		# 	[0,     0,     1,     1,     1,     1]] #F
-    # #		D		A		B	  C		E		F
-    # w_source = [0,     0,     0,     0,     0,     0]
-    # W_source = [	[0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0]]
-    # node_claim_order = [1, 2, 3, 0, 4, 5]
-
-
-    # MAX_THR=5140 #kbps
-    # #Setup topology
-    # #		        A		B	  C		D       E		F
-    # T_topology = [	[1,     1,     0,     1,     0,     0], #A
-		# 	[1,     1,     1,     0,     0,     1], #B
-		# 	[0,     1,     1,     0,     1,     1], #C
-		# 	[1,     0,     0,     1,     0,     0], #D
-		# 	[0,     0,     1,     0,     1,     1], #E
-		# 	[0,     1,     1,     0,     1,     1]] #F
-    # #		A		B	  C		D       E		F
-    # w_source = [0,     0,     0,     0,     0,     0]
-    # W_source = [	[0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0],
-		# 	        [0,     0,     0,     0,     0,     0]]
-    # node_claim_order = [0, 1, 2, 3, 4, 5]
-
     MAX_THR=5140 #kbps
     #Setup topology
-    #		        A		B	  C		D       E		F
+    #				A		B	  C		D,      E		F
     T_topology = [	[1,     1,     1,     0,     0,     0], #A
 			[1,     1,     1,     0,     0,     0], #B
 			[1,     1,     1,     0,     0,     0], #C
-			[1,     0,     0,     0,     0,     0], #D
+			[0,     0,     0,     0,     0,     0], #D
 			[0,     0,     0,     0,     0,     0], #E
 			[0,     0,     0,     0,     0,     0]] #F
-    #		A		B	  C		D       E		F
+    #				A		B	  C		D,      E		F
     w_source = [0,     0,     0,     0,     0,     0]
     W_source = [	[0,     0,     0,     0,     0,     0],
 			        [0,     0,     0,     0,     0,     0],
@@ -271,7 +328,6 @@ def main(args):
     while do_run:
         gevent.sleep(1)
         print("\nConnected nodes", [str(node.name) for node in nodes])
-        if True:
         if len(nodes) >= len(hosts):
             time.sleep(1)
             lcpDescriptor_nodes = []
@@ -301,16 +357,19 @@ def main(args):
             nodes = nodes_sort
 
             react_time_update = 1 #seconds
-            react_algorithm_activation = False
+            react_algorithm_activation = True
             nodes_source_rate = []
             nodes_temp = []
 
-            for ii in range(0, len(hosts)):
+            for ii in range(0, len(nodes)):
                 nodes_source_rate.append(0)
                 if not nodes[ii] in nodes_temp:
                     print("node %s - index %d" % (nodes[ii].ip, ii) )
                     nodes_temp.append(nodes[ii])
             nodes = nodes_temp
+
+            for ii in range(0, len(nodes)):
+                wifinodes.append(WiFiNode(nodes[ii], mac_address[ii] ))
 
             #START visualizer socket
             socket_visualizer = start_visualizer_connection()
@@ -320,7 +379,10 @@ def main(args):
             _thread.start_new_thread( x.run_loop, () )
             time.sleep(1)
             [staions_claims, stations_w, stations_offer] = x.get_node_react_list()
+            a_coll = [0.25, 0.25, 0.25]
+            a_ave = [0.009, 0.009, 0.009]
 
+            connection_aborted = True
             try:
                 #SETUP NODES
                 print("START node setup")
@@ -331,181 +393,107 @@ def main(args):
                         if nodes[jj].ip == eth_ip[ii]:
                             print("setup topology node %s - index %d" % (nodes[jj].ip, jj) )
                             pos = eth_ip.index(nodes[jj].ip)
-                            #rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-react", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
-                            rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-react", freq[pos], tx_power[pos], "6", wlan_ip[pos], "off", "aa:bb:cc:dd:ee:ff", True)
+
+                            #setup wifi network
+                            rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-react", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
+                            #rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-react", freq[pos], tx_power[pos], "6", wlan_ip[pos], "off", "aa:bb:cc:dd:ee:ff", True)
+
+
+                            #setup infrastructured network (put interface in managed mode and disable network manager)
+                            # if role[pos] == "AP":
+                            #     setAP(controller, nodes[jj], iface[pos], wlan_ip[pos], "wishful-react")
+                            # elif role[pos] == "STA":
+                            #     connection_result = setSTA(controller, nodes[jj], iface[pos], wlan_ip[pos], "wishful-react")
+                            #     print(connection_result)
+                            #     if connection_result == False:
+                            #         raise SystemExit('Unable to connect')
+                            # else:
+                            #     print("no station role found ")
+                            #     break
+
                             gevent.sleep(1)
-                            rvalue = controller.nodes(nodes[jj]).net.start_monitor(driver[pos], "wlan0")
+                            rvalue = controller.nodes(nodes[jj]).net.start_monitor(driver[pos], iface[pos])
 
                             #RUN REACT
                             print("start local control program on nodes")
                             lcpDescriptor_nodes.append(controller.node(nodes[jj]).hc.start_local_control_program(program=react))
-                            msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : 0, "claim" : staions_claims[node_claim_order[jj]], "w" : stations_w[node_claim_order[jj]], "offer" : stations_offer[node_claim_order[jj]], "enable_react" : react_algorithm_activation}
+                            msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : 0, "claim" : staions_claims[node_claim_order[jj]], "w" : stations_w[node_claim_order[jj]],
+                                 "offer" : stations_offer[node_claim_order[jj]], "enable_react" : react_algorithm_activation, "contention_windows" : 31}
                             lcpDescriptor_nodes[ii].send(msg)
                             print("start thread for collect measurements from nodes")
                             reading_thread.append(threading.Thread(target=collect_remote_messages, args=(lcpDescriptor_nodes[ii], socket_visualizer, mac_address, label)))
                             reading_thread[ii].start()
                             break
+
                 print("END node setup")
             except (Exception) as err:
                 print("exception", err)
                 print("Error in node setup procedure")
                 do_run = False
 
+
             if do_run:
+                #update react
+                w_source = [1, 1, 1, 0, 0, 0]
+                W_source = [ [0, 0, 1, 0, 0, 0], [1, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0] ]
+
+
+                x.update_traffic(W_source, w_source)
+                [staions_claims, stations_w, stations_offer] = x.get_node_react_list()
+                print(w_source)
+                print('A B C D E F')
+                print(staions_claims)
+
                 for node in nodes:
                     controller.delay(1).nodes(node).net.create_packetflow_sink('1234', '1', True, 'wlan0')
+                value = 6000
+                # controller.delay(2).nodes(nodes[0]).net.start_packetflow(wlan_ip[1] , '1234', '3000', str(value)+'K', '1470')
+                # controller.delay(2).nodes(nodes[1]).net.start_packetflow(wlan_ip[2] , '1234', '3000', str(value)+'K', '1470')
+                # controller.delay(2).nodes(nodes[2]).net.start_packetflow(wlan_ip[0] , '1234', '3000', str(value)+'K', '1470')
 
-                socket_command = start_command_connection()
-                poller = zmq.Poller()
-                poller.register(socket_command, flags=zmq.POLLIN)
-                EXPERIMENT_DURATION= 3000
-                dt=0
-                while do_run:
-                    socket_list = poller.poll(1000)
-                    if socket_list:
-                        for socket_info in socket_list:
-                            if socket_info[1] == zmq.POLLIN:
-                                parsed_json = socket_command.recv_json()
-                                print('parsed_json : %s' % str(parsed_json))
-                                type = parsed_json['type']
-                                if type == 'traffic':
-                                    node = parsed_json['src']
-                                    #TO DO --> find index in file
-                                    if node == 'A':
-                                        node_src_index = 0
-                                    elif node == 'B':
-                                        node_src_index = 1
-                                    elif node == 'C':
-                                        node_src_index = 2
-                                    elif node == 'D':
-                                        node_src_index = 3
-                                    elif node == 'E':
-                                        node_src_index = 4
-                                    elif node == 'F':
-                                        node_src_index = 5
-                                    else:
-                                        print('node index not retreive')
-                                        break
+                #enable react
+                rts_enabler = '250'
+                react_algorithm_activation = True
+                contention_window = 142
+                for jj in range(0, len(nodes)):
+                    controller.nodes(nodes[jj]).radio.set_rts_threshold(rts_enabler)
+                    msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : nodes_source_rate[jj],
+                        "claim" : staions_claims[node_claim_order[jj]], "w" : stations_w[node_claim_order[jj]], "offer" : stations_offer[node_claim_order[jj]],
+                        "enable_react" : react_algorithm_activation, "contention_windows" : contention_window}
+                    lcpDescriptor_nodes[jj].send(msg)
 
-                                    command = parsed_json['command']
-                                    #if off traffic is selected for a specific node
-                                    if command == 'off_traffic':
-                                        nodes_source_rate[node_src_index] = 0
-                                        #call UPI to stop traffic on node
-                                        controller.nodes(nodes[node_src_index]).net.stop_packetflow()
-                                        w_source[node_claim_order[node_src_index]] = 0 #min(1, (source_rate/float(MAX_THR) ))
-                                        W_source[node_claim_order[node_src_index]] = [0 for x in range(0, len(W_source))]
-                                        print('D A B C E F')
-                                        print(w_source)
-                                        x.update_traffic(W_source, w_source)
-                                        [staions_claims, stations_w, stations_offer] = x.get_node_react_list()
-                                        print('D A B C E F')
-                                        print(staions_claims)
-                                        if react_algorithm_activation:
-                                            #send react information to all nodes
-                                            for jj in range(0, len(nodes)):
-                                                msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : source_rate,
-                                                 "claim" : staions_claims[node_claim_order[jj]], "w" : stations_w[node_claim_order[jj]], "offer" : stations_offer[node_claim_order[jj]],
-                                                 "enable_react" : react_algorithm_activation}
-                                                lcpDescriptor_nodes[jj].send(msg)
-                                        break
+            EXPERIMENT_DURATION = 200
+            dt = 0
+            while do_run:
+                log.warning('waiting for ... (%d sec / %d)' % (dt, EXPERIMENT_DURATION) )
+                dt += 1
+                gevent.sleep(20)
+                # if contention_window == 10:
+                #     contention_window = 100
+                # else:
+                #     contention_window += 100
+                #contention_window += 5
 
-                                    #if start traffic is selected for a specific node
-                                    if command == 'set_traffic':
-                                        node = parsed_json['dst']
-                                        #TO DO --> find index in file
-                                        if node == 'A':
-                                            node_dst_index = 0
-                                        elif node == 'B':
-                                            node_dst_index = 1
-                                        elif node == 'C':
-                                            node_dst_index = 2
-                                        elif node == 'D':
-                                            node_dst_index = 3
-                                        elif node == 'E':
-                                            node_dst_index = 4
-                                        elif node == 'F':
-                                            node_dst_index = 5
-                                        else:
-                                            print('node index not retreive')
-                                            break
+                for jj in range(0, len(nodes)):
+                    #controller.nodes(nodes[jj]).radio.set_rts_threshold(rts_enabler)
+                    msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : nodes_source_rate[jj],
+                        "claim" : staions_claims[node_claim_order[jj]], "w" : stations_w[node_claim_order[jj]], "offer" : stations_offer[node_claim_order[jj]],
+                        "enable_react" : react_algorithm_activation, "contention_windows" : contention_window}
+                    lcpDescriptor_nodes[jj].send(msg)
 
-                                        value = parsed_json['value']
-                                        nodes_source_rate[node_src_index] = value
-                                        source_rate = float(nodes_source_rate[node_src_index])
-                                        #call UPI to start traffic
-                                        controller.delay(1).nodes(nodes[node_src_index]).net.start_packetflow(wlan_ip[node_dst_index] , '1234', '3000', str(value)+'K', '1470')
-                                        #update react
-                                        w_source[node_claim_order[node_src_index]] = min(1, (round(source_rate/float(MAX_THR),2) ))
+                if dt == 1:
+                    controller.delay(2).nodes(nodes[0]).net.start_packetflow(wlan_ip[1] , '1234', '3000', str(value)+'K', '1470')
+                    controller.delay(2).nodes(nodes[1]).net.start_packetflow(wlan_ip[2] , '1234', '3000', str(value)+'K', '1470')
+                    controller.delay(2).nodes(nodes[2]).net.start_packetflow(wlan_ip[0] , '1234', '3000', str(value)+'K', '1470')
 
-                                        W_source[node_claim_order[node_src_index]][node_claim_order[node_dst_index]] = 1
-                                        print('D A B C E F')
-                                        print(w_source)
-                                        x.update_traffic(W_source, w_source)
-                                        [staions_claims, stations_w, stations_offer] = x.get_node_react_list()
-                                        print('D A B C E F')
-                                        print(staions_claims)
-                                        if react_algorithm_activation:
-                                            #send react information to all nodes
-                                            for jj in range(0, len(nodes)):
-                                                msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : source_rate,
-                                                 "claim" : staions_claims[node_claim_order[jj]], "w" : stations_w[node_claim_order[jj]], "offer" : stations_offer[node_claim_order[jj]],
-                                                 "enable_react" : react_algorithm_activation}
-                                                lcpDescriptor_nodes[jj].send(msg)
+                if dt > EXPERIMENT_DURATION:
+                    break
 
-                                    #if C is on RTS is on
-                                    if w_source[3]>0:
-                                        if react_algorithm_activation:
-                                            rts_c = '250'
-                                        else:
-                                            rts_c = 'off'
-                                    else:
-                                        rts_c = 'off'
-                                    for jj in range(0, len(nodes)):
-                                        controller.nodes(nodes[jj]).radio.set_rts_threshold(rts_c)
-
-
-
-                                if type == 'algorithm':
-                                    command = parsed_json['command']
-
-                                    #enable react
-                                    if command == 'start_react':
-                                        #if C is on RTS is on
-                                        if w_source[3]>0:
-                                            rts_c = '250'
-                                        else:
-                                            rts_c = 'off'
-
-                                        react_algorithm_activation = True
-                                        for jj in range(0, len(nodes)):
-                                            controller.nodes(nodes[jj]).radio.set_rts_threshold(rts_c)
-                                            msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : nodes_source_rate[jj],
-                                                 "claim" : staions_claims[node_claim_order[jj]], "w" : stations_w[node_claim_order[jj]], "offer" : stations_offer[node_claim_order[jj]],
-                                                 "enable_react" : react_algorithm_activation}
-                                            lcpDescriptor_nodes[jj].send(msg)
-
-                                    #disable react
-                                    if command == 'stop_react':
-                                        react_algorithm_activation = False
-                                        for jj in range(0, len(nodes)):
-                                            controller.nodes(nodes[jj]).radio.set_rts_threshold('off')
-                                            #controller.nodes(nodes[jj]).radio.set_rts_threshold('250')
-                                            msg={"iface" : "wlan0", "i_time" : react_time_update, "iperf_rate" : 0,
-                                                 "claim" : staions_claims[node_claim_order[jj]], "w" : stations_w[node_claim_order[jj]], "offer" : stations_offer[node_claim_order[jj]],
-                                                 "enable_react" : react_algorithm_activation}
-                                            lcpDescriptor_nodes[jj].send(msg)
-
-                    if not(dt%10):
-                        log.warning('waiting for ... (%d sec / %d)' % (dt, EXPERIMENT_DURATION) )
-                    dt += 1
-
-                    gevent.sleep(1)
-
-                    if dt > EXPERIMENT_DURATION:
-                        break
 
             do_run = False
+            for jj in range(0, len(nodes)):
+                controller.nodes(nodes[jj]).net.stop_packetflow()
+
             for ii in range(0,len(nodes)):
                 try:
                     controller.nodes(nodes[ii]).net.destroy_packetflow_sink()
@@ -521,6 +509,9 @@ def main(args):
                     reading_thread[ii].join()
                 except:
                     print('Error in %s local control program shutdown' % str(nodes[ii].ip))
+
+            meas_collector.save_measurements(nodes=wifinodes, directory="react_data")
+
 
 
 if __name__ == "__main__":

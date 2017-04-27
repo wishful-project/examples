@@ -41,5 +41,9 @@ def set_hosts(host_file):
 	mac_address = [i.split(',')[j].replace("\n", "") for i in hosts_info]
 	j=j+1
 	label = [i.split(',')[j].replace("\n", "") for i in hosts_info]
+	j=j+1
+	role = [i.split(',')[j].replace("\n", "") for i in hosts_info]
+	j=j+1
+	iface = [i.split(',')[j].replace("\n", "") for i in hosts_info]
 
-	return hosts,driver,eth_ip,freq,tx_power,wlan_ip,mac_address,label
+	return hosts,driver,eth_ip,freq,tx_power,wlan_ip,mac_address,label,role,iface

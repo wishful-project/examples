@@ -478,7 +478,7 @@ class Adder(ttk.Frame):
             else:
                 continue
 
-            #print('parsed_json : %s' % str(parsed_json))
+            print('parsed_json : %s' % str(parsed_json))
             #parsed_json : {u'label': u'C', u'measure': [[1484644417.3528204, 0.0, 0.0, 1.0, 0.0, 1023, 0, 0]], u'mac_address': u'00:0e:8e:30:9d:ee'}
             label = parsed_json['label']
             if label :
@@ -489,9 +489,9 @@ class Adder(ttk.Frame):
                 if label == 'A':
                     item = 'I001'
 
-                    if not self.sta1val_traffic_activation:
-                        measure[5] = 0
-                        measure[6] = 0
+                    # if not self.sta1val_traffic_activation:
+                    #     measure[5] = 0
+                    #     measure[6] = 0
 
                     self.sta1val_cw.pop(0)
                     self.sta1val_cw.append( float(measure[5]) )
@@ -509,9 +509,9 @@ class Adder(ttk.Frame):
                 elif label == 'B':
                     item = 'I002'
 
-                    if not self.sta2val_traffic_activation:
-                        measure[5] = 0
-                        measure[6] = 0
+                    # if not self.sta2val_traffic_activation:
+                    #     measure[5] = 0
+                    #     measure[6] = 0
 
                     self.sta2val_cw.pop(0)
                     self.sta2val_cw.append( float(measure[5]) )
@@ -527,9 +527,9 @@ class Adder(ttk.Frame):
                 elif label == 'C':
                     item = 'I003'
 
-                    if not self.sta3val_traffic_activation:
-                        measure[5] = 0
-                        measure[6] = 0
+                    # if not self.sta3val_traffic_activation:
+                    #     measure[5] = 0
+                    #     measure[6] = 0
 
                     self.sta3val_cw.pop(0)
                     self.sta3val_cw.append( float(measure[5]) )

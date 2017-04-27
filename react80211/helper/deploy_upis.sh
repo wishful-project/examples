@@ -18,7 +18,7 @@ if [ 1 -eq 1 ]; then
         rsync -avz  ../../../agent_modules/wifi_wmp/  -e ssh $user@$node:~/wishful-github-manifest/agent_modules/wifi_wmp/
         rsync -avz  ../../../agent_modules/wifi/  -e ssh   $user@$node:~/wishful-github-manifest/agent_modules/wifi/
         rsync -avz  ../../../agent_modules/net_linux/  -e ssh $user@$node:~/wishful-github-manifest/agent_modules/net_linux/
-        rsync -avz  ../../../examples/react80211/  -e ssh $user@$node:~/wishful-github-manifest/examples/react80211/
+        rsync -avz  ../../../examples/react80211/ --exclude station-conf/*  -e ssh $user@$node:~/wishful-github-manifest/examples/react80211/
     done
 
 fi
