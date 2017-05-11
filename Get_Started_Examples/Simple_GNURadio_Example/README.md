@@ -15,7 +15,7 @@ We want to demonstrate how the WISHFUL UPI can be exploited to:
 
 # Getting Started
 
-## 1 - Reserving the VM's
+## 1. Reserving the VM's
 
 Reserve ***three WiSHFUL nodes*** by using the reservation system at : https://www.iris-testbed.connectcentre.ie/reservation
 
@@ -44,65 +44,65 @@ The agents are implemented in:
 In order to better understand all the phases of the this example tutorial and the single UPI function usage, we add
 inline comment to both controller and agent programs.
 
-# Step-by-Step  
-
-## SHELL 1 - WiSHFUL CONTROLLER:
-1. connect to controller PC (you can find the command in the reservation webpage):
+## 2. Access WiSHFUL CONTROLLER
+1. Open a shell in your computer.
+2. Connect to controller PC (you can find the command in the reservation webpage):
     ```
     ssh -A -X -i your-private-key user@controller-vm-ip -oPort=22 -oProxyCommand='ssh -i path-to-your-private-key -oPort=22 user@134.226.55.214 -W %h:%p'
    ```
-2. Move in the experiment directory
+3. Move in the experiment directory
     ```
     cd /opt/examples/Get_Started_Examples/Simple-GNURadio-Example
     ```
-3. Open ```wishful_simple_controller.py``` and change the following variables, replacing their values accordingly:
+4. Open ```wishful_simple_controller.py``` and change the following variables, replacing their values accordingly:
     ```
     controller_PC_IP_address = "IP.address.of.controller" 
     controller_PC_interface = "ethinterface"
     ```
-4. start controller
+5. Start controller
     ```
     chmod +x wishful_simple_controller
     ./wishful_simple_controller (#run with -v for debugging)
     ```
 
-## SHELL 2  - TX :
-1. Connect to agent TX PC
+## 3. Access the TX agent
+1. Open a shell in your computer (you should have two shells now)
+2. Connect to agent TX PC
     ```
     ssh -A -X -i your-private-key user@tx-ip -oPort=22 -oProxyCommand='ssh -i path-to-your-private-key -oPort=22 user@134.226.55.214 -W %h:%p'
    ```
-2. Move in the experiment directory
+3. Move in the experiment directory
     ```
     cd examples/Get_Started_Examples/Simple-GNURadio-Example
     ```
-3. Open ```agent_tx.py``` and change the following variables.
+4. Open ```agent_tx.py``` and change the following variables.
     - agent_PC_ip_address = "172.16.0.101"
     - agent_PC_interface = "eth0"
-4. start the TX agent
+5. Start the TX agent
     ```
     chmod +x agent_tx
     ./agent_tx (#run with -v for debugging)
     ```
-
-## SHELL 3  - RX :
-
-1. connect to controller PC 
+    
+## 4. Access the RX agent
+1. Open a shell in your computer (you should have three shells now)
+2. connect to controller PC 
     ```
     ssh -A -X -i your-private-key user@rx-ip -oPort=22 -oProxyCommand='ssh -i path-to-your-private-key -oPort=22 user@134.226.55.214 -W %h:%p'
    ```
-2. move in the experiment directory
+3. move in the experiment directory
     ```
     cd examples/Get_Started_Examples/Simple-GNURadio-Example
     ```
-3. Open ```agent_rx.py``` and change the following variables.
+4. Open ```agent_rx.py``` and change the following variables.
     - agent_PC_ip_address = "172.16.0.201"
     - agent_PC_interface = "eth0"
-4. start the RX agent
+5. start the RX agent
     ```
     chmod +x agent_rx
     ./agent_rx (#run with -v for debugging)
     ```
-    
+  
 ## Acknowledgement
 The research leading to these results has received funding from the European Horizon 2020 Programme under grant agreement n645274 (WiSHFUL project).
 
