@@ -1,0 +1,205 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+GNURadio Simple Example: Example tutorial of WiSHFUL (controller side)
+
+Usage:
+   wishful_simple_controller [options] [-q | -v]
+
+Options:
+   --logfile name      Name of the logfile
+   --config configFile Config file path
+
+Example:
+   ./wishful_simple_controller -v --config ./config.yaml
+
+Other options:
+   -h, --help          show this help message and exit
+   -q, --quiet         print less text
+   -v, --verbose       print more text
+   --version           show version and exit
+"""
+
+import datetime
+import logging
+import wishful_controller
+import gevent
+import wishful_upis as upis
+import os
+import time
+import wishful_module_gnuradio
+
+__author__ = "Maicon Kist"
+__copyright__ = "Copyright (c) 2017 Connect Centre - Trinity College Dublin"
+__version__ = "0.1.0"
+__email__ = "kistm@tcd.ie"
+
+
+""" START Define logging controller """
+""" we use the python logging system module (https://docs.python.org/2/library/logging.html) """
+log = logging.getLogger('wishful_controller')
+
+#Create controller, we specify in the parameters the ip addresses and the ports used for downlink and uplink connection
+#with the nodes tesbed, in this case we spcify the interface loopback and the port 8990 for the downlink and the
+# interface loopback and the port 8989 for the uplink.
+controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+
+#Configure controller, we specify in the parameters the controller name and a string information related to the
+#controller
+controller.set_controller_info(name="WishfulController", info="WishfulControllerInfo")
+
+#add the discovery module, responsable for the nodes discovery procedure and nodes adding to the controllers
+#we specify interface, the name of the nodes group, and the ip address and port for the downlink and uplink connection
+controller.add_module(moduleName="discovery", pyModuleName="wishful_module_discovery_pyre",
+                      className="PyreDiscoveryControllerModule",
+                      kwargs={"iface":"lo", "groupName":"wishful_1234", "downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"})
+""" END the WiSHFUL controller setting """
+
+
+# Global list with all nodes (agents) connected to this controller. We start empty and append nodes when they start.
+# See new_node function below
+nodes = []
+
+@controller.new_node_callback()
+def new_node(node):
+    """ This function is performed when a new node has been found in the network
+
+    :param node: finded node
+    """
+    nodes.append(node)
+    print("New node appeared:")
+    print(node)
+
+
+@controller.node_exit_callback()
+def node_exit(node, reason):
+    """ This function is performed when a node, present in the controller node list, leave the experiment. During the
+    experiment, the nodes send "hello packet" to the controller. If the controller do not receives hello packet from a node
+    present in the node list, perform this function and the node is been removed
+
+    :param node: node that leave the experiment
+    :param reason : exit reason
+    """
+    # Safety check
+    if node in nodes:
+        nodes.remove(node);
+    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
+
+
+@controller.add_callback(upis.radio.get_parameters)
+def get_vars_response(group, node, data):
+    """ This function implements a callback called when ANY get_* function is called in ANY of the nodes
+
+    :param group: Experiment group name
+    :param node: Node used to execute the UPI
+    :param data: ::TODO::
+    """
+    print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+
+def print_response(group, node, data):
+    """ This function implements a callback to print generic UPI function calling result
+
+    :param group: Experiment group name
+    :param node: Node used to execute the UPI
+    :param data: Execution time
+    """
+    print("\n{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
+
+
+# Entry point after globals initialization
+if __name__ == '__main__':
+
+    # Files that we will execute.
+    # Key of dict is the name of the agent.
+    # For the sake of simplicity, agents are named 'tx' and 'rx', and their respective GRC files are named 'tx.grc' and 'rx.grc'.
+    files = {
+        'tx': './grc/tx.grc',
+        'rx': './grc/rx.grc'
+    }
+
+    #Start controller
+    controller.start()
+
+
+    # We expect two agents (tx and rx).
+    # Observation: we dont check if the agents connectict are in fact the ones that we want.
+    while len(nodes) < 2:
+
+        print('-- Nodes connected: %d/2' % len(nodes))
+        gevent.sleep(2)
+
+    print("All nodes connected. Starting GNURadio Simple Experiment")
+    # Iterate over the list of nodes.
+    # We check the agent name (which is configured at the agent side), and based on the name we start the corresponding GNURadio program.
+    for node in nodes:
+        # There are several ways to make this more efficient.
+        # However, the purpose of this example is to be as simple as possible.
+        # node is 'tx'
+        if node.name == 'tx':
+            # Example of UPI to get the current program running on the node
+            running = controller.node(node).radio.get_running_radio_program()
+
+            # As we have not started anything, running should be None
+            if running is None:
+                print('\t- Starting program at TX Agent')
+                # We pass a string that contains the entire grc content
+                program_code = open(files['tx']).read()
+
+                # Here we send the program to the agent
+                # Parameters:
+                #   - program_name: The name of the grc program. Used to identify the program when starting/stopping it.
+                #   - program_code: String with the GRC file content
+                #   - program_type: 'grc' or 'py' (we can also pass a '.py' file instead of a GRC.
+                #   - program_port: Port that the XMLRPCServer will run (check the XMLRPC Server block on tx.grc file)     
+                controller.node(node).radio.activate_radio_program({'program_name': 'tx', 'program_code': program_code, 'program_type': 'grc', 'program_port': 8080})
+
+        # node is 'rx'
+        if node.name == 'rx':
+            running = controller.node(node).radio.get_running_radio_program()
+            if running is None:
+                print('\t- Starting program at RX Agent')
+                # We pass a string that contains the entire grc content
+                program_code = open(files['rx']).read()
+
+                # Here we send the program to the agent
+                # Parameters:
+                #   - program_name: The name of the grc program. Used to identify the program when starting/stopping it.
+                #   - program_code: String with the GRC file content
+                #   - program_type: 'grc' or 'py' (we can also pass a '.py' file instead of a GRC.
+                #   - program_port: Port that the XMLRPCServer will run (check the XMLRPC Server block on rx.grc file)     
+                controller.node(node).radio.activate_radio_program({'program_name': 'rx', 'program_code': program_code, 'program_type': 'grc', 'program_port': 8081})
+
+    # We do a sleep here to give time time for agents (particularly the most recent that connected) have started their GNURadio program 
+    gevent.sleep(3)
+
+    print('* Starting Main Loop.')
+    iterations = 0
+    while iterations < 20:
+        iterations += 1
+        for node in nodes:
+            if node.name == 'tx':
+                print('- Changing TX parameters')
+                # get current shift value
+
+                # We use UPI_R::get_parameters to get values from the agent.
+                # get_parameters receives a list of parameters
+                vals = controller.node(node).radio.get_parameters(['shift', ])
+                # if shift is 0, shift to 5000, otherwise set back to 0
+                if vals['shift'] == 0:
+                    # We use UPI_R::set_parameters to set values in the agents. get_parameters receives a list of parameters
+                    controller.node(node).radio.set_parameters({'shift': 5000})
+                else:
+                    controller.node(node).radio.set_parameters({'shift': 0})
+
+            if node.name == 'rx':
+                print('- Changing RX parameters')
+                vals = controller.node(node).radio.get_parameters(['rate',])
+                print(vals)
+
+        gevent.sleep(2)
+
+    # End GNURadio programs in the agents. 
+    # Keep in mind that the agents are still running.
+    controller.node(node).radio.set_inactive('tx')
+    controller.node(node).radio.set_inactive('rx')
