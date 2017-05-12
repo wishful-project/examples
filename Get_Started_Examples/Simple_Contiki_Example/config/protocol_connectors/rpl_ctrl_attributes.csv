@@ -1,0 +1,7 @@
+"category","unique_name","unique_id","format","sub_format","endianness"
+"PARAMETER","rpl_dio_interval_min",36638,"UINT8","","<"
+"PARAMETER","rpl_dio_interval_doublings",21691,"UINT8","","<"
+"PARAMETER","rpl_dio_redundancy",56854,"UINT8","","<"
+"PARAMETER","rpl_default_lifetime",28735,"UINT8","","<"
+"PARAMETER","rpl_objective_function",2355,"UINT16","","<"
+"MEASUREMENT","rpl_stats",54452,"UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16","","<"
