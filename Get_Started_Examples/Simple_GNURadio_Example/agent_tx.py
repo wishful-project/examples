@@ -33,14 +33,11 @@ __version__ = "0.1.0"
 __email__ = "kistm@tcd.ie"
 
 """
-Setting of experiment node
+Setting of agent node
 """
-
-node_interface = "lo"
-group_name = "wishful_1234"
-
+agent_PC_interface = "lo"
 """
-END setting of experiment nodes
+END setting of agent node
 """
 
 
@@ -51,13 +48,12 @@ such as the node discovery, the UPI functions execution on local and remote node
 global control program and local control program, and all the other management functions of the framework. The different
 works of the controller are  performed by different module can be added on demand in the controller
 """
-
 #Create agent
 agent = wishful_agent.Agent()
 
 #Configure agent, we specify in the parameters the controller name and a string information related to the
 #controller
-agent.set_agent_info(name="tx", info="Example tutorial Agent", iface=node_interface)
+agent.set_agent_info(name="tx", info="Example tutorial Agent", iface=agent_PC_interface)
 
 
 #the following rows add all the needed modules to the controller
@@ -66,7 +62,7 @@ agent.set_agent_info(name="tx", info="Example tutorial Agent", iface=node_interf
 #we specify interface and the name of the nodes group
 
 agent.add_module(moduleName="discovery", pyModule="wishful_module_discovery_pyre",
-                 className="PyreDiscoveryAgentModule", kwargs={"iface":node_interface, "groupName":group_name})
+                 className="PyreDiscoveryAgentModule", kwargs={"iface":agent_PC_interface, "groupName":"wishful_1234"})
 
 #add the net_linux module,
 agent.add_module(moduleName="gnuradio", pyModule="wishful_module_gnuradio",

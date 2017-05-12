@@ -23,17 +23,34 @@ Other options:
 
 import datetime
 import logging
-import wishful_controller
 import gevent
-import wishful_upis as upis
 import os
+import sys
 import time
+from itertools import cycle
+
+
+# WiSHFUL imports
+import wishful_controller
+import wishful_upis as upis
 import wishful_module_gnuradio
 
 __author__ = "Maicon Kist"
 __copyright__ = "Copyright (c) 2017 Connect Centre - Trinity College Dublin"
 __version__ = "0.1.0"
 __email__ = "kistm@tcd.ie"
+
+"""
+Setting of controller node
+"""
+controller_PC_IP_address = "192.168.5.167"
+controller_PC_interface = "ens3"
+"""
+END setting of controller nodes
+"""
+
+DL_address = "tcp://" + controller_PC_IP_address + ":8990"
+UL_address = "tcp://" + controller_PC_IP_address + ":8989"
 
 
 """ START Define logging controller """
@@ -43,7 +60,7 @@ log = logging.getLogger('wishful_controller')
 #Create controller, we specify in the parameters the ip addresses and the ports used for downlink and uplink connection
 #with the nodes tesbed, in this case we spcify the interface loopback and the port 8990 for the downlink and the
 # interface loopback and the port 8989 for the uplink.
-controller = wishful_controller.Controller(dl="tcp://127.0.0.1:8990", ul="tcp://127.0.0.1:8989")
+controller = wishful_controller.Controller(dl=DL_address, ul=UL_address)
 
 #Configure controller, we specify in the parameters the controller name and a string information related to the
 #controller
@@ -53,13 +70,13 @@ controller.set_controller_info(name="WishfulController", info="WishfulController
 #we specify interface, the name of the nodes group, and the ip address and port for the downlink and uplink connection
 controller.add_module(moduleName="discovery", pyModuleName="wishful_module_discovery_pyre",
                       className="PyreDiscoveryControllerModule",
-                      kwargs={"iface":"lo", "groupName":"wishful_1234", "downlink":"tcp://127.0.0.1:8990", "uplink":"tcp://127.0.0.1:8989"})
+                      kwargs={"iface":controller_PC_interface, "groupName":"wishful_1234", "downlink":DL_address, "uplink":UL_address})
 """ END the WiSHFUL controller setting """
-
 
 # Global list with all nodes (agents) connected to this controller. We start empty and append nodes when they start.
 # See new_node function below
 nodes = []
+TOTAL_NODES = 1 # We expect 2 nodes to connect: 'tx', and 'rx'. 
 
 @controller.new_node_callback()
 def new_node(node):
@@ -70,7 +87,6 @@ def new_node(node):
     nodes.append(node)
     print("New node appeared:")
     print(node)
-
 
 @controller.node_exit_callback()
 def node_exit(node, reason):
@@ -118,15 +134,23 @@ if __name__ == '__main__':
         'rx': './grc/rx.grc'
     }
 
+    # circular buffer with gains.
+    # We go from 0 to 40 and then restart.
+    # We do this only in the TX node
+    tx_gains = cycle([0, 10, 20, 30, 40])
+
+    # Initial center frequency
+    # We get the initial center frequency when the TX node starts to execute.
+    # Go to: ::GETTING_INITIAL_CF:: for the code
+    initial_cf = None
+
     #Start controller
     controller.start()
 
-
     # We expect two agents (tx and rx).
     # Observation: we dont check if the agents connectict are in fact the ones that we want.
-    while len(nodes) < 2:
-
-        print('-- Nodes connected: %d/2' % len(nodes))
+    while len(nodes) < TOTAL_NODES:
+        print('-- Nodes connected: {}/{}'.format(len(nodes), TOTAL_NODES))
         gevent.sleep(2)
 
     print("All nodes connected. Starting GNURadio Simple Experiment")
@@ -173,10 +197,21 @@ if __name__ == '__main__':
     # We do a sleep here to give time time for agents (particularly the most recent that connected) have started their GNURadio program 
     gevent.sleep(3)
 
+
+    # ::GETTING_INITIAL_CF::
+    # We can get several parameters at one by passing a list with the parameters that we want.
+    # radio_get_parameters return a dict in the form of {'parameter1': value1, 'parameter2':value2}
+    vals = controller.node(node).radio.get_parameters(['center_freq', 'gain', 'samp_rate'])
+    # We are only interested in the center_frequency
+    initial_cf = vals['center_freq']
+
     print('* Starting Main Loop.')
     iterations = 0
-    while iterations < 20:
+    while iterations < 5:
         iterations += 1
+
+        print ("== ITERATION {}/20".format(iterations))
+
         for node in nodes:
             if node.name == 'tx':
                 print('- Changing TX parameters')
@@ -184,22 +219,23 @@ if __name__ == '__main__':
 
                 # We use UPI_R::get_parameters to get values from the agent.
                 # get_parameters receives a list of parameters
-                vals = controller.node(node).radio.get_parameters(['shift', ])
-                # if shift is 0, shift to 5000, otherwise set back to 0
-                if vals['shift'] == 0:
-                    # We use UPI_R::set_parameters to set values in the agents. get_parameters receives a list of parameters
-                    controller.node(node).radio.set_parameters({'shift': 5000})
-                else:
-                    controller.node(node).radio.set_parameters({'shift': 0})
+                vals = controller.node(node).radio.get_parameters(['gain', 'center_freq' ])
+
+                n_gain = next(tx_gains)
+                print ('\t Changing gain from {} to {}'.format(vals['gain'], n_gain))
+                controller.node(node).radio.set_parameters({'gain': n_gain})
 
             if node.name == 'rx':
                 print('- Changing RX parameters')
-                vals = controller.node(node).radio.get_parameters(['rate',])
+                vals = controller.node(node).radio.get_parameters(['rate', 'signal_level'])
                 print(vals)
 
         gevent.sleep(2)
 
     # End GNURadio programs in the agents. 
     # Keep in mind that the agents are still running.
-    controller.node(node).radio.set_inactive('tx')
-    controller.node(node).radio.set_inactive('rx')
+    controller.node(node).radio.deactivate_radio_program('tx')
+    controller.node(node).radio.deactivate_radio_program('rx')
+
+    # End gracefully
+    sys.exit(1)
