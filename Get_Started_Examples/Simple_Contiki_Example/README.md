@@ -45,3 +45,7 @@ Start a global control program that retrieves all configuration parameters and m
 ```
 python global_cp.py --config config/localhost/global_cp_config.yaml
 ```
+
+## Acknowledgement
+The research leading to these results has received funding from the European
+Horizon 2020 Programme under grant agreement n645274 (WiSHFUL project).
