@@ -1,0 +1,3 @@
+"category","unique_name","unique_id","format","sub_format","endianness"
+"PARAMETER","ContikiMAC_ChannelCheckRate",54299,"UINT16","","<"
+"PARAMETER","ContikiMAC_PhaseOptimization",52178,"BOOL","","<"
