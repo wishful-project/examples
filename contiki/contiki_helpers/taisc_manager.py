@@ -109,6 +109,44 @@ class TAISCMACManager(MACManager):
             return ret
         else:
             return -1
+            
+    def update_hopping_sequence(self, hopping_sequence_csv, mac_address_list=None):
+        """This function allows to create a new hopping sequence
+
+        Args:
+            channel_lst (list): list of channels to be blacklisted
+
+        Returns:
+            dict: error codes from each node
+        """
+        hopping_sequence_lst = read_taisc_hoppingsequence(hopping_sequence_csv)
+        current_offset = 0
+        ret_val = 0
+        ret_dict = {}
+        param_name = "IEEE802154e_macHoppingSequenceList"
+        if self.mac_mode == "TSCH":
+            if mac_address_list is None:
+                mac_address_list = self.node_manager.mac_address_list
+            for mac_address in self.node_manager.mac_address_list:
+                ret_dict[mac_address] = 0
+            
+            while(current_offset < len(hopping_sequence_lst)):
+                hoppingsequence_tpl = (current_offset,) + tuple(hopping_sequence_lst[current_offset:current_offset + MAX_MSG_SIZE -1])
+                
+                param_key_values_dict = {param_name: hoppingsequence_tpl}
+                print("UPDATE : %s" % (param_key_values_dict))
+                ret = self.update_macconfiguration(param_key_values_dict)
+                for mac_address in ret:
+                    if type(ret[mac_address]) is dict:
+                        ret_dict[mac_address] += ret[mac_address][param_name]
+                        ret_val += ret[mac_address][param_name]
+                    else:
+                        ret_dict[mac_address] += ret[mac_address]
+                        ret_val += ret[mac_address]
+                current_offset += len(hoppingsequence_tpl) - 1
+            return ret_val
+        else:
+            return -1
 
 
 class taiscLinkOptions(IntEnum):
@@ -339,6 +377,24 @@ def read_taisc_slotframe(slotframe_csv):
             taisc_slot = taiscLink(src_address, dst_address, int(row['macLinkType']), int(row['macChannelOffset']))
             taisc_slotframe.add_slot(taisc_slot)
         return taisc_slotframe
+    except Exception as e:
+        print("An error occurred while reading parameters: %s" % e)
+        return -1
+    finally:
+        file_sf.close()
+
+def read_taisc_hoppingsequence(hoppingsequence_csv):
+    """Create TSCH hopping sequence from CSV file.
+    """
+    file_sf = None
+    try:
+        file_sf = open(hoppingsequence_csv, 'rt')
+        reader = csv.reader(file_sf, delimiter=',')
+        hopping_sequence = []
+        for row in reader:
+            channel = int(row[0])
+            hopping_sequence.append(channel)
+        return hopping_sequence
     except Exception as e:
         print("An error occurred while reading parameters: %s" % e)
         return -1

@@ -127,7 +127,7 @@ if __name__ == "__main__":
             
         global_node_manager = GlobalNodeManager(config)
         app_manager = AppManager(global_node_manager)
-        taisc_manager = TAISCMACManager(global_node_manager, "TDMA")
+        taisc_manager = TAISCMACManager(global_node_manager, "TSCH")
         
         global_node_manager.set_default_callback(default_callback)
 
@@ -149,6 +149,9 @@ if __name__ == "__main__":
         err = taisc_manager.update_slotframe('./contiki_helpers/default_taisc_slotframe.csv','TSCH')
         print("Setting superframe allocation to %s (%s)"%('./contiki_helpers/default_taisc_slotframe.csv',err)) 
         
+        err = taisc_manager.update_hopping_sequence('./contiki_helpers/default_tsch_hopping_sequence.csv','TSCH')
+        print("Setting hopping sequence to %s (%s)"%('./contiki_helpers/default_taisc_slotframe.csv',err)) 
+        
         with open(os.path.dirname(os.path.realpath(__file__))+'/tsch_settings.csv', 'r') as csvfile:
             tsch_settings = csv.reader(csvfile, delimiter=',')
             for tsch_setting_it in tsch_settings:
@@ -158,7 +161,6 @@ if __name__ == "__main__":
                 elif tsch_setting[0] == "app":
                     err = app_manager.update_configuration({tsch_setting[1]: int(tsch_setting[2])})
                 print("Setting %s to %s (%s)"%(tsch_setting[1],tsch_setting[2],err)) 
-        
         #Application:
         #~ 0 APPLICATION_NONE,
         #~ 1 APPLICATION_UDP_SERVER,
