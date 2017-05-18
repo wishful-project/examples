@@ -31,7 +31,7 @@ import datetime
 import numpy   
 import wishful_upis as upis
 import signal
-import threading
+import _thread
 from measurement_logger import *
 from stdout_measurement_logger import *
 from file_measurement_logger import *
@@ -57,9 +57,12 @@ packet_statistics = { 0:0, 1:0, 2:0, 3:0}
 def default_callback(group, node, cmd, data, interface = ""):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}, interface: {}".format(datetime.datetime.now(), group, node.name, cmd, data, interface))
 
-def event_cb(mac_address, event_name, event_value):
+def print_event(mac_address, event_name, event_value):
     print(str(event_name) + " : " + str(event_value) + " (" + str(mac_address) + ")")
-    coexistence_logger.log_measurement(event_name, event_value)
+
+def event_cb(mac_address, event_name, event_value):
+    _thread.start_new_thread(print_event, (mac_address, event_name, event_value))
+    #~ coexistence_logger.log_measurement(event_name, event_value)
 
 if __name__ == "__main__":
     try:
@@ -137,30 +140,65 @@ if __name__ == "__main__":
         
         global_node_manager.start_local_monitoring_cp()
 
-        superframe_size=3
-        transmission_power=5
+        superframe_size     = 30
+        transmission_power  = 5
+        timeslot_duration   = 10000
+        message_size        = 10
+        example             = "ping"
 
         #Superframe allocation:
+        err = taisc_manager.update_slotframe('./contiki_helpers/default_taisc_slotframe.csv','TSCH')
+        print("Setting superframe allocation to %s (%s)"%('./contiki_helpers/default_taisc_slotframe.csv',err)) 
         #Superframe size:
-        err1 = taisc_manager.update_macconfiguration({"IEEE802154e_macSlotframeSize": superframe_size})
-        print("Setting superframe size to %s (%s)"%(superframe_size,err1)) 
-        gevent.sleep(2)
+        err = taisc_manager.update_macconfiguration({"IEEE802154e_macSlotframeSize": superframe_size})
+        print("Setting superframe size to %s (%s)"%(superframe_size,err)) 
         #Hopping sequence:
         #Transmission power:
-        err1 = taisc_manager.update_macconfiguration({"IEEE802154_phyTXPower": transmission_power})
-        print("Setting transmission power to %s (%s)"%(transmission_power,err1)) 
-        gevent.sleep(1)
+        err = taisc_manager.update_macconfiguration({"IEEE802154_phyTXPower": transmission_power})
+        print("Setting transmission power to %s (%s)"%(transmission_power,err)) 
+        #Timeslot duration:
+        err = taisc_manager.update_macconfiguration({"IEEE802154e_macTsTimeslotLength": timeslot_duration})
+        print("Setting time slot duration to %s (%s)"%(timeslot_duration,err)) 
+        #Message size:
+        err = app_manager.update_configuration({"APP_MessageSize": message_size})
+        print("Setting message size to %s (%s)"%(message_size,err)) 
+        
+        #Application:
+        #~ 0 APPLICATION_NONE,
+        #~ 1 APPLICATION_UDP_SERVER,
+        #~ 2 APPLICATION_UDP_CLIENT,
+        #~ 3 APPLICATION_TCP_SERVER,
+        #~ 4 APPLICATION_TCP_CLIENT,
+        #~ 5 APPLICATION_PING,
+        #~ 6 APPLICATION_MAX,
+        if(example == "ping"):
+            print("Starting ping example")
+            print("Activating clients")
+            app_manager.update_configuration({"APP_ActiveApplication": 5},range(2,len(global_node_manager.get_mac_address_list())+1))
+            
+            ret_events = taisc_manager.subscribe_events(["ping_result"], event_cb, 0)
+            print("Suscribe event returns %s"%(ret_events)) 
+        elif(example=="udp"):
+            print("Starting udp example")
+            print("Activating server")
+            app_manager.update_configuration({"APP_ActiveApplication": 1},[1])
+            print("Activating clients")
+            app_manager.update_configuration({"APP_ActiveApplication": 2},range(2,len(global_node_manager.get_mac_address_list())+1))
+            
+            #~ ret_events = taisc_manager.subscribe_events(["app_rx_event"], event_cb, 0)
+            #~ print("Suscribe event returns %s"%(ret_events))  
+            #~ ret_events = taisc_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
+            #~ print("Suscribe event returns %s"%(ret_events))  
+            #~ ret_events = taisc_manager.subscribe_events(["tsch_stats"], event_cb, 0)
+            #~ print("Suscribe event returns %s"%(ret_events)) 
 
         gevent.sleep(2)
-        #~ ret = taisc_manager.update_slotframe('./coexistence/default_taisc_slotframe.csv')
-        #~ print("Update slot frame " + str(ret))
-        #ret_events = taisc_manager.subscribe_events(["coexistence_stats"], event_cb, 0)
-        #print("Suscribe event returns %s"%(ret_events))    
-        #ret_events = taisc_manager.subscribe_events(["tdma_stats"], event_cb, 0)
-        #print("Suscribe event returns %s"%(ret_events))        
+        
+        #EVENTS:          
         
         while True:
-            gevent.sleep(20)
+            #~ print(taisc_manager.get_measurements(["APP_STATS"]))
+            gevent.sleep(1)
     except KeyboardInterrupt:
         log.debug("Exit")
         global_node_manager.stop()
