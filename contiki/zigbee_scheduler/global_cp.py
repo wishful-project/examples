@@ -171,27 +171,23 @@ if __name__ == "__main__":
             print("Starting ping example")
             print("Activating clients")
             app_manager.update_configuration({"APP_ActiveApplication": 5},range(2,len(global_node_manager.get_mac_address_list())+1))
-            
-            ret_events = taisc_manager.subscribe_events(["ping_result"], event_cb, 0)
-            print("Suscribe event returns %s"%(ret_events)) 
         elif(example=="udp"):
             print("Starting udp example")
             print("Activating server")
             app_manager.update_configuration({"APP_ActiveApplication": 1},[1])
             print("Activating clients")
             app_manager.update_configuration({"APP_ActiveApplication": 2},range(2,len(global_node_manager.get_mac_address_list())+1))
-            
-            #~ ret_events = taisc_manager.subscribe_events(["app_rx_event"], event_cb, 0)
-            #~ print("Suscribe event returns %s"%(ret_events))  
-            #~ ret_events = taisc_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
-            #~ print("Suscribe event returns %s"%(ret_events))  
-            #~ ret_events = taisc_manager.subscribe_events(["tsch_stats"], event_cb, 0)
-            #~ print("Suscribe event returns %s"%(ret_events)) 
 
-        gevent.sleep(2)
-        
-        #EVENTS:          
-        
+        #EVENTS:
+        with open(os.path.dirname(os.path.realpath(__file__))+'/event_settings.csv', 'r') as csvfile:
+            event_settings = csv.reader(csvfile, delimiter=',')
+            for event_setting_it in event_settings:
+                event_setting = list(event_setting_it)
+                print(event_setting)
+                if event_setting[0] == "1":
+                    ret_events = taisc_manager.subscribe_events([event_setting[1]], event_cb, 0)
+                    print("Suscribe event %s returns %s"%(event_setting[1],ret_events))
+
         while True:
             #~ print(taisc_manager.get_measurements(["APP_STATS"]))
             gevent.sleep(1)
