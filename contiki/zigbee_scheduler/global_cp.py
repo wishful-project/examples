@@ -13,6 +13,7 @@ Options:
    --nodes nodesFile   Config file with node info
    --experiment_name Name of the experiment
    --experiment_group Name of the experiment group
+   --application_name Name of the contiki application (udp/ping)
    --abs_log_dir Absolute path of the logging directory
 
 Example:
@@ -32,6 +33,8 @@ import numpy
 import wishful_upis as upis
 import signal
 import _thread
+import csv
+import os
 from measurement_logger import *
 from stdout_measurement_logger import *
 from file_measurement_logger import *
@@ -140,28 +143,21 @@ if __name__ == "__main__":
         
         global_node_manager.start_local_monitoring_cp()
 
-        superframe_size     = 30
-        transmission_power  = 5
-        timeslot_duration   = 10000
-        message_size        = 10
-        example             = "ping"
+        example             = args['--application_name']
 
         #Superframe allocation:
         err = taisc_manager.update_slotframe('./contiki_helpers/default_taisc_slotframe.csv','TSCH')
         print("Setting superframe allocation to %s (%s)"%('./contiki_helpers/default_taisc_slotframe.csv',err)) 
-        #Superframe size:
-        err = taisc_manager.update_macconfiguration({"IEEE802154e_macSlotframeSize": superframe_size})
-        print("Setting superframe size to %s (%s)"%(superframe_size,err)) 
-        #Hopping sequence:
-        #Transmission power:
-        err = taisc_manager.update_macconfiguration({"IEEE802154_phyTXPower": transmission_power})
-        print("Setting transmission power to %s (%s)"%(transmission_power,err)) 
-        #Timeslot duration:
-        err = taisc_manager.update_macconfiguration({"IEEE802154e_macTsTimeslotLength": timeslot_duration})
-        print("Setting time slot duration to %s (%s)"%(timeslot_duration,err)) 
-        #Message size:
-        err = app_manager.update_configuration({"APP_MessageSize": message_size})
-        print("Setting message size to %s (%s)"%(message_size,err)) 
+        
+        with open(os.path.dirname(os.path.realpath(__file__))+'/tsch_settings.csv', 'r') as csvfile:
+            tsch_settings = csv.reader(csvfile, delimiter=',')
+            for tsch_setting_it in tsch_settings:
+                tsch_setting = list(tsch_setting_it)
+                if tsch_setting[0] == "mac":
+                    err = taisc_manager.update_macconfiguration({tsch_setting[1]: int(tsch_setting[2])})
+                elif tsch_setting[0] == "app":
+                    err = app_manager.update_configuration({tsch_setting[1]: int(tsch_setting[2])})
+                print("Setting %s to %s (%s)"%(tsch_setting[1],tsch_setting[2],err)) 
         
         #Application:
         #~ 0 APPLICATION_NONE,
