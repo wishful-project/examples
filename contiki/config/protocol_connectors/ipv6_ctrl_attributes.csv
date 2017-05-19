@@ -9,3 +9,4 @@
 "MEASUREMENT","APP_RxStats",28060,"UINT32;UINT32","","<"
 "PARAMETER","APP_ActiveApplication",57303,"UINT8","","<"
 "PARAMETER","APP_MessageSize",43297,"UINT8","","<"
+"PARAMETER","APP_SendInterval",47444,"UINT32","","<"

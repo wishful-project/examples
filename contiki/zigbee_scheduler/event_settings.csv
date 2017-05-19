@@ -1,4 +1,4 @@
-0,app_rx_event
-0,ping_result
+1,app_rx_event
+1,ping_result
 1,IEEE802154_event_macStats
-0,tsch_stats
+1,tsch_stats
