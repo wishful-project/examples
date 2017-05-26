@@ -1,39 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-wmp_example_tutorial_agent: Example tutorial of WiSHFUL (agent side)
-Usage:
-   wmp_example_tutorial_agent [options] [-q | -v]
-Options:
-   --logfile name      Name of the logfile
-   --config configFile Config file path
-Example:
-   ./wishful_example_tutorial_agent -v --config ./config.yaml
-Other options:
-   -h, --help          show this help message and exit
-   -q, --quiet         print less text
-   -v, --verbose       print more text
-   --version           show version and exit
-"""
-
 
 import logging
 import signal
 import sys, os
 import yaml
 
-
 sys.path.append('../../')
 sys.path.append("../../agent_modules/net_linux")
 sys.path.append("../../agent_modules/module_lte")
+sys.path.append("../../agent_modules/module_lte/wishful_module_lte")
 sys.path.append('../../upis')
 sys.path.append('../../framework')
 sys.path.append('../../agent')
 
 import wishful_upis as upis
 import wishful_agent
-from agent_modules.wifi_wmp.wmp_structure import UPI_R
 
 __author__ = "Francesco Giannone, Domenico Garlisi"
 __copyright__ = "Copyright (c) 2017, Sant'Anna, CNIT"
@@ -45,7 +28,7 @@ Setting of experiment node
 """
 
 node_interface = "eth0"
-group_name = "example_tutorial"
+group_name = "lte_example"
 
 """
 END setting of experiment nodes
@@ -81,8 +64,7 @@ agent.add_module(moduleName="net_linux", pyModule="wishful_module_net_linux",
                  className="NetworkModule")
 
 #add the wifi_wmp module, responsable to controll wmp platform
-agent.add_module_lte(moduleName="lte", pyModule="wishful_module_lte",
-                 className="LteModule")
+agent.add_module(moduleName="lte", pyModule="wishful_module_lte", className="LteModule")
 
 
 """ END WiSHFUL agent setting """
@@ -93,40 +75,16 @@ agent.add_module_lte(moduleName="lte", pyModule="wishful_module_lte",
 
 #set the logging name
 log = logging.getLogger('wishful_agent')
+logLevel = logging.INFO
+logging.basicConfig(level=logLevel, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
 """ END Define logging controller """
 
-
-if __name__ == "__main__":
-    try:
-        from docopt import docopt
-    except:
-        print("""
-        Please install docopt using:
-            pip install docopt==0.6.1
-        For more refer to:
-        https://github.com/docopt/docopt
-        """)
-        raise
-
-    #get program arguments
-    args = docopt(__doc__, version=__version__)
-
-    #set the logging level by argument parameters
-    log_level = logging.INFO  # default
-    if args['--verbose']:
-        log_level = logging.DEBUG
-    elif args['--quiet']:
-        log_level = logging.ERROR
-
-    #set the logging format
-    logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
-
-    try:
-        #Start agent
-        agent.run()
-    except KeyboardInterrupt:
-        log.debug("Agent exits")
-    finally:
-        log.debug("Exit")
-        agent.stop()
+try:
+    #Start agent
+    agent.run()
+except KeyboardInterrupt:
+    log.debug("Agent exits")
+finally:
+    log.debug("Exit")
+    agent.stop()
