@@ -28,6 +28,7 @@ import os
 import sys
 import time
 from itertools import cycle
+import math
 
 
 # WiSHFUL imports
@@ -43,7 +44,7 @@ __email__ = "kistm@tcd.ie"
 """
 Setting of controller node
 """
-controller_PC_IP_address = "192.168.5.167"
+controller_PC_IP_address = "192.168.5.76"
 controller_PC_interface = "ens3"
 """
 END setting of controller nodes
@@ -76,7 +77,7 @@ controller.add_module(moduleName="discovery", pyModuleName="wishful_module_disco
 # Global list with all nodes (agents) connected to this controller. We start empty and append nodes when they start.
 # See new_node function below
 nodes = []
-TOTAL_NODES = 1 # We expect 2 nodes to connect: 'tx', and 'rx'. 
+TOTAL_NODES = 2 # We expect 2 nodes to connect: 'tx', and 'rx'. 
 
 @controller.new_node_callback()
 def new_node(node):
@@ -137,7 +138,7 @@ if __name__ == '__main__':
     # circular buffer with gains.
     # We go from 0 to 40 and then restart.
     # We do this only in the TX node
-    tx_gains = cycle([0, 10, 20, 30, 40])
+    tx_gains = cycle([0, 40,])
 
     # Initial center frequency
     # We get the initial center frequency when the TX node starts to execute.
@@ -177,6 +178,8 @@ if __name__ == '__main__':
                 #   - program_type: 'grc' or 'py' (we can also pass a '.py' file instead of a GRC.
                 #   - program_port: Port that the XMLRPCServer will run (check the XMLRPC Server block on tx.grc file)     
                 controller.node(node).radio.activate_radio_program({'program_name': 'tx', 'program_code': program_code, 'program_type': 'grc', 'program_port': 8080})
+            else:
+                print('\t Agent TX is already running something. Please stop it first') 
 
         # node is 'rx'
         if node.name == 'rx':
@@ -193,10 +196,12 @@ if __name__ == '__main__':
                 #   - program_type: 'grc' or 'py' (we can also pass a '.py' file instead of a GRC.
                 #   - program_port: Port that the XMLRPCServer will run (check the XMLRPC Server block on rx.grc file)     
                 controller.node(node).radio.activate_radio_program({'program_name': 'rx', 'program_code': program_code, 'program_type': 'grc', 'program_port': 8081})
+            else:
+                print('\t Agent RX is already running something. Please stop it first') 
+
 
     # We do a sleep here to give time time for agents (particularly the most recent that connected) have started their GNURadio program 
     gevent.sleep(3)
-
 
     # ::GETTING_INITIAL_CF::
     # We can get several parameters at one by passing a list with the parameters that we want.
@@ -207,7 +212,7 @@ if __name__ == '__main__':
 
     print('* Starting Main Loop.')
     iterations = 0
-    while iterations < 5:
+    while iterations < 20:
         iterations += 1
 
         print ("== ITERATION {}/20".format(iterations))
@@ -225,17 +230,32 @@ if __name__ == '__main__':
                 print ('\t Changing gain from {} to {}'.format(vals['gain'], n_gain))
                 controller.node(node).radio.set_parameters({'gain': n_gain})
 
+                if iterations == 10:
+                        print ('\t Changing frequency to {}'.format(initial_cf + 10e6))
+                        print ('RX will not receive data from now on.')
+                        print ('\tRate will maintain the last value monitored. Signal level will be very low')
+                        controller.node(node).radio.set_parameters({'center_freq': initial_cf + 10e6})
+
             if node.name == 'rx':
-                print('- Changing RX parameters')
+                print('- Getting RX values')
                 vals = controller.node(node).radio.get_parameters(['rate', 'signal_level'])
-                print(vals)
+                print ('\t Rate: \t%f' % (vals['rate']))
+                print ('\t Signal Level: \t %f' % (math.log10(vals['signal_level'])))
 
         gevent.sleep(2)
 
     # End GNURadio programs in the agents. 
     # Keep in mind that the agents are still running.
-    controller.node(node).radio.deactivate_radio_program('tx')
-    controller.node(node).radio.deactivate_radio_program('rx')
+    for node in nodes:
+        if node.name == 'tx':
+                print('Stopping TX')
+                controller.node(node).radio.deactivate_radio_program('tx')
+        elif node.name == 'rx':
+                print('Stopping RX')
+                controller.node(node).radio.deactivate_radio_program('rx')
+        else:
+                print ('\tNode unknown. Have you started it?')
 
     # End gracefully
+    print('Controller Exiting')
     sys.exit(1)
