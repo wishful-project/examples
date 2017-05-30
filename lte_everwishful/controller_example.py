@@ -15,6 +15,8 @@ sys.path.append('../../agent')
 
 import wishful_controller
 import wishful_upis as upis
+import wishful_upis.lte.meta_radio as radio
+import wishful_upis.lte.meta_net as net
 
 __author__ = "Francesco Giannone, Domenico Garlisi"
 __copyright__ = "Copyright (c) 2017, Sant'Anna, CNIT"
@@ -58,8 +60,6 @@ group_name = "lte_example"
 """
 END setting of experiment nodes
 """
-
-
 
 """ START the WiSHFUL controller setting """
 """
@@ -172,6 +172,7 @@ def main():
         #Check if all nodes are present in the experiment
         if len(nodes) == nodes_number:
 
+            print('nodes %s' % str(nodes))
             """
             This part of controller assigns the correct role for any experiment node finded
             """
@@ -195,12 +196,9 @@ def main():
             """
 
             #execute blocking function immediately
-            # result = controller.node(enb_node).radio.set_parameters(parameter_enb)
-            # result = controller.node(ue_node).radio.set_parameters(parameter_ue)
-
-            result = controller.node(enb_node).radio.set_tx_gain_enb(10)
-            # result = controller.node(rcc_node).radio.set_tx_gain_rcc(10)
-            # result = controller.node(rru_node).radio.set_tx_gain_rru(10)
+            UPIargs = {radio.TX_GAIN_enb.key: 10}
+            result = controller.node(enb_node).radio.set_parameters(UPIargs)
+            #result = controller.node(ue_node).radio.set_parameters(parameter_ue)
 
             break
 
