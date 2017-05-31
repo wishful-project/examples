@@ -1,0 +1,19 @@
+
+
+==========================================
+sudo apt-get install python3-matplotlib
+
+and on all zotacs:
+sudo apt-get install libnl-genl-3-dev
+sudo apt-get install libnl-genl-3-200:i386
+==========================================
+
+
+#if matplotlib module fails, please install it using
+~~~~
+sudo apt-get install python3-matplotlib
+~~~~
+
+
+# how to read the busytime with iw.
+iw dev wlan0 surveydump

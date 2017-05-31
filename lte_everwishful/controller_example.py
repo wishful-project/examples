@@ -1,21 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-"""
-wmp_example_tutorial_controller: Example tutorial of WiSHFUL (agent side)
-Usage:
-   wmp_example_tutorial_controller [options] [-q | -v]
-Options:
-   --logfile name      Name of the logfile
-   --config configFile Config file path
-Example:
-   ./wishful_example_tutorial_controller -v --config ./config.yaml
-Other options:
-   -h, --help          show this help message and exit
-   -q, --quiet         print less text
-   -v, --verbose       print more text
-   --version           show version and exit
-"""
 import types
 import sys
 import time
@@ -31,6 +15,8 @@ sys.path.append('../../agent')
 
 import wishful_controller
 import wishful_upis as upis
+import wishful_upis.lte.meta_radio as radio
+import wishful_upis.lte.meta_net as net
 
 __author__ = "Francesco Giannone, Domenico Garlisi"
 __copyright__ = "Copyright (c) 2017, Sant'Anna, CNIT"
@@ -41,8 +27,9 @@ __email__ = "{francesco.giannone@santannapisa.it, domenico.garlisi@cnit.it}"
 Setting of experiment nodes, ip address and name
 """
 #Controller (UP-Board_2)
-controller_PC_ip_address = "10.30.2.149"
-controller_PC_interface = "eth0" 
+controller_PC_ip_address = "10.8.8.10"
+#controller_PC_ip_address = "10.30.2.149"
+controller_PC_interface = "eth1.8"
 
 # EPC
 epc_name = "UP-Board 1"
@@ -56,7 +43,8 @@ epc_interface = "enx503f56020469"
 
 # eNB/RRU
 enb_name = "Wilson" 
-enb_ip = "10.30.2.58"
+#enb_ip = "10.30.2.58"
+enb_ip = "10.8.12.3"
 enb_interface = "eth0"
 
 #UE
@@ -65,13 +53,13 @@ ue_ip = "10.30.2.98" #to check
 ue_interface = "eth0" #to check
 
 #Nodes number
-nodes_number=3
+nodes_number=1
+group_name = "lte_example"
+
 
 """
 END setting of experiment nodes
 """
-
-
 
 """ START the WiSHFUL controller setting """
 """
@@ -104,7 +92,10 @@ controller.add_module(moduleName="discovery", pyModuleName="wishful_module_disco
 """ we use the python logging system module (https://docs.python.org/2/library/logging.html) """
 
 #set the logging name
+#set the logging name
 log = logging.getLogger('wishful_controller')
+logLevel = logging.INFO
+logging.basicConfig(level=logLevel, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
 """ END Define logging controller """
 
@@ -163,7 +154,7 @@ def setUE(controller, node):
     pass
 
 
-def main(args):
+def main():
 
     #start the controller
     controller.start()
@@ -181,6 +172,7 @@ def main(args):
         #Check if all nodes are present in the experiment
         if len(nodes) == nodes_number:
 
+            print('nodes %s' % str(nodes))
             """
             This part of controller assigns the correct role for any experiment node finded
             """
@@ -191,7 +183,7 @@ def main(args):
             for ii in range(0, len(nodes)):
                 if nodes[ii].ip == epc_ip:
                     epc_node = nodes[ii]
-                if nodes[ii].ip == epc_ip:
+                if nodes[ii].ip == enb_ip:
                     enb_node = nodes[ii]
                 if nodes[ii].ip == ue_ip:
                     ue_node = nodes[ii]
@@ -204,45 +196,18 @@ def main(args):
             """
 
             #execute blocking function immediately
-            result = controller.node(enb_node).radio.set_parameters(parameter_enb)
-            result = controller.node(ue_node).radio.set_parameters(parameter_ue)
+            UPIargs = {radio.TX_GAIN_enb.key: 10}
+            result = controller.node(enb_node).radio.set_parameters(UPIargs)
+            #result = controller.node(ue_node).radio.set_parameters(parameter_ue)
 
             break
 
 
-if __name__ == "__main__":
-    try:
-        from docopt import docopt
-    except:
-        print("""
-        Please install docopt using:
-            pip install docopt==0.6.1
-        For more refer to:
-        https://github.com/docopt/docopt
-        """)
-        raise
 
-    #get program arguments
-    args = docopt(__doc__, version=__version__)
-
-    """ START Configure logging controller """
-    """ we use the python logging system module (https://docs.python.org/2/library/logging.html) """
-
-    #set the logging level
-    log_level = logging.INFO  # default
-    if args['--verbose']:
-        log_level = logging.DEBUG
-    elif args['--quiet']:
-        log_level = logging.ERROR
-    #set the logging format
-    logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
-
-    """ END Define logging controller """
-
-    try:
-        main(args)
-    except KeyboardInterrupt:
-        log.debug("Controller exits")
-    finally:
-        log.debug("Exit")
-        controller.stop()
+try:
+    main()
+except KeyboardInterrupt:
+    log.debug("Controller exits")
+finally:
+    log.debug("Exit")
+    controller.stop()

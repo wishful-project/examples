@@ -60,3 +60,12 @@ target/
 
 #python editor
 .idea
+
+#firmware
+*firmware
+
+#backports
+*backport*
+
+#fig
+*fig*
