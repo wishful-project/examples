@@ -6,21 +6,21 @@ For any information or issue, please contact Maicon Kist at kistm@tcd.ie
 
 The goal of this experiment is to create an example tutorial for the WiSHFUL framework and the UPI functions usage that
 run on GNURadio platform.
-Specifically, this experiment uses the WiSHFUL framework and the UPI functions to set-up a GNURadio Tx/Rx pair and change parameters. All the UPI functions used in this example tutorial are fully documented at link https://wishful-project.github.io/wishful_upis/ and this example tutorial can be found at the link https://github.com/wishful-project/examples
+Specifically, this experiment uses the WiSHFUL framework and the UPI functions to set-up a GNURadio TX/RX pair and change parameters. All the UPI functions used in this example are fully documented in https://wishful-project.github.io/wishful_upis/
 
 We want to demonstrate how the WISHFUL UPI can be exploited to:
-*i*) Setup two GNURadio waveforms, an OFDM Tx and a OFDM Rx;
+*i*) Set up two GNURadio waveforms, an OFDM TX and a OFDM RX;
 *ii*) Show the use of UPI_R to monitor nodes parameters;
-*iii*) Show the use of UPI_R functions to tune the nodes parameters.
+*iii*) Show the use of UPI_R functions to tune the node's parameters.
 
 # Getting Started
 
 ## 1. Reserving the VM's
 
-Reserve ***three WiSHFUL nodes*** by using the reservation system at : https://www.iris-testbed.connectcentre.ie/reservation
+Reserve ***three WiSHFUL nodes*** by using the reservation system at: https://www.iris-testbed.connectcentre.ie/reservation
 
 These VMs are used as follows:
-(*i*) one VM to run the the controller program, or WiSHFUL controller;
+(*i*) one VM to run the the Controller program, or WiSHFUL Controller;
 (*ii*) one VM to run the TX;
 (*iii*) one VM to run the RX.
 
@@ -28,20 +28,20 @@ These VMs are used as follows:
 
 The controller is implemented in ```wishful_simple_controller.py```
 
-The controller program permits to: (*i*) discovery of agent nodes, (*ii*) installation of GNURadio waveforms on the agents, (*iii*) monitor values from the GNURadio waveform, and (*iv*) configure parameters on the GNURadio waveform.
+The WiSHFUL Controller permits to: (*i*) discovery of agent nodes, (*ii*) installation of GNURadio waveforms on the agents, (*iii*) monitor values from the GNURadio waveform, and (*iv*) configure parameters on the GNURadio waveform.
 
-In addition, the WiSHFUL controller executes the logic
-for controlling the experiment, where we distinguish three phases: (*i*) we wait for all agent nodes to connect in the WiSHFUL controller, (*ii*) setup the corresponding waveforms in each agent, and (*iii*) monitor/configure parameters on the GNURadio waveforms.
+Also, the WiSHFUL controller executes the logic
+for controlling the experiment, where we distinguish three phases: (*i*) we wait for all agent nodes to connect to the WiSHFUL controller, (*ii*) set up the corresponding waveforms in each agent, and (*iii*) monitor/configure parameters on the GNURadio waveforms.
 
 ### The WiSHFUL agents
 
-The two agents that we will use in this example dont implement any specific functionality. Their sole purpose in this experiment is to connect to the WiSHFUL controller and wait for instructions (passed through UPI calls).
+The two agents that we will use in this example don't implement any specific functionality. Their sole purpose in this experiment is to connect to the WiSHFUL controller and wait for instructions (passed through UPI calls).
 
 The agents are implemented in:
 - ```agent_tx.py``` for the transmitter;
 - ```agent_rx.py``` for the receiver
 
-In order to better understand all the phases of the this example tutorial and the single UPI function usage, we add
+To better understand all the phases of this example tutorial and the single UPI function usage, we add
 inline comment to both controller and agent programs.
 
 ## 2. Access WiSHFUL CONTROLLER
@@ -54,7 +54,7 @@ inline comment to both controller and agent programs.
     ```
     cd /opt/wishful/examples/Get_Started_Examples/Simple-GNURadio-Example
     ```
-4. Open ```wishful_simple_controller.py``` and change the following variables, replacing their values accordingly (NOTE: much likely the interface is **ens3**): 
+4. Open ```wishful_simple_controller.py``` and change "controller-vm-ip" and "ethinterface" by the IP address and the Ethernet interface of the Iris testbed network (NOTE: much likely the IP starts with **192.168.*.* ** and the interface is **ens3**): 
     ```
     controller_PC_IP_address = "controller-vm-ip" 
     controller_PC_interface = "ethinterface"
@@ -75,7 +75,7 @@ inline comment to both controller and agent programs.
     ```
     cd /opt/wishful/examples/Get_Started_Examples/Simple-GNURadio-Example
     ```
-4. Open ```agent_tx.py``` and change the following variables (NOTE: much likely the interface is **ens3**):
+4. Open ```agent_tx.py``` and change the "ethernet_interface" by the Ethernet inferface connected in the Iris testbed internal network (NOTE: much likely the interface is **ens3**):
     ```
     agent_PC_interface = "ethernet_interface"
     ```
@@ -95,7 +95,7 @@ inline comment to both controller and agent programs.
     ```
     cd /opt/wishful/examples/Get_Started_Examples/Simple-GNURadio-Example
     ```
-4. Open ```agent_rx.py``` and change the following variables (NOTE: much likely the interface is **ens3**):
+4. Open ```agent_rx.py``` and  change the "ethernet_interface" by the Ethernet inferface connected in the Iris testbed internal network (NOTE: much likely the interface is **ens3**):
     ```
     agent_PC_interface = "ethernet_interface"
     ```
@@ -135,7 +135,7 @@ Iface_Modules: {}
 Modules_without_iface: [0, 1, 2]
 ```
 
-After all nodes connected you should see the controlle printing the messages informing that the GNURadio programs are being installed on the agents:
+After all nodes connected you should see the WiSHFUL Controller printing the messages informing that the GNURadio programs are being installed on the agents:
 
 ```
 All nodes connected. Starting GNURadio Simple Experiment
@@ -147,7 +147,7 @@ After installing the programs, the controller starts its main loop. The main loo
 
  1. Change the gain of the TX.
  2. Get the RX rate (a.k.a throughput) and the RX signal level.
- 3. Print the RX rate and signal level (NOTE: signal level printed in log10 scale).
+ 3. Print the RX rate and signal level (NOTE: signal level is printed in log10 scale).
 
 ```
 == ITERATION 1/20
@@ -174,7 +174,7 @@ After installing the programs, the controller starts its main loop. The main loo
 
 ```
 
-After 10 iterations we change the center frequency of the transmitter to a frequency that the RX cannot receive anything. With this we just want to demonstrate what happens with the RX rate and RX signal level.
+After 10 iterations we change the center frequency of the transmitter to a frequency that the RX cannot receive anything. With this, we just want to demonstrate what happens with the RX rate and RX signal level.
 
 ```
 == ITERATION 10/20
@@ -182,7 +182,7 @@ After 10 iterations we change the center frequency of the transmitter to a frequ
      Changing gain from 0 to 40
      Changing frequency to 2910000000.0
 RX will not receive data from now on.
-    Rate will maintain the last value monitored. Signal level will be very low
+    The rate will maintain the last value monitored. Signal level will be very low
 - Getting RX values
      Rate:     4060.423164
      Signal Level:      -3.170337
@@ -203,7 +203,7 @@ RX will not receive data from now on.
 Note that rate does not change after the TX changes its center frequency. This happens because the RX flowgraph is 'stalled' at the OFDM demodulation block (all blocks after that do not process anything anymore). Thus, the block responsible for calculating the rate just informs the last value calculated. Notice also that the RX signal level is very low compared to the 10 first iterations.
 
 After 20 iterations the controller stops the TX and RX GNURadio programs and exits. 
-We highlight that although the GNURadio programs are stopped, the agents are still running. You can restart the contrller again if you want.
+We highlight that although the GNURadio programs are stopped, the agents are still running. You can restart the WiSHFUL Controller again if you want.
 ```
 Stopping TX
 Stopping RX
@@ -212,15 +212,15 @@ Controller Exiting
 
 ## Visualizing the Spectrum
 
-To see the spectogram during the experiment you can open a 4th terminal, connect to the VM acting as the Controller and type:
+To see the spectrogram during the experiment, you can open a 4th terminal, connect to the VM acting as the Controller and type:
 
 ```
 uhd_fft --freq 2.9e9
 ```
+
 Remember to do this before starting the experiment. You should see something similar to this in the GUI:
 
-![Spectrum](img/spectogram.png "Spectogram of signal received")
+![Spectrum](img/spectogram.png "Spectrogram of signal received")
 
 ## Acknowledgement
 The research leading to these results has received funding from the European Horizon 2020 Programme under grant agreement n645274 (WiSHFUL project).
-
