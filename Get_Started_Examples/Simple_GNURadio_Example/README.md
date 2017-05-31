@@ -219,8 +219,8 @@ uhd_fft --freq 2.9e9
 ```
 Remember to do this before starting the experiment. You should see something similar to this in the GUI:
 
-![alt text](https://github.com/wishful-project/examples/tree/tcd_gnuradio/Get_Started_Examples/Simple_GNURadio_Example/img/spectogram.png "Spectogram of signal received")
-
+![Spectrum](img/spectogram.png "Spectogram of signal received")
 
 ## Acknowledgement
 The research leading to these results has received funding from the European Horizon 2020 Programme under grant agreement n645274 (WiSHFUL project).
+
