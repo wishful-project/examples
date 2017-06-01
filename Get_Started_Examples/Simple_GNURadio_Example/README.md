@@ -2,6 +2,10 @@ WiSHFUL GNURadio example tutorial
 
 For any information or issue, please contact Maicon Kist at kistm@tcd.ie
 
+## Before you start
+
+We assume that the person following this tutorial has familiarity with the Unix command line (specially the networking tools, such as **ifconfig**) and with a command line text editor (such as vim or nano).
+
 ## Goal of this experiment
 
 The goal of this experiment is to create an example tutorial for the WiSHFUL framework and the UPI functions usage that
