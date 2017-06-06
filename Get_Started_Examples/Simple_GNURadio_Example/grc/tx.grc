@@ -1198,7 +1198,7 @@
     </param>
     <param>
       <key>port</key>
-      <value>8080</value>
+      <value>1235</value>
     </param>
   </block>
   <connection>
