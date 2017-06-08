@@ -35,6 +35,6 @@
 "EVENT","IEEE802154_event_contikimacStats",13632,"UINT8;UINT8;UINT8;UINT8;UINT32","","<"
 "EVENT","coexistence_stats",25813,"UINT8;UINT8;UINT8","","<"
 "EVENT","tdma_stats",25814,"UINT8;UINT8;UINT8","","<"
-"EVENT","tsch_stats",53259,"UINT8;UINT32;INT8;INT8;UINT8","","<"
+"EVENT","tsch_stats",53259,"UINT8;INT;INT8;INT8;UINT8","","<"
 "EVENT","ping_result",35159,"UINT8;UINT32","","<"
 "EVENT","app_rx_event",58574,"UINT16;UINT16;UINT32;UINT32;UINT32;UINT16;UINT16;INT8;UINT8","","<"
