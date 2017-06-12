@@ -61,6 +61,7 @@ def default_callback(group, node, cmd, data, interface = ""):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}, interface: {}".format(datetime.datetime.now(), group, node.name, cmd, data, interface))
 
 def handle_event(mac_address, event_name, event_value):
+    print("%s @ %s: %s"%(str(mac_address), event_name, str(event_value)))
     measurement_logger.log_measurement(event_name, event_value)
 
 def event_cb(mac_address, event_name, event_value):
