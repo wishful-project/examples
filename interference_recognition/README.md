@@ -42,6 +42,7 @@ sudo python3 agent --config agent_cfg_wilab.yaml
 sudo python3 controller --config controller_cfg_wilab2_zotach4.yaml --nodes node_info_wilab2_4hop.txt
 
 if matplotlib module fails, please install it using
+
 ~~~~
 sudo apt-get install python3-matplotlib
 ~~~~
@@ -94,10 +95,31 @@ sudo python3 controller --config controller_cfg_nova.yaml --nodes node_info_ttil
 ~~~~
 
 #visualizer connection (39 --> CONTROLLER)
+
+Tunnel over ops:
+
 ~~~~
-ssh -L 8401:10.11.16.39:8401 user@ops.wilab2.ilabt.iminds.be -v
-ssh -L 8400:10.11.16.39:8400 user@ops.wilab2.ilabt.iminds.be -v
+ssh -L 8601:10.11.16.39:8601 user@ops.wilab2.ilabt.iminds.be -v
+ssh -L 8600:10.11.16.39:8600 user@ops.wilab2.ilabt.iminds.be -v
 ~~~~
+
+Tunnel over Nova:
+
+~~~~
+ssh -L 8601:localhost:8601 pierluigi@lab.tti.unipa.it -v
+ssh -L 8600:localhost:8600 pierluigi@lab.tti.unipa.it -v
+~~~~
+
+this is equivalent than the following, because the first address is the address of the local machine as seen by nova 
+
+~~~~
+ssh -L 8601:10.8.8.10:8601 pierluigi@lab.tti.unipa.it -v
+ssh -L 8600:10.8.8.10:8600 pierluigi@lab.tti.unipa.it -v
+~~~~
+
+
+
+
 #START graphical interface
 cd visualizer
 python graphic_interface.py

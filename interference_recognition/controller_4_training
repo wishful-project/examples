@@ -31,7 +31,6 @@ DEMO visualizer START
 		python demo_visualizer.py
 """
 
-
 """
 DEMO START
 
@@ -44,7 +43,6 @@ DEMO START
  on PC node
 	./wishful_ras_controller --config controller_cfg.yaml
 """
-
 
 import threading
 import datetime
@@ -61,7 +59,6 @@ from node_setup import *
 import zmq
 import _thread
 
-
 # for loading and using the trained classifier
 from sklearn.ensemble import BaggingClassifier
 from sklearn.externals import joblib
@@ -77,7 +74,6 @@ sys.path.append('../../agent')
 sys.path.append('../../controller')
 sys.path.append('../../controller_modules')
 sys.path.append('../../controller_modules/wireless_topology')
-
 
 import wishful_controller
 import wishful_upis as upis
@@ -99,6 +95,7 @@ class WiFiNode():
 		Stores/Removes low level measurements
 		Store the low level measurements type
 	"""
+
 	def __init__(self, node, mac_address):
 		""" Creates a new WiFiNode object
 		"""
@@ -123,7 +120,6 @@ class WiFiNode():
 		:param class: the predicted interference class according to the classifier
 		"""
 		self.interference_class.append(interf_class)
-		
 
 	def get_available_measures(self):
 		""" Gets the available measure of the node
@@ -134,7 +130,7 @@ class WiFiNode():
 
 log = logging.getLogger('wishful_agent.main')
 controller = wishful_controller.Controller()
-#create MeasurementCollector object, to keep information about WiFiNode measurements and perform plotting result
+# create MeasurementCollector object, to keep information about WiFiNode measurements and perform plotting result
 meas_collector = MeasurementCollector(log)
 
 nodes = []
@@ -142,6 +138,7 @@ wifinodes = []
 configuration_message_for_visualizzer = {}
 do_run = None
 trained_classifier = None
+
 
 @controller.new_node_callback()
 def new_node(node):
@@ -159,11 +156,14 @@ def node_exit(node, reason):
 
 @controller.set_default_callback()
 def default_callback(group, node, cmd, data):
-	print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
+	print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group,
+	                                                                                   node.name, cmd, data))
+
 
 def csResultCollector1(group, node, data):
 	messagedata = data
-	log.info('1 - receives data msg at %s - %s' % (str(node.ip), str(messagedata) ))
+	log.info('1 - receives data msg at %s - %s' % (str(node.ip), str(messagedata)))
+
 
 def start_command_connection():
 	''' SETUP PYTHON COMMAND RECEIVER '''
@@ -189,34 +189,30 @@ def collect_remote_messages(lcpDescriptor_node, socket_visualizer, mac_address, 
 	while getattr(receive_thread, "do_run", True):
 		msg = lcpDescriptor_node.recv(timeout=0.1)
 		if msg:
-			#log.info("Recv: %s" % str(msg))
-			#parsed_json: {u'label': u'C', u'measure': [[1484644417.3528204, 0.0, 0.0, 1.0, 0.0, 1023, 0, 0]], u'mac_address': u'00:0e:8e:30:9d:ee'}
+			log.info("Recv: %s" % str(msg))
+
 			for ii in range(0, len(mac_address)):
 				if msg['mac_address'] == mac_address[ii]:
 					msg['label'] = label[ii]
-					msg['type'] = u'statistics'
 					# print ('Label = %s' %(msg['measure']))
 
-					# sanitizes single and double quo
-					meas_json = json.dumps(msg['measure'])
-
+					# --- sanitizes single and double quotes
+					# meas_json = json.dumps(msg['measure'])
 					# meas_values = json.loads(meas_json)
-					# print ('meas_values = %s' %meas_values[0][1:])
-					# remove timestamp because it is not a feature
-					#msg['interference_class'] = int(trained_classifier.predict(array([meas_values[0][1:]])))
-					# print ("received message %s - sending to visualizer" %msg)
-					#print ("predicted class = %s " %msg['interference_class'])
-					# print ("now message is %s" %str(msg))
-
+					# print ('meas_values = %s' % meas_values[0][1:])
+					# --- remove timestamp because it is not a feature
+					# msg['interference_class'] = int(trained_classifier.predict(array([meas_values[0][1:]])))
+					# print ("predicted class = %s " % msg['interference_class'])
+					# print ("now message is %s" % str(msg))
 					socket_visualizer.send_json(msg)
 
-			#print (msg['measure'])
+			# print (msg['measure'])
 			# add measurement on nodes element
 			for node in wifinodes:
 				if node.mac_address == msg['mac_address'] and msg['measure'][0][0] != 0:
 					node.measurements.append(msg['measure'])
 					# for further  usage within the controller (e.g. for taking some actions depending on the interference class)
-					#node.interference_class.append(int(msg['interference_class']))
+					# node.interference_class.append(int(msg['interference_class']))
 
 		gevent.sleep(1)
 
@@ -224,11 +220,11 @@ def collect_remote_messages(lcpDescriptor_node, socket_visualizer, mac_address, 
 def start_visualizer_connection():
 	''' SETUP PYTHON VISUALIZER '''
 
-	# global trained_classifier
+	global trained_classifier
 	# trained_classifier = joblib.load('trained-interference-classifier.pkl')
 
 	''' implement message zmq for realtime visualizer '''
-	#global socket_visualizer
+	# global socket_visualizer
 
 	print(controller.name)
 	# if controller.name == 'Controller wilab':
@@ -254,55 +250,56 @@ def signal_handler(signal, frame):
 	global do_run
 	do_run = False
 
+
 signal.signal(signal.SIGINT, signal_handler)
 
 
-
 def setAP(controller, node, iface, wlan_ip, essid):
-		""" Creates infrastructure BSS, uses node such as Access Point
+	""" Creates infrastructure BSS, uses node such as Access Point
 		:param node: elected Access Point Node
 		:param essid: the SSID
 		"""
-		#stop hostpad
-		rvalue = controller.nodes(node).net.stop_hostapd()
-		#set ip address
-		rvalue = controller.nodes(node).net.set_ip_address(iface, wlan_ip)
-		#set hostapd configuration
-		rvalue = controller.nodes(node).net.set_hostapd_conf(iface, './helper/hostapd.conf', 6, essid)
-		#start hostapd
-		rvalue = controller.nodes(node).net.start_hostapd('./helper/hostapd.conf')
-		#set power
-		rvalue = controller.nodes(node).radio.set_tx_power(15)
-		#set modulation rate
-		rvalue = controller.nodes(node).radio.set_modulation_rate(6)
+	# stop hostpad
+	rvalue = controller.nodes(node).net.stop_hostapd()
+	# set ip address
+	rvalue = controller.nodes(node).net.set_ip_address(iface, wlan_ip)
+	# set hostapd configuration
+	rvalue = controller.nodes(node).net.set_hostapd_conf(iface, './helper/hostapd.conf', 6, essid)
+	# start hostapd
+	rvalue = controller.nodes(node).net.start_hostapd('./helper/hostapd.conf')
+	# set power
+	rvalue = controller.nodes(node).radio.set_tx_power(15)
+	# set modulation rate
+	rvalue = controller.nodes(node).radio.set_modulation_rate(6)
+
 
 def setSTA(controller, node, iface, wlan_ip, essid):
-		""" Associate node to infrastructure BSS
+	""" Associate node to infrastructure BSS
 		:param node: elected station node by associate
 		:param essid: the SSID
 		"""
-		#stop hostpad
-		rvalue = controller.nodes(node).net.stop_hostapd()
-		#set ip address
-		rvalue = controller.nodes(node).net.set_ip_address(iface, wlan_ip)
-		#set power
-		rvalue = controller.nodes(node).radio.set_tx_power(15)
-		#set modulation rate
-		rvalue = controller.nodes(node).radio.set_modulation_rate(6)
-		connected = False
-		for ii in range(10):
-			#associate station
-			rvalue = controller.nodes(node).net.connect_to_network(iface, essid)
-			time.sleep(2)
-			#dump connection
-			rvalue = controller.nodes(node).net.network_dump(iface)
-			#self.log.debug('dump connection :\n%s\n'  % (str(rvalue) ))
-			flow_info_lines = rvalue.rstrip().split('\n')
-			if flow_info_lines[0][0:9] == "Connected" :
-				connected = True
-				break
+	# stop hostpad
+	rvalue = controller.nodes(node).net.stop_hostapd()
+	# set ip address
+	rvalue = controller.nodes(node).net.set_ip_address(iface, wlan_ip)
+	# set power
+	rvalue = controller.nodes(node).radio.set_tx_power(15)
+	# set modulation rate
+	rvalue = controller.nodes(node).radio.set_modulation_rate(6)
+	connected = False
+	for ii in range(10):
+		# associate station
+		rvalue = controller.nodes(node).net.connect_to_network(iface, essid)
+		time.sleep(2)
+		# dump connection
+		rvalue = controller.nodes(node).net.network_dump(iface)
+		# self.log.debug('dump connection :\n%s\n'  % (str(rvalue) ))
+		flow_info_lines = rvalue.rstrip().split('\n')
+		if flow_info_lines[0][0:9] == "Connected":
+			connected = True
+			break
 
-		return connected
+	return connected
 
 
 def main(args):
@@ -313,8 +310,8 @@ def main(args):
 	log.debug(args)
 
 	transmission_matrix = matrix([[0, 1, 0],
-								  [1, 0, 0],
-								  [0, 1, 0]])
+	                              [1, 0, 0],
+	                              [0, 1, 0]])
 
 	wlan_inject_iface = 'mon0'
 	config_file_path = args['--config']
@@ -323,17 +320,18 @@ def main(args):
 		config = yaml.load(f)
 	controller.load_config(config)
 
-	nodes_info_path=args['--nodes']
+	nodes_info_path = args['--nodes']
 	if nodes_info_path:
-		[hosts, driver, eth_ip, freq,tx_power, wlan_ip, mac_address, label, role, iface]=set_hosts(nodes_info_path)
+		[hosts, driver, eth_ip, freq, tx_power, wlan_ip, mac_address, label, role, iface] = set_hosts(nodes_info_path)
 		print([hosts, driver, eth_ip, freq, tx_power, wlan_ip, mac_address, label, role, iface])
 
-	controller.add_module(moduleName="wireless_topology", pyModuleName="wishful_module_wireless_topology", className="WirelessTopologyModule", importAs="wireless_topology")
+	controller.add_module(moduleName="wireless_topology", pyModuleName="wishful_module_wireless_topology",
+	                      className="WirelessTopologyModule", importAs="wireless_topology")
 
-	#Start controller
+	# Start controller
 	controller.start()
 
-	#control loop
+	# control loop
 	while do_run:
 		gevent.sleep(1)
 		print("\nConnected nodes", [str(node.id) for node in nodes])
@@ -344,7 +342,7 @@ def main(args):
 
 			print("find node")
 			for ii in range(0, len(nodes)):
-				print("\t %s - index %d" % (nodes[ii].ip, ii) )
+				print("\t %s - index %d" % (nodes[ii].ip, ii))
 
 			nodes_sort = []
 			for ii in range(0, len(hosts)):
@@ -354,55 +352,58 @@ def main(args):
 
 			print('sort nodes')
 			for ii in range(0, len(nodes_sort)):
-				print("\t %s - index %d" % (nodes_sort[ii].ip, ii) )
+				print("\t %s - index %d" % (nodes_sort[ii].ip, ii))
 
 			if len(nodes_sort) != len(hosts):
 				print('Error in build node list')
-				print('len(nodes_sort) != len(hosts) [%d != %d]' %(len(nodes_sort), len(hosts)))
+				print('len(nodes_sort) != len(hosts) [%d != %d]' % (len(nodes_sort), len(hosts)))
 				break
 			else:
-				print('len(nodes_sort) == len(hosts) [%d == %d]' %(len(nodes_sort), len(hosts)))
+				print('len(nodes_sort) == len(hosts) [%d == %d]' % (len(nodes_sort), len(hosts)))
 
 			nodes = nodes_sort
 
-			time_update = 1 #seconds
+			time_update = 1  # seconds
 			nodes_source_rate = []
 			nodes_temp = []
 
 			for ii in range(0, len(nodes)):
 				nodes_source_rate.append(0)
 				if not nodes[ii] in nodes_temp:
-					print("node %s - index %d" % (nodes[ii].ip, ii) )
+					print("node %s - index %d" % (nodes[ii].ip, ii))
 					nodes_temp.append(nodes[ii])
 			nodes = nodes_temp
 
 			for ii in range(0, len(nodes)):
-				wifinodes.append(WiFiNode(nodes[ii], mac_address[ii] ))
-				
-			#START visualizer socket
+				wifinodes.append(WiFiNode(nodes[ii], mac_address[ii]))
+
+			# START visualizer socket
 			socket_visualizer = start_visualizer_connection()
 
 			"""
 			****** setup network ******
 			"""
 			try:
-				#SETUP NODES
+				# SETUP NODES
 				print("START node setup")
 				lcpDescriptor = None;
 				for ii in range(0, len(hosts)):
-					print("search node %s - index %d" % (eth_ip[ii], ii) )
+					print("search node %s - index %d" % (eth_ip[ii], ii))
 					for jj in range(0, len(nodes)):
 						if nodes[jj].ip == eth_ip[ii]:
-							print("setup topology node %s - index %d" % (nodes[jj].ip, jj) )
+							print("setup topology node %s - index %d" % (nodes[jj].ip, jj))
 							pos = eth_ip.index(nodes[jj].ip)
 
-							#setup wifi network
-							#set ad-hoc network
-							rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
-							#rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "off", "aa:bb:cc:dd:ee:ff", True)
+							# setup wifi network
+							# set ad-hoc network
+							rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0",
+							                                                     "wishful-interference", freq[pos],
+							                                                     tx_power[pos], "6", wlan_ip[pos],
+							                                                     "250", "aa:bb:cc:dd:ee:ff", True)
+							# rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "off", "aa:bb:cc:dd:ee:ff", True)
 
-							#setup infrastructured network (put interface in managed mode and disable network manager)
-							#set infrastructured network
+							# setup infrastructured network (put interface in managed mode and disable network manager)
+							# set infrastructured network
 							# if role[pos] == "AP":
 							#	  setAP(controller, nodes[jj], iface[pos], wlan_ip[pos], "wishful-interference")
 							# elif role[pos] == "STA":
@@ -414,7 +415,7 @@ def main(args):
 							#	  print("no station role found ")
 							#	  break
 
-							#set monitor interface
+							# set monitor interface
 							gevent.sleep(1)
 							rvalue = controller.nodes(nodes[jj]).net.start_monitor(driver[pos], iface[pos])
 
@@ -424,7 +425,6 @@ def main(args):
 				print("Error in node setup procedure")
 				do_run = False
 
-
 			# """
 			# ****** test topology by checking which nodes are in carrier range and which in communication range ******
 			# """
@@ -433,10 +433,10 @@ def main(args):
 			# CSmat = controller.blocking(True).wireless_topology.estimate_nodes_in_carrier_sensing_range(nodes, wlan_inject_iface, TAU=0.9)
 			# for jj in range(0, len(nodes)):
 			# 	log.info(" from node %s --> tp node %s [%s] " % (str(CSmat[jj][0].ip), str(CSmat[jj][1].ip), str(CSmat[jj][2])))
-            #
-            #
-            #
-            #
+			#
+			#
+			#
+			#
 			# # CR test
 			# log.info("Testing communication range ...")
 			# CRmat = controller.blocking(True).wireless_topology.estimate_nodes_in_communication_range(nodes, wlan_inject_iface, MINPDR=0.9)
@@ -463,7 +463,8 @@ def main(args):
 								msg = {"iface": "wlan0", "i_time": time_update}
 								lcpDescriptor_nodes[ii].send(msg)
 								print("start thread for collect measurements from nodes")
-								reading_thread.append(threading.Thread(target=collect_remote_messages, args=(lcpDescriptor_nodes[ii], socket_visualizer, mac_address, label)))
+								reading_thread.append(threading.Thread(target=collect_remote_messages, args=(
+									lcpDescriptor_nodes[ii], socket_visualizer, mac_address, label)))
 								reading_thread[ii].start()
 								break
 
@@ -473,18 +474,17 @@ def main(args):
 					print("Error in node control program setup procedure")
 					do_run = False
 
-
 				"""
 				****** SETUP STATIC IPERF FLOW ******
 				"""
-				#start ipert server on nodes
+				# start ipert server on nodes
 				# for node in nodes:
 				# 	controller.delay(1).nodes(node).net.create_packetflow_sink('1234', '1', True, 'wlan0')
-                #
+				#
 				# #start iperf client traffic
 				# log.warning("starting flows")
 				# slot_time = 5
-                #
+				#
 				# # controller.delay(2*slot_time).nodes(nodes[0]).net.start_packetflow(dest_ip=wlan_ip[1]	 , port='1234', time_duration=str(3*slot_time), bandwidth = '6M', frame_length='1470')
 				# controller.delay(12*slot_time).nodes(nodes[1]).net.start_packetflow(dest_ip=wlan_ip[2]	, port='1234', time_duration=str(3*slot_time), bandwidth = '6M', frame_length='1470')
 				# controller.delay(22*slot_time).nodes(nodes[2]).net.start_packetflow(dest_ip=wlan_ip[0] , port='1234', time_duration=str(3*slot_time), bandwidth = '6M', frame_length='1470')
@@ -494,17 +494,17 @@ def main(args):
 				"""
 				# EXPERIMENT_DURATION = 30*slot_time
 				# dt = 0
-                #
+				#
 				# while do_run:
 				# 	log.warning('waiting for ... (%d sec / %d)' % (dt, EXPERIMENT_DURATION) )
 				# 	dt += slot_time
 				# 	# read values every <x> second
 				# 	gevent.sleep(slot_time)
-                #
+				#
 				# 	for jj in range(0, len(nodes)):
 				# 		msg={"iface" : "wlan0", "i_time" : time_update}
 				# 		lcpDescriptor_nodes[jj].send(msg)
-                #
+				#
 				# 	if dt > EXPERIMENT_DURATION:
 				# 		log.warning("ending flows")
 				# 		break
@@ -518,7 +518,7 @@ def main(args):
 				socket_command = start_command_connection()
 				poller = zmq.Poller()
 				poller.register(socket_command, flags=zmq.POLLIN)
-				EXPERIMENT_DURATION = 30000000
+				EXPERIMENT_DURATION = 300
 				dt = 0
 				while do_run:
 					socket_list = poller.poll(1000)
@@ -528,24 +528,6 @@ def main(args):
 								parsed_json = socket_command.recv_json()
 								print('parsed_json : %s' % str(parsed_json))
 								type = parsed_json['type']
-
-								#parsed_json: {'type': 'find_topology', 'command': 'carrier_sense'}
-								if type == 'find_topology':
-									command = parsed_json['command']
-									if command == 'carrier_sense':
-										controller.nodes(nodes).net.stop_packetflow()
-										# CS test
-										log.info("Testing carrier sensing ...")
-										CSmat = controller.blocking(True).wireless_topology.estimate_nodes_in_carrier_sensing_range(nodes, wlan_inject_iface, TAU=0.9)
-										for jj in range(0, len(nodes)):
-											log.info(" from node %s --> tp node %s [%s] " % (str(CSmat[jj][0].ip), str(CSmat[jj][1].ip), str(CSmat[jj][2])))
-											CSmat[jj][0] = label[eth_ip.index(CSmat[jj][0].ip)]
-											CSmat[jj][1] = label[eth_ip.index(CSmat[jj][1].ip)]
-
-										msg = {"type": "find_topology", "measure": "carrier_sense_result", "value": CSmat}
-										log.info("Recv: %s" % str(msg))
-										socket_visualizer.send_json(msg)
-
 								if type == 'traffic':
 									node = parsed_json['src']
 									# TO DO --> find index in file
@@ -597,7 +579,8 @@ def main(args):
 										nodes_source_rate[node_src_index] = value
 										source_rate = float(nodes_source_rate[node_src_index])
 										# call UPI to start traffic
-										controller.delay(1).nodes(nodes[node_src_index]).net.start_packetflow(wlan_ip[node_dst_index], '1234', '3000', str(value) + 'K', '1470')
+										controller.delay(1).nodes(nodes[node_src_index]).net.start_packetflow(
+											wlan_ip[node_dst_index], '1234', '3000', str(value) + 'K', '1470')
 
 					if not (dt % 10):
 						log.warning('waiting for ... (%d sec / %d)' % (dt, EXPERIMENT_DURATION))
@@ -606,12 +589,11 @@ def main(args):
 					if dt > EXPERIMENT_DURATION:
 						break
 
-
 			do_run = False
 			for jj in range(0, len(nodes)):
 				controller.nodes(nodes[jj]).net.stop_packetflow()
 
-			for ii in range(0,len(nodes)):
+			for ii in range(0, len(nodes)):
 				try:
 					controller.nodes(nodes[ii]).net.destroy_packetflow_sink()
 
@@ -628,7 +610,6 @@ def main(args):
 					print('Error in %s local control program shutdown' % str(nodes[ii].ip))
 
 			meas_collector.save_measurements(nodes=wifinodes, directory="experiment_data")
-
 
 
 if __name__ == "__main__":
@@ -655,7 +636,7 @@ if __name__ == "__main__":
 		logfile = args['--logfile']
 
 	logging.basicConfig(filename=logfile, level=log_level,
-		format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+	                    format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
 	try:
 		main(args)
