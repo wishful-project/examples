@@ -9,9 +9,11 @@ Wishful LTE everwishful
  
  #move files on controller
  
+ <!--
   rsync -avz --delete  --exclude=.git --exclude '*.o' --exclude '*.h' --exclude '*.c' --exclude '*.pyc' --exclude .repo/ ./wishful-github-manifest/  -e ssh controller_address:~/wishful-github-manifest/
  #rsync -avz --delete  --exclude=.git --exclude '*.o' --exclude '*.h' --exclude '*.c' --exclude '*.pyc' --exclude .repo/ ./wishful-github-manifest-5/  -e ssh fabrizio@10.8.12.3:~/wishful-github-manifest/
  #rsync -avz --delete  --exclude=.git --exclude '*.o' --exclude '*.h' --exclude '*.c' --exclude '*.pyc' --exclude .repo/ ./wishful-github-manifest-5/  -e ssh domenico@lab.tti.unipa.it:~/wishful-github-manifest/
+ -->
  
  #connect to nodes
   ssh user@controller_address

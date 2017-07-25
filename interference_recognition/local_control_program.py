@@ -126,7 +126,7 @@ def read_busy_time(controller):
         burst = 0
 
         phy = getPHY(iface)
-        reading_interval = time_interval[0] * 5
+        reading_interval = time_interval[0] # * 5
         #dd = time_interval[0]
         reading_time_ = 0
 
@@ -140,10 +140,10 @@ def read_busy_time(controller):
             #[pkt_stats, reading_time] = get_ieee80211_stats(phy)
             UPIargs = { 'parameters' : [radio.BUSY_TIME.key, radio.EXT_BUSY_TIME.key, radio.TX_ACTIVITY.key, radio.NUM_TX.key, radio.NUM_TX_SUCCESS.key, radio.RX_ACTIVITY.key] }
             pkt_stats = controller.radio.get_parameters(UPIargs)
+            print(pkt_stats)
             reading_time = time.time()
             if pkt_stats:
                 if True:
-                    print ("pkt_stats = %s" % (str(pkt_stats)))
                     dd = float(reading_time - reading_time_)
 
                     busy_time = pkt_stats[radio.BUSY_TIME.key] - busy_time_
@@ -217,7 +217,7 @@ def read_busy_time(controller):
 
     #CONTROLLER MAIN LOOP
     while not controller.is_stopped():
-        msg = controller.recv(timeout=5)
+        msg = controller.recv(timeout=1)
         if msg:
             #log.info("Receive message %s" % str(msg))
             i_time[0] = msg['i_time']
@@ -233,8 +233,7 @@ def read_busy_time(controller):
             # 								"num_tx_success" : report_stats['num_tx_success']
             # 								} ,
             # 								"mac_address" : (my_mac) })
-            controller.send_upstream({"measure": [
-                [report_stats['reading_time'], report_stats['busy_time'], report_stats['tx_activity'], report_stats['num_tx'], report_stats['num_tx_success']]], "mac_address": (my_mac)})
+            controller.send_upstream({"measure": [[report_stats['reading_time'], report_stats['busy_time'], report_stats['tx_activity'], report_stats['num_tx'], report_stats['num_tx_success']]], "mac_address": (my_mac)})
 
 
 

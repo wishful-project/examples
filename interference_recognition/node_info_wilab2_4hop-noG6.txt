@@ -1,0 +1,9 @@
+#hostname,driver,eth0_ip,freq,txpower,wlan0_ip,mac_address,label
+nodezotacd6,ath9k,10.11.16.54,5180,3,192.168.0.54,00:0e:8e:30:9c:ba,A,AP,wlan0
+#nodezotacg6,ath9k,10.11.16.56,5180,3,192.168.0.56,00:0e:8e:30:9d:3c,B,STA,wlan0
+nodezotacf6,ath9k,10.11.16.55,5180,3,192.168.0.57,00:0e:8e:30:9d:3b,B,STA,wlan0
+nodezotach6,ath9k,10.11.16.57,5180,3,192.168.0.58,00:0e:8e:30:9c:d8,H,STA,wlan0
+nodezotacj6,ath9k,10.11.16.59,5180,3,192.168.0.59,00:0e:8e:30:9c:ea,C,STA,wlan0
+nodezotacb1,ath9k,10.11.16.1,5180,3,192.168.0.1,00:0e:8e:30:9c:b3,D,STA,wlan0
+nodezotack1,ath9k,10.11.16.10,5180,3,192.168.0.10,00:0e:8e:30:9e:ea,E,STA,wlan0
+nodezotaci3,ath9k,10.11.16.29,5180,3,192.168.0.29,00:0e:8e:30:91:7b,F,STA,wlan0
