@@ -26,7 +26,7 @@ if [ $action == "--install" ] || [ $action == "--all" ]; then
 		wget https://www.kernel.org/pub/linux/kernel/projects/backports/stable/v4.2.6/${bp_dir_vers}.tar.gz
 		tar fvxz ${bp_dir_vers}.tar.gz
 		cd ${bp_dir_vers}
-		patch -p 2 < ../edca_tpc_patch.patch
+		patch -p 2 < ../edca_tpc_busytime.patch
 		echo "CPTCFG_ATH9K_STATION_STATISTICS=y" >> defconfigs/ath9k-debug
 		echo "CPTCFG_MAC80211_DEBUG_COUNTERS=y"  >> defconfigs/ath9k-debug
 		make defconfig-ath9k-debug
@@ -86,5 +86,10 @@ if [ $action == "--load-module" ] || [ $action == "--all" ]; then
 	sudo insmod athmodules/ath9k_hw.ko
 	sudo insmod athmodules/ath9k_common.ko
 	sudo insmod athmodules/ath9k.ko
+        exit
+fi
+
+if [ $action == "--unload-module" ]; then
+	sudo rmmod ath9k ath9k_common ath9k_hw ath mac80211 cfg80211 compat
         exit
 fi

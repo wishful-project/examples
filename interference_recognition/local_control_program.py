@@ -26,6 +26,7 @@ def read_busy_time(controller):
     import time
     import json
     import netifaces
+    import zmq
     import re
     import signal
 
@@ -97,6 +98,25 @@ def read_busy_time(controller):
     # 	f_cw = open(f_name, 'w')
     # 	f_cw.write(txq_params_msg)
 
+    def rcv_from_reading_program(reading_buffer):
+        """
+        This function collects the reading buffer information
+        """
+        reading_thread = threading.currentThread()
+        print('start socket reading_program')
+        reading_port = "8901"
+        reading_server_ip_address = "127.0.0.1"
+        context = zmq.Context()
+        reading_socket = context.socket(zmq.SUB)
+        print("tcp://%s:%s" % (reading_server_ip_address, reading_port))
+        reading_socket.connect("tcp://%s:%s" % (reading_server_ip_address, reading_port))
+        reading_socket.setsockopt_string(zmq.SUBSCRIBE, '')
+
+        print('socket reading_program started')
+        while getattr(reading_thread, "do_run", True):
+            parsed_json = reading_socket.recv_json()
+            print('parsed_json : %s' % ( str(parsed_json)))
+            reading_buffer[0] = parsed_json['measure']
 
     def reading_function(iface, time_interval):
         reading_thread = threading.currentThread()
@@ -138,30 +158,36 @@ def read_busy_time(controller):
 
         while getattr(reading_thread, "do_run", True):
             #[pkt_stats, reading_time] = get_ieee80211_stats(phy)
-            UPIargs = { 'parameters' : [radio.BUSY_TIME.key, radio.EXT_BUSY_TIME.key, radio.TX_ACTIVITY.key, radio.NUM_TX.key, radio.NUM_TX_SUCCESS.key, radio.RX_ACTIVITY.key] }
-            pkt_stats = controller.radio.get_parameters(UPIargs)
-            print(pkt_stats)
+            # UPIargs = {'parameters': [radio.BUSY_TIME.key, radio.EXT_BUSY_TIME.key, radio.TX_ACTIVITY.key, radio.NUM_TX.key, radio.NUM_TX_SUCCESS.key, radio.RX_ACTIVITY.key]}
+            # UPIargs = {'parameters': [radio.BUSY_TIME.key, radio.EXT_BUSY_TIME.key, radio.TX_ACTIVITY.key, radio.RX_ACTIVITY.key]}
+            UPIargs = {'parameters': [radio.NUM_TX_SUCCESS.key, radio.NUM_TX.key]}
+            #pkt_stats = controller.radio.get_parameters(UPIargs)
+            #print(pkt_stats)
             reading_time = time.time()
             if pkt_stats:
                 if True:
                     dd = float(reading_time - reading_time_)
 
-                    busy_time = pkt_stats[radio.BUSY_TIME.key] - busy_time_
-                    ext_busy_time = pkt_stats[radio.EXT_BUSY_TIME.key] - ext_busy_time_
-                    tx_activity = pkt_stats[radio.TX_ACTIVITY.key] - tx_activity_
-                    rx_activity = pkt_stats[radio.RX_ACTIVITY.key] - rx_activity_
+                    # busy_time = pkt_stats[radio.BUSY_TIME.key] - busy_time_
+                    # ext_busy_time = pkt_stats[radio.EXT_BUSY_TIME.key] - ext_busy_time_
+                    # tx_activity = pkt_stats[radio.TX_ACTIVITY.key] - tx_activity_
+                    # rx_activity = pkt_stats[radio.RX_ACTIVITY.key] - rx_activity_
+                    # num_tx = pkt_stats[radio.NUM_TX.key] - num_tx_
+                    # num_tx_success = pkt_stats[radio.NUM_TX_SUCCESS.key] - num_tx_success_
+                    #
+                    # busy_time_ = pkt_stats[radio.BUSY_TIME.key]
+                    # ext_busy_time_ = pkt_stats[radio.EXT_BUSY_TIME.key]
+                    # tx_activity_ = pkt_stats[radio.TX_ACTIVITY.key]
+                    # rx_activity_ = pkt_stats[radio.RX_ACTIVITY.key]
+                    # num_tx_ = pkt_stats[radio.NUM_TX.key]
+                    # num_tx_success_ = pkt_stats[radio.NUM_TX_SUCCESS.key]
 
-                    num_tx = pkt_stats[radio.NUM_TX.key] - num_tx_
-                    # print ("num tx = %s" %(num_tx))
-                    num_tx_success = pkt_stats[radio.NUM_TX_SUCCESS.key] - num_tx_success_
-
-                    busy_time_ = pkt_stats[radio.BUSY_TIME.key]
-                    ext_busy_time_ = pkt_stats[radio.EXT_BUSY_TIME.key]
-                    tx_activity_ = pkt_stats[radio.TX_ACTIVITY.key]
-                    rx_activity_ = pkt_stats[radio.RX_ACTIVITY.key]
-                    num_tx_ = pkt_stats[radio.NUM_TX.key]
-                    num_tx_success_ = pkt_stats[radio.NUM_TX_SUCCESS.key]
-
+                    busy_time_ = 0
+                    ext_busy_time_ = 0
+                    tx_activity_ = 0
+                    rx_activity_ = 0
+                    num_tx_ = 0
+                    num_tx_success_ = 0
 
                 if debug or debug_statistics:
                     # if debug_cycle > 3:
@@ -202,11 +228,16 @@ def read_busy_time(controller):
                 i_time = []
                 i_time.append(msg['i_time'])
 
+                reading_buffer = []
+                reading_buffer.append(0.0)
+                reading_buffer_thread = threading.Thread(target=rcv_from_reading_program, args=(reading_buffer,))
+                reading_buffer_thread.do_run = True
+                reading_buffer_thread.start()
+
                 #read function starting
-                reading_thread = threading.Thread(target=reading_function, args=(msg['iface'], i_time))
-                reading_thread.do_run = True
-                print ("starting reading thread")
-                reading_thread.start()
+                # reading_thread = threading.Thread(target=reading_function, args=(msg['iface'], i_time))
+                # reading_thread.do_run = True
+                # reading_thread.start()
 
             except (Exception) as err:
                 if debug:
@@ -225,18 +256,12 @@ def read_busy_time(controller):
 
         #send statistics to controller
         if 'reading_time' in report_stats:
-            # controller.send_upstream({ "reading_time" : report_stats['reading_time'],
-            # 						   "measurements":
-            # 							   {"busy_time": report_stats['busy_time'],
-            # 		"tx_activity": report_stats['tx_activity'],
-            # 								"num_tx" : report_stats['num_tx'],
-            # 								"num_tx_success" : report_stats['num_tx_success']
-            # 								} ,
-            # 								"mac_address" : (my_mac) })
-            controller.send_upstream({"measure": [[report_stats['reading_time'], report_stats['busy_time'], report_stats['tx_activity'], report_stats['num_tx'], report_stats['num_tx_success']]], "mac_address": (my_mac)})
+            # controller.send_upstream({"measure": [[report_stats['reading_time'], report_stats['busy_time'], report_stats['tx_activity'], report_stats['num_tx'], report_stats['num_tx_success']]], "mac_address": (my_mac)})
+            # controller.send_upstream({"measure": [[report_stats['reading_time'], reading_buffer[0], report_stats['num_tx'], report_stats['num_tx_success']]], "mac_address": (my_mac)})
+            controller.send_upstream({"measure": reading_buffer[0], "mac_address": (my_mac)})
 
-
-
-    reading_thread.do_run = False
-    reading_thread.join()
+    # reading_thread.do_run = False
+    # reading_thread.join()
+    reading_buffer_thread.do_run = False
+    reading_buffer_thread.join()
     time.sleep(2)

@@ -193,30 +193,16 @@ def collect_remote_messages(lcpDescriptor_node, socket_visualizer, mac_address, 
 			#parsed_json: {u'label': u'C', u'measure': [[1484644417.3528204, 0.0, 0.0, 1.0, 0.0, 1023, 0, 0]], u'mac_address': u'00:0e:8e:30:9d:ee'}
 			for ii in range(0, len(mac_address)):
 				if msg['mac_address'] == mac_address[ii]:
+					# print('message = %s - mac = %s' % (msg['measure'], msg['mac_address']))
 					msg['label'] = label[ii]
 					msg['type'] = u'statistics'
-					# print ('Label = %s' %(msg['measure']))
-
-					# sanitizes single and double quo
-					meas_json = json.dumps(msg['measure'])
-
-					# meas_values = json.loads(meas_json)
-					# print ('meas_values = %s' %meas_values[0][1:])
-					# remove timestamp because it is not a feature
-					#msg['interference_class'] = int(trained_classifier.predict(array([meas_values[0][1:]])))
-					# print ("received message %s - sending to visualizer" %msg)
-					#print ("predicted class = %s " %msg['interference_class'])
-					# print ("now message is %s" %str(msg))
-
+					# print(msg)
 					socket_visualizer.send_json(msg)
 
-			#print (msg['measure'])
 			# add measurement on nodes element
 			for node in wifinodes:
-				if node.mac_address == msg['mac_address'] and msg['measure'][0][0] != 0:
+				if node.mac_address == msg['mac_address'] and msg['measure']:
 					node.measurements.append(msg['measure'])
-					# for further  usage within the controller (e.g. for taking some actions depending on the interference class)
-					#node.interference_class.append(int(msg['interference_class']))
 
 		gevent.sleep(1)
 
@@ -382,6 +368,9 @@ def main(args):
 			#START visualizer socket
 			socket_visualizer = start_visualizer_connection()
 
+			all_nodes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+
+
 			"""
 			****** setup network ******
 			"""
@@ -398,8 +387,8 @@ def main(args):
 
 							#setup wifi network
 							#set ad-hoc network
-							rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
-							#rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "off", "aa:bb:cc:dd:ee:ff", True)
+							# rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
+							rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "off", "aa:bb:cc:dd:ee:ff", True)
 
 							#setup infrastructured network (put interface in managed mode and disable network manager)
 							#set infrastructured network
@@ -548,22 +537,7 @@ def main(args):
 
 								if type == 'traffic':
 									node = parsed_json['src']
-									# TO DO --> find index in file
-									if node == 'A':
-										node_src_index = 0
-									elif node == 'B':
-										node_src_index = 1
-									elif node == 'C':
-										node_src_index = 2
-									elif node == 'D':
-										node_src_index = 3
-									elif node == 'E':
-										node_src_index = 4
-									elif node == 'F':
-										node_src_index = 5
-									else:
-										print('node index not retreive')
-										break
+									node_src_index = all_nodes.index(node)
 
 									command = parsed_json['command']
 									# if off traffic is selected for a specific node
@@ -576,23 +550,7 @@ def main(args):
 									# if start traffic is selected for a specific node
 									if command == 'set_traffic':
 										node = parsed_json['dst']
-										# TO DO --> find index in file
-										if node == 'A':
-											node_dst_index = 0
-										elif node == 'B':
-											node_dst_index = 1
-										elif node == 'C':
-											node_dst_index = 2
-										elif node == 'D':
-											node_dst_index = 3
-										elif node == 'E':
-											node_dst_index = 4
-										elif node == 'F':
-											node_dst_index = 5
-										else:
-											print('node index not retreive')
-											break
-
+										node_dst_index = all_nodes.index(node)
 										value = parsed_json['value']
 										nodes_source_rate[node_src_index] = value
 										source_rate = float(nodes_source_rate[node_src_index])
