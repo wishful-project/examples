@@ -115,7 +115,7 @@ def main(args):
                 controller.callback(print_response_generic).node(nodes[0]).radio.iface("ismtv").get_radio_info("generator")
 
             controller.callback(print_response_sensor).node(nodes[0]).radio.iface("ismtv").get_measurements([868.3e6, 919.0e6, 400e3])
-            controller.callback(print_response_generic).node(nodes[0]).radio.iface("ismtv").play_waveform(iface=10, freq=869e6, power_lvl=-10)
+            controller.callback(print_response_generic).node(nodes[0]).radio.iface("ismtv").play_waveform(iface="none", freq=869e6, power_lvl=-10, kwargs={"play_time": 10})
 
 
 
