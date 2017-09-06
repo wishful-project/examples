@@ -56,7 +56,7 @@ inline comment to both controller and agent programs.
    ```
 3. Move in the experiment directory
     ```
-    cd /opt/wishful/examples/Get_Started_Examples/Simple-GNURadio-Example
+    cd /opt/wishful/examples/Get_Started_Examples/Simple_GNURadio_Example
     ```
 4. Open ```wishful_simple_controller.py``` and change "controller-vm-ip" and "ethinterface" by the IP address and the Ethernet interface of the Iris testbed network (NOTE: much likely the IP starts with **192.168.*.* ** and the interface is **ens3**): 
     ```
@@ -77,7 +77,7 @@ inline comment to both controller and agent programs.
    ```
 3. Move in the experiment directory
     ```
-    cd /opt/wishful/examples/Get_Started_Examples/Simple-GNURadio-Example
+    cd /opt/wishful/examples/Get_Started_Examples/Simple_GNURadio_Example
     ```
 4. Open ```agent_tx.py``` and change the "ethernet_interface" by the Ethernet inferface connected in the Iris testbed internal network (NOTE: much likely the interface is **ens3**):
     ```
@@ -97,7 +97,7 @@ inline comment to both controller and agent programs.
    ```
 3. Move in the experiment directory:
     ```
-    cd /opt/wishful/examples/Get_Started_Examples/Simple-GNURadio-Example
+    cd /opt/wishful/examples/Get_Started_Examples/Simple_GNURadio_Example
     ```
 4. Open ```agent_rx.py``` and  change the "ethernet_interface" by the Ethernet inferface connected in the Iris testbed internal network (NOTE: much likely the interface is **ens3**):
     ```
