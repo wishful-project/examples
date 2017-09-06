@@ -30,7 +30,7 @@ These VMs are used as follows:
 
 ### The WiSHFUL controller node
 
-The controller is implemented in ```wishful_simple_controller.py```
+The controller is implemented in ```wishful_simple_controller```
 
 The WiSHFUL Controller permits to: (*i*) discovery of agent nodes, (*ii*) installation of GNURadio waveforms on the agents, (*iii*) monitor values from the GNURadio waveform, and (*iv*) configure parameters on the GNURadio waveform.
 
@@ -58,7 +58,7 @@ inline comment to both controller and agent programs.
     ```
     cd /opt/wishful/examples/Get_Started_Examples/Simple_GNURadio_Example
     ```
-4. Open ```wishful_simple_controller.py``` and change "controller-vm-ip" and "ethinterface" by the IP address and the Ethernet interface of the Iris testbed network (NOTE: much likely the IP starts with **192.168.*.* ** and the interface is **ens3**): 
+4. Open ```wishful_simple_controller``` and change "controller-vm-ip" and "ethinterface" by the IP address and the Ethernet interface of the Iris testbed network (NOTE: much likely the IP starts with **192.168.*.* ** and the interface is **ens3**): 
     ```
     controller_PC_IP_address = "controller-vm-ip" 
     controller_PC_interface = "ethinterface"
