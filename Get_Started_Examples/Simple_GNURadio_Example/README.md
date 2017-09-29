@@ -21,7 +21,7 @@ We want to demonstrate how the WISHFUL UPI can be exploited to:
 
 ## 1. Reserving the VM's
 
-Reserve ***three WiSHFUL nodes*** by using the reservation system at: https://www.iris-testbed.connectcentre.ie/reservation
+Reserve ***three WiSHFUL nodes*** in the ***IRIS Testbed*** by using the JFED reservation.
 
 These VMs are used as follows:
 (*i*) one VM to run the the Controller program, or WiSHFUL Controller;
