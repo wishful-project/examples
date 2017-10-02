@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-wishful_agent_sixlowpan.py: First implementation of WiSHFUL agent
+wishful_agent_6lowpan.py: First implementation of WiSHFUL agent
 
 Usage:
-   wishful_agent_sixlowpan.py [options] [-q | -v]
+   wishful_agent_6lowpan.py [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./wishful_agent_sixlowpan -v --config ./config.yaml
+   ./wishful_agent_6lowpan -v --config ./config.yaml
 
 Other options:
    -h, --help          show this help message and exit

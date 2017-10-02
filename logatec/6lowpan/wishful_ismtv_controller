@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-wishful_sixlowpan_controller.py: First implementation of WiSHFUL controller
+wishful_6lowpan_controller.py: First implementation of WiSHFUL controller
 
 Usage:
-   wishful_sixlowpan_controller.py [options] [-q | -v]
+   wishful_6lowpan_controller.py [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./wishful_sixlowpan_controller -v --config ./config.yaml 
+   ./wishful_6lowpan_controller -v --config ./config.yaml 
 
 Other options:
    -h, --help          show this help message and exit

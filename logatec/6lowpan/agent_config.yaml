@@ -12,7 +12,7 @@ modules:
     kwargs: {"iface":"lo", "groupName":"wishful_1234"}
 
   simple:
-    module : wishful_module_sixlowpan
+    module : wishful_module_6lowpan
     class_name : SixlowpanModule
-    interfaces : ['sixlowpan']
+    interfaces : ['6lowpan']
     kwargs: {"service":"http://127.0.0.1:9000", "serial":"/dev/ttyS1"}
