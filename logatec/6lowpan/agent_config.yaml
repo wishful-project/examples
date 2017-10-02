@@ -1,0 +1,18 @@
+## WiSHFUL Agent config file
+
+agent_info:
+  name: 'agent_123'
+  info: 'agent_info'
+  iface: 'lo'
+
+modules:
+  discovery:
+    module : wishful_module_discovery_pyre
+    class_name : PyreDiscoveryAgentModule
+    kwargs: {"iface":"lo", "groupName":"wishful_1234"}
+
+  simple:
+    module : wishful_module_sixlowpan
+    class_name : SixlowpanModule
+    interfaces : ['sixlowpan']
+    kwargs: {"service":"http://127.0.0.1:9000", "serial":"/dev/ttyS1"}
