@@ -87,11 +87,12 @@ def main(args):
    
     #control loop
     while True:
-        gevent.sleep(30)
+        gevent.sleep(5)
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
             # TODO: Implement 6lowpan controller
+            controller.callback(print_response_generic).node(nodes[0]).radio.iface("6lowpan").get_measurements(['world'])
 
 
 
