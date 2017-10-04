@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-wishful_lora_controller.py: First implementation of WiSHFUL controller
+wishful_uwb_controller.py: First implementation of WiSHFUL controller
 
 Usage:
-   wishful_lora_controller.py [options] [-q | -v]
+   wishful_uwb_controller.py [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./wishful_lora_controller -v --config ./config.yaml 
+   ./wishful_uwb_controller -v --config ./config.yaml 
 
 Other options:
    -h, --help          show this help message and exit
@@ -72,7 +72,7 @@ def get_channel_reponse(group, node, data):
     print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
 def print_response_generic(group, node, data):
-    print("{} Print response : Group:{}, NodeName:{}, Result:{}".format(datetime.datetime.now(), group, node.name, data))
+    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
 
 def main(args):
     log.debug(args)
@@ -84,16 +84,15 @@ def main(args):
 
     controller.load_config(config)
     controller.start()
+    start = True
    
     #control loop
     while True:
-        gevent.sleep(5)
+        gevent.sleep(30)
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
-            # TODO: Implement lora controller
-            controller.callback(print_response_generic).node(nodes[0]).radio.iface("lora").get_radio_info("lora")
-            controller.callback(print_response_generic).node(nodes[1]).radio.iface("lora").get_radio_info("lora")
+            # TODO: Implement uwb controller
 
 
 

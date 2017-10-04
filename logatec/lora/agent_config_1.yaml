@@ -1,8 +1,8 @@
 ## WiSHFUL Agent config file
 
 agent_info:
-  name: 'agent_123'
-  info: 'agent_info'
+  name: 'lora_1'
+  info: 'lora'
   iface: 'lo'
 
 modules:
@@ -15,4 +15,4 @@ modules:
     module : wishful_module_lora
     class_name : LoraModule
     interfaces : ['lora']
-    kwargs: {"service":"http://127.0.0.1:9000", "serial":"/dev/ttyS1"}
+    kwargs: {"service":"http://127.0.0.1:9000", "serial":"/dev/ttyUSB0"}
