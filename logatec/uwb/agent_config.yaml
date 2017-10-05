@@ -1,8 +1,8 @@
 ## WiSHFUL Agent config file
 
 agent_info:
-  name: 'agent_123'
-  info: 'agent_info'
+  name: 'UWB'
+  info: 'Ultra-Wide Band node'
   iface: 'lo'
 
 modules:
@@ -15,4 +15,4 @@ modules:
     module : wishful_module_uwb
     class_name : UwbModule
     interfaces : ['uwb']
-    kwargs: {"service":"http://127.0.0.1:9000", "serial":"/dev/ttyS1"}
+    kwargs: {"dev":"/dev/ttyUSB2"}
