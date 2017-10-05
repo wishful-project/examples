@@ -72,7 +72,7 @@ def get_channel_reponse(group, node, data):
     print("{} get_channel_reponse : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
 
 def print_response_generic(group, node, data):
-    print("{} Print response : Group:{}, NodeName:{}, Result:{}".format(datetime.datetime.now(), group, node.name, data))
+    print("{} Print response : Group:{}, NodeIP:{}, NodeName:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, node.name, data))
 
 def main(args):
     log.debug(args)
@@ -87,14 +87,30 @@ def main(args):
    
     #control loop
     while True:
-        gevent.sleep(5)
+        gevent.sleep(10)
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
-            # TODO: Implement lora controller
+            # Get connected lora radio information
             controller.callback(print_response_generic).node(nodes[0]).radio.iface("lora").get_radio_info("lora")
             controller.callback(print_response_generic).node(nodes[1]).radio.iface("lora").get_radio_info("lora")
-
+            
+            # Set Spreading Factor and Coding Rate
+            controller.callback(print_response_generic).node(nodes[0]).radio.iface("lora").set_parameters({"SF": 7, "CR": "4_5"})
+            controller.callback(print_response_generic).node(nodes[1]).radio.iface("lora").set_parameters({"SF": 7, "CR": "4_5"})
+            
+            # Set transmit power and frequency in Hz and bandwidth in kHz only on transmitter node
+            controller.callback(print_response_generic).node(nodes[0]).radio.iface("lora").set_tx_power(6)
+            controller.callback(print_response_generic).node(nodes[0]).radio.iface("lora").set_txchannel(868500000, 125)
+            
+            # Set receiver frequency in Hz and bandwidth in kHz only on receiver node
+            controller.callback(print_response_generic).node(nodes[1]).radio.iface("lora").set_rxchannel(868500000, 125)
+            
+            # Set the lora traffic sniffer node and timeout
+            controller.callback(print_response_generic).node(nodes[1]).net.iface("lora").sniff_layer2_traffic("lora", 10)
+            
+            # Set the lora packet transmitter
+            controller.callback(print_response_generic).node(nodes[0]).net.iface("lora").inject_frame("lora", "TX data hello", True)
 
 
 if __name__ == "__main__":
