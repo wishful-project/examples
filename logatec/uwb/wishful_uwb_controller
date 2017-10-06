@@ -97,6 +97,7 @@ def main(args):
             
             # Check the documentation how to set the UWB radio
             controller.callback(print_response_generic).node(nodes[0]).radio.iface("uwb").set_parameters({'ch_code': 9, 'pac': 32, 'nssfd': 1, 'prf': 64, 'ch': 5, 'plen': 1024, 'sfdto': 1057, 'dr': 110})
+            controller.callback(print_response_generic).node(nodes[0]).radio.iface("uwb").get_parameters(['ch_code', 'pac', 'nssfd', 'prf', 'ch', 'plen', 'sfdto', 'dr'])
             
             # Get UWB measurements
             controller.callback(print_response_generic).node(nodes[0]).radio.iface("uwb").get_measurements([])
