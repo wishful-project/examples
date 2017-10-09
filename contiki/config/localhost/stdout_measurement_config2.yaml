@@ -5,3 +5,4 @@ measurement_config:
         measurement_db_name: "link_estimator"
         measurement_definitions:
             UDP_rxstats: "timestamp:double numRx:int32 numTx:int32 numTxLoss:int32 packetDeliveryRatio:double"
+            UDP_stats: "numRx:int32 numRxLoss:int32 numTx:int32 numTxLoss:int32"
