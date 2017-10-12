@@ -87,7 +87,7 @@ def main(args):
    
     #control loop
     while True:
-        gevent.sleep(10)
+        gevent.sleep(30)
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
