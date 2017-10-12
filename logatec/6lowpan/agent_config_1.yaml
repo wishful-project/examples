@@ -1,7 +1,7 @@
 ## WiSHFUL Agent config file
 
 agent_info:
-  name: 'agent_123'
+  name: '6lowpan_1'
   info: 'agent_info'
   iface: 'lo'
 
@@ -15,4 +15,3 @@ modules:
     module : wishful_module_6lowpan
     class_name : SixlowpanModule
     interfaces : ['6lowpan']
-    kwargs: {"service":"http://127.0.0.1:9000", "serial":"/dev/ttyS1"}

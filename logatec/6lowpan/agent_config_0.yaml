@@ -1,0 +1,17 @@
+## WiSHFUL Agent config file
+
+agent_info:
+  name: '6lowpan_0'
+  info: 'agent_info'
+  iface: 'lo'
+
+modules:
+  discovery:
+    module : wishful_module_discovery_pyre
+    class_name : PyreDiscoveryAgentModule
+    kwargs: {"iface":"lo", "groupName":"wishful_1234"}
+
+  simple:
+    module : wishful_module_6lowpan
+    class_name : SixlowpanModule
+    interfaces : ['6lowpan']

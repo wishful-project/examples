@@ -87,12 +87,12 @@ def main(args):
    
     #control loop
     while True:
-        gevent.sleep(5)
+        gevent.sleep(10)
         print("\n")
         print("Connected nodes", [str(node.name) for node in nodes])
         if nodes:
-            # TODO: Implement 6lowpan controller
-            controller.callback(print_response_generic).node(nodes[0]).radio.iface("6lowpan").get_measurements(['world'])
+            controller.callback(print_response_generic).node(nodes[0]).net.iface("6lowpan").create_packetflow_sink(10000)
+            controller.callback(print_response_generic).node(nodes[1]).net.iface("6lowpan").start_packetflow("::1", 10000)
 
 
 
