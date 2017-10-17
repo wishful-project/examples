@@ -339,7 +339,7 @@
     </param>
   </block>
   <block>
-    <key>digital_ofdm_demod</key>
+    <key>blocks_moving_average_xx</key>
     <param>
       <key>alias</key>
       <value></value>
@@ -353,20 +353,12 @@
       <value></value>
     </param>
     <param>
-      <key>cp_length</key>
-      <value>128</value>
-    </param>
-    <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>fft_length</key>
-      <value>512</value>
-    </param>
-    <param>
       <key>_coordinate</key>
-      <value>(392, 88)</value>
+      <value>(496, 196)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -374,7 +366,15 @@
     </param>
     <param>
       <key>id</key>
-      <value>digital_ofdm_demod_0</value>
+      <value>blocks_moving_average_xx_0</value>
+    </param>
+    <param>
+      <key>length</key>
+      <value>10000</value>
+    </param>
+    <param>
+      <key>max_iter</key>
+      <value>4000</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -385,20 +385,154 @@
       <value>0</value>
     </param>
     <param>
-      <key>modulation</key>
-      <value>bpsk</value>
-    </param>
-    <param>
-      <key>occupied_tones</key>
-      <value>200</value>
+      <key>scale</key>
+      <value>1</value>
     </param>
     <param>
       <key>type</key>
-      <value>int</value>
+      <value>float</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_tag_debug</key>
+    <param>
+      <key>alias</key>
+      <value></value>
     </param>
     <param>
-      <key>snr</key>
-      <value>10</value>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>display</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(624, 108)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>blocks_tag_debug_0</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>filter</key>
+      <value>""</value>
+    </param>
+    <param>
+      <key>name</key>
+      <value></value>
+    </param>
+    <param>
+      <key>num_inputs</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>digital_ofdm_rx</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>cp_len</key>
+      <value>16</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>fft_len</key>
+      <value>64</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(352, 88)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>header_mod</key>
+      <value>"BPSK"</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>digital_ofdm_rx_0</value>
+    </param>
+    <param>
+      <key>log</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>occupied_carriers</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>packet_len_key</key>
+      <value>"packet_len"</value>
+    </param>
+    <param>
+      <key>payload_mod</key>
+      <value>"BPSK"</value>
+    </param>
+    <param>
+      <key>pilot_carriers</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>pilot_symbols</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>scramble_bits</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>sync_word1</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>sync_word2</key>
+      <value>()</value>
     </param>
   </block>
   <block>
@@ -764,7 +898,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(144, 232)</value>
+      <value>(212, 312)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2135,7 +2269,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(56, 104)</value>
+      <value>(56, 108)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2357,7 +2491,7 @@
     </param>
     <param>
       <key>type</key>
-      <value>int</value>
+      <value>byte</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -2400,7 +2534,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(480, 216)</value>
+      <value>(776, 216)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2417,7 +2551,7 @@
   </block>
   <connection>
     <source_block_id>blocks_complex_to_mag_0</source_block_id>
-    <sink_block_id>zz_probe_signal</sink_block_id>
+    <sink_block_id>blocks_moving_average_xx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -2428,13 +2562,25 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>digital_ofdm_demod_0</source_block_id>
+    <source_block_id>blocks_moving_average_xx_0</source_block_id>
+    <sink_block_id>zz_probe_signal</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>digital_ofdm_rx_0</source_block_id>
     <sink_block_id>blocks_int_to_float_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>digital_ofdm_demod_0</source_block_id>
+    <source_block_id>digital_ofdm_rx_0</source_block_id>
+    <sink_block_id>blocks_tag_debug_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>digital_ofdm_rx_0</source_block_id>
     <sink_block_id>zz_probe_rate</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -2447,7 +2593,7 @@
   </connection>
   <connection>
     <source_block_id>uhd_usrp_source_0</source_block_id>
-    <sink_block_id>digital_ofdm_demod_0</sink_block_id>
+    <sink_block_id>digital_ofdm_rx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
