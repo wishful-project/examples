@@ -35,7 +35,7 @@ __email__ = "kistm@tcd.ie"
 """
 Setting of agent node
 """
-agent_PC_interface = "lo"
+agent_PC_interface = "ens3"
 """
 END setting of agent node
 """
