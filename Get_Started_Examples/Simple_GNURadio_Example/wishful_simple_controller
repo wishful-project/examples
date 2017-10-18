@@ -44,7 +44,7 @@ __email__ = "kistm@tcd.ie"
 """
 Setting of controller node
 """
-controller_PC_IP_address = "192.168.5.195"
+controller_PC_IP_address = "192.168.5.205"
 controller_PC_interface = "ens3"
 """
 END setting of controller nodes
@@ -240,7 +240,7 @@ if __name__ == '__main__':
                 print('- Getting RX values')
                 vals = controller.node(node).radio.get_parameters(['rate', 'signal_level'])
                 print ('\t Rate: \t%f' % (vals['rate']))
-                print ('\t Signal Level: \t %f' % (math.log10(vals['signal_level'])))
+                print ('\t Signal Level: \t %f' % (vals['signal_level']))
 
         gevent.sleep(2)
 
@@ -258,4 +258,3 @@ if __name__ == '__main__':
 
     # End gracefully
     print('Controller Exiting')
-    sys.exit(1)
