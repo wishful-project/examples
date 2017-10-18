@@ -27,12 +27,12 @@ import datetime
 import time
 import math
 import logging
-from contiki.contiki_helpers.global_node_manager import *
-from contiki.contiki_helpers.taisc_manager import *
-from contiki.contiki_helpers.app_manager import *
+from contiki.contiki_helpers.global_node_manager import GlobalNodeManager
+from contiki.contiki_helpers.taisc_manager import TAISCMACManager
+from contiki.contiki_helpers.app_manager import AppManager
 import gevent
 import yaml
-from measurement_logger import *
+from measurement_logger import MeasurementLogger
 
 __author__ = "Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
@@ -93,9 +93,9 @@ def event_cb(mac_address, event_name, event_value):
     global prev_stats
     global current_mac
     mac_stats_event = [int(time.time()), mac_address, 107, current_mac, event_value[0]]
-    for j in range(1, len(prev_stats[mac_address])-1):
+    for j in range(1, len(prev_stats[mac_address]) - 1):
         mac_stats_event.append(event_value[j] - prev_stats[mac_address][j])
-    mac_stats_event.append(event_value[len(prev_stats[mac_address])-1])
+    mac_stats_event.append(event_value[len(prev_stats[mac_address]) - 1])
     prev_stats[mac_address] = event_value
     measurement_logger.log_measurement(event_name, mac_stats_event)
 
@@ -122,9 +122,8 @@ def main(args):
     log.info(ret)
     ret = taisc_manager.update_macconfiguration({'IEEE802154e_macSlotframeSize': len(contiki_nodes)})
     log.info(ret)
-    ret = app_manager.update_configuration({"RIME_exampleUnicastSendIntervalBoundaries": (32,48)})
+    ret = app_manager.update_configuration({"RIME_exampleUnicastSendIntervalBoundaries": (32, 48)})
     log.info(ret)
-
 
     while True:
         # activate receiver
@@ -162,9 +161,9 @@ def main(args):
         err1 = taisc_manager.activate_radio_program("TDMA")
         current_mac = "TDMA"
         log.info("Activated TDMA: ERROR {}".format(err1))
-        #send_interval = int(math.ceil(128 / (1000 / (len(contiki_nodes) * 8))))
-        #ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": send_interval})
-        #log.info(ret)
+        # send_interval = int(math.ceil(128 / (1000 / (len(contiki_nodes) * 8))))
+        # ret = app_manager.update_configuration({"RIME_exampleUnicastSendInterval": send_interval})
+        # log.info(ret)
 
         err1 = app_manager.update_configuration({"RIME_exampleUnicastActivateApplication": 1})
         log.info("Starting APP: ERROR {}".format(err1))

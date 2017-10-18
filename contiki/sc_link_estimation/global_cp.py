@@ -25,7 +25,7 @@ import logging
 import wishful_controller
 import yaml
 import gevent
-from measurement_logger import *
+from measurement_logger import MeasurementLogger
 import time
 
 __author__ = "Peter Ruckebusch"
@@ -128,28 +128,31 @@ if __name__ == "__main__":
 
         gevent.sleep(20)
 
-        ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").set_parameters_net({'APP_ActiveApplication': 1})
+        ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").set_parameters_net({'app_activate': 1})
         control_msg_rx_overhead["lowpan0"] += 2
         control_msg_tx_overhead["lowpan0"] += 2
 
         prev_val = (0, 0)
 
         for i in range(1, len(radio_platforms)):
-            ret = controller.blocking(True).node(nodes[0]).net.iface(radio_platforms[i]).set_parameters_net({'APP_ActiveApplication': 2})
+            ret = controller.blocking(True).node(nodes[0]).net.iface(radio_platforms[i]).set_parameters_net({'app_activate': 2})
             control_msg_rx_overhead[radio_platforms[i]] += 2
             control_msg_tx_overhead[radio_platforms[i]] += 2
             print(ret)
             gevent.sleep(5)
-            val = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").get_measurements_net(['APP_RxStats'])
-            rx = val['APP_RxStats'][0] - prev_val[0]
-            rx_loss = val['APP_RxStats'][1] - prev_val[1]
-            pdr = rx / (rx + rx_loss)
+            val = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").get_measurements_net(['app_stats'])
+            rx = val['app_stats'][0] - prev_val[0]
+            rx_loss = val['app_stats'][1] - prev_val[1]
+            if rx + rx_loss > 0:
+                pdr = rx / (rx + rx_loss)
+            else:
+                pdr = 0
             measurement_logger.log_measurement("UDP_rxstats", [time.time(), rx, rx + rx_loss, rx_loss, pdr])
             # print("rx = {}, rx_loss {}, PDR {}".format(rx, rx_loss, pdr))
-            prev_val = val['APP_RxStats']
+            prev_val = val['app_stats']
 
         for rp in radio_platforms:
-            ret = controller.blocking(True).node(nodes[0]).net.iface(rp).set_parameters_net({'APP_ActiveApplication': 0})
+            ret = controller.blocking(True).node(nodes[0]).net.iface(rp).set_parameters_net({'app_activate': 0})
             control_msg_rx_overhead[rp] += 2
             control_msg_tx_overhead[rp] += 2
             print(ret)
@@ -169,28 +172,31 @@ if __name__ == "__main__":
             control_msg_tx_overhead[rp] += 2
             print(ret)
 
-        ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").set_parameters_net({'APP_ActiveApplication': 1})
+        ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").set_parameters_net({'app_activate': 1})
         control_msg_rx_overhead["lowpan0"] += 2
         control_msg_tx_overhead["lowpan0"] += 2
 
         prev_val = (0, 0)
 
         for i in range(1, len(radio_platforms)):
-            ret = controller.blocking(True).node(nodes[0]).net.iface(radio_platforms[i]).set_parameters_net({'APP_ActiveApplication': 2})
+            ret = controller.blocking(True).node(nodes[0]).net.iface(radio_platforms[i]).set_parameters_net({'app_activate': 2})
             control_msg_rx_overhead[radio_platforms[i]] += 2
             control_msg_tx_overhead[radio_platforms[i]] += 2
             print(ret)
             gevent.sleep(5)
-            val = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").get_measurements_net(['APP_RxStats'])
-            rx = val['APP_RxStats'][0] - prev_val[0]
-            rx_loss = val['APP_RxStats'][1] - prev_val[1]
-            pdr = rx / (rx + rx_loss)
+            val = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").get_measurements_net(['app_stats'])
+            rx = val['app_stats'][0] - prev_val[0]
+            rx_loss = val['app_stats'][1] - prev_val[1]
+            if rx + rx_loss > 0:
+                pdr = rx / (rx + rx_loss)
+            else:
+                pdr = 0
             measurement_logger.log_measurement("UDP_rxstats", [time.time(), rx, rx + rx_loss, rx_loss, pdr])
             # print("rx = {}, rx_loss {}, PDR {}".format(rx, rx_loss, pdr))
-            prev_val = val['APP_RxStats']
+            prev_val = val['app_stats']
 
         for rp in radio_platforms:
-            ret = controller.blocking(True).node(nodes[0]).net.iface(rp).set_parameters_net({'APP_ActiveApplication': 0})
+            ret = controller.blocking(True).node(nodes[0]).net.iface(rp).set_parameters_net({'app_activate': 0})
             control_msg_rx_overhead[rp] += 2
             control_msg_tx_overhead[rp] += 2
             print(ret)

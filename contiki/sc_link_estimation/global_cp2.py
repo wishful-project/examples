@@ -14,7 +14,7 @@ Options:
 
 Example:
    python sc_link_estimation/global_cp.py --config config/localhost/global_cp_config.yaml --measurements config/portable/measurement_config.yaml
-   
+
 Other options:
    -h, --help          show this help message and exit
    -q, --quiet         print less text
@@ -25,8 +25,7 @@ import logging
 import wishful_controller
 import yaml
 import gevent
-from measurement_logger import *
-import time
+from measurement_logger import MeasurementLogger
 
 __author__ = "Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2017, IMEC"
@@ -39,7 +38,7 @@ log = logging.getLogger('SC Link Estimation')
 if __name__ == "__main__":
     try:
         from docopt import docopt
-    except:
+    except Exception:
         print("""
         Please install docopt using:
             pip install docopt==0.6.1
@@ -128,14 +127,14 @@ if __name__ == "__main__":
 
         gevent.sleep(20)
 
-        ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").set_parameters_net({'APP_ActiveApplication': 1})
+        ret = controller.blocking(True).node(nodes[0]).net.iface("lowpan0").set_parameters_net({'app_activate': 1})
         control_msg_rx_overhead["lowpan0"] += 2
         control_msg_tx_overhead["lowpan0"] += 2
 
         prev_num_rx = 0
 
         for i in range(1, len(radio_platforms)):
-            ret = controller.blocking(True).node(nodes[0]).net.iface(radio_platforms[i]).set_parameters_net({'APP_ActiveApplication': 2})
+            ret = controller.blocking(True).node(nodes[0]).net.iface(radio_platforms[i]).set_parameters_net({'app_activate': 2})
             control_msg_rx_overhead[radio_platforms[i]] += 2
             control_msg_tx_overhead[radio_platforms[i]] += 2
             print(ret)

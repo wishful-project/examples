@@ -106,7 +106,10 @@ if __name__ == "__main__":
             "rpl_dio_interval_doublings",
             "rpl_dio_redundancy",
             "rpl_default_lifetime",
-            "rpl_objective_function"
+            "rpl_objective_function",
+            "app_activate",
+            "app_payload_length"
+            "app_send_interval"
         ]
 
         net_measurement_list = [
@@ -115,7 +118,12 @@ if __name__ == "__main__":
             "tcp_stats",
             "udp_stats",
             "nd6_stats",
-            "rpl_stats"
+            "rpl_stats",
+            "app_stats"
+        ]
+
+        net_event_list = [
+            "app_rx_event"
         ]
 
         while True:
@@ -134,25 +142,25 @@ if __name__ == "__main__":
                 else:
                     for node in nodes:
                         for param in radio_param_list:
-                             for radio_platform in radio_platforms:
-                                 val = controller.blocking(True).node(node).radio.iface(radio_platform).get_parameters([param])
-                                 print("{}: {}".format(radio_platform, val))
-                             gevent.sleep(1)
+                            for radio_platform in radio_platforms:
+                                val = controller.blocking(True).node(node).radio.iface(radio_platform).get_parameters([param])
+                                print("{}: {}".format(radio_platform, val))
+                            gevent.sleep(1)
                         for param in net_param_list:
-                             for radio_platform in radio_platforms:
-                                 val = controller.blocking(True).node(node).net.iface(radio_platform).get_parameters_net([param])
-                                 print("{}: {}".format(radio_platform, val))
-                             gevent.sleep(1)
+                            for radio_platform in radio_platforms:
+                                val = controller.blocking(True).node(node).net.iface(radio_platform).get_parameters_net([param])
+                                print("{}: {}".format(radio_platform, val))
+                            gevent.sleep(1)
                         for m in radio_measurement_list:
-                             for radio_platform in radio_platforms:
-                                 val = controller.blocking(True).node(node).radio.iface(radio_platform).get_measurements([m])
-                                 print("{}: {}".format(radio_platform, val))
-                             gevent.sleep(1)
+                            for radio_platform in radio_platforms:
+                                val = controller.blocking(True).node(node).radio.iface(radio_platform).get_measurements([m])
+                                print("{}: {}".format(radio_platform, val))
+                            gevent.sleep(1)
                         for m in net_measurement_list:
-                             for radio_platform in radio_platforms:
-                                 val = controller.blocking(True).node(node).net.iface(radio_platform).get_measurements_net([m])
-                                 print("{}: {}".format(radio_platform, val))
-                             gevent.sleep(1)
+                            for radio_platform in radio_platforms:
+                                val = controller.blocking(True).node(node).net.iface(radio_platform).get_measurements_net([m])
+                                print("{}: {}".format(radio_platform, val))
+                            gevent.sleep(1)
 
     except KeyboardInterrupt:
         log.debug("Controller exits")
