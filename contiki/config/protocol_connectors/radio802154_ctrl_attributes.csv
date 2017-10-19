@@ -1,0 +1,6 @@
+"category","unique_name","unique_id","format","sub_format","endianness"
+"PARAMETER","IEEE802154_macExtendedAddress",4194,"UINT8;UINT8;UINT8;UINT8;UINT8;UINT8;UINT8;UINT8","","<"
+"PARAMETER","IEEE802154_macPANId",35995,"UINT","","<"
+"PARAMETER","IEEE802154_macShortAddress",55909,"UINT","","<"
+"PARAMETER","IEEE802154_phyCurrentChannel",51638,"UINT","","<"
+"PARAMETER","IEEE802154_phyTXPower",58914,"UINT","","<"

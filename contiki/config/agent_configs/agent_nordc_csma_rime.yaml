@@ -1,0 +1,52 @@
+## WiSHFUL Agent config file
+
+agent_info:
+    name: 'contiki_control_agent'
+    info: 'WiSHFUL example Contiki control agent'
+    iface: 'lo'
+
+modules:
+    discovery:
+        module : wishful_module_discovery_pyre
+        class_name : PyreDiscoveryAgentModule
+        kwargs: {"iface":eth0, "groupName":"wishful_contiki"}
+    gitar_engine:
+        module : wishful_module_gitar
+        class_name : GitarEngine
+        interfaces : ['lowpan0']
+        kwargs :
+            GitarConfig : './config/localhost/gitar.ini'
+            SupportedInterfaces : ['lowpan0']
+    generic_connector:
+        module : wishful_module_generic
+        class_name : GenericConnector
+        interfaces : ['lowpan0']
+        kwargs :
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : {"generic_connector": './config/protocol_connectors/generic_ctrl_attributes.csv'}
+            ControlFunctions : {"generic_connector": './config/protocol_connectors/generic_ctrl_functions.csv'}
+            ProtocolConnectors: {"generic_connector": 0}
+    rime_connector:
+        module : wishful_module_rime
+        class_name : RIMEConnector
+        interfaces : ['lowpan0']
+        kwargs :
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : {'rime_connector': './config/protocol_connectors/rime_ctrl_attributes.csv'}
+            ControlFunctions : {'rime_connector': './config/protocol_connectors/rime_ctrl_functions.csv'}
+            ProtocolConnectors: {'rime_connector': 9}
+    nordc_csma_connector:
+        module : wishful_module_nordc_csma
+        class_name : NORDCCSMAConnector
+        interfaces : ['lowpan0']
+        kwargs :
+            SupportedInterfaces : ['lowpan0']
+            ControlAttributes : 
+                radio_connector: './config/protocol_connectors/radio802154_ctrl_attributes.csv'
+                nullrdc_connector: './config/protocol_connectors/nordc_ctrl_attributes.csv'
+                csma_connector: './config/protocol_connectors/csma_ctrl_attributes.csv'
+            ControlFunctions : 
+                radio_connector: './config/protocol_connectors/radio802154_ctrl_functions.csv'
+                nullrdc_connector: './config/protocol_connectors/nordc_ctrl_functions.csv'
+                csma_connector: './config/protocol_connectors/csma_ctrl_functions.csv'
+            ProtocolConnectors: {'csma_connector': 4, 'nullrdc_connector': 8, 'radio_connector': 6}
