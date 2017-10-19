@@ -15,5 +15,5 @@ setup(
     description='WiSHFUL Examples',
     long_description='WiSHFUL Examples',
     keywords='wireless control',
-    install_requires=['pyyaml', 'docopt']
+    install_requires=['pyyaml', 'docopt', 'jsocket', 'oml4py']
 )
