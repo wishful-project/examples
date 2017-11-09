@@ -104,6 +104,7 @@ if __name__ == "__main__":
             "rpl_dio_redundancy",
             "rpl_default_lifetime",
             "rpl_objective_function",
+            "app_server_ipv6_address",
         ]
 
         radio_param_list = [
