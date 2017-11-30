@@ -328,9 +328,9 @@ def main(args):
 			lcpDescriptor_nodes = []
 			reading_thread = []
 
-			print("find node")
-			for ii in range(0, len(nodes)):
-				print("\t %s - index %d" % (nodes[ii].ip, ii) )
+			# print("find node")
+			# for ii in range(0, len(nodes)):
+			# 	print("\t %s - index %d" % (nodes[ii].ip, ii) )
 
 			nodes_sort = []
 			for ii in range(0, len(hosts)):
@@ -358,7 +358,7 @@ def main(args):
 			for ii in range(0, len(nodes)):
 				nodes_source_rate.append(0)
 				if not nodes[ii] in nodes_temp:
-					print("node %s - index %d" % (nodes[ii].ip, ii) )
+					# print("node %s - index %d" % (nodes[ii].ip, ii) )
 					nodes_temp.append(nodes[ii])
 			nodes = nodes_temp
 
@@ -368,8 +368,8 @@ def main(args):
 			#START visualizer socket
 			socket_visualizer = start_visualizer_connection()
 
-			all_nodes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-
+			# all_nodes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+			all_nodes = ['A', 'B', 'C']
 
 			"""
 			****** setup network ******
@@ -377,62 +377,58 @@ def main(args):
 			try:
 				#SETUP NODES
 				print("START node setup")
-				lcpDescriptor = None;
+				for ii in range(0, len(hosts)):
+					# print("search node %s - index %d" % (eth_ip[ii], ii) )
+					for jj in range(0, len(nodes)):
+						if nodes[jj].ip == eth_ip[ii]:
+							pos = eth_ip.index(nodes[jj].ip)
+							if role[pos] == "AP":
+								print("setup topology node %s - index %d" % (nodes[jj].ip, jj))
+								setAP(controller, nodes[jj], iface[pos], wlan_ip[pos], "wishful-interference")
+							elif role[pos] == "STA":
+								pass
+							else:
+								print("no station role found ")
+								break
+
+
 				for ii in range(0, len(hosts)):
 					print("search node %s - index %d" % (eth_ip[ii], ii) )
 					for jj in range(0, len(nodes)):
 						if nodes[jj].ip == eth_ip[ii]:
-							print("setup topology node %s - index %d" % (nodes[jj].ip, jj) )
 							pos = eth_ip.index(nodes[jj].ip)
 
 							#setup wifi network
 							#set ad-hoc network
 							# rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "250", "aa:bb:cc:dd:ee:ff", True)
-							rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "off", "aa:bb:cc:dd:ee:ff", True)
+							# rvalue = controller.nodes(nodes[jj]).net.start_adhoc(driver[pos], "wlan0", "wishful-interference", freq[pos], tx_power[pos], "6", wlan_ip[pos], "off", "aa:bb:cc:dd:ee:ff", True)
 
 							#setup infrastructured network (put interface in managed mode and disable network manager)
 							#set infrastructured network
-							# if role[pos] == "AP":
-							#	  setAP(controller, nodes[jj], iface[pos], wlan_ip[pos], "wishful-interference")
-							# elif role[pos] == "STA":
-							#	  connection_result = setSTA(controller, nodes[jj], iface[pos], wlan_ip[pos], "wishful-interference")
-							#	  print(connection_result)
-							#	  if connection_result == False:
-							#		  raise SystemExit('Unable to connect')
-							# else:
-							#	  print("no station role found ")
-							#	  break
+							if role[pos] == "AP":
+								pass
+							elif role[pos] == "MON":
+								rvalue = controller.nodes(nodes[jj]).net.start_monitor(driver[pos], iface[pos])
+								rvalue = controller.nodes(nodes[jj]).radio.set_channel(iface[pos], "6")
+							elif role[pos] == "STA":
+								print("setup topology node %s - index %d" % (nodes[jj].ip, jj))
+								connection_result = setSTA(controller, nodes[jj], iface[pos], wlan_ip[pos], "wishful-interference")
+								print(connection_result)
+								if connection_result == False:
+									raise SystemExit('Unable to connect')
+							else:
+								print("no station role found ")
+								break
 
 							#set monitor interface
-							gevent.sleep(1)
-							rvalue = controller.nodes(nodes[jj]).net.start_monitor(driver[pos], iface[pos])
+							# gevent.sleep(1)
+							# rvalue = controller.nodes(nodes[jj]).net.start_monitor(driver[pos], iface[pos])
 
 				print("END node setup")
 			except (Exception) as err:
 				print("exception", err)
 				print("Error in node setup procedure")
 				do_run = False
-
-
-			# """
-			# ****** test topology by checking which nodes are in carrier range and which in communication range ******
-			# """
-			# # CS test
-			# log.info("Testing carrier sensing ...")
-			# CSmat = controller.blocking(True).wireless_topology.estimate_nodes_in_carrier_sensing_range(nodes, wlan_inject_iface, TAU=0.9)
-			# for jj in range(0, len(nodes)):
-			# 	log.info(" from node %s --> tp node %s [%s] " % (str(CSmat[jj][0].ip), str(CSmat[jj][1].ip), str(CSmat[jj][2])))
-            #
-            #
-            #
-            #
-			# # CR test
-			# log.info("Testing communication range ...")
-			# CRmat = controller.blocking(True).wireless_topology.estimate_nodes_in_communication_range(nodes, wlan_inject_iface, MINPDR=0.9)
-			# for jj in range(0, len(nodes)):
-			# 	log.info(" from node %s --> tp node %s [%s] " % (str(CRmat[jj][0].ip), str(CRmat[jj][1].ip), str(CRmat[jj][2])))
-			# # do_run = False
-
 
 			if do_run:
 				"""
@@ -442,14 +438,15 @@ def main(args):
 					print("START local control program")
 					lcpDescriptor = None;
 					for ii in range(0, len(hosts)):
-						print("search node %s - index %d" % (eth_ip[ii], ii))
 						for jj in range(0, len(nodes)):
+							print("search node %s - index %d" % (eth_ip[ii], ii))
 							if nodes[jj].ip == eth_ip[ii]:
+								pos = eth_ip.index(nodes[jj].ip)
 								# RUN REACT
 								print("start local control program on nodes")
 								lcpDescriptor_nodes.append(
 									controller.node(nodes[jj]).hc.start_local_control_program(program=read_busy_time))
-								msg = {"iface": "wlan0", "i_time": time_update}
+								msg = {"iface":  iface[pos], "i_time": time_update}
 								lcpDescriptor_nodes[ii].send(msg)
 								print("start thread for collect measurements from nodes")
 								reading_thread.append(threading.Thread(target=collect_remote_messages, args=(lcpDescriptor_nodes[ii], socket_visualizer, mac_address, label)))
@@ -461,7 +458,6 @@ def main(args):
 					print("exception", err)
 					print("Error in node control program setup procedure")
 					do_run = False
-
 
 				"""
 				****** SETUP STATIC IPERF FLOW ******
@@ -501,8 +497,10 @@ def main(args):
 				"""
 				****** MAIN LOOP WITH interface commands management (start/stop iperf flows) ******
 				"""
-				for node in nodes:
-					controller.delay(1).nodes(node).net.create_packetflow_sink('1234', '1', True, 'wlan0')
+				for jj in range(0, len(nodes)):
+					pos = eth_ip.index(nodes[jj].ip)
+					if label[pos] == 'B' or label[pos] == 'C':
+						controller.delay(1).nodes(nodes[jj]).net.create_packetflow_sink('1234', '1', True, 'wlan0')
 
 				socket_command = start_command_connection()
 				poller = zmq.Poller()
@@ -534,6 +532,12 @@ def main(args):
 										msg = {"type": "find_topology", "measure": "carrier_sense_result", "value": CSmat}
 										log.info("Recv: %s" % str(msg))
 										socket_visualizer.send_json(msg)
+
+								if type == 'microwave':
+									for jj in range(0, len(nodes)):
+										pos = eth_ip.index(nodes[jj].ip)
+										if label[pos] == 'A':
+											lcpDescriptor_nodes[jj].send(parsed_json)
 
 								if type == 'traffic':
 									node = parsed_json['src']

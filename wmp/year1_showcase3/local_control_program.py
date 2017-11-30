@@ -47,10 +47,7 @@ def local_control_program(controller):
     import datetime
     import sys
     import threading
-<<<<<<< HEAD
     import zmq
-=======
->>>>>>> origin/master
 
     sys.path.append('../../../')
     sys.path.append("../../../agent_modules/wifi_ath")
@@ -63,11 +60,8 @@ def local_control_program(controller):
     from agent_modules.wifi_wmp.wmp_structure import UPI_R
 
     #socket iperf pointer
-<<<<<<< HEAD
     iperf_socket = None
-=======
-	iperf_socket = None
->>>>>>> origin/master
+    iperf_socket = None
 
     def rcv_from_iperf_socket(iperf_througputh, controller, interface):
         iperf_thread = threading.currentThread()
@@ -81,25 +75,18 @@ def local_control_program(controller):
         iperf_socket.setsockopt_string(zmq.SUBSCRIBE, '')
 
         wlan_ip_address = controller.net.get_iface_ip_addr(interface)
-<<<<<<< HEAD
         wlan_ip_address = wlan_ip_address[0]
-=======
->>>>>>> origin/master
-
         print('socket iperf started')
         while getattr(iperf_thread, "do_run", True):
             parsed_json = iperf_socket.recv_json()
-<<<<<<< HEAD
             #print('my address %s - parsed_json : %s' % (str(wlan_ip_address), str(parsed_json)))
             rcv_ip_address = parsed_json['ip_address']
             if rcv_ip_address == wlan_ip_address:
             #    print('parsed_json : %s' % str(parsed_json))
-=======
             print('my address %s - parsed_json : %s' % (str(wlan_ip_address), str(parsed_json)))
             rcv_ip_address = parsed_json['ip_address']
             if rcv_ip_address == wlan_ip_address:
                 print('parsed_json : %s' % str(parsed_json))
->>>>>>> origin/master
                 iperf_througputh[0] = float(parsed_json['throughput'])
 
     """

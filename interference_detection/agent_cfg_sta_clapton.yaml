@@ -1,0 +1,25 @@
+## WiSHFUL agent config file
+
+agent_info:
+  name: 'interference'
+  info: 'interference agent info'
+  iface: 'eth1'
+
+modules:
+  network:
+      module : wishful_module_net_linux
+      class_name : NetworkModule
+
+  discovery:
+      module : wishful_module_discovery_pyre
+      class_name : PyreDiscoveryAgentModule
+      kwargs: {"iface":"eth1", "groupName":"interference"}
+
+  wifi:
+      module : wishful_module_wifi_wmp
+      class_name : WmpModule
+      kwargs: {"executionEngine":"error-sense", "iface":"wlan2"}
+
+  iperf:
+      module : wishful_module_iperf
+      class_name : IperfModule
