@@ -131,6 +131,18 @@ def node_exit(node, reason):
         nodes.remove(node);
     print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
 
+def set_activate_RRU_container(controller, node):
+	""" This function is used for starting the Docker Container for the deploying of the RRU
+    """
+    os.system('sudo docker start RRU1')
+    os.system('sudo docker attach RRU1')
+
+def set_activate_RCC_container(controller, node):
+	""" This function is used for starting the Docker Container for the deploying of the RCC
+    """
+    os.system('sudo docker start RCC1')
+    os.system('sudo docker attach RCC1')
+
 def setHSS(controller, node):
     """ This function use WiSHFUL UPI functions to perform an
     :param controller: framework controller object
@@ -167,31 +179,33 @@ def setSPGW(controller, node):
     controller.delay(5).node(node).net.SPGW_activation()
     gevent.sleep(5)
 
-def setRCC(controller, node):
+    def setRCC_container(controller, node):
     """ This function use WiSHFUL UPI functions to
     :param controller: framework controller object
     :param node:
     :return
     """
     #This UPI function stops the RCC
-    controller.blocking(False).node(node).net.RCC_deactivation()
+    controller.blocking(False).node(node).net.RCC_container_deactivation()
     gevent.sleep(5)
     #This UPI function starts the eNB
-    controller.delay(15).node(node).net.RCC_activation()
+    controller.delay(15).node(node).net.RCC_container_activation()
     gevent.sleep(5)
 
-def setRRU(controller, node):
+def setRRU_container(controller, node):
     """ This function use WiSHFUL UPI functions to
     :param controller: framework controller object
     :param node:
     :return
     """
     #This UPI function stops the RRU
-    controller.blocking(False).node(node).net.RRU_deactivation()
+    controller.blocking(False).node(node).net.RRU_container_deactivation()
     gevent.sleep(5)
     #This UPI function starts the eNB
-    controller.delay(10).node(node).net.RRU_activation()
+    controller.delay(10).node(node).net.RRU_container_activation()
     gevent.sleep(5)
+
+
 
 def setUE(controller, node, central_freq, N_RB, tx_gain, rx_gain):
     """ This function use WiSHFUL UPI functions
@@ -260,11 +274,14 @@ def main():
             setMME(controller,epc_node)
             setSPGW(controller,epc_node)
 
-            setRRU(controller,rru_node)
-            setRCC(controller,rcc_node)
-            
-            setUE(controller,ue_node, central_freq, N_RB, tx_gain, rx_gain)
+            set_activate_RRU_container(controller,rru_node)
+            setRRU_container(controller,rru_node)
 
+            set_activate_RRU_container(controller,rcc_node)
+            setRCC_container(controller,rcc_node)
+
+            setUE(controller,ue_node, central_freq, N_RB, tx_gain, rx_gain)
+            
             do_run = True            
             EXPERIMENT_DURATION = 200
             dt = 0

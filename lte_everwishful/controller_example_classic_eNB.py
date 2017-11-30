@@ -30,7 +30,7 @@ Setting of experiment nodes, ip address and name
 """
 #Controller (UP-Board_2)
 controller_PC_ip_address = "10.30.2.59"
-controller_PC_interface = "eth1"
+controller_PC_interface = "br0"
 
 # EPC
 epc_name = "UP-Board 1"
@@ -45,7 +45,13 @@ enb_interface = "eth4"
 #UE
 ue_name = "Kote"
 ue_ip = "10.30.2.98"
-ue_interface = "eth0"
+ue_interface = "eth3"
+
+#UE parameters
+central_freq ='2660000000'
+N_RB ='25'
+tx_gain = '90'
+rx_gain ='120'
 
 #Nodes number
 nodes_number=3
@@ -121,39 +127,39 @@ def node_exit(node, reason):
     print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
 
 def setHSS(controller, node):
-    """ This function use WiSHFUL UPI functions to perform an
+    """ This function use WiSHFUL UPI to perform the deactivation/activation of the HSS
     :param controller: framework controller object
-    :param node:
-    """
+    :param node: EPC node
+    """ 
     #This UPI function stops the HSS
     controller.blocking(False).node(node).net.HSS_deactivation()
     gevent.sleep(5)
     #This UPI function starts the HSS
-    controller.delay(3).node(node).net.HSS_activation()
+    controller.delay(1).node(node).net.HSS_activation()
     gevent.sleep(5)
 
 def setMME(controller, node):
-    """ This function use WiSHFUL UPI functions to perform an
+    """ This function use WiSHFUL UPI to perform the activation/deactivation of the MME
     :param controller: framework controller object
-    :param node:
+    :param node: EPC node
     """
     #This UPI function stops the MME
     controller.blocking(False).node(node).net.MME_deactivation()
     gevent.sleep(5)
     #This UPI function starts the MME
-    controller.delay(13).node(node).net.MME_activation()
+    controller.delay(3).node(node).net.MME_activation()
     gevent.sleep(5)
 
 def setSPGW(controller, node):
-    """ This function use WiSHFUL UPI functions to perform an
+    """ This function use WiSHFUL UPI to perform the activation/deactivation of the SPGW
     :param controller: framework controller object
-    :param node:
+    :param node:EPC node
     """
     #This UPI function stops the SPGW
     controller.blocking(False).node(node).net.SPGW_deactivation()
     gevent.sleep(5)
     #This UPI function starts the SPGW
-    controller.delay(23).node(node).net.SPGW_activation()
+    controller.delay(7).node(node).net.SPGW_activation()
     gevent.sleep(5)
 
 def setENB(controller, node):
@@ -166,10 +172,10 @@ def setENB(controller, node):
     controller.blocking(False).node(node).net.eNB_deactivation()
     gevent.sleep(5)
     #This UPI function starts the eNB
-    controller.delay(33).node(node).net.eNB_activation()
+    controller.delay(10).node(node).net.eNB_activation()
     gevent.sleep(5)
 
-def setUE(controller, node):
+def setUE(controller, node, central_freq, N_RB, tx_gain, rx_gain):
     """ This function use WiSHFUL UPI functions
     :param controller: framework controller object
     :param node:
@@ -179,19 +185,8 @@ def setUE(controller, node):
     controller.blocking(False).node(node).net.UE_deactivation()
     gevent.sleep(5)
     #This UPI function starts the eNB
-    controller.delay(43).node(node).net.UE_activation()
+    controller.delay(20).node(node).net.UE_activation(central_freq, N_RB, tx_gain, rx_gain)
     gevent.sleep(5)
-
-def RUNping(controller, ip_address):
-    """ This function use WiSHFUL UPI functions to
-    :param controller: framework controller object
-    :param node:
-    :return
-    """
-
-    #This UPI function stops the eNB, if present on node#
-    #rvalue = controller.nodes(node).net.ping_test()
-    pass
 
 def main():
 
@@ -242,10 +237,11 @@ def main():
             setHSS(controller,epc_node)
             setMME(controller,epc_node)
             setSPGW(controller,epc_node)
-            time.sleep(10)
+
             setENB(controller,enb_node)
-            time.sleep(10)
-            setUE(controller,ue_node)
+
+            setUE(controller, ue_node, central_freq, N_RB, tx_gain, rx_gain)
+            
             do_run = True            
             EXPERIMENT_DURATION = 200
             dt = 0
