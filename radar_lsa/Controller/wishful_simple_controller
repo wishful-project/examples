@@ -1,0 +1,317 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""This is the Erika version - Here I can connect to a server and receive the commands to send to the specific agentes. 
+Open Call Radar LSA working. 
+wishful_controller_simple.py:
+
+Usage:
+   wishful_controller_simple.py [options] [-q | -v]
+
+Options:
+   --logfile name      Name of the logfile
+   --config configFile Config file path
+
+Example:
+   ./wishful_simple_local_controller -v --config ./config.yaml 
+
+Other options:
+   -h, --help          show this help message and exit
+   -q, --quiet         print less text
+   -v, --verbose       print more text
+   --version           show version and exit
+"""
+
+import sys
+import datetime
+import time
+import logging
+import gevent
+import yaml
+import xml.etree.ElementTree as ET
+import socket
+import threading
+import os
+import sys
+from itertools import cycle
+import math
+
+# WiSHFUL imports
+import wishful_controller
+import wishful_upis as upis
+import wishful_module_gnuradio
+import wishful_framework as framework
+
+__author__ = "Piotr Gawlowicz, Mikolaj Chwalisz, Erika Fonseca"
+__copyright__ = "Copyright (c) 2015, Technische Universität Berlin"
+__version__ = "0.1.0"
+__email__ = "{gawlowicz, chwalisz}@tkn.tu-berlin.de"
+
+log = logging.getLogger('wishful_agent.main')
+controller = wishful_controller.Controller()
+nodes = []
+TCP_IP = '213.136.85.177'
+TCP_PORT = 22
+BUFFER_SIZE = 1024
+
+#load config iris or gnuradio - Software Defined Radio using Wishful.
+def load_config():
+    tree = ET.parse('sdr.xml')
+    root = tree.getroot()
+
+    for agents in root.findall('agent'):
+        sdr_type = agents.attrib.get('type')
+        port = agents.attrib.get('port')
+        number_agent = agents.attrib.get('number_agent')
+    return (sdr_type, port, number_agent)
+
+def inicial():
+    print ("************************ Wishful Controller  ************************ ")
+    parameter = input("Write the Frequency: ")
+    parameter = "set_frequency:" + parameter + '\n'
+    
+    print("\n")
+    print ("Send parameters to node(s)")
+    print("\n")
+    
+@controller.new_node_callback()
+def new_node(node):
+    nodes.append(node)
+    print("New node appeared:")
+    print(node)
+
+@controller.node_exit_callback()
+def node_exit(node, reason):
+    if node in nodes:
+        print (nodes)
+        nodes.remove(node);
+    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
+
+@controller.set_default_callback()
+def default_callback(group, node, cmd, data):
+    print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
+
+def print_response(group, node, data):
+    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data)) 
+
+def client_tcp(ip,port,buffer_size):
+    #Threading responsable for the communication with the server, in other words, to receive the commands
+    TCP_IP = ip
+    TCP_PORT = port
+    BUFFER_SIZE = buffer_size
+    MESSAGE = "Connected to Wishful Controller\r\n"
+    global s
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((TCP_IP, TCP_PORT))
+    s.send(MESSAGE.encode())
+    #try:
+    while True:
+        data = s.recv(BUFFER_SIZE)
+        print('Received: {data}'.format(data=data.decode("utf-8")))
+        data = data.decode("utf-8")
+        if data != None:
+            controllerReceivedMessage = "Controller received: " + str(data)
+            s.send(controllerReceivedMessage.encode())
+            
+            the_list.clear()
+            the_list.append(str(data))
+            #print(b'The command received is: ')
+            #print("\r\n".encode())
+    
+    
+def main(args):
+    
+    log.debug(args)
+    global the_list
+    the_list = []
+    config_file_path = args['--config']
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+
+    controller.load_config(config)
+    controller.start()
+    send_parameter = True #provavel q possa tirar essa linha
+    lrate =[0,0] #list that will contain the rates values
+    const = 0
+    #load config software defined radio
+    config = load_config()
+    sdr_type = config[0]
+    port_agent = config[1]
+    number_agent = int(config[2])
+    #Connecting a socket server and creating a buffer to receive comands
+    th = threading.Thread(target=client_tcp,args=(TCP_IP,TCP_PORT,BUFFER_SIZE,))
+    th.start()
+    
+    files = { 
+        'tx': './grc/tx.grc',
+        'rx': './grc/rx.grc'
+    }
+
+    
+    while (len(nodes) < number_agent):
+        print("Nodes Connected: %d/%d" % (len(nodes), number_agent))
+        gevent.sleep(2)
+
+
+    print ("************************ Wishful Controller  ************************ ")
+   
+    for n in nodes:
+        #For the GNURadio agents it`s necessary send the grc code
+        if n.name == "tx" :
+            # Example of UPI to get the current program running on the node
+            running = controller.node(n).radio.get_running_radio_program()
+
+            # As we have not started anything, running should be None
+            if running is None:
+                print('\t- Starting program at TX Agent')
+                # We pass a string that contains the entire grc content
+                program_code = open(files['tx']).read()
+
+                # Here we send the program to the agent
+                # Parameters:
+                #   - program_name: The name of the grc program. Used to identify the program when starting/stopping it.
+                #   - program_code: String with the GRC file content
+                #   - program_type: 'grc' or 'py' (we can also pass a '.py' file instead of a GRC.
+                #   - program_port: Port that the XMLRPCServer will run (check the XMLRPC Server block on tx.grc file)     
+                controller.node(n).radio.activate_radio_program({'program_name': 'tx', 'program_code': program_code, 'program_type': 'grc'})
+        elif n.name=="rx":
+            global receptor
+            receptor = n
+            running = controller.node(n).radio.get_running_radio_program()
+            print('\t- Starting program at RX Agent')
+            if running is None:
+                program_code = open(files['rx']).read()
+                # Here we send the program to the agent
+                # Parameters:
+                #   - program_name: The name of the grc program. Used to identify the program when starting/stopping it.
+                #   - program_code: String with the GRC file content
+                #   - program_type: 'grc' or 'py' (we can also pass a '.py' file instead of a GRC.
+                #   - program_port: Port that the XMLRPCServer will run (check the XMLRPC Server block on rx.grc file)     
+                controller.node(n).radio.activate_radio_program({'program_name': 'rx', 'program_code': program_code, 'program_type': 'grc'})
+
+    #control loop
+    while True:
+        gevent.sleep(3)
+        print("\n")
+        print("Connected nodes", [str(node.name) for node in nodes])
+        print("Nodes IP: ", [str(node.ip) for node in nodes])
+        vals = controller.node(receptor).radio.get_parameters(['rate', 'signal_level'])
+        lrate [0] = lrate[1]
+        lrate[1] = vals['rate']
+        print (lrate)
+        if (lrate[0] == lrate[1]) or (lrate[1]==const):
+            #print("ENTREI NO IFFEE")
+            if lrate[1]!=0: const = lrate[1]
+            lrate[1] = 0
+        #rate = '\n \t Rate: \t%f' % (lrate[1])
+        rate = '\n \t Rate: \t%f' % (lrate[1])
+        rate = str(rate)
+        #signal = '\n \t Signal Level: \t %f' % (math.log10(vals['signal_level']))
+        #signal = str(signal)
+        print("RX MEASURES:")
+        print (rate)
+        ##print (signal)
+        rxMeasuresMessage = "RX measures: bitrate=%f;\r\n" % lrate[1]
+        s.send(rxMeasuresMessage.encode())
+
+        if the_list != []:
+            #command = the_list.pop(0)
+            #command = command.replace("b'","")
+            #command = command.replace("'","")
+            command =  str(the_list[0]).split(",")
+            #print("Command: {}".format(command))
+            the_list.clear()
+
+            for i in nodes:
+                if command[0] == i.name:
+                    n = i
+            
+            if str(command[0]) =="radar":
+                print("***********  RADAR ************ Command: {}".format(command[1]))
+                #In the iris case:
+                if command[1] == "turnon":
+                    #changing the frequency to a operational frequency
+                    parameterrx = "set:phyengine1.usrprx1.frequency=" + '3511500000' #string with the correct command
+                    controller.blocking(False).node(n).radio.iface(sdr_type).set_frequency(sdr_type, str(n.ip), port_agent, parameterrx)                    
+                elif command[1] == "turnoff": 
+                    #changing the frequency for a not working frequency
+                    parameterrx = "set:phyengine1.usrprx1.frequency=" + '500000000' #string with the correct command
+                    controller.blocking(False).node(n).radio.iface(sdr_type).set_frequency(sdr_type, str(n.ip), port_agent, parameterrx)
+                else:
+                    print("Command incorrect, the command have to be: turnon / turnoff. \n The command was: ", command[1])
+            
+
+            elif str(command[0]) =="sensor":
+                print("***********  Sensor ************ Command: {}".format(command[1]))
+                #In the iris case:
+                if command[1] == "turnon":
+                    #changing the frequency to a operational frequency
+                    parameterrx = "set:phyengine1.usrprx1.frequency=" + '3511500000' #string with the correct command
+                    controller.blocking(False).node(n).radio.iface(sdr_type).set_frequency(sdr_type, str(n.ip), port_agent, parameterrx)                    
+                elif command[1] == "turnoff": 
+                    #changing the frequency for a not working frequency
+                    parameterrx = "set:phyengine1.usrprx1.frequency=" + '1800000000' #string with the correct command
+                    controller.blocking(False).node(n).radio.iface(sdr_type).set_frequency(sdr_type, str(n.ip), port_agent, parameterrx)
+                else:
+                    print("Command incorrect, the command have to be: turnon / turnoff. \n The command was: ", command[1])
+            
+
+            #In the GNURadio case
+            elif str(command[0]) == "tx" :
+                print("*********** TX ************ Command: {}".format(command[1]))
+                if command[1] == "turnon":
+                    print ("TX: TURN ON")
+                    controller.node(n).radio.set_parameters({'amplitude': 1, })
+                elif command[1] == "turnoff":
+                    print ("TX TURN OFF")
+                    controller.node(n).radio.set_parameters({'amplitude': 0, })
+                else:
+                    print("Command incorrect, the command have to be turnon or turnoff. \n The command was: ", command[1])
+
+           
+            
+
+if __name__ == "__main__":
+    try:
+        from docopt import docopt
+    except:
+        print("""
+        Please install docopt using:
+            pip install docopt==0.6.1
+        For more refer to:
+        https://github.com/docopt/docopt
+        """)
+        raise
+
+    args = docopt(__doc__, version=__version__)
+
+    log_level = logging.INFO  # default
+    if args['--verbose']:
+        log_level = logging.DEBUG
+    elif args['--quiet']:
+        log_level = logging.ERROR
+
+    logfile = None
+    if args['--logfile']:
+        logfile = args['--logfile']
+
+    logging.basicConfig(filename=logfile, level=log_level,
+        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    try:
+        main(args)
+    except KeyboardInterrupt:
+        log.debug("Controller exits")
+        
+    finally:
+        for node in nodes:
+            if node.name == 'tx':
+                print('Stopping TX')
+                controller.node(node).radio.deactivate_radio_program('tx')
+            elif node.name == 'rx':
+                print('Stopping RX')
+                controller.node(node).radio.deactivate_radio_program('rx')
+        log.debug("Exit")
+        controller.stop()
+
