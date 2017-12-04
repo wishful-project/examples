@@ -1,0 +1,62 @@
+<softwareradio name="Radio1">
+
+  <controller class="forgecontroller">
+    <parameter name="usrptxcomponent" value="usrptx1"/>
+    <parameter name="usrptxengine" value="phyengine1"/>
+    <parameter name="usrprxcomponent" value="rx1"/>
+    <parameter name="usrprxengine" value="phyengine2"/>
+    <parameter name="radartxcomponent" value="radartx1"/>
+    <parameter name="radartxengine" value="phyengine1"/>
+  </controller>
+
+  <controller class="radarsystemcontroller"/>
+
+  <engine name="phyengine1" class="phyengine">
+
+    <component name="radartx1" class="radartx">
+      <parameter name="IPM" value="PR"/>
+      <parameter name="FrequencyExcursion" value="3e5"/>
+      <parameter name="PW" value="10e-6"/>
+      <parameter name="PRI" value="1e-3"/>
+      <parameter name="Gmax" value="35"/>
+      <parameter name="ScanType" value="FAN-CIRCULAR"/>
+      <parameter name="ElevationAngle" value="0"/>
+      <parameter name="ASP" value="3"/>
+      <parameter name="rate" value="1e6"/>
+      <parameter name="radar_enable" value="true"/>
+      <parameter name="startradio" value="true"/>
+      <port name="signaloutput1" value="output"/>
+    </component>
+
+    <component name="usrptx1" class="usrptx">
+      <parameter name="streaming" value="false"/>
+      <parameter name="rate" value="1e6"/>
+      <parameter name="fixlooffset" value="11e6"/>
+      <parameter name="frequency" value="3511500000"/>
+      <parameter name="gain" value="60"/>
+      <!--<parameter name="antenna" value="Tx/Rx"/>-->
+      <parameter name="antenna" value="Tx/Rx"/>
+      <port name="input1" value="input"/>
+    </component>
+  </engine>
+
+  <engine name="phyengine2" class="phyengine">
+
+    <component name="rx1" class="usrprxhacked">
+      <parameter name="rate" value="100e3"/>
+      <parameter name="frequency" value="3500000000"/>
+      <parameter name="gain" value="35"/>
+      <parameter name="antenna" value="Rx2"/>
+      <parameter name="outputblocksize" value="500"/>
+      <port name="output1" class="output"/>
+    </component>
+
+    <component name="null1" class="nullsink"> 
+      <port name="input1" class="input"/>
+    </component>
+  </engine>
+
+  <link source="radartx1.signaloutput1" sink="usrptx1.input1" />
+  <link source="rx1.output1" sink="null1.input1" />
+
+</softwareradio>

@@ -1,0 +1,23 @@
+<softwareradio name="Radio1">
+  <!--<controller class="forgecontroller">
+    <parameter name="usrprxcomponent" value="usrprx1"/>
+    <parameter name="usrprxengine" value="phyengine1"/>
+  </controller>-->
+  <engine name="phyengine1" class="phyengine">
+    <component name="usrprx1" class="usrprx">
+      <parameter name="fixlooffset" value="2000000"/>
+      <parameter name="rate" value="1000000"/>
+      <parameter name="frequency" value="3511500000"/>
+      <parameter name="gain" value="20"/>
+      <parameter name="antenna" value="Tx/Rx"/>
+      <port name="output1" value="output"/>
+    </component>
+    <component name="radarsensor1" class="radarsensor">
+      <parameter name="Pthres" value="15"/> <!--35 in grid -->
+      <parameter name="h_len" value="5"/>
+      <parameter name="pulse_thresdB" value="10"/>
+      <port name="input1" value="input"/>
+    </component>
+  </engine>
+  <link source="usrprx1.output1" sink="radarsensor1.input1" />
+</softwareradio>
