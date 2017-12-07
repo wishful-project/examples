@@ -15,4 +15,4 @@ modules:
     module : wishful_module_ismtv
     class_name : IsmtvModule
     interfaces : ['ismtv']
-    kwargs: {"service":"http://127.0.0.1:9000", "serial":"/dev/ttyS1"}
+    kwargs: {"dev":"/dev/ttyS2"}
