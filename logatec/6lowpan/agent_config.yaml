@@ -1,7 +1,7 @@
 ## WiSHFUL Agent config file
 
 agent_info:
-  name: 'agent_123'
+  name: '6lowpan'
   info: 'agent_info'
   iface: 'lo'
 
@@ -12,7 +12,7 @@ modules:
     kwargs: {"iface":"lo", "groupName":"wishful_1234"}
 
   simple:
-    module : wishful_module_ismtv
-    class_name : IsmtvModule
-    interfaces : ['ismtv']
-    kwargs: {"dev":"/dev/ttyS2"}
+    module : wishful_module_6lowpan
+    class_name : SixlowpanModule
+    interfaces : ['6lowpan']
+    kwargs: {"uri":"coap://[aaaa::212:4b00:6:267f]:5683/test"}
