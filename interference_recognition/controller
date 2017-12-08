@@ -555,6 +555,7 @@ def main(args):
 										nodes_source_rate[node_src_index] = value
 										source_rate = float(nodes_source_rate[node_src_index])
 										# call UPI to start traffic
+										print(wlan_ip[node_dst_index])
 										controller.delay(1).nodes(nodes[node_src_index]).net.start_packetflow(wlan_ip[node_dst_index], '1234', '3000', str(value) + 'K', '1470')
 
 					if not (dt % 10):

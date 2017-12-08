@@ -30,7 +30,7 @@ Setting of experiment nodes, ip address and name
 """
 #Controller (UP-Board_2)
 controller_PC_ip_address = "10.30.2.59"
-controller_PC_interface = "eth1"
+controller_PC_interface = "br0"
 
 # EPC
 epc_name = "UP-Board 1"
@@ -51,6 +51,12 @@ rru_interface = "eth4"
 ue_name = "Kote"
 ue_ip = "10.30.2.98"
 ue_interface = "eth0"
+
+#UE parameters
+central_freq ='2660000000'
+N_RB ='25'
+tx_gain = '90'
+rx_gain ='120'
 
 #Nodes number
 nodes_number=4
@@ -134,7 +140,7 @@ def setHSS(controller, node):
     controller.blocking(False).node(node).net.HSS_deactivation()
     gevent.sleep(5)
     #This UPI function starts the HSS
-    controller.delay(3).node(node).net.HSS_activation()
+    controller.delay(1).node(node).net.HSS_activation()
     gevent.sleep(5)
 
 def setMME(controller, node):
@@ -146,7 +152,7 @@ def setMME(controller, node):
     controller.blocking(False).node(node).net.MME_deactivation()
     gevent.sleep(5)
     #This UPI function starts the MME
-    controller.delay(13).node(node).net.MME_activation()
+    controller.delay(3).node(node).net.MME_activation()
     gevent.sleep(5)
 
 def setSPGW(controller, node):
@@ -158,7 +164,7 @@ def setSPGW(controller, node):
     controller.blocking(False).node(node).net.SPGW_deactivation()
     gevent.sleep(5)
     #This UPI function starts the SPGW
-    controller.delay(23).node(node).net.SPGW_activation()
+    controller.delay(5).node(node).net.SPGW_activation()
     gevent.sleep(5)
 
 def setRCC(controller, node):
@@ -171,7 +177,7 @@ def setRCC(controller, node):
     controller.blocking(False).node(node).net.RCC_deactivation()
     gevent.sleep(5)
     #This UPI function starts the eNB
-    controller.delay(33).node(node).net.RCC_activation()
+    controller.delay(15).node(node).net.RCC_activation()
     gevent.sleep(5)
 
 def setRRU(controller, node):
@@ -184,10 +190,10 @@ def setRRU(controller, node):
     controller.blocking(False).node(node).net.RRU_deactivation()
     gevent.sleep(5)
     #This UPI function starts the eNB
-    controller.delay(33).node(node).net.RRU_activation()
+    controller.delay(10).node(node).net.RRU_activation()
     gevent.sleep(5)
 
-def setUE(controller, node):
+def setUE(controller, node, central_freq, N_RB, tx_gain, rx_gain):
     """ This function use WiSHFUL UPI functions
     :param controller: framework controller object
     :param node:
@@ -197,19 +203,8 @@ def setUE(controller, node):
     controller.blocking(False).node(node).net.UE_deactivation()
     gevent.sleep(5)
     #This UPI function starts the eNB
-    controller.delay(43).node(node).net.UE_activation()
+    controller.delay(20).node(node).net.UE_activation(central_freq, N_RB, tx_gain, rx_gain)
     gevent.sleep(5)
-
-def RUNping(controller, ip_address):
-    """ This function use WiSHFUL UPI functions to
-    :param controller: framework controller object
-    :param node:
-    :return
-    """
-
-    #This UPI function stops the eNB, if present on node#
-    #rvalue = controller.nodes(node).net.ping_test()
-    pass
 
 def main():
 
@@ -237,6 +232,7 @@ def main():
             rcc_node = None
             rru_node = None
             ue_node= None
+
             #Find experiment nodes role
             for ii in range(0, len(nodes)):
                 if nodes[ii].ip == epc_ip:
@@ -263,12 +259,12 @@ def main():
             setHSS(controller,epc_node)
             setMME(controller,epc_node)
             setSPGW(controller,epc_node)
-            time.sleep(10)
-            setRCC(controller,rcc_node)
-            time.sleep(10)
+
             setRRU(controller,rru_node)
-            time.sleep(10)
-            setUE(controller,ue_node)
+            setRCC(controller,rcc_node)
+            
+            setUE(controller,ue_node, central_freq, N_RB, tx_gain, rx_gain)
+
             do_run = True            
             EXPERIMENT_DURATION = 200
             dt = 0

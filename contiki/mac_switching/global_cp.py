@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-global_cp.py: Example Contiki global control program
+global_cp.py: Example Contiki global control program for mac switching.
 
 Usage:
    global_cp.py [options] [-q | -v]
@@ -10,10 +10,11 @@ Usage:
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
-   --num_nodes numNodes Number of nodes in experiment
+   --nodes nodesFile   Config file with node info
+   --measurements measurementsConfig Config file with measurement info
 
 Example:
-   ./global_cp -v --config ./config/localhost/control_program_global.yaml --num_nodes 10
+   python mac_switching/global_cp.py --config config/portable/global_cp_config.yaml --nodes config/portable/nodes.yaml --measurements config/portable/measurement_config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -22,128 +23,76 @@ Other options:
    --version           show version and exit
 """
 
-
 import datetime
 import logging
-import wishful_controller
+from contiki.contiki_helpers.global_node_manager import *
+from contiki.contiki_helpers.taisc_manager import *
+from contiki.contiki_helpers.app_manager import *
 import gevent
 import yaml
-import _thread
-from contiki.mac_managers.taisc_manager import *
-from contiki.app_managers.app_manager import *
-from local_cp import my_local_control_program
+from measurement_logger import *
 
 __author__ = "Peter Ruckebusch"
-__copyright__ = "Copyright (c) 2016, Technische Universität Berlin"
+__copyright__ = "Copyright (c) 2016, imec"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
-
-log = logging.getLogger('global_cp.main')
-global_control_engine = wishful_controller.Controller()
-global_taisc_manager = GlobalTAISCMACManager(global_control_engine, "CSMA")
-global_app_manager = GlobalAppManager(global_control_engine, global_taisc_manager)
-nodes = []
+log = logging.getLogger('contiki_global_control_program')
 
 
-@global_control_engine.new_node_callback()
-def new_node(node):
-    nodes.append(node)
-    print("New node appeared:")
-    print(node)
-
-
-@global_control_engine.node_exit_callback()
-def node_exit(node, reason):
-    if node in nodes:
-        # global_taisc_manager.remove_node(node)
-        nodes.remove(node)
-    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
-
-
-@global_control_engine.set_default_callback()
 def default_callback(group, node, cmd, data):
-    print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(
-        datetime.datetime.now(), group, node.name, cmd, data))
+    print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
 
 
-def hc_message_handler(hc_connector):
-    while True:
-        msg = hc_connector.recv(block=False, timeout=1)
-        while msg is not None:
-            print("{} Global CP received msg {} from local CP".format(datetime.datetime.now(), msg))
-            msg = hc_connector.recv(block=False, timeout=1)
-        gevent.sleep(1)
-    pass
+def print_response(group, node, data):
+    print("{} Print response : Group:{}, NodeIP:{}, Result:{}".format(datetime.datetime.now(), group, node.ip, data))
+
+
+def event_cb(mac_address, event_name, event_value):
+    measurement_logger.log_measurement(event_name, event_value)
+    # print("{} Node {} Event {}: {} ".format(datetime.datetime.now(), mac_address, event_name, event_value))
 
 
 def main(args):
-    log.debug(args)
-
-    config_file_path = args['--config']
-    config = None
-    with open(config_file_path, 'r') as f:
-        config = yaml.load(f)
-
-    global_control_engine.load_config(config)
-    global_control_engine.start()
-
-    num_nodes = int(args['--num_nodes'])
-
-    # Wait for nodes before starting the local CP.
-    while True:
-        gevent.sleep(10)
-        if len(nodes) == num_nodes:
-            log.info("All nodes are active we can start the local control programs")
-            log.info("Connected nodes: %s", nodes)
-            break
-        else:
-            log.info("Still waiting for %d nodes", num_nodes - len(nodes))
-
-    for node in nodes:
-        global_taisc_manager.add_node(node)
-        hc_connector = global_control_engine.node(node).hc.start_local_control_program(program=my_local_control_program)
-        _thread.start_new_thread(hc_message_handler, (hc_connector,))
-
-    gevent.sleep(10)
-
-    #param_key_values = {'taiscSlotframe': (0, 10, 1, 65535, 1, 0, 2, 1, 0, 0, 3, 1, 0, 0, 4, 1, 0, 0, 5, 1, 0, 0, 6, 1, 0, 0, 7, 1, 0, 0, 8, 1, 0, 0, 9, 1, 0, 0, 10, 1, 0, 0)}
-    #ret = global_control_engine.nodes(nodes).blocking(True).radio.iface("lowpan0").set_parameters(param_key_values)
-    ret = global_taisc_manager.update_slotframe('./mac_managers/default_taisc_slotframe.csv')
+    contiki_nodes = global_node_manager.get_mac_address_list()
+    print("Connected nodes", [str(node) for node in contiki_nodes])
+    taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
+    app_manager = AppManager(global_node_manager)
+    ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv')
     log.info(ret)
-
-    gevent.sleep(10)
-    parameters = {"RIME_exampleUnicastActivateApplication": 1}
+    ret = taisc_manager.update_macconfiguration({'IEEE802154_macSlotframeSize': len(contiki_nodes)})
+    log.info(ret)
+    ret = taisc_manager.update_macconfiguration({'IEEE802154e_macSlotframeSize': len(contiki_nodes)})
+    log.info(ret)
+    global_node_manager.start_local_monitoring_cp()
+    gevent.sleep(5)
+    taisc_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
+    gevent.sleep(5)
 
     # control loop
     while True:
         log.info("Activating CSMA MAC!")
-        parameters["RIME_exampleUnicastActivateApplication"] = 0
-        err1 = global_app_manager.update_configuration(parameters)
-        err2 = global_taisc_manager.activate_radio_program("CSMA")
+        err1 = app_manager.update_configuration({"APP_ActiveApplication": 0})
+        err2 = taisc_manager.activate_radio_program("CSMA")
         gevent.sleep(5)
-        parameters["RIME_exampleUnicastActivateApplication"] = 1
-        err3 = global_app_manager.update_configuration(parameters)
-        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
-        gevent.sleep(20)
+        err3 = app_manager.update_configuration({"APP_ActiveApplication": 1})
+        log.info("Error: MAC {} APP {},{}".format(err2, err1, err3))
+        gevent.sleep(10)
         log.info("Activating TDMA MAC!")
-        parameters["RIME_exampleUnicastActivateApplication"] = 0
-        err1 = global_app_manager.update_configuration(parameters)
-        err2 = global_taisc_manager.activate_radio_program("TDMA")
+        err1 = app_manager.update_configuration({"APP_ActiveApplication": 0})
+        err2 = taisc_manager.activate_radio_program("TDMA")
         gevent.sleep(5)
-        parameters["RIME_exampleUnicastActivateApplication"] = 1
-        err3 = global_app_manager.update_configuration(parameters)
-        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
-        gevent.sleep(20)
+        err3 = app_manager.update_configuration({"APP_ActiveApplication": 1})
+        log.info("Error: MAC {} APP {},{}".format(err2, err1, err3))
+        gevent.sleep(10)
         log.info("Activating TSCH MAC!")
-        parameters["RIME_exampleUnicastActivateApplication"] = 0
-        err1 = global_app_manager.update_configuration(parameters)
-        err2 = global_taisc_manager.activate_radio_program("TSCH")
+        err1 = app_manager.update_configuration({"APP_ActiveApplication": 0})
+        err2 = taisc_manager.activate_radio_program("TSCH")
         gevent.sleep(5)
-        parameters["RIME_exampleUnicastActivateApplication"] = 1
-        err3 = global_app_manager.update_configuration(parameters)
-        log.info("Error: MAC {} APP {},{}".format(err2,err1,err3))
-        gevent.sleep(20)
+        err3 = app_manager.update_configuration({"APP_ActiveApplication": 1})
+        log.info("Error: MAC {} APP {},{}".format(err2, err1, err3))
+        gevent.sleep(10)
+
 
 if __name__ == "__main__":
     try:
@@ -169,8 +118,26 @@ if __name__ == "__main__":
     if args['--logfile']:
         logfile = args['--logfile']
 
-    logging.basicConfig(filename=logfile, level=log_level,
-                        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+    logging.basicConfig(filename=logfile, level=log_level, format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    log.debug(args)
+
+    config_file_path = args['--config']
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+    global_node_manager = GlobalNodeManager(config)
+    global_node_manager.set_default_callback(default_callback)
+
+    nodes_file_path = args['--nodes']
+    with open(nodes_file_path, 'r') as f:
+        node_config = yaml.load(f)
+    global_node_manager.wait_for_agents(node_config['ip_address_list'])
+
+    measurements_file_path = args['--measurements']
+    with open(measurements_file_path, 'r') as f:
+        measurement_config = yaml.load(f)
+    measurement_logger = MeasurementLogger.load_config(measurement_config)
 
     try:
         main(args)
@@ -178,4 +145,5 @@ if __name__ == "__main__":
         log.debug("Controller exits")
     finally:
         log.debug("Exit")
-        global_control_engine.stop()
+        measurement_logger.stop_logging()
+        global_node_manager.stop()

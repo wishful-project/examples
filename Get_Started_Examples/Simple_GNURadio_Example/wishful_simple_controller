@@ -44,7 +44,7 @@ __email__ = "kistm@tcd.ie"
 """
 Setting of controller node
 """
-controller_PC_IP_address = "192.168.5.76"
+controller_PC_IP_address = "192.168.5.205"
 controller_PC_interface = "ens3"
 """
 END setting of controller nodes
@@ -177,7 +177,7 @@ if __name__ == '__main__':
                 #   - program_code: String with the GRC file content
                 #   - program_type: 'grc' or 'py' (we can also pass a '.py' file instead of a GRC.
                 #   - program_port: Port that the XMLRPCServer will run (check the XMLRPC Server block on tx.grc file)     
-                controller.node(node).radio.activate_radio_program({'program_name': 'tx', 'program_code': program_code, 'program_type': 'grc', 'program_port': 8080})
+                controller.node(node).radio.activate_radio_program({'program_name': 'tx', 'program_code': program_code, 'program_type': 'grc', 'program_port': 1235})
             else:
                 print('\t Agent TX is already running something. Please stop it first') 
 
@@ -195,7 +195,7 @@ if __name__ == '__main__':
                 #   - program_code: String with the GRC file content
                 #   - program_type: 'grc' or 'py' (we can also pass a '.py' file instead of a GRC.
                 #   - program_port: Port that the XMLRPCServer will run (check the XMLRPC Server block on rx.grc file)     
-                controller.node(node).radio.activate_radio_program({'program_name': 'rx', 'program_code': program_code, 'program_type': 'grc', 'program_port': 8081})
+                controller.node(node).radio.activate_radio_program({'program_name': 'rx', 'program_code': program_code, 'program_type': 'grc', 'program_port': 1235})
             else:
                 print('\t Agent RX is already running something. Please stop it first') 
 
@@ -240,7 +240,7 @@ if __name__ == '__main__':
                 print('- Getting RX values')
                 vals = controller.node(node).radio.get_parameters(['rate', 'signal_level'])
                 print ('\t Rate: \t%f' % (vals['rate']))
-                print ('\t Signal Level: \t %f' % (math.log10(vals['signal_level'])))
+                print ('\t Signal Level: \t %f' % (vals['signal_level']))
 
         gevent.sleep(2)
 
@@ -258,4 +258,3 @@ if __name__ == '__main__':
 
     # End gracefully
     print('Controller Exiting')
-    sys.exit(1)

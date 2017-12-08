@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.10'?>
+<?grc format='1' created='3.7.11'?>
 <flow_graph>
   <timestamp>Tue May  9 15:27:34 2017</timestamp>
   <block>
@@ -214,7 +214,7 @@
     </param>
     <param>
       <key>type</key>
-      <value>int</value>
+      <value>byte</value>
     </param>
     <param>
       <key>repeat</key>
@@ -222,7 +222,7 @@
     </param>
   </block>
   <block>
-    <key>blocks_throttle</key>
+    <key>blocks_multiply_const_vxx</key>
     <param>
       <key>alias</key>
       <value></value>
@@ -230,6 +230,10 @@
     <param>
       <key>comment</key>
       <value></value>
+    </param>
+    <param>
+      <key>const</key>
+      <value>0.1</value>
     </param>
     <param>
       <key>affinity</key>
@@ -241,7 +245,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(184, 148)</value>
+      <value>(656, 148)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -249,11 +253,11 @@
     </param>
     <param>
       <key>id</key>
-      <value>blocks_throttle_0</value>
+      <value>blocks_multiply_const_vxx_0</value>
     </param>
     <param>
-      <key>ignoretag</key>
-      <value>True</value>
+      <key>type</key>
+      <value>complex</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -262,14 +266,6 @@
     <param>
       <key>minoutbuf</key>
       <value>0</value>
-    </param>
-    <param>
-      <key>samples_per_second</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>int</value>
     </param>
     <param>
       <key>vlen</key>
@@ -277,7 +273,7 @@
     </param>
   </block>
   <block>
-    <key>digital_ofdm_mod</key>
+    <key>blocks_stream_to_tagged_stream</key>
     <param>
       <key>alias</key>
       <value></value>
@@ -291,20 +287,12 @@
       <value></value>
     </param>
     <param>
-      <key>cp_length</key>
-      <value>128</value>
-    </param>
-    <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>fft_length</key>
-      <value>512</value>
-    </param>
-    <param>
       <key>_coordinate</key>
-      <value>(344, 112)</value>
+      <value>(192, 140)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -312,11 +300,11 @@
     </param>
     <param>
       <key>id</key>
-      <value>digital_ofdm_mod_0</value>
+      <value>blocks_stream_to_tagged_stream_0</value>
     </param>
     <param>
-      <key>type</key>
-      <value>int</value>
+      <key>len_tag_key</key>
+      <value>"packet_len"</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -327,20 +315,107 @@
       <value>0</value>
     </param>
     <param>
-      <key>modulation</key>
-      <value>bpsk</value>
+      <key>packet_len</key>
+      <value>100</value>
     </param>
     <param>
-      <key>occupied_tones</key>
-      <value>200</value>
+      <key>type</key>
+      <value>byte</value>
     </param>
     <param>
-      <key>pad_for_usrp</key>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>digital_ofdm_tx</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>cp_len</key>
+      <value>16</value>
+    </param>
+    <param>
+      <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>payload_length</key>
+      <key>fft_len</key>
+      <value>64</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(432, 104)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>header_mod</key>
+      <value>"BPSK"</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>digital_ofdm_tx_0</value>
+    </param>
+    <param>
+      <key>packet_len_key</key>
+      <value>"packet_len"</value>
+    </param>
+    <param>
+      <key>log</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>occupied_carriers</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>payload_mod</key>
+      <value>"BPSK"</value>
+    </param>
+    <param>
+      <key>pilot_carriers</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>pilot_symbols</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>rolloff</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>scramble_bits</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>sync_word1</key>
+      <value>()</value>
+    </param>
+    <param>
+      <key>sync_word2</key>
+      <value>()</value>
     </param>
   </block>
   <block>
@@ -1015,7 +1090,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(624, 112)</value>
+      <value>(824, 112)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1203,19 +1278,25 @@
   </block>
   <connection>
     <source_block_id>analog_random_source_x_0</source_block_id>
-    <sink_block_id>blocks_throttle_0</sink_block_id>
+    <sink_block_id>blocks_stream_to_tagged_stream_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_throttle_0</source_block_id>
-    <sink_block_id>digital_ofdm_mod_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>digital_ofdm_mod_0</source_block_id>
+    <source_block_id>blocks_multiply_const_vxx_0</source_block_id>
     <sink_block_id>uhd_usrp_sink_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blocks_stream_to_tagged_stream_0</source_block_id>
+    <sink_block_id>digital_ofdm_tx_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>digital_ofdm_tx_0</source_block_id>
+    <sink_block_id>blocks_multiply_const_vxx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
