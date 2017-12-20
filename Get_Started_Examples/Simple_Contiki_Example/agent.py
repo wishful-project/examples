@@ -2,14 +2,14 @@
 contiki_control_agent.py: Implementation of WiSHFUL control agent for Contiki
 
 Usage:
-   contiki_control_agent.py [options] [-q | -v]
+   agent.py [options] [-q | -v]
 
 Options:
    --logfile name      Name of the logfile
    --config configFile Config file path
 
 Example:
-   ./contiki_control_agent -v --config ./control_agent_config.yaml
+   python agent.py -v --config ./control_agent_config.yaml
 
 Other options:
    -h, --help          show this help message and exit
@@ -19,8 +19,6 @@ Other options:
 """
 
 import logging
-import signal
-import sys, os
 import yaml
 import wishful_agent
 
@@ -28,19 +26,23 @@ __author__ = "Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2016, Ghent University, iMinds"
 __version__ = "0.1.0"
 
+# Get a logger.
 log = logging.getLogger('contiki_control_agent.main')
+
+# Create a WiSHFUL agent
 control_agent = wishful_agent.Agent()
 
+# Main function
 def main(args):
     log.debug(args)
-
+    # Get the agent configuration
     config_file_path = args['--config']
-
     config = None
     with open(config_file_path, 'r') as f:
         config = yaml.load(f)
-
+    # Load the modules specified in the agent configuration
     control_agent.load_config(config)
+    # Start the WiSHFUL agent
     control_agent.run()
 
 
