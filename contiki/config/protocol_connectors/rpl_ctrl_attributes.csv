@@ -5,3 +5,5 @@
 "PARAMETER","rpl_default_lifetime",28735,"UINT8","","<"
 "PARAMETER","rpl_objective_function",2355,"UINT16","","<"
 "MEASUREMENT","rpl_stats",54452,"UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16;UINT16","","<"
+"MEASUREMENT","rpl_dio_stats",41948,"UINT16;UINT16;UINT16","","<"
+"MEASUREMENT","rpl_rank",26965,"UINT16","","<"

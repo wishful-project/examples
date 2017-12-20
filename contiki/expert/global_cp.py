@@ -87,7 +87,10 @@ if __name__ == "__main__":
             "rpl_stats",
             "global_ipv6_address",
             "link_local_ipv6_address",
-            "nd6_num_neighbors"
+            "nd6_num_neighbors",
+            "rpl_rank",
+            "rpl_dio_stats",
+            "energest_stats",
         ]
 
         net_param_list = [
@@ -101,6 +104,7 @@ if __name__ == "__main__":
             "rpl_dio_redundancy",
             "rpl_default_lifetime",
             "rpl_objective_function",
+            "app_server_ipv6_address",
         ]
 
         radio_param_list = [

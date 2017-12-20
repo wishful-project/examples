@@ -1,0 +1,3 @@
+"category","unique_name","unique_id","format","sub_format","endianness"
+"EVENT","energest_stats_event",42450,"UINT32;ULONG;ULONG;ULONG;ULONG;ULONG;ULONG","","<"
+"MEASUREMENT","energest_stats",26866,"UINT32;ULONG;ULONG;ULONG;ULONG;ULONG;ULONG","","<"
