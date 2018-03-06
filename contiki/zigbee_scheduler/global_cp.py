@@ -140,13 +140,13 @@ def main():
         if(application_name == "ping"):
             print("Starting ping example")
             print("Activating clients")
-            app_manager.update_configuration({"APP_ActiveApplication": 5},range(2,len(global_node_manager.get_mac_address_list())+1))
+            app_manager.update_configuration({"app_activate": 5},range(2,len(global_node_manager.get_mac_address_list())+1))
         elif(application_name=="udp"):
             print("Starting udp example")
             print("Activating server")
-            app_manager.update_configuration({"APP_ActiveApplication": 1},[1])
+            app_manager.update_configuration({"app_activate": 1},[1])
             print("Activating clients")
-            app_manager.update_configuration({"APP_ActiveApplication": 2},range(2,len(global_node_manager.get_mac_address_list())+1))
+            app_manager.update_configuration({"app_activate": 2},range(2,len(global_node_manager.get_mac_address_list())+1))
         else:
             print("No application active (%s)"%(application_name))
 

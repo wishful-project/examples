@@ -249,9 +249,9 @@ if __name__ == "__main__":
         print("Suscribe event returns %s"%(ret_events))
         
         print("Activating server")
-        app_manager.update_configuration({"APP_ActiveApplication": 1},[1])
+        app_manager.update_configuration({"app_activate": 1},[1])
         print("Activating clients")
-        app_manager.update_configuration({"APP_ActiveApplication": 2},range(2,len(global_node_manager.get_mac_address_list())+1))
+        app_manager.update_configuration({"app_activate": 2},range(2,len(global_node_manager.get_mac_address_list())+1))
         
         while True:
             gevent.sleep(20)
