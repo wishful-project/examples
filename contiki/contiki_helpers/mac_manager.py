@@ -1,12 +1,14 @@
 """ This module implements basic abstractions for MAC configuration and control on sensor nodes.
 """
 import logging
+import sys
 
 
 class MACManager(object):
     """Local MAC manager class implementing all the mandatory MACManager functions.
     This class can be extended to support extra functions, specific to a MAC protocol (CSMA,TDMA,TSCH)
     """
+    mac_mode = ""
 
     def __init__(self, node_manager, mac_mode):
         """Creates a MAC Manager object.
@@ -16,7 +18,7 @@ class MACManager(object):
         """
         self.node_manager = node_manager
         self.log = logging.getLogger("mac_manager")
-        self.mac_mode = mac_mode
+        self.activate_radio_program(mac_mode)
         pass
 
     def update_macconfiguration(self, param_key_values_dict, mac_address_list=None):
