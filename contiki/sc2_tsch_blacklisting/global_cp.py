@@ -79,6 +79,17 @@ def print_response(group, node, data):
 def event_cb(mac_address, event_name, event_value):
     measurement_logger.log_measurement(event_name, event_value)
 
+def start_application(app_manager, server_node, client_nodes):
+    print("Activating server")
+    app_manager.update_configuration({"APP_ActiveApplication": 1},[server_node])
+    print("Activating clients")
+    app_manager.update_configuration({"APP_ActiveApplication": 2},client_nodes)
+
+def stop_application(app_manager, server_node, client_nodes):
+    print("Activating server")
+    app_manager.update_configuration({"APP_ActiveApplication": 0},[server_node])
+    print("Activating clients")
+    app_manager.update_configuration({"APP_ActiveApplication": 0},client_nodes)
 
 def main(args, interferer_ap, interferer_sta):
     contiki_nodes = global_node_manager.get_mac_address_list()

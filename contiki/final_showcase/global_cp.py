@@ -33,12 +33,28 @@ import yaml
 from measurement_logger import *
 
 __author__ = "Peter Ruckebusch"
+__co_author__ = "Jan Bauwens"
 __copyright__ = "Copyright (c) 2016, imec"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
 
 log = logging.getLogger('contiki_global_control_program')
 
+def mapWifiOnZigbeeChannels(log, channel_mapping):
+    dct = {}
+    try:
+        file_n = open(channel_mapping, 'rt')
+        import csv
+        reader = csv.DictReader(file_n)
+        for row in reader:
+            dct[int(row["ieee80211"])] = []
+            for x in row["ieee802154"].split('-'):
+                dct[int(row["ieee80211"])].append(int(x))
+    except Exception as e:
+        log.fatal("An error occurred while reading nodes: %s" % e)
+    finally:
+        file_n.close()
+    return dct
 
 def default_callback(group, node, cmd, data):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
@@ -73,20 +89,31 @@ def main(args):
     taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
     app_manager = AppManager(global_node_manager)
     
+    log.info("Configuring TSCH")
+    taisc_manager.activate_radio_program("TSCH")
+    gevent.sleep(5)
+    ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv', 'TSCH')
+    log.info(ret)
+    gevent.sleep(5)
+    wifi_to_tsch_channels_dct = mapWifiOnZigbeeChannels(log, './sc2_tsch_blacklisting/ieee80211_to_ieee802154_channels.csv')
+    blacklisted_channels = wifi_to_tsch_channels_dct[6]
+    taisc_manager.blacklist_channels(blacklisted_channels)
+    gevent.sleep(5)
+
     log.info("Configuring TDMA")
     taisc_manager.activate_radio_program("TDMA")
     gevent.sleep(5)
     ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv', 'TDMA')
     log.info(ret)
     gevent.sleep(5)
-    log.info("Configuring TSCH")
-    ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv', 'TSCH')
-    log.info(ret)
-    gevent.sleep(5)
+
+    log.info("Set slotframe")
     ret = taisc_manager.update_macconfiguration({'IEEE802154_macSlotframeSize': len(contiki_nodes) + 1})
     log.info(ret)
     ret = taisc_manager.update_macconfiguration({'IEEE802154e_macSlotframeSize': len(contiki_nodes) + 1})
     log.info(ret)
+    
+    log.info("Start local monitoring cp and events")
     global_node_manager.start_local_monitoring_cp()
     gevent.sleep(5)
     taisc_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
