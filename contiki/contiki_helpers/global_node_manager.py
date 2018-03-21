@@ -203,3 +203,19 @@ class GlobalNodeManager(NodeManager):
 
     def stop(self):
         self.control_engine.stop()
+
+    def allocate_memory(self, mac_address, module_id, elf_file_size, rom_size, ram_size, nodes=[]):
+        ret = self.execute_upi_function('mgmt', 'allocate_memory', [mac_address], module_id, elf_file_size, rom_size, ram_size, nodes)
+        return ret[mac_address]
+
+    def disseminate_software_module(self, mac_address, module_id, elf_program_file, block_size=64, nodes=[]):
+        ret = self.execute_upi_function('mgmt', 'disseminate_software_module', [mac_address], module_id, elf_program_file, block_size, nodes)
+        return ret[mac_address]
+
+    def install_software_module(self, mac_address, module_id, nodes=[]):
+        ret = self.execute_upi_function('mgmt', 'install_software_module', [mac_address], module_id, nodes)
+        return ret[mac_address]
+
+    def activate_software_module(self, mac_address, module_id, nodes=[]):
+        ret = self.execute_upi_function('mgmt', 'activate_software_module', [mac_address], module_id, nodes)
+        return ret[mac_address]

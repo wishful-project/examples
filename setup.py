@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
 
+
 def readme():
     with open('README.md') as f:
         return f.read()
+
 
 setup(
     name='wishful_examples',
@@ -15,5 +17,5 @@ setup(
     description='WiSHFUL Examples',
     long_description='WiSHFUL Examples',
     keywords='wireless control',
-    install_requires=['pyyaml', 'docopt', 'jsocket', 'oml4py']
+    install_requires=['pyyaml', 'docopt', 'jsocket', 'oml4py', "pyelftools"]
 )
