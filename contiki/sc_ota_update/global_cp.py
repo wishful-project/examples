@@ -17,7 +17,7 @@ Options:
    --init-function initFunction Init function that needs to be called when the module is activated.
 
 Example:
-   python sc_ota_update/global_cp.py --config config/localhost/global_cp_config.yaml --nodes config/portable/nodes.yaml --measurements config/portable/measurement_config.yaml --elf-files tdma_uppermac.o;slotted_protocol.o -- elf-firmware udp-example.elf --init-function tdma_uppermac_init
+   python sc_ota_update/global_cp.py --config config/localhost/global_cp_config.yaml --nodes config/portable/nodes.yaml --measurements config/portable/measurement_config.yaml --elf-files tdma_uppermac.o;slotted_protocol.o --elf-firmware udp-example.elf --init-function tdma_uppermac_init
 
 Other options:
    -h, --help          show this help message and exit
@@ -148,10 +148,6 @@ def main(args, log, global_node_manager, measurement_logger):
     print("Connected nodes", [str(node) for node in contiki_nodes])
     taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
     app_manager = AppManager(global_node_manager)
-    ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv')
-    log.info(ret)
-    ret = taisc_manager.update_macconfiguration({'IEEE802154_macSlotframeSize': len(contiki_nodes)})
-    log.info(ret)
 
     border_router_id = 1
     log.info("Set node %d as border router" % (border_router_id))
@@ -168,14 +164,19 @@ def main(args, log, global_node_manager, measurement_logger):
     app_manager.update_configuration({"app_activate": 2}, range(2, len(global_node_manager.get_mac_address_list()) + 1))
 
     size_list = calculate_elf_filesizes(elf_files)
+    log.info(size_list)
     module_id = 1024
     allocated_memory_block = global_node_manager.allocate_memory(border_router_id, module_id, size_list[0], size_list[1], size_list[2])
-    elf_program_file = prepare_software_module(elf_firmware, elf_files, allocated_memory_block[0], allocated_memory_block[1], init_function)
+    elf_program_file = prepare_software_module('tdma', elf_firmware, elf_files, allocated_memory_block[0], allocated_memory_block[1], init_function)
     ret = global_node_manager.disseminate_software_module(border_router_id, module_id, elf_program_file)
     log.info(ret)
     ret = global_node_manager.install_software_module(border_router_id, module_id)
     log.info(ret)
     ret = global_node_manager.activate_software_module(border_router_id, module_id)
+    log.info(ret)
+    ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv')
+    log.info(ret)
+    ret = taisc_manager.update_macconfiguration({'IEEE802154_macSlotframeSize': len(contiki_nodes)})
     log.info(ret)
 
 
@@ -223,7 +224,7 @@ if __name__ == "__main__":
             measurement_config = yaml.load(f)
         measurement_logger = MeasurementLogger.load_config(measurement_config)
 
-        main(args, global_node_manager, measurement_logger)
+        main(args, log, global_node_manager, measurement_logger)
     except KeyboardInterrupt:
         log.debug("Controller exits")
     finally:
