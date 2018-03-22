@@ -1,12 +1,8 @@
 ELF_PROGRAM_FILE_NAME=$1
-LINKER_SCRIPT=$2
-FIRMWARE=$3
-INIT_FUNCTION=$4
-ELF_OBJECT_FILES="${@:5}"
+FIRMWARE=$2
+INIT_FUNCTION=$3
 
-echo "Will link $ELF_OBJECT_FILES based on $FIRMWARE into $ELF_PROGRAM_FILE" 
-
-arm-none-eabi-ld -r -o $ELF_PROGRAM_FILE_NAME.merged $ELF_OBJECT_FILES -T $LINKER_SCRIPT
+echo "Will link $ELF_PROGRAM_FILE_NAME with $FIRMWARE" 
 
 IFS_old=$IFS
 IFS=$'\n'
@@ -22,7 +18,7 @@ do
     echo "PROVIDE(\"${UNDEFINED_SYMBOL_ARRAY[1]}\"=0x${UNDEFINED_SYMBOL_ADDR});" >> $ELF_PROGRAM_FILE_NAME.lds
 done
 
-DMM_RAM_ALIGNED_ADDR=`nm shell-loadelf-fw.elf | grep dmm_ram_aligned | awk '{print $1;}'`
+DMM_RAM_ALIGNED_ADDR=`nm $FIRMWARE | grep dmm_ram_aligned | awk '{print $1;}'`
 echo "ENTRY($INIT_FUNCTION)
 SECTIONS
 {

@@ -36,6 +36,8 @@ from measurement_logger import MeasurementLogger
 from elftools.elf.elffile import ELFFile
 import subprocess
 
+import os
+
 __author__ = "Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2017, IMEC"
 __version__ = "0.1.0"
@@ -49,7 +51,7 @@ def __calculate_alignment_overhead(size):
             return 4 - (size % 4)
 
 
-def calculate_elf_filesizes(elf_object_files):
+def calculate_elf_filesizes(elf_object_file):
     text_size = rodata_size = data_size = bss_size = 0
     elf_fileheader_size = 52
     elf_sectionheaders_size = 2 * 40  # NULL section header + shstrtab section header
@@ -58,39 +60,38 @@ def calculate_elf_filesizes(elf_object_files):
     alignement_overhead = 0
     has_rom_program_header = False
     has_ram_program_header = False
-    for elf_object_file in elf_object_files:
-        with open(elf_object_file, 'rb') as f:
-            elffile = ELFFile(f)
-            # determine rom size
-            text_section = elffile.get_section_by_name('.text')
-            if text_section is not None:
-                text_size += text_section['sh_size']
-                elf_sectionheaders_size += 40  # section header
-                elf_shstrtab_size += 6  # shstrtab
-                has_rom_program_header = True
-            rodata_section = elffile.get_section_by_name('.rodata')
-            if rodata_section is not None:
-                rodata_size += rodata_section['sh_size']
-                elf_sectionheaders_size += 40  # section header
-                elf_shstrtab_size += 8  # shstrtab
-                has_rom_program_header = True
-            # determine ram size
-            data_section = elffile.get_section_by_name('.data')
-            if data_section is not None:
-                data_size += data_section['sh_size']
-                elf_sectionheaders_size += 40  # section header
-                elf_shstrtab_size += 6  # shstrtab
-                has_ram_program_header = True
-            bss_section = elffile.get_section_by_name('.bss')
-            if bss_section is not None:
-                bss_size += bss_section['sh_size']
-                elf_sectionheaders_size += 40  # section header
-                elf_shstrtab_size += 5  # shstrtab
-                has_ram_program_header = True
-            if has_rom_program_header:
-                elf_programheaders_size += 32
-            if has_ram_program_header:
-                elf_programheaders_size += 32
+    with open(elf_object_file, 'rb') as f:
+        elffile = ELFFile(f)
+        # determine rom size
+        text_section = elffile.get_section_by_name('.text')
+        if text_section is not None:
+            text_size += text_section['sh_size']
+            elf_sectionheaders_size += 40  # section header
+            elf_shstrtab_size += 6  # shstrtab
+            has_rom_program_header = True
+        rodata_section = elffile.get_section_by_name('.rodata')
+        if rodata_section is not None:
+            rodata_size += rodata_section['sh_size']
+            elf_sectionheaders_size += 40  # section header
+            elf_shstrtab_size += 8  # shstrtab
+            has_rom_program_header = True
+        # determine ram size
+        data_section = elffile.get_section_by_name('.data')
+        if data_section is not None:
+            data_size += data_section['sh_size']
+            elf_sectionheaders_size += 40  # section header
+            elf_shstrtab_size += 6  # shstrtab
+            has_ram_program_header = True
+        bss_section = elffile.get_section_by_name('.bss')
+        if bss_section is not None:
+            bss_size += bss_section['sh_size']
+            elf_sectionheaders_size += 40  # section header
+            elf_shstrtab_size += 5  # shstrtab
+            has_ram_program_header = True
+        if has_rom_program_header:
+            elf_programheaders_size += 32
+        if has_ram_program_header:
+            elf_programheaders_size += 32
     alignement_overhead += __calculate_alignment_overhead(text_size)
     alignement_overhead += __calculate_alignment_overhead(rodata_size)
     alignement_overhead += __calculate_alignment_overhead(data_size)
@@ -99,7 +100,21 @@ def calculate_elf_filesizes(elf_object_files):
     return [elf_file_size, text_size + rodata_size, data_size + bss_size]
 
 
-def prepare_software_module(elf_program_file_name, elf_firmware, elf_object_files, rom_start_addr, ram_start_addr, init_function):
+def merge_object_files(elf_program_file_name, elf_object_files):
+    elf_objects = []
+    if type(elf_object_files) is str:
+        elf_objects[0] = elf_object_files
+    else:
+        elf_objects = elf_object_files
+    merger_cmd = ['./sc_ota_update/merger_script.sh', elf_program_file_name, './sc_ota_update/merge_rodata.ld']
+    for elf_object in elf_objects:
+        merger_cmd.append(elf_object)
+    print(merger_cmd)
+    subprocess.run(merger_cmd, shell=True)
+    return './' + elf_program_file_name + '.merged'
+
+
+def prepare_software_module(elf_program_file_name, elf_firmware, rom_start_addr, ram_start_addr, init_function):
     """This functions links a new software module to an existing firmware based on the memory allocated using the ‘allocate_memory’ function.
 
     Args:
@@ -113,15 +128,9 @@ def prepare_software_module(elf_program_file_name, elf_firmware, elf_object_file
         int: Error value 0 = SUCCESS; -1 = FAIL
     """
     # first merge the elf object files
-    elf_objects = []
-    if type(elf_object_files) is str:
-        elf_objects[0] = elf_object_files
-    else:
-        elf_objects = elf_object_files
-    linker_cmd = './sc_ota_update/linker_script.sh ' + elf_program_file_name + ' ./sc_ota_update/merge_rodata_script ' + elf_firmware + ' ' + init_function
-    for elf_object in range(0, len(elf_objects)):
-        linker_cmd = linker_cmd + ' ' + elf_object
-    subprocess.call(linker_cmd)
+    linker_cmd = ['./sc_ota_update/linker_script.sh', elf_program_file_name, elf_firmware, init_function]
+    print(linker_cmd)
+    subprocess.run(linker_cmd, shell=True)
     return './' + elf_program_file_name + '.stripped'
 
 
@@ -163,11 +172,13 @@ def main(args, log, global_node_manager, measurement_logger):
     log.info("Activating clients")
     app_manager.update_configuration({"app_activate": 2}, range(2, len(global_node_manager.get_mac_address_list()) + 1))
 
-    size_list = calculate_elf_filesizes(elf_files)
+    merged_elf_file = merge_object_files("tdma", elf_files)
+
+    size_list = calculate_elf_filesizes(merged_elf_file)
     log.info(size_list)
     module_id = 1024
     allocated_memory_block = global_node_manager.allocate_memory(border_router_id, module_id, size_list[0], size_list[1], size_list[2])
-    elf_program_file = prepare_software_module('tdma', elf_firmware, elf_files, allocated_memory_block[0], allocated_memory_block[1], init_function)
+    elf_program_file = prepare_software_module('tdma', elf_firmware, allocated_memory_block[0], allocated_memory_block[1], init_function)
     ret = global_node_manager.disseminate_software_module(border_router_id, module_id, elf_program_file)
     log.info(ret)
     ret = global_node_manager.install_software_module(border_router_id, module_id)
