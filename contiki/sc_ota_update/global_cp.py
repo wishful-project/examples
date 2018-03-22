@@ -14,9 +14,10 @@ Options:
    --measurements measurements Config file with measurement info
    --elf-files elfFiles ELF file that need to be linked, uploaded and installed (seperated with semicolons)
    --elf-firmware elfFirmware ELF firmware used to link the ELF file.
+   --init-function initFunction Init function that needs to be called when the module is activated.
 
 Example:
-   python sc_ota_update/global_cp.py --config config/localhost/global_cp_config.yaml --nodes config/portable/nodes.yaml --measurements config/portable/measurement_config.yaml --elf-files tdma_uppermac.o;slotted_protocol.o -- elf-firmware udp-example.elf
+   python sc_ota_update/global_cp.py --config config/localhost/global_cp_config.yaml --nodes config/portable/nodes.yaml --measurements config/portable/measurement_config.yaml --elf-files tdma_uppermac.o;slotted_protocol.o --elf-firmware udp-example.elf --init-function tdma_uppermac_init
 
 Other options:
    -h, --help          show this help message and exit
@@ -98,7 +99,7 @@ def calculate_elf_filesizes(elf_object_files):
     return [elf_file_size, text_size + rodata_size, data_size + bss_size]
 
 
-def prepare_software_module(elf_firmware, elf_object_files, rom_start_addr, ram_start_addr, init_function):
+def prepare_software_module(elf_program_file_name, elf_firmware, elf_object_files, rom_start_addr, ram_start_addr, init_function):
     """This functions links a new software module to an existing firmware based on the memory allocated using the ‘allocate_memory’ function.
 
     Args:
@@ -117,11 +118,11 @@ def prepare_software_module(elf_firmware, elf_object_files, rom_start_addr, ram_
         elf_objects[0] = elf_object_files
     else:
         elf_objects = elf_object_files
-    linker_cmd = '../../agent_modules/contiki/wishful_module_gitar/linker_script.sh ' + elf_objects[0] + ' ../../agent_modules/contiki/wishful_module_gitar/merge_rodata_script ' + elf_firmware + ' ' + init_function
-    for elf_object in range(1, len(elf_objects)):
+    linker_cmd = './sc_ota_update/linker_script.sh ' + elf_program_file_name + ' ./sc_ota_update/merge_rodata_script ' + elf_firmware + ' ' + init_function
+    for elf_object in range(0, len(elf_objects)):
         linker_cmd = linker_cmd + ' ' + elf_object
     subprocess.call(linker_cmd)
-    return
+    return './' + elf_program_file_name + '.stripped'
 
 
 def default_callback(group, node, cmd, data):
@@ -137,18 +138,16 @@ def main(args, log, global_node_manager, measurement_logger):
     # get the elf files and firmware from the arguments
     elf_files = args['--elf-files'].split(';')
     elf_firmware = args['--elf-firmware']
+    init_function = args['--init-function']
     log.info(elf_files)
     log.info(elf_firmware)
+    log.info(init_function)
 
     # now configure the nodes normally
     contiki_nodes = global_node_manager.get_mac_address_list()
     print("Connected nodes", [str(node) for node in contiki_nodes])
     taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
     app_manager = AppManager(global_node_manager)
-    ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv')
-    log.info(ret)
-    ret = taisc_manager.update_macconfiguration({'IEEE802154_macSlotframeSize': len(contiki_nodes)})
-    log.info(ret)
 
     border_router_id = 1
     log.info("Set node %d as border router" % (border_router_id))
@@ -164,7 +163,21 @@ def main(args, log, global_node_manager, measurement_logger):
     log.info("Activating clients")
     app_manager.update_configuration({"app_activate": 2}, range(2, len(global_node_manager.get_mac_address_list()) + 1))
 
-    
+    size_list = calculate_elf_filesizes(elf_files)
+    log.info(size_list)
+    module_id = 1024
+    allocated_memory_block = global_node_manager.allocate_memory(border_router_id, module_id, size_list[0], size_list[1], size_list[2])
+    elf_program_file = prepare_software_module('tdma', elf_firmware, elf_files, allocated_memory_block[0], allocated_memory_block[1], init_function)
+    ret = global_node_manager.disseminate_software_module(border_router_id, module_id, elf_program_file)
+    log.info(ret)
+    ret = global_node_manager.install_software_module(border_router_id, module_id)
+    log.info(ret)
+    ret = global_node_manager.activate_software_module(border_router_id, module_id)
+    log.info(ret)
+    ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv')
+    log.info(ret)
+    ret = taisc_manager.update_macconfiguration({'IEEE802154_macSlotframeSize': len(contiki_nodes)})
+    log.info(ret)
 
 
 if __name__ == "__main__":
@@ -211,7 +224,7 @@ if __name__ == "__main__":
             measurement_config = yaml.load(f)
         measurement_logger = MeasurementLogger.load_config(measurement_config)
 
-        main(args, global_node_manager, measurement_logger)
+        main(args, log, global_node_manager, measurement_logger)
     except KeyboardInterrupt:
         log.debug("Controller exits")
     finally:
