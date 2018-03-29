@@ -68,7 +68,7 @@ if __name__ == "__main__":
     parser.add_argument("--ip_controller", help="increase output verbosity")
     args = parser.parse_args()
 
-    log_level = logging.INFO  # default
+    log_level = logging.DEBUG  # default
     logfile = None
     logging.basicConfig(filename=logfile, level=log_level,
                         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
