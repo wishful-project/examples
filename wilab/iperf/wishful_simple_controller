@@ -60,7 +60,7 @@ def main(controller, nodes):
                         log.info("MAC address %s \n", mac)
                         #omlDB.inject("stats", (int(time.time()), agent_control_ip, mac, station_info[node][mac]['inactive time'][0], station_info[node][mac]['rx bytes'][0], station_info[node][mac]['rx packets'][0], station_info[node][mac]['tx bytes'][0], station_info[node][mac]['tx packets'][0], station_info[node][mac]['tx retries'][0], station_info[node][mac]['tx failed'][0], station_info[node][mac]['signal'][0], station_info[node][mac]['signal avg'][0], station_info[node][mac]['tx bitrate'][0] ))
 
-    omlDB.close()
+    #omlDB.close()
 
 
 if __name__ == "__main__":
