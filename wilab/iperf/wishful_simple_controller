@@ -44,7 +44,7 @@ def main(controller, nodes):
         controller.nodes(nodes[0]).net.iface("wlan0").set_ip_address("192.168.0.1")
         gevent.sleep(10)
         controller.nodes(nodes[1]).net.iface("wlan0").connect_to_network("wlan0","wishAP")
-        controller.nodes(nodes[0]).net.iface("wlan0").set_ip_address("192.168.0.2")
+        controller.nodes(nodes[1]).net.iface("wlan0").set_ip_address("192.168.0.2")
     while True:
         gevent.sleep(10)
         log.info("\n")
