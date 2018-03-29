@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+wishful_controller_simple.py: First implementation of WiSHFUL controller
+
+Usage:
+   wishful_controller_simple.py --ip-controller <IP_ADDRESS>
+
+Example:
+   ./wishful_simple_local_controller -v --ip-controller 127.0.0.1
+
+Options:
+   --ip-controller     IP address of the global controller
+"""
+
+import logging
+import wishful_controller
+import gevent
+import wishful_framework.upi_arg_classes.edca as edca
+import argparse
+import time
+from oml4py import OMLBase
+
+
+__author__ = "Pieter Becue"
+__copyright__ = "Copyright (c) 2018, IDLab - UGent - imec"
+__version__ = "0.1.0"
+__email__ = "{pbecue}@intec.ugent.be"
+
+
+log = logging.getLogger('wishful_agent.main')
+
+
+def main(controller, nodes):
+    omlDB=OMLBase("station_info", "wifi_dense10","controller","tcp:oml.portable.ilabt.iminds.be:3003")
+    omlDB.addmp("stats", "timestamp:int32 agent_control_ip:string station_mac:string inactive_time:int32 rx_bytes:int32 rx_packets:int32 tx_bytes:int32 tx_packets:int32 tx_retries:int32 tx_failed:int32 signal:int32 signal_avg:int32 tx_bitrate:int32")
+    omlDB.start()
+    if nodes:
+        controller.nodes(nodes[0]).net.iface("wlan0").set_hostapd_conf("wlan0","/etc/hostapd.conf",11,"wishAP")
+        controller.nodes(nodes[0]).net.iface("wlan0").start_hostapd("/etc/hostapd.conf")
+        
+    while True:
+        gevent.sleep(10)
+        log.info("\n")
+        log.info("Connected nodes %s", nodes)
+        controller.nodes(nodes).net.iface("wlan0").connect_to_network("wlan0","wishAP")
+        if nodes:
+            station_info = controller.nodes(nodes).net.iface("wlan0").get_info_of_connected_devices()
+            if station_info is not None:
+                for node in station_info.keys():
+                    agent_control_ip = node.ip
+                    station_info_node = station_info[node]
+                    for mac in station_info_node.keys():
+                        omlDB.inject("stats", (int(time.time()), agent_control_ip, mac, station_info[node][mac]['inactive time'][0], station_info[node][mac]['rx bytes'][0], station_info[node][mac]['rx packets'][0], station_info[node][mac]['tx bytes'][0], station_info[node][mac]['tx packets'][0], station_info[node][mac]['tx retries'][0], station_info[node][mac]['tx failed'][0], station_info[node][mac]['signal'][0], station_info[node][mac]['signal avg'][0], station_info[node][mac]['tx bitrate'][0] ))
+
+    omlDB.close()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip_controller", help="increase output verbosity")
+    args = parser.parse_args()
+
+    log_level = logging.INFO  # default
+    logfile = None
+    logging.basicConfig(filename=logfile, level=log_level,
+                        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    controller_ip = args.ip_controller
+    # Create controller
+    controller = wishful_controller.Controller(
+        dl="tcp://" + controller_ip + ":8990", ul="tcp://" + controller_ip + ":8989")
+
+    # Configure controller
+    controller.set_controller_info(
+        name="WishfulController", info="WishfulControllerInfo")
+    controller.add_module(moduleName="discovery", pyModuleName="wishful_module_discovery_pyre",
+                          className="PyreDiscoveryControllerModule",
+                          kwargs={"iface": "eth0", "groupName": "wishful_wilab", "downlink": "tcp://" + controller_ip + ":8990", "uplink": "tcp://" + controller_ip + ":8989"})
+
+    nodes = []
+
+    @controller.new_node_callback()
+    def new_node(node):
+        nodes.append(node)
+        print("New node appeared:")
+        print(node)
+
+    @controller.node_exit_callback()
+    def node_exit(node, reason):
+        if node in nodes:
+            nodes.remove(node)
+        print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
+
+    @controller.set_default_callback()
+    def default_callback(group, node, cmd, data):
+        print("DEFAULT CALLBACK : Group: {}, NodeId: {}, Cmd: {}, Returns: {}".format(
+            group, node.id, cmd, data))
+
+    controller.start()
+
+    try:
+        main(controller,nodes)
+    except KeyboardInterrupt:
+        log.debug("Controller exits")
+    finally:
+        log.debug("Exit")
+        controller.stop()
