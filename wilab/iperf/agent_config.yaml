@@ -19,3 +19,7 @@ modules:
   netModule:
       module : wishful_module_net_linux
       class_name : NetworkModule
+
+  iperf:
+      module : wishful_module_iperf
+      class_name : IperfModule
