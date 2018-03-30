@@ -48,9 +48,8 @@ def main(controller, nodes):
         controller.nodes(nodes[1]).net.iface("wlan0").connect_to_network("wlan0","wishAP")
         controller.nodes(nodes[1]).net.iface("wlan0").set_ip_address("wlan0","192.168.0.2")
         gevent.sleep(5)
-        controller.nodes(nodes[1]).net.start_packetflow("192.168.0.1",5001)
-        gevent.sleep(15)
-        controller.nodes(nodes[1]).net.stop_packetflow()
+        iperfoutput = controller.nodes(nodes[1]).net.start_packetflow("192.168.0.1",5001)
+        log.info("IPERF OUTPUT %s \n", iperfoutput)
     while True:
         gevent.sleep(10)
         log.info("\n")
@@ -117,5 +116,8 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         log.debug("Controller exits")
     finally:
+        controller.nodes(nodes[1]).net.stop_packetflow()
+        controller.nodes(nodes[0]).net.destroy_packetflow_sink()
+        controller.nodes(nodes[0]).net.iface("wlan0").stop_hostapd()
         log.debug("Exit")
         controller.stop()
