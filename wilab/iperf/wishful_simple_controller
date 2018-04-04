@@ -19,6 +19,7 @@ import gevent
 import argparse
 from oml4py import OMLBase
 import wishful_upis as upis
+import netifaces as ni
 # from threading import Thread
 
 __author__ = "Pieter Becue, Peter Ruckebusch"
@@ -57,36 +58,38 @@ def main(controller, nodes):
         gevent.sleep(5)
         iperfoutput = controller.nodes(nodes[1]).net.start_packetflow("192.168.0.1",5001)
         log.info("IPERF OUTPUT %s \n", iperfoutput)
-    while True:
-        gevent.sleep(10)
-        log.info("\n")
-        log.info("Connected nodes %s", nodes)
+    while not iperf_finished:
+        gevent.sleep(1)
+        #log.info("\n")
+        #log.info("Connected nodes %s", nodes)
         # controller.nodes(nodes).net.iface("wlan0").connect_to_network("wlan0","wishAP")
-        if nodes:
-            station_info = controller.nodes(nodes).net.iface(
-                "wlan0").get_info_of_connected_devices()
-            if station_info is not None:
-                for node in station_info.keys():
-                    agent_control_ip = node.ip
-                    station_info_node = station_info[node]
-                    for mac in station_info_node.keys():
-                        log.info("MAC address %s \n", mac)
+        #if nodes:
+        #    station_info = controller.nodes(nodes).net.iface(
+        #        "wlan0").get_info_of_connected_devices()
+        #    if station_info is not None:
+        #        for node in station_info.keys():
+        #            agent_control_ip = node.ip
+        #            station_info_node = station_info[node]
+        #            for mac in station_info_node.keys():
+        #                log.info("MAC address %s \n", mac)
                         # omlDB.inject("stats", (int(time.time()), agent_control_ip, mac, station_info[node][mac]['inactive time'][0], station_info[node][mac]['rx bytes'][0], station_info[node][mac]['rx packets'][0], station_info[node][mac]['tx bytes'][0], station_info[node][mac]['tx packets'][0], station_info[node][mac]['tx retries'][0], station_info[node][mac]['tx failed'][0], station_info[node][mac]['signal'][0], station_info[node][mac]['signal avg'][0], station_info[node][mac]['tx bitrate'][0] ))
 
     # omlDB.close()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ip_controller", help="increase output verbosity")
-    args = parser.parse_args()
+    #parser = argparse.ArgumentParser()
+    #parser.add_argument("--ip_controller", help="increase output verbosity")
+    #args = parser.parse_args()
 
-    log_level = logging.DEBUG  # default
+    log_level = logging.INFO  # default
     logfile = None
     logging.basicConfig(filename=logfile, level=log_level,
                         format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
 
-    controller_ip = args.ip_controller
+    #controller_ip = args.ip_controller
+    ni.ifaddresses('eth0')
+    controller_ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
     # Create controller
     controller = wishful_controller.Controller(
         dl="tcp://" + controller_ip + ":8990", ul="tcp://" + controller_ip + ":8989")
@@ -99,6 +102,7 @@ if __name__ == "__main__":
                           kwargs={"iface": "eth0", "groupName": "wishful_wilab", "downlink": "tcp://" + controller_ip + ":8990", "uplink": "tcp://" + controller_ip + ":8989"})
 
     nodes = []
+    iperf_finished = False
 
     @controller.new_node_callback()
     def new_node(node):
@@ -115,6 +119,7 @@ if __name__ == "__main__":
     @controller.add_callback(upis.net.start_packetflow)
     def start_packetflow_cb(group, node, data):
         print(data)
+        iperf_finished = True
 
     @controller.set_default_callback()
     def default_callback(group, node, cmd, data):
