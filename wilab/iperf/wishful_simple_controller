@@ -3,7 +3,6 @@
 
 """
 wishful_controller_simple.py: First implementation of WiSHFUL controller
-
 Usage:
    wishful_controller_simple.py --ip-controller <IP_ADDRESS>
 
@@ -20,8 +19,9 @@ import gevent
 import wishful_framework.upi_arg_classes.edca as edca
 import argparse
 import time
+import _thread
 from oml4py import OMLBase
-
+#from threading import Thread
 
 __author__ = "Pieter Becue"
 __copyright__ = "Copyright (c) 2018, IDLab - UGent - imec"
@@ -37,19 +37,23 @@ def main(controller, nodes):
     #omlDB.addmp("stats", "timestamp:int32 agent_control_ip:string station_mac:string inactive_time:int32 rx_bytes:int32 rx_packets:int32 tx_bytes:int32 tx_packets:int32 tx_retries:int32 tx_failed:int32 signal:int32 signal_avg:int32 tx_bitrate:int32")
     #omlDB.start()
     log.info("Waiting for all nodes to connect \n")
-    gevent.sleep(30)
+    gevent.sleep(5)
     if nodes:
         controller.nodes(nodes[0]).net.iface("wlan0").set_hostapd_conf("wlan0","/etc/hostapd.conf",11,"wishAP")
         controller.nodes(nodes[0]).net.iface("wlan0").start_hostapd("/etc/hostapd.conf")
         controller.nodes(nodes[0]).net.iface("wlan0").set_ip_address("wlan0","192.168.0.1")
         gevent.sleep(2)
+        #serverThread = Thread(controller.nodes(nodes[0]).net.create_packetflow_sink(5001))
+        #serverThread.start()
         controller.nodes(nodes[0]).net.create_packetflow_sink(5001)
+        #serverThread.join()
         gevent.sleep(10)
+        log.info("CONNECT TO wishAP NETWORK \n")
         controller.nodes(nodes[1]).net.iface("wlan0").connect_to_network("wlan0","wishAP")
         controller.nodes(nodes[1]).net.iface("wlan0").set_ip_address("wlan0","192.168.0.2")
         gevent.sleep(5)
-        iperfoutput = controller.nodes(nodes[1]).net.start_packetflow("192.168.0.1",5001)
-        log.info("IPERF OUTPUT %s \n", iperfoutput)
+        #iperfoutput = controller.nodes(nodes[1]).net.start_packetflow("192.168.0.1",5001)
+        #log.info("IPERF OUTPUT %s \n", iperfoutput)
     while True:
         gevent.sleep(10)
         log.info("\n")
