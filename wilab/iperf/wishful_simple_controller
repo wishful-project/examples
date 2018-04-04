@@ -21,7 +21,7 @@ from oml4py import OMLBase
 import wishful_upis as upis
 # from threading import Thread
 
-__author__ = "Pieter Becue"
+__author__ = "Pieter Becue, Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2018, IDLab - UGent - imec"
 __version__ = "0.1.0"
 __email__ = "{pbecue}@intec.ugent.be"
@@ -55,8 +55,8 @@ def main(controller, nodes):
         controller.nodes(nodes[1]).net.iface(
             "wlan0").set_ip_address("wlan0", "192.168.0.2")
         gevent.sleep(5)
-        # iperfoutput = controller.nodes(nodes[1]).net.start_packetflow("192.168.0.1",5001)
-        # log.info("IPERF OUTPUT %s \n", iperfoutput)
+        iperfoutput = controller.nodes(nodes[1]).net.start_packetflow("192.168.0.1",5001)
+        log.info("IPERF OUTPUT %s \n", iperfoutput)
     while True:
         gevent.sleep(10)
         log.info("\n")
@@ -114,7 +114,7 @@ if __name__ == "__main__":
 
     @controller.add_callback(upis.net.start_packetflow)
     def start_packetflow_cb(group, node, data):
-        print("Ken e twa were gekregen van node {}: {}".format(node, data))
+        print(data)
 
     @controller.set_default_callback()
     def default_callback(group, node, cmd, data):
