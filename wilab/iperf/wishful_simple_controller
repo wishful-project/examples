@@ -45,9 +45,9 @@ def main(controller, nodes, iperf_finished):
 
     if nodes:
         controller.nodes(nodes[0]).net.iface("wlan0").set_hostapd_conf(
-            "wlan0", "/etc/hostapd.conf", 11, "wishAP")
+            "wlan0", "/usr/share/doc/hostapd/examples/hostapd.conf", 11, "wishAP")
         controller.nodes(nodes[0]).net.iface(
-            "wlan0").start_hostapd("/etc/hostapd.conf")
+            "wlan0").start_hostapd("/usr/share/doc/hostapd/examples/hostapd.conf")
         controller.nodes(nodes[0]).net.iface(
             "wlan0").set_ip_address("wlan0", "192.168.0.1")
         gevent.sleep(2)
