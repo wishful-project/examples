@@ -96,19 +96,19 @@ def main(args):
     if nodes:
 
         # first initialize the environment emulator
-        global_control_engine.blocking(True).nodes(nodes).iface("ee").init_energy_harvester()
+        global_control_engine.blocking(True).nodes(nodes).mgmt.iface("ee").init_energy_harvester()
         gevent.sleep(3)
 
         # start the environment emulator
-        global_control_engine.blocking(True).nodes(nodes).iface("ee").start_energy_harvester()
-        gevent.sleep(10)
+        global_control_engine.blocking(True).nodes(nodes).mgmt.iface("ee").start_energy_harvester()
+        gevent.sleep(100)
 
         # update the environment emulator
-        global_control_engine.blocking(True).nodes(nodes).iface("ee").update_energy_harvester()
-        gevent.sleep(10)
+        # global_control_engine.blocking(True).nodes(nodes).mgmt.iface("ee").update_energy_harvester()
+        # gevent.sleep(20)
 
         # stop the environment emulator
-        global_control_engine.blocking(True).nodes(nodes).iface("ee").stop_energy_harvester()
+        global_control_engine.blocking(True).nodes(nodes).mgmt.iface("ee").stop_energy_harvester()
         gevent.sleep(1)
 
 
