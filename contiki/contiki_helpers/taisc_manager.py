@@ -413,6 +413,7 @@ class TAISCHoppingSequence(object):
 def read_taisc_slotframe(slotframe_csv):
     """Create TSCH slotframe from CSV file.
     """
+    file_sf = None
     try:
         file_sf = open(slotframe_csv, 'rt')
         reader = csv.DictReader(file_sf)
@@ -429,7 +430,8 @@ def read_taisc_slotframe(slotframe_csv):
         print("An error occurred while reading parameters: %s" % e)
         return -1
     finally:
-        file_sf.close()
+        if file_sf is not None:
+            file_sf.close()
 
 def read_taisc_hoppingsequence(hoppingsequence_csv):
     """Create TSCH hopping sequence from CSV file.
