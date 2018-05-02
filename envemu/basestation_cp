@@ -1,0 +1,265 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+envemu_cp.py: First implementation of WiSHFUL controller
+
+Usage:
+   envemu_cp.py [options] [-q | -v]
+
+Options:
+   --logfile name      Name of the logfile
+   --config configFile Config file path
+   --nodes nodesFile Nodes file path
+
+Example:
+   ./envemu_cp -v --config ./config.yaml --nodes ./nodes.yaml
+
+Other options:
+   -h, --help          show this help message and exit
+   -q, --quiet         print less text
+   -v, --verbose       print more text
+   --version           show version and exit
+"""
+
+
+import datetime
+import logging
+import wishful_controller
+import gevent
+import yaml
+import wishful_upis as upis
+import _thread
+
+__author__ = "Peter Ruckebusch"
+__copyright__ = "Copyright (c) 2015, IMEC IDLAB UGENT"
+__version__ = "0.1.0"
+__email__ = "peter.ruckebusch@ugent.be"
+
+
+log = logging.getLogger('envemu_cp.main')
+global_control_engine = wishful_controller.Controller()
+connected_nodes = []
+connected_enddevices = []
+connected_basestations = []
+
+bs_ips_to_evt_listener_cp = {}
+
+
+@global_control_engine.new_node_callback()
+def new_node(node):
+    connected_nodes.append(node)
+    print(node.name)
+    print("New node appeared:")
+    print(node)
+    if node.name == "contiki_control_agent":
+        connected_basestations.append(node)
+    elif node.name == "agent_envemu":
+        connected_enddevices.append(node)
+    else:
+        print("bweurk bweurk")
+
+
+@global_control_engine.node_exit_callback()
+def node_exit(node, reason):
+    if node in connected_nodes:
+        connected_nodes.remove(node)
+    print("NodeExit : NodeID : {} Reason : {}".format(node.id, reason))
+
+
+@global_control_engine.set_default_callback()
+def default_callback(group, node, cmd, data):
+    print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
+
+
+@global_control_engine.add_callback(upis.mgmt.init_energy_harvester)
+def init_energy_harvester_response(group, node, data):
+    print("{} init_energy_harvester_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+
+
+@global_control_engine.add_callback(upis.mgmt.start_energy_harvester)
+def start_energy_harvester_response(group, node, data):
+    print("{} start_energy_harvester_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+
+
+@global_control_engine.add_callback(upis.mgmt.stop_energy_harvester)
+def stop_energy_harvester_response(group, node, data):
+    print("{} stop_energy_harvester_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+
+
+@global_control_engine.add_callback(upis.mgmt.update_energy_harvester)
+def update_energy_harvester_response(group, node, data):
+    print("{} update_energy_harvester_response : Group:{}, NodeId:{}, msg:{}".format(datetime.datetime.now(), group, node.id, data))
+
+
+def global_event_callback(basestation_ip, event_name, event_value):
+    print("received event {} from {} value {}".format(event_name, basestation_ip, event_value))
+    pass
+
+def wait_for_agents(end_device_ips, base_station_ips, timeout=60):
+    print("wait for nodes")
+    num_matches_ed = num_matches_bs = 0
+    for i in range(0, timeout):
+        if len(connected_enddevices) >= len(end_device_ips):
+            num_matches_ed = 0
+            for node in connected_enddevices:
+                print(node.ip)
+                print(type(node.ip))
+                for ip in end_device_ips:
+                    print(ip)
+                    if node.ip == ip:
+                        num_matches_ed += 1
+                        break
+                print(num_matches_ed)
+        if len(connected_basestations) >= len(base_station_ips):
+            num_matches_bs = 0
+            for node in connected_enddevices:
+                print(node.ip)
+                print(type(node.ip))
+                for ip in base_station_ips:
+                    print(ip)
+                    if node.ip == ip:
+                        num_matches_bs += 1
+                        break
+                print(num_matches_bs)
+        if num_matches_ed + num_matches_bs >= len(end_device_ips) + len(base_station_ips):
+            print("All nodes are active we can start the experiment")
+            return True
+        print("Still waiting for {} nodes: ".format(len(end_device_ips) + len(base_station_ips) - len(connected_nodes)))
+        gevent.sleep(1)
+    print("nodes not found")
+    return False
+
+
+def evt_listener_thread(evt_listener_cp, basestation_ip):
+        while True:
+            msg = evt_listener_cp.recv(block=False, timeout=1)
+            while msg is not None:
+                if type(msg) is dict and "msg_type" in msg:
+                    msg_type = msg["msg_type"]
+                    if msg_type == "event":
+                        global_event_callback(basestation_ip, msg["event_name"], msg["event_value"])
+                    else:
+                        print("{} Global Manager received unknown msgtype {} from local CP {}".format(datetime.datetime.now(), msg, basestation_ip))
+                else:
+                    print("{} Global Manager received unknown msg {} from local CP {}".format(datetime.datetime.now(), msg, basestation_ip))
+                msg = evt_listener_cp.recv(block=False, timeout=1)
+            gevent.sleep(1)
+        pass
+
+
+def local_evt_listener(control_engine):
+    # do all needed imports here!!!
+    import gevent
+
+    def event_handler(interface, event_name, event_value):
+        control_engine.send_upstream({"msg_type": "event", "interface": interface, "event_name": event_name, "event_value": event_value})
+        pass
+
+    print(("local event listener started - Name: {}, Id: {} - STARTED".format(control_engine.name, control_engine.id)))
+    
+    control_engine.blocking(True).radio.iface("lowpan0").subscribe_events(['taisc_pg_rx_event'], event_handler, 0)
+
+    # control loop
+    while not control_engine.is_stopped():
+        #msg = control_engine.recv(block=False)
+        #print("local event listener unknown msg {}".format(msg))
+        gevent.sleep(1)
+
+    print(("local event listener  - Name: {}, Id: {} - STOPPED".format(control_engine.name, control_engine.id)))
+
+
+def main(args):
+    log.debug(args)
+
+    config_file_path = args['--config']
+    config = None
+    with open(config_file_path, 'r') as f:
+        config = yaml.load(f)
+
+    global_control_engine.load_config(config)
+    global_control_engine.start()
+    
+    nodes_file_path = args['--nodes']
+    with open(nodes_file_path, 'r') as f:
+        node_config = yaml.load(f)
+    end_device_ips = node_config['end_device_ips']
+    base_station_ips = node_config['base_station_ips']
+    ip_address_list = end_device_ips
+    ip_address_list.extend(base_station_ips)
+    print(ip_address_list)
+    #if wait_for_agents(end_device_ips, base_station_ips, 20):
+        #for node in connected_nodes:
+            #if node.ip in end_device_ips:
+            #    connected_enddevices.append(node)
+           # elif node.ip in base_station_ips:
+           #     connected_basestations.append(node)
+          #  else:
+         #       print("bweurk");
+        #print("Connected nodes", [str(node.name) for node in connected_nodes])
+    gevent.sleep(10)
+    if True:
+        # configure the MCS of the basestations
+        index = 2
+        for bs in connected_basestations:
+            global_control_engine.blocking(True).node(bs).radio.iface("lowpan0").set_parameters({"TAISC_active_radio_config_index": index})
+            # enable pg rx event
+            local_evt_cp = global_control_engine.node(bs).hc.start_local_control_program(program=local_evt_listener)
+            bs_ips_to_evt_listener_cp[bs.ip] = local_evt_cp
+            _thread.start_new_thread(evt_listener_thread, (local_evt_cp, bs.ip))
+            index += 1
+            if index > 5:
+                print("warning more basestations then MCS configs");
+                index = 2
+
+        # first initialize the environment emulator
+        global_control_engine.blocking(True).nodes(connected_enddevices).mgmt.iface("ee").init_energy_harvester()
+        gevent.sleep(3)
+
+        # start the environment emulator
+        global_control_engine.blocking(True).nodes(connected_enddevices).mgmt.iface("ee").start_energy_harvester()
+        gevent.sleep(100)
+
+        # update the environment emulator
+        # global_control_engine.blocking(True).nodes(connected_enddevices).mgmt.iface("ee").update_energy_harvester()
+        # gevent.sleep(20)
+
+        # stop the environment emulator
+        global_control_engine.blocking(True).nodes(connected_enddevices).mgmt.iface("ee").stop_energy_harvester()
+        gevent.sleep(1)
+
+
+if __name__ == "__main__":
+    try:
+        from docopt import docopt
+    except:
+        print("""
+        Please install docopt using:
+            pip install docopt==0.6.1
+        For more refer to:
+        https://github.com/docopt/docopt
+        """)
+        raise
+
+    args = docopt(__doc__, version=__version__)
+
+    log_level = logging.INFO  # default
+    if args['--verbose']:
+        log_level = logging.DEBUG
+    elif args['--quiet']:
+        log_level = logging.ERROR
+
+    logfile = None
+    if args['--logfile']:
+        logfile = args['--logfile']
+
+    logging.basicConfig(filename=logfile, level=log_level,
+        format='%(asctime)s - %(name)s.%(funcName)s() - %(levelname)s - %(message)s')
+
+    try:
+        main(args)
+    except KeyboardInterrupt:
+        log.debug("global_control_engine exits")
+    finally:
+        log.debug("Exit")
+        global_control_engine.stop()
