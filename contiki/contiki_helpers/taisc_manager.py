@@ -152,8 +152,8 @@ class TAISCMACManager(MACManager):
             return ret
         else:
             return -1
-            
-    def update_hopping_sequence(self, hopping_sequence_csv, mac_address_list=None):
+    
+    def update_hopping_sequence_from_list(self, hopping_sequence_lst, mac_address_list=None):
         """This function allows to create a new hopping sequence
 
         Args:
@@ -162,7 +162,6 @@ class TAISCMACManager(MACManager):
         Returns:
             dict: error codes from each node
         """
-        hopping_sequence_lst = read_taisc_hoppingsequence(hopping_sequence_csv)
         current_offset = 0
         ret_val = 0
         ret_dict = {}
@@ -190,6 +189,19 @@ class TAISCMACManager(MACManager):
             return ret_val
         else:
             return -1
+            
+    def update_hopping_sequence(self, hopping_sequence_csv, mac_address_list=None):
+        """This function allows to create a new hopping sequence
+
+        Args:
+            channel_lst (list): csv of channels to be blacklisted
+
+        Returns:
+            dict: error codes from each node
+        """
+        hopping_sequence_lst = read_taisc_hoppingsequence(hopping_sequence_csv)
+        self.update_hopping_sequence_from_list(hopping_sequence_lst, mac_address_list)
+      
 
 
 class taiscLinkOptions(IntEnum):
