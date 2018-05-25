@@ -55,7 +55,7 @@ def main(controller, nodes, iperf_finished):
         gevent.sleep(10)
         log.info("CONNECT TO wishAP NETWORK \n")
         controller.nodes(nodes[1]).net.iface(
-            "wlan0").connect_to_network("wlan0", "wishAP")
+            "wlan0").connect_to_network("wlan0", "wishAP",False)
         controller.nodes(nodes[1]).net.iface(
             "wlan0").set_ip_address("wlan0", "192.168.0.2")
         gevent.sleep(5)
