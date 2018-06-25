@@ -152,8 +152,8 @@ class TAISCMACManager(MACManager):
             return ret
         else:
             return -1
-            
-    def update_hopping_sequence(self, hopping_sequence_csv, mac_address_list=None):
+    
+    def update_hopping_sequence_from_list(self, hopping_sequence_lst, mac_address_list=None):
         """This function allows to create a new hopping sequence
 
         Args:
@@ -162,7 +162,6 @@ class TAISCMACManager(MACManager):
         Returns:
             dict: error codes from each node
         """
-        hopping_sequence_lst = read_taisc_hoppingsequence(hopping_sequence_csv)
         current_offset = 0
         ret_val = 0
         ret_dict = {}
@@ -190,6 +189,19 @@ class TAISCMACManager(MACManager):
             return ret_val
         else:
             return -1
+            
+    def update_hopping_sequence(self, hopping_sequence_csv, mac_address_list=None):
+        """This function allows to create a new hopping sequence
+
+        Args:
+            channel_lst (list): csv of channels to be blacklisted
+
+        Returns:
+            dict: error codes from each node
+        """
+        hopping_sequence_lst = read_taisc_hoppingsequence(hopping_sequence_csv)
+        self.update_hopping_sequence_from_list(hopping_sequence_lst, mac_address_list)
+      
 
 
 class taiscLinkOptions(IntEnum):
@@ -413,6 +425,7 @@ class TAISCHoppingSequence(object):
 def read_taisc_slotframe(slotframe_csv):
     """Create TSCH slotframe from CSV file.
     """
+    file_sf = None
     try:
         file_sf = open(slotframe_csv, 'rt')
         reader = csv.DictReader(file_sf)
@@ -429,7 +442,8 @@ def read_taisc_slotframe(slotframe_csv):
         print("An error occurred while reading parameters: %s" % e)
         return -1
     finally:
-        file_sf.close()
+        if file_sf is not None:
+            file_sf.close()
 
 def read_taisc_hoppingsequence(hoppingsequence_csv):
     """Create TSCH hopping sequence from CSV file.

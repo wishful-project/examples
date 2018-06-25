@@ -1,0 +1,2 @@
+end_device_ips: ['172.0.0.1']
+base_station_ips: ['172.0.0.1']
