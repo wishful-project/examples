@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ELF_PROGRAM_FILE_NAME=$1
 LINKER_SCRIPT=$2
 ELF_OBJECT_FILES="${@:3}"

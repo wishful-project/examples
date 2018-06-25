@@ -35,13 +35,18 @@ import gevent
 from measurement_logger import MeasurementLogger
 from elftools.elf.elffile import ELFFile
 import subprocess
-
+import traceback
 import os
+import sys
 
 __author__ = "Peter Ruckebusch"
 __copyright__ = "Copyright (c) 2017, IMEC"
 __version__ = "0.1.0"
 __email__ = "peter.ruckebusch@intec.ugent.be"
+
+
+disseminate_finish = False
+ota_transaction_finished = False
 
 
 def __calculate_alignment_overhead(size):
@@ -62,6 +67,7 @@ def calculate_elf_filesizes(elf_object_file):
     has_ram_program_header = False
     with open(elf_object_file, 'rb') as f:
         elffile = ELFFile(f)
+        print("elf_fileheader_size {}".format(elf_fileheader_size))
         # determine rom size
         text_section = elffile.get_section_by_name('.text')
         if text_section is not None:
@@ -69,12 +75,14 @@ def calculate_elf_filesizes(elf_object_file):
             elf_sectionheaders_size += 40  # section header
             elf_shstrtab_size += 6  # shstrtab
             has_rom_program_header = True
+            print("found rom section size %u".format(text_size))
         rodata_section = elffile.get_section_by_name('.rodata')
         if rodata_section is not None:
             rodata_size += rodata_section['sh_size']
             elf_sectionheaders_size += 40  # section header
             elf_shstrtab_size += 8  # shstrtab
             has_rom_program_header = True
+            print("found rodata section size %u".format(rodata_size))
         # determine ram size
         data_section = elffile.get_section_by_name('.data')
         if data_section is not None:
@@ -82,22 +90,29 @@ def calculate_elf_filesizes(elf_object_file):
             elf_sectionheaders_size += 40  # section header
             elf_shstrtab_size += 6  # shstrtab
             has_ram_program_header = True
+            print("found data section size %u".format(data_size))
         bss_section = elffile.get_section_by_name('.bss')
         if bss_section is not None:
             bss_size += bss_section['sh_size']
             elf_sectionheaders_size += 40  # section header
             elf_shstrtab_size += 5  # shstrtab
             has_ram_program_header = True
+            print("found bss section size %u".format(bss_size))
         if has_rom_program_header:
             elf_programheaders_size += 32
         if has_ram_program_header:
             elf_programheaders_size += 32
+    print("elf_programheaders_size {}".format(elf_programheaders_size))
     alignement_overhead += __calculate_alignment_overhead(text_size)
     alignement_overhead += __calculate_alignment_overhead(rodata_size)
     alignement_overhead += __calculate_alignment_overhead(data_size)
     alignement_overhead += __calculate_alignment_overhead(elf_shstrtab_size)
-    elf_file_size = elf_fileheader_size + elf_programheaders_size + text_size + rodata_size + data_size + elf_shstrtab_size + elf_sectionheaders_size
-    return [elf_file_size, text_size + rodata_size, data_size + bss_size]
+    print("section_alignment overhead {}".format(alignement_overhead))
+    print("elf_shstrtab_size {}".format(elf_shstrtab_size))
+    print("elf_sectionheaders_size {}".format(elf_sectionheaders_size))
+    elf_file_size = elf_fileheader_size + elf_programheaders_size + text_size + rodata_size + data_size + alignement_overhead + elf_shstrtab_size + elf_sectionheaders_size
+    print("elf_file_size {}".format(elf_sectionheaders_size))
+    return [elf_file_size, text_size + rodata_size, data_size + bss_size, elf_fileheader_size + elf_programheaders_size]
 
 
 def merge_object_files(elf_program_file_name, elf_object_files):
@@ -106,12 +121,13 @@ def merge_object_files(elf_program_file_name, elf_object_files):
         elf_objects[0] = elf_object_files
     else:
         elf_objects = elf_object_files
-    merger_cmd = ['./sc_ota_update/merger_script.sh', elf_program_file_name, './sc_ota_update/merge_rodata.ld']
+    cwd = os.getcwd()
+    merger_cmd = [cwd + '/sc_ota_update/merger_script.sh', elf_program_file_name, cwd + '/sc_ota_update/merge_rodata.ld']
     for elf_object in elf_objects:
-        merger_cmd.append(elf_object)
+        merger_cmd.append(cwd + '/' + elf_object)
     print(merger_cmd)
-    subprocess.run(merger_cmd, shell=True)
-    return './' + elf_program_file_name + '.merged'
+    subprocess.run(merger_cmd)
+    return cwd + '/' + elf_program_file_name + '.merged'
 
 
 def prepare_software_module(elf_program_file_name, elf_firmware, rom_start_addr, ram_start_addr, init_function):
@@ -128,14 +144,46 @@ def prepare_software_module(elf_program_file_name, elf_firmware, rom_start_addr,
         int: Error value 0 = SUCCESS; -1 = FAIL
     """
     # first merge the elf object files
-    linker_cmd = ['./sc_ota_update/linker_script.sh', elf_program_file_name, elf_firmware, init_function]
+    cwd = os.getcwd()
+    linker_cmd = [cwd + '/sc_ota_update/linker_script.sh', elf_program_file_name, cwd + '/' + elf_firmware, init_function, "0x%08X" % rom_start_addr, "0x%08X" % ram_start_addr]
     print(linker_cmd)
-    subprocess.run(linker_cmd, shell=True)
-    return './' + elf_program_file_name + '.stripped'
+    subprocess.run(linker_cmd)
+    return cwd + '/' + elf_program_file_name + '.stripped'
 
 
 def default_callback(group, node, cmd, data):
     print("{} DEFAULT CALLBACK : Group: {}, NodeName: {}, Cmd: {}, Returns: {}".format(datetime.datetime.now(), group, node.name, cmd, data))
+
+
+def print_binary_data(bin_string):
+    out_str = ""
+    for i in range(0, len(bin_string)):
+        out_str += "%02X " % bin_string[i]
+        if (i + 1) % 8 == 0:
+            print("%s" % out_str)
+            out_str = ""
+    print(out_str)
+
+
+def store_file(global_node_manager, border_router_id, elf_program_file):
+    try:
+        block_size = 48
+        block_offset = 0
+        with open(elf_program_file, "rb") as binary_file:
+            bin_string = binary_file.read()
+            while len(bin_string) > block_size:
+                print_binary_data(bin_string[:block_size])
+                err = global_node_manager.store_file(border_router_id, False, block_size, block_offset, bin_string[:block_size])
+                if err != 0:
+                    print("Error storing block: offset {}, size {}".format(block_offset, block_size))
+                block_offset += block_size
+                bin_string = bin_string[block_size:]
+            print_binary_data(bin_string[:block_size])
+            err = global_node_manager.store_file(border_router_id, True, len(bin_string), block_offset, bin_string)
+            if err != 0:
+                print("Error storing block: offset {}, size {}".format(block_offset, block_size))
+    except Exception:
+        traceback.print_exc(file=sys.stdout)
 
 
 def event_cb(mac_address, event_name, event_value):
@@ -143,7 +191,14 @@ def event_cb(mac_address, event_name, event_value):
     # print("{} Node {} Event {}: {} ".format(datetime.datetime.now(), mac_address, event_name, event_value))
 
 
+def gitar_event_cb(mac_address, event_name, event_value):
+    global ota_transaction_finished
+    print("gitar mgmt event received {}".format(event_value))
+    ota_transaction_finished = True
+
+
 def main(args, log, global_node_manager, measurement_logger):
+    global ota_transaction_finished
     # get the elf files and firmware from the arguments
     elf_files = args['--elf-files'].split(';')
     elf_firmware = args['--elf-firmware']
@@ -166,29 +221,77 @@ def main(args, log, global_node_manager, measurement_logger):
     gevent.sleep(5)
     taisc_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
     gevent.sleep(5)
+    global_node_manager.subscribe_events(['gitar_mgmt_event'], gitar_event_cb, 0)
 
-    log.info("Activating server")
-    app_manager.update_configuration({"app_activate": 1}, [border_router_id])
-    log.info("Activating clients")
-    app_manager.update_configuration({"app_activate": 2}, range(2, len(global_node_manager.get_mac_address_list()) + 1))
+    server_node = [border_router_id]
+    client_nodes = []
+    for mac_address in contiki_nodes:
+        if mac_address != border_router_id:
+            client_nodes.append(mac_address)
+
+    # log.info("Activating server")
+    # app_manager.update_configuration({"app_activate": 1}, server_node)
+    # log.info("Activating clients")
+    # app_manager.update_configuration({"app_activate": 2}, client_nodes)
 
     merged_elf_file = merge_object_files("tdma", elf_files)
 
     size_list = calculate_elf_filesizes(merged_elf_file)
     log.info(size_list)
-    module_id = 1024
-    allocated_memory_block = global_node_manager.allocate_memory(border_router_id, module_id, size_list[0], size_list[1], size_list[2])
-    elf_program_file = prepare_software_module('tdma', elf_firmware, allocated_memory_block[0], allocated_memory_block[1], init_function)
-    ret = global_node_manager.disseminate_software_module(border_router_id, module_id, elf_program_file)
+
+    ret = global_node_manager.prepare_ota_update(border_router_id, client_nodes)
     log.info(ret)
-    ret = global_node_manager.install_software_module(border_router_id, module_id)
+
+    allocated_memory_block = global_node_manager.allocate_memory(border_router_id, size_list[0], size_list[1], size_list[2])
+    for val in allocated_memory_block:
+        print("0x%08X" % val)
+    elf_program_file = prepare_software_module('tdma', elf_firmware, allocated_memory_block[0] + size_list[3], allocated_memory_block[1], init_function)
+
+    # wait for event
+    while not ota_transaction_finished:
+        gevent.sleep(1)
+    ota_transaction_finished = False
+
+    store_file(global_node_manager, border_router_id, elf_program_file)
+
+    # wait for event
+    while not ota_transaction_finished:
+        gevent.sleep(1)
+    ota_transaction_finished = False
+
+    ret = global_node_manager.disseminate_software_module(border_router_id)
     log.info(ret)
-    ret = global_node_manager.activate_software_module(border_router_id, module_id)
+
+    # wait for event
+    while not ota_transaction_finished:
+        gevent.sleep(1)
+    ota_transaction_finished = False
+
+    ret = global_node_manager.install_software_module(border_router_id)
     log.info(ret)
+
+    # wait for event
+    while not ota_transaction_finished:
+        gevent.sleep(1)
+    ota_transaction_finished = False
+
+    ret = global_node_manager.activate_software_module(border_router_id)
+    log.info(ret)
+
+    # wait for event
+    while not ota_transaction_finished:
+        gevent.sleep(1)
+    ota_transaction_finished = False
+
     ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv')
     log.info(ret)
     ret = taisc_manager.update_macconfiguration({'IEEE802154_macSlotframeSize': len(contiki_nodes)})
     log.info(ret)
+
+    log.info("Activating server")
+    app_manager.update_configuration({"app_activate": 1}, server_node)
+    log.info("Activating clients")
+    app_manager.update_configuration({"app_activate": 2}, client_nodes)
 
 
 if __name__ == "__main__":

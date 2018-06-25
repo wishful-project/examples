@@ -1,6 +1,10 @@
+#!/bin/bash
+
 ELF_PROGRAM_FILE_NAME=$1
 FIRMWARE=$2
 INIT_FUNCTION=$3
+ROM_ADDR_HEX=$4
+RAM_ADDR_HEX=$5
 
 echo "Will link $ELF_PROGRAM_FILE_NAME with $FIRMWARE" 
 
@@ -18,14 +22,14 @@ do
     echo "PROVIDE(\"${UNDEFINED_SYMBOL_ARRAY[1]}\"=0x${UNDEFINED_SYMBOL_ADDR});" >> $ELF_PROGRAM_FILE_NAME.lds
 done
 
-DMM_RAM_ALIGNED_ADDR=`nm $FIRMWARE | grep dmm_ram_aligned | awk '{print $1;}'`
+# DMM_RAM_ALIGNED_ADDR=`nm $FIRMWARE | grep dmm_ram_aligned | awk '{print $1;}'`
 echo "ENTRY($INIT_FUNCTION)
 SECTIONS
 {
-    . = 0x00202074;
+    . = $ROM_ADDR_HEX;
     .text : { *(.text*) }
     .rodata : { *(.rodata*) }
-    . = 0x$DMM_RAM_ALIGNED_ADDR;
+    . = $RAM_ADDR_HEX;
     .data : ALIGN(4) { *(.data*) }
     .bss : ALIGN(4) { *(.bss*) }
 }" >> $ELF_PROGRAM_FILE_NAME.lds

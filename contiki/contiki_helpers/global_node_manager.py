@@ -175,6 +175,20 @@ class GlobalNodeManager(NodeManager):
                 ret[mac_address] = self.control_engine.blocking(True).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
         return ret
 
+    def execute_upi_function_async(self, upi_type, upi_fname, callback, mac_address_list=None, *args, **kwargs):
+        ret = {}
+        if mac_address_list is None:
+            mac_address_list = self.mac_address_list
+        if type(mac_address_list) is int:
+            mac_address_list = [mac_address_list]
+        for mac_address in mac_address_list:
+            if mac_address in self.mac_address_list:
+                node = self.mac_address_to_node_id[mac_address]
+                iface = self.mac_address_to_interface[mac_address]
+                self.control_engine._clear_call_context()
+                ret[mac_address] = self.control_engine.blocking(False).callback(callback).node(node).iface(iface).exec_cmd(upi_type=upi_type, fname=upi_fname, args=args, kwargs=kwargs)
+        return ret
+
     def schedule_upi_function(self, upi_type, upi_fname, exec_time, mac_address_list=None, callback=None, *args, **kwargs):
         ret = {}
         if mac_address_list is None:
@@ -204,18 +218,26 @@ class GlobalNodeManager(NodeManager):
     def stop(self):
         self.control_engine.stop()
 
-    def allocate_memory(self, mac_address, module_id, elf_file_size, rom_size, ram_size, nodes=[]):
-        ret = self.execute_upi_function('mgmt', 'allocate_memory', [mac_address], module_id, elf_file_size, rom_size, ram_size, nodes)
+    def prepare_ota_update(self, mac_address, nodes=[]):
+        ret = self.execute_upi_function('mgmt', 'prepare_ota_update', [mac_address], nodes)
         return ret[mac_address]
 
-    def disseminate_software_module(self, mac_address, module_id, elf_program_file, block_size=64, nodes=[]):
-        ret = self.execute_upi_function('mgmt', 'disseminate_software_module', [mac_address], module_id, elf_program_file, block_size, nodes)
+    def allocate_memory(self, mac_address, elf_file_size, rom_size, ram_size):
+        ret = self.execute_upi_function('mgmt', 'allocate_memory', [mac_address], elf_file_size, rom_size, ram_size)
         return ret[mac_address]
 
-    def install_software_module(self, mac_address, module_id, nodes=[]):
-        ret = self.execute_upi_function('mgmt', 'install_software_module', [mac_address], module_id, nodes)
+    def store_file(self, mac_address, is_last_block, block_size, block_offset, block_data):
+        ret = self.execute_upi_function('mgmt', 'store_file', [mac_address], is_last_block, block_size, block_offset, block_data)
         return ret[mac_address]
 
-    def activate_software_module(self, mac_address, module_id, nodes=[]):
-        ret = self.execute_upi_function('mgmt', 'activate_software_module', [mac_address], module_id, nodes)
+    def disseminate_software_module(self, mac_address):
+        ret = self.execute_upi_function('mgmt', 'disseminate_software_module', [mac_address])
+        return ret[mac_address]
+
+    def install_software_module(self, mac_address):
+        ret = self.execute_upi_function('mgmt', 'install_software_module', [mac_address])
+        return ret[mac_address]
+
+    def activate_software_module(self, mac_address):
+        ret = self.execute_upi_function('mgmt', 'activate_software_module', [mac_address])
         return ret[mac_address]

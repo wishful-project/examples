@@ -1,1 +1,2 @@
 "category","unique_name","unique_id","format","sub_format","endianness"
+"EVENT","gitar_mgmt_event",41979,"UINT8;INT8","","<"
