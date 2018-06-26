@@ -75,14 +75,14 @@ def calculate_elf_filesizes(elf_object_file):
             elf_sectionheaders_size += 40  # section header
             elf_shstrtab_size += 6  # shstrtab
             has_rom_program_header = True
-            print("found rom section size %u".format(text_size))
+            print("found rom section size {}".format(text_size))
         rodata_section = elffile.get_section_by_name('.rodata')
         if rodata_section is not None:
             rodata_size += rodata_section['sh_size']
             elf_sectionheaders_size += 40  # section header
             elf_shstrtab_size += 8  # shstrtab
             has_rom_program_header = True
-            print("found rodata section size %u".format(rodata_size))
+            print("found rodata section size {}".format(rodata_size))
         # determine ram size
         data_section = elffile.get_section_by_name('.data')
         if data_section is not None:
@@ -90,14 +90,14 @@ def calculate_elf_filesizes(elf_object_file):
             elf_sectionheaders_size += 40  # section header
             elf_shstrtab_size += 6  # shstrtab
             has_ram_program_header = True
-            print("found data section size %u".format(data_size))
+            print("found data section size {}".format(data_size))
         bss_section = elffile.get_section_by_name('.bss')
         if bss_section is not None:
             bss_size += bss_section['sh_size']
             elf_sectionheaders_size += 40  # section header
             elf_shstrtab_size += 5  # shstrtab
             has_ram_program_header = True
-            print("found bss section size %u".format(bss_size))
+            print("found bss section size {}".format(bss_size))
         if has_rom_program_header:
             elf_programheaders_size += 32
         if has_ram_program_header:
@@ -187,14 +187,19 @@ def store_file(global_node_manager, border_router_id, elf_program_file):
 
 
 def event_cb(mac_address, event_name, event_value):
-    measurement_logger.log_measurement(event_name, event_value)
+    global ota_transaction_finished
+    if event_name == "gitar_mgmt_event":
+        print("gitar mgmt event received {}".format(event_value))
+        ota_transaction_finished = True
+    elif event_name == "IEEE802154_event_macStats":
+        measurement_logger.log_measurement(event_name, event_value)
     # print("{} Node {} Event {}: {} ".format(datetime.datetime.now(), mac_address, event_name, event_value))
 
 
-def gitar_event_cb(mac_address, event_name, event_value):
-    global ota_transaction_finished
-    print("gitar mgmt event received {}".format(event_value))
-    ota_transaction_finished = True
+# def gitar_event_cb(mac_address, event_name, event_value):
+#     global ota_transaction_finished
+#     print("gitar mgmt event received {}".format(event_value))
+#     ota_transaction_finished = True
 
 
 def main(args, log, global_node_manager, measurement_logger):
@@ -221,13 +226,15 @@ def main(args, log, global_node_manager, measurement_logger):
     gevent.sleep(5)
     taisc_manager.subscribe_events(["IEEE802154_event_macStats"], event_cb, 0)
     gevent.sleep(5)
-    global_node_manager.subscribe_events(['gitar_mgmt_event'], gitar_event_cb, 0)
+    app_manager.subscribe_events(['gitar_mgmt_event'], event_cb, 0, [border_router_id])
 
     server_node = [border_router_id]
     client_nodes = []
     for mac_address in contiki_nodes:
         if mac_address != border_router_id:
             client_nodes.append(mac_address)
+
+    log.info("client nodes {}".format(client_nodes))
 
     # log.info("Activating server")
     # app_manager.update_configuration({"app_activate": 1}, server_node)
@@ -254,10 +261,7 @@ def main(args, log, global_node_manager, measurement_logger):
 
     store_file(global_node_manager, border_router_id, elf_program_file)
 
-    # wait for event
-    while not ota_transaction_finished:
-        gevent.sleep(1)
-    ota_transaction_finished = False
+    gevent.sleep(1)
 
     ret = global_node_manager.disseminate_software_module(border_router_id)
     log.info(ret)
@@ -283,6 +287,9 @@ def main(args, log, global_node_manager, measurement_logger):
         gevent.sleep(1)
     ota_transaction_finished = False
 
+    log.info("waiting for module to become active")
+    gevent.sleep(20)
+
     ret = taisc_manager.update_slotframe('./mac_switching/taisc_slotframe.csv')
     log.info(ret)
     ret = taisc_manager.update_macconfiguration({'IEEE802154_macSlotframeSize': len(contiki_nodes)})
@@ -292,6 +299,9 @@ def main(args, log, global_node_manager, measurement_logger):
     app_manager.update_configuration({"app_activate": 1}, server_node)
     log.info("Activating clients")
     app_manager.update_configuration({"app_activate": 2}, client_nodes)
+
+    while True:
+        gevent.sleep(1)
 
 
 if __name__ == "__main__":

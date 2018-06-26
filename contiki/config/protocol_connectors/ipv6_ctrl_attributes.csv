@@ -14,3 +14,4 @@
 "MEASUREMENT","app_stats",53022,"UINT32;UINT32;UINT32;UINT32","","<"
 "MEASUREMENT","nd6_num_neighbors",60907,"INT","","<"
 "EVENT","app_rx_event",58574,"UINT16;UINT16;UINT32;UINT32;UINT32;UINT16;UINT16;INT8;UINT8","","<"
+"EVENT","gitar_mgmt_event",41979,"UINT8;INT8","","<"
