@@ -236,17 +236,17 @@ def main(args, log, global_node_manager, measurement_logger):
 
     log.info("client nodes {}".format(client_nodes))
 
-    log.info("Configuring application")
-    app_manager.update_configuration({'app_send_interval': len(contiki_nodes)}, contiki_nodes)
-    log.info("Activating server")
-    app_manager.update_configuration({"app_activate": 1}, server_node)
-    log.info("Activating clients")
-    app_manager.update_configuration({"app_activate": 2}, client_nodes)
+    # log.info("Configuring application")
+    # app_manager.update_configuration({'app_send_interval': len(contiki_nodes)}, contiki_nodes)
+    # log.info("Activating server")
+    # app_manager.update_configuration({"app_activate": 1}, server_node)
+    # log.info("Activating clients")
+    # app_manager.update_configuration({"app_activate": 2}, client_nodes)
 
-    gevent.sleep(60)
+    # gevent.sleep(60)
 
-    log.info("Stopping activation for update")
-    app_manager.update_configuration({"app_activate": 0}, contiki_nodes)
+    # log.info("Stopping activation for update")
+    # app_manager.update_configuration({"app_activate": 0}, contiki_nodes)
 
 
     # log.info("Activating server")
