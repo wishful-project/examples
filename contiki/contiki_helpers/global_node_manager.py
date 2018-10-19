@@ -9,10 +9,17 @@ from contiki.contiki_helpers.node_manager import NodeManager
 
 class GlobalNodeManager(NodeManager):
 
-    def __init__(self, config):
+    def __init__(self, config=None, ip_address = "172.0.0.1", interface = "lo", group_name = "wishful_1234"):
         super(GlobalNodeManager, self).__init__("global")
-        self.control_engine = wishful_controller.Controller()
-        self.control_engine.load_config(config)
+        self.control_engine = wishful_controller.Controller(dl = "tcp://" + ip_address + ":8990", ul="tcp://" + ip_address + ":8989")
+        if config is not None:
+            self.control_engine.load_config(config)
+        else:
+            # downlink = "tcp://" + ip_address + ":8990"
+            # uplink = "tcp://" + ip_address + ":8989"
+            # print("downlink {} uplink {}".format(downlink,uplink))
+            self.control_engine.set_controller_info(name="ContikiGlobalController", info="ContikiGlobalController")
+            self.control_engine.add_module(moduleName="discovery", pyModuleName="wishful_module_discovery_pyre", className="PyreDiscoveryControllerModule", kwargs={"iface":interface, "groupName":group_name, "downlink":"tcp://" + ip_address + ":8990", "uplink":"tcp://" + ip_address + ":8989"})
         self.control_engine.nodeManager.add_new_node_callback(self.add_node)
         self.control_engine.nodeManager.add_node_exit_callback(self.remove_node)
         self.control_engine.start()
