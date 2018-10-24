@@ -30,7 +30,7 @@ import wishful_agent
 __author__ = "Maicon Kist"
 __copyright__ = "Copyright (c) 2017 Connect Centre - Trinity College Dublin" 
 __version__ = "0.1.0"
-__email__ = "kistm@tcd.ie"
+__email__ = "tallonj@tcd.ie"
 
 """
 Setting of agent node
