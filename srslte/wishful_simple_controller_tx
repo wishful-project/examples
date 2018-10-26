@@ -180,9 +180,9 @@ if __name__ == '__main__':
     # We can get several parameters at one by passing a list with the parameters that we want.
     # radio_get_parameters return a dict in the form of {'parameter1': value1, 'parameter2':value2}
     #vals = controller.node(node).radio.get_parameters(['center_freq', 'gain', 'samp_rate'])
-    vals = controller.node(nodes[0]).radio.get_parameters(['FREQ'])
+    vals = controller.node(nodes[0]).radio.get_parameters(['LTE_ENB_DL_FREQ'])
     # We are only interested in the center_frequency
-    initial_cf = vals['FREQ']
+    initial_cf = vals['LTE_ENB_DL_FREQ']
     print("Frequency is :",initial_cf)
 
     print('* Starting Main task block.')
@@ -203,11 +203,11 @@ if __name__ == '__main__':
     gevent.sleep(5)
     #print("About to change frequency\n")
    
-   # controller.node(nodes[0]).radio.set_parameters({'FREQ':600000000})
+   # controller.node(nodes[0]).radio.set_parameters({'LTE_UE_DL_FREQ':600000000})
 
     #gevent.sleep(30)
 
-    controller.node(nodes[0]).radio.set_parameters({'FREQ':600000000})
+    controller.node(nodes[0]).radio.set_parameters({'LTE_ENB_DL_FREQ':600000000})
 
     #vals2 = controller.node(nodes[0]).radio.get_parameters(['FREQ'])
 
@@ -220,15 +220,15 @@ if __name__ == '__main__':
     # Keep in mind that the agents are still running.
     gevent.sleep(5)
 
-    controller.node(nodes[0]).radio.set_parameters({'FREQ':806000000})
+    controller.node(nodes[0]).radio.set_parameters({'LTE_ENB_DL_FREQ':806000000})
 
     gevent.sleep(5)
 
-    controller.node(nodes[0]).radio.set_parameters({'FREQ':600000000})
+    controller.node(nodes[0]).radio.set_parameters({'LTE_ENB_DL_FREQ':600000000})
 
     gevent.sleep(5)
 
-    controller.node(nodes[0]).radio.set_parameters({'FREQ':600000000})
+    controller.node(nodes[0]).radio.set_parameters({'LTE_ENB_DL_FREQ':600000000})
 
     gevent.sleep(5)
 

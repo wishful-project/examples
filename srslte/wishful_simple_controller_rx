@@ -164,7 +164,7 @@ if __name__ == '__main__':
     if running is 0:
         print('\t- Starting program at RX Agent')
         controller.node(nodes[0]).radio.set_parameters({'IS_UE':True})
-        controller.node(nodes[0]).radio.set_parameters({'FREQ':600000000})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_DL_FREQ':2410000000})
 
         controller.node(nodes[0]).radio.activate_radio_program('UE')
 
@@ -178,9 +178,9 @@ if __name__ == '__main__':
     # We can get several parameters at one by passing a list with the parameters that we want.
     # radio_get_parameters return a dict in the form of {'parameter1': value1, 'parameter2':value2}
     #vals = controller.node(node).radio.get_parameters(['center_freq', 'gain', 'samp_rate'])
-    vals = controller.node(nodes[0]).radio.get_parameters(['FREQ'])
+    vals = controller.node(nodes[0]).radio.get_parameters(['LTE_UE_DL_FREQ'])
     # We are only interested in the center_frequency
-    initial_cf = vals['FREQ']
+    initial_cf = vals['LTE_UE_DL_FREQ']
     print("Frequency is :",initial_cf)
 
     print('* Starting Main task block.')

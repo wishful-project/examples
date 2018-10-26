@@ -144,13 +144,13 @@ if __name__ == '__main__':
 
         print('\t- Starting program at TX Agent')
         controller.node(nodes[1]).radio.set_parameters({'IS_UE':False})
-        controller.node(nodes[1]).radio.set_parameters({'FREQ': 2410000000})
-        controller.node(nodes[1]).radio.set_parameters({'RF_AMP': 0.8})
-        controller.node(nodes[1]).radio.set_parameters({'GAIN': 20})
-        #controller.node(nodes[1]).radio.set_parameters({'NO_OF_FRAMES': 100000})
-        controller.node(nodes[1]).radio.set_parameters({'NO_OF_PRBS': 25})
-        controller.node(nodes[1]).radio.set_parameters({'WHICH_PRBS': 0xFFFF})
-        controller.node(nodes[1]).radio.set_parameters({'MCS': 1})
+        controller.node(nodes[1]).radio.set_parameters({'LTE_ENB_DL_FREQ': 2410000000})
+        controller.node(nodes[1]).radio.set_parameters({'LTE_ENB_RF_AMP': 0.8})
+        controller.node(nodes[1]).radio.set_parameters({'LTE_ENB_TX_GAIN': 20})
+        #controller.node(nodes[1]).radio.set_parameters({'LTE_ENB_NO_OF_FRAMES': 100000})
+        controller.node(nodes[1]).radio.set_parameters({'LTE_ENB_DL_BW': 25})
+        controller.node(nodes[1]).radio.set_parameters({'LTE_ENB_WHICH_PRBS': 0xFFFF})
+        controller.node(nodes[1]).radio.set_parameters({'LTE_ENB_MCS': 1})
         # set any static  parameters needed to be set here for the ENB
         controller.node(nodes[1]).radio.activate_radio_program('ENB')
     else:
@@ -164,16 +164,15 @@ if __name__ == '__main__':
 
         # set any static  parameters needed to be set here for the UE
         controller.node(nodes[0]).radio.set_parameters({'IS_UE':True})
-        controller.node(nodes[0]).radio.set_parameters({'FREQ': 2410000000})
-        controller.node(nodes[0]).radio.set_parameters({'GAIN': 30})
-        controller.node(nodes[0]).radio.set_parameters({'NO_OF_ANTENNAS': 1})
-        controller.node(nodes[0]).radio.set_parameters({'EQUALIZER_MODE': 'mmse'})
-        controller.node(nodes[0]).radio.set_parameters({'MAX_TURBO_ITS': 3})
-        controller.node(nodes[0]).radio.set_parameters({'NOISE_EST_ALG': 0})
-        controller.node(nodes[0]).radio.set_parameters({'MAX_TURBO_ITS': 3})
-        controller.node(nodes[0]).radio.set_parameters({'SSS_ALGORITHM': 1})
-        controller.node(nodes[0]).radio.set_parameters({'SNR_EMA_COEFF': 0.1})
-        controller.node(nodes[0]).radio.set_parameters({'CFO_TOL': 50})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_DL_FREQ': 2410000000})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_RX_GAIN': 30})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_N_RX_ANT': 1})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_EQUALIZER_MODE': 'mmse'})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_MAX_TURBO_ITS': 3})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_NOISE_EST_ALG': 0})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_SSS_ALGORITHM': 1})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_SNR_EMA_COEFF': 0.1})
+        controller.node(nodes[0]).radio.set_parameters({'LTE_UE_CFO_TOL': 50})
         #now that our parameters are set we can start our radio, these parameters have default values so they do not HAVE to be set
         controller.node(nodes[0]).radio.activate_radio_program('UE')
     else:
@@ -183,11 +182,11 @@ if __name__ == '__main__':
 
 
     # the following logic ensures the transmitter and receiver are on the same frequency
-    vals = controller.node(nodes[0]).radio.get_parameters(['FREQ'])
+    vals = controller.node(nodes[0]).radio.get_parameters(['LTE_UE_DL_FREQ'])
 
     initial_cf_ue = vals['FREQ']
 
-    vals = controller.node(nodes[1]).radio.get_parameters(['FREQ'])
+    vals = controller.node(nodes[1]).radio.get_parameters(['LTE_ENB_DL_FREQ'])
     initial_cf_enb = vals['FREQ']
     if initial_cf_enb != initial_cf_ue:
         controller.node(nodes[0]).radio.set_parameters({'FREQ': initial_cf_enb})
@@ -201,7 +200,7 @@ if __name__ == '__main__':
     print ('\t snr is \n', snr)
     gevent.sleep(2)
     if snr < 10:
-        controller.node(nodes[1]).radio.set_parameters({'GAIN': 20})
+        controller.node(nodes[1]).radio.set_parameters({'LTE_ENB_TX_GAIN': 20})
 
 
     gevent.sleep(5)
@@ -210,9 +209,9 @@ if __name__ == '__main__':
     print ('\t pdsch_miss is \n',pdsch_miss)
     gevent.sleep(2)
     if pdsch_miss < 5:
-        param = controller.node(nodes[1]).radio.get_parameters(['MCS'])
+        param = controller.node(nodes[1]).radio.get_parameters(['LTE_ENB_MCS'])
         mcs = param['MCS']
-        controller.node(nodes[1]).radio.set_parameters({'MCS': mcs + 2})
+        controller.node(nodes[1]).radio.set_parameters({'LTE_ENB_MCS': mcs + 2})
 
     gevent.sleep(30)
 
