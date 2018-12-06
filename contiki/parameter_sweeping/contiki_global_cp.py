@@ -47,11 +47,11 @@ def main(args, log, global_node_manager, border_router_id):
     contiki_nodes = global_node_manager.get_mac_address_list()
     print("Connected nodes", [str(node) for node in contiki_nodes])
     taisc_manager = TAISCMACManager(global_node_manager, "CSMA")
-    app_manager = AppManager(global_node_manager)
+    # app_manager = AppManager(global_node_manager)
 
     server_node = [border_router_id]
     log.info("Set node %d as border router" % (border_router_id))
-    app_manager.rpl_set_border_router([0xfd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01], border_router_id)
+    # app_manager.rpl_set_border_router([0xfd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01], border_router_id)
 
     client_nodes = []
     for mac_address in contiki_nodes:
@@ -62,20 +62,24 @@ def main(args, log, global_node_manager, border_router_id):
     tx_power_settings = [0xF5, 0xE5, 0xD5, 0xC5, 0xB5, 0xA5, 0x95, 0x85, 0x75, 0x65, 0x55, 0x45, 0x35, 0x25, 0x15, 0x05]
     tx_power_settings_mapping = {0xF5: 4.5, 0xE5: 2.5, 0xD5: 1, 0xC5 :-0.5, 0xB5: -1.5, 0xA5: -3, 0x95: -4, 0x85: -6, 0x75: -8, 0x65:-10, 0x55:-12, 0x45:-14, 0x35:-16, 0x25:-18, 0x15:-20, 0x05:-22}
 
-    log.info("Activating server")
-    app_manager.update_configuration({"app_activate": 1}, server_node)
-    log.info("Activating clients")
-    app_manager.update_configuration({"app_activate": 2}, client_nodes)
-    app_manager.update_configuration({"app_send_interval":128}, client_nodes)
+    log.info("Activating nodes")
+    # app_manager.update_configuration({"app_activate": 1}, server_node)
+    taisc_manager.update_macconfiguration({"TAISC_PG_ACTIVE": 1})
+    # log.info("Activating clients")
+    # app_manager.update_configuration({"app_activate": 2}, client_nodes)
+    # app_manager.update_configuration({"app_send_interval":128}, client_nodes)
 
     for tx_power_setting in tx_power_settings:
         # configuring RADIO
         log.info("Setting TX power to {} dBm".format(tx_power_settings_mapping[tx_power_setting]))
-        taisc_manager.update_macconfiguration({"IEEE802154_phyTXPower": tx_power_setting})
+        ret = taisc_manager.update_macconfiguration({"IEEE802154_phyTXPower": tx_power_setting})
+        print(ret)
+        ret = taisc_manager.get_measurements(["IEEE802154_measurement_macStats"])
+        print(ret)
         gevent.sleep(5)
 
     log.info("Stopping application")
-    app_manager.update_configuration({"app_activate": 0})
+    taisc_manager.update_macconfiguration({"TAISC_PG_ACTIVE": 0})
 
 if __name__ == "__main__":
     try:

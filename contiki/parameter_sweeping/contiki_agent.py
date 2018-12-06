@@ -33,6 +33,7 @@ def main(args):
 
     discovery_interface = args['--discovery-interface']
     lowpan_interfaces = args['--lowpan-interfaces'].strip(";").split(";")
+    print("interfaces {}".format(lowpan_interfaces))
 
     control_agent.set_agent_info(name="ContikiAgent", info="ContikiAgent", iface=discovery_interface)
 
